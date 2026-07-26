@@ -306,9 +306,10 @@
             cursor: pointer; font-size: 22px; font-weight: bold;
         }
 
+        /* Payment Section Improvements */
         .payment-section {
             margin-top: 15px;
-            padding: 10px;
+            padding: 12px;
             background: #f8f9fa;
             border: 1px dashed #2874f0;
             border-radius: 6px;
@@ -316,9 +317,32 @@
         }
 
         .qr-container { display: none; text-align: center; margin-top: 10px; }
-        .qr-container img { width: 180px; height: 180px; border: 1px solid #ddd; padding: 5px; border-radius: 6px; }
+        .qr-container img { width: 170px; height: 170px; border: 1px solid #ddd; padding: 5px; border-radius: 6px; }
 
-        /* Order Tracking UI Styles */
+        .direct-pay-btn {
+            display: block;
+            background: #2874f0;
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 13px;
+            margin: 10px 0;
+            transition: background 0.2s;
+        }
+        .direct-pay-btn:hover { background: #1a5ac7; }
+
+        .upi-id-box {
+            background: #eef4fe;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 8px;
+            word-break: break-all;
+        }
+
+        /* Order Tracking Styles */
         .track-search-box {
             display: flex;
             gap: 10px;
@@ -426,9 +450,17 @@
                     </select>
 
                     <div class="qr-container" id="qrContainer">
-                        <p style="font-size: 12px; margin-top:8px; color: #555;">GPay / PhonePe / Paytm se QR Scan karke Pay karein:</p>
+                        <!-- Direct App Launch Button for Mobile -->
+                        <a id="directUpiBtn" href="#" class="direct-pay-btn">📲 Tap to Pay with UPI App</a>
+                        
+                        <p style="font-size: 12px; color: #555;">Ya Dusre Mobile se QR Scan karein:</p>
                         <img id="upiQrImg" src="" alt="UPI QR Code">
-                        <input type="text" id="txnId" placeholder="UPI Transaction ID / Ref No. (Optional)">
+                        
+                        <div class="upi-id-box">
+                            UPI ID: <strong id="merchantUpiText">9771556448@ybl</strong>
+                        </div>
+
+                        <input type="text" id="txnId" placeholder="UPI Transaction ID / Ref No. (Optional)" style="margin-top:10px;">
                     </div>
                 </div>
 
@@ -453,7 +485,6 @@
                 <p style="margin-top:4px;"><strong>Total Amount:</strong> ₹<span id="resAmount"></span></p>
                 <p style="margin-top:4px; font-size:12px; color:#666;"><strong>Items:</strong> <span id="resItems"></span></p>
                 
-                <!-- Timeline Progress Bar -->
                 <div class="order-status-timeline">
                     <div class="status-step" id="step-placed">
                         <div class="status-icon">✓</div>
@@ -496,7 +527,8 @@
         const db = getFirestore(app);
 
         const myWhatsAppNumber = "919771556448";
-        const myUpiId = "kanhaiyakumar462@nyas";
+        // APNI WORKING PhonePe/GPay UPI ID YAHAN BADLEIN:
+        const myUpiId = "kanhaiyakumar462@nyes"; 
 
         const products = [
             { id: 1, title: "Wireless Bluetooth Headphones", price: 1299, originalPrice: 2999, discount: "56% off", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500" },
@@ -533,7 +565,6 @@
             });
         }
 
-        // Global functions for onclick events
         window.searchProducts = function() {
             const query = document.getElementById('search-input').value.toLowerCase();
             const filtered = products.filter(p => p.title.toLowerCase().includes(query));
@@ -585,8 +616,16 @@
 
             if (method === 'UPI') {
                 qrContainer.style.display = 'block';
-                const upiUrl = `upi://pay?pa=${myUpiId}&pn=Jaynagar%20Store&am=${totalAmount}&cu=INR`;
-                document.getElementById('upiQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+                document.getElementById('merchantUpiText').innerText = myUpiId;
+                
+                // Formatted UPI Deep Link URI
+                const upiString = `upi://pay?pa=${myUpiId}&pn=JaynagarStore&am=${totalAmount}&cu=INR&tn=OrderPayment`;
+                
+                // Set Direct Button Link
+                document.getElementById('directUpiBtn').href = upiString;
+
+                // QR Code Image API
+                document.getElementById('upiQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiString)}`;
             } else {
                 qrContainer.style.display = 'none';
             }
@@ -617,12 +656,11 @@
             document.getElementById('cart-total').innerText = total;
         }
 
-        // Generate Random Order ID
         function generateOrderId() {
             return 'JS-' + Math.floor(100000 + Math.random() * 900000);
         }
 
-        // Submit Order Logic
+        // Submit Order
         document.getElementById('orderForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (cart.length === 0) return;
@@ -642,7 +680,6 @@
             submitBtn.disabled = true;
 
             try {
-                // 1. Firebase Firestore Data Save
                 await addDoc(collection(db, "orders"), {
                     orderId: orderId,
                     customerName: name,
@@ -652,15 +689,14 @@
                     transactionId: txnId,
                     items: cart,
                     totalAmount: totalAmount,
-                    status: "Placed", // Default initial status
+                    status: "Placed",
                     orderDate: new Date()
                 });
 
-                // 2. WhatsApp Notification URL
                 const message = `*Naya Order Aaya Hai!*%0A%0A*Order ID:* ${orderId}%0A*Naam:* ${encodeURIComponent(name)}%0A*Mobile:* ${encodeURIComponent(phone)}%0A*Address:* ${encodeURIComponent(address)}%0A%0A*Items:* ${encodeURIComponent(productDetailsList)}%0A*Total Price:* ₹${totalAmount}%0A%0A*Payment Method:* ${paymentMethod}%0A*Txn ID:* ${encodeURIComponent(txnId)}`;
                 const whatsappUrl = `https://wa.me/${myWhatsAppNumber}?text=${message}`;
 
-                alert(`Order Successful!\n\nAapka Order ID hai: ${orderId}\nKripya is Order ID ko note kar lein tracking ke liye.`);
+                alert(`Order Successful!\n\nAapka Order ID hai: ${orderId}\nTracking ke liye yeh ID saved rakhein.`);
                 
                 cart = [];
                 updateCartUI();
@@ -679,7 +715,7 @@
             }
         });
 
-        // Track Order Logic (Fetch from Firebase)
+        // Track Order
         window.fetchOrderDetails = async function() {
             const inputId = document.getElementById('trackOrderIdInput').value.trim();
             const resultBox = document.getElementById('orderResult');
@@ -698,7 +734,7 @@
                 const querySnapshot = await getDocs(q);
 
                 if (querySnapshot.empty) {
-                    errorBox.innerText = "Koi order nahi mila. Kripya sahi Order ID check karein.";
+                    errorBox.innerText = "Order nahi mila. Correct Order ID check karein.";
                     errorBox.style.display = 'block';
                     return;
                 }
@@ -710,14 +746,13 @@
                     document.getElementById('resAmount').innerText = data.totalAmount;
                     document.getElementById('resItems').innerText = data.items.map(i => i.title).join(', ');
 
-                    // Update Stepper Progress UI
                     updateStatusProgress(data.status || "Placed");
                     resultBox.style.display = 'block';
                 });
 
             } catch (err) {
                 console.error("Tracking Error: ", err);
-                errorBox.innerText = "Order status lane me samasya aayi.";
+                errorBox.innerText = "Tracking error aaya.";
                 errorBox.style.display = 'block';
             }
         };
