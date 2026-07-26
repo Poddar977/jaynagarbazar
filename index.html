@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jaynagar Store</title>
+    <title>Jaynagar Store E-Commerce</title>
     <style>
         /* Base Styles */
         * {
@@ -18,7 +18,7 @@
             color: #333;
         }
 
-        /* Header / Navbar (Flipkart Style) */
+        /* Header / Navbar */
         header {
             background-color: #2874f0;
             color: white;
@@ -41,7 +41,7 @@
 
         .search-container {
             display: flex;
-            width: 40%;
+            width: 35%;
         }
 
         .search-container input {
@@ -53,17 +53,22 @@
             font-size: 14px;
         }
 
-        .cart-btn {
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .track-nav-btn, .cart-btn {
             background-color: #fff;
             color: #2874f0;
             border: none;
-            padding: 8px 20px;
+            padding: 8px 15px;
             font-weight: bold;
             border-radius: 2px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .cart-badge {
@@ -88,7 +93,7 @@
             margin-bottom: 8px;
         }
 
-        /* Main Layout */
+        /* Main Container */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -108,7 +113,6 @@
             gap: 15px;
         }
 
-        /* Product Card */
         .product-card {
             background-color: white;
             border-radius: 4px;
@@ -180,7 +184,7 @@
             background-color: #fb641b;
         }
 
-        /* Cart Modal Sidebar */
+        /* Cart Sidebar */
         .cart-modal {
             position: fixed;
             top: 0;
@@ -195,9 +199,7 @@
             flex-direction: column;
         }
 
-        .cart-modal.open {
-            right: 0;
-        }
+        .cart-modal.open { right: 0; }
 
         .cart-header {
             background-color: #2874f0;
@@ -240,18 +242,13 @@
             margin-top: 10px;
         }
 
-        .close-cart {
-            cursor: pointer;
-            font-size: 20px;
-        }
+        .close-cart { cursor: pointer; font-size: 20px; }
 
-        /* Customer Checkout Modal overlay */
-        .checkout-modal-overlay {
+        /* Checkout & Tracking Modal Overlay */
+        .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(0,0,0,0.5);
             display: none;
             justify-content: center;
@@ -259,27 +256,27 @@
             z-index: 300;
         }
 
-        .checkout-modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
-        .checkout-box {
+        .modal-box {
             background: white;
             padding: 25px;
             border-radius: 8px;
             width: 90%;
-            max-width: 400px;
+            max-width: 450px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
-        .checkout-box h2 {
+        .modal-box h2 {
             margin-bottom: 15px;
             font-size: 20px;
             color: #2874f0;
         }
 
-        .checkout-box input, .checkout-box textarea {
+        .modal-box input, .modal-box textarea, .modal-box select {
             width: 100%;
             margin-top: 10px;
             padding: 10px;
@@ -287,9 +284,10 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             outline: none;
+            font-size: 14px;
         }
 
-        .checkout-box button {
+        .modal-box button.btn-submit {
             background: #ff9f00;
             color: white;
             border: none;
@@ -301,18 +299,72 @@
             border-radius: 4px;
         }
 
-        .checkout-box button:hover {
-            background: #fb641b;
+        .modal-box button.btn-submit:hover { background: #fb641b; }
+
+        .close-modal {
+            position: absolute; right: 15px; top: 15px;
+            cursor: pointer; font-size: 22px; font-weight: bold;
         }
 
-        .close-checkout {
-            position: absolute;
-            right: 15px;
-            top: 15px;
-            cursor: pointer;
-            font-size: 22px;
-            font-weight: bold;
+        .payment-section {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border: 1px dashed #2874f0;
+            border-radius: 6px;
+            text-align: center;
         }
+
+        .qr-container { display: none; text-align: center; margin-top: 10px; }
+        .qr-container img { width: 180px; height: 180px; border: 1px solid #ddd; padding: 5px; border-radius: 6px; }
+
+        /* Order Tracking UI Styles */
+        .track-search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .track-search-box input { margin-top: 0; flex: 1; }
+        .track-search-box button {
+            background: #2874f0; color: white; border: none; padding: 0 15px;
+            border-radius: 4px; cursor: pointer; font-weight: bold;
+        }
+
+        .order-result { display: none; background: #f9f9f9; padding: 15px; border-radius: 6px; border: 1px solid #eee; }
+        .order-status-timeline {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+        .order-status-timeline::before {
+            content: '';
+            position: absolute;
+            top: 12px; left: 10%; right: 10%;
+            height: 3px;
+            background: #ddd;
+            z-index: 1;
+        }
+        .status-step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
+        }
+        .status-icon {
+            width: 25px; height: 25px;
+            border-radius: 50%;
+            background: #ccc;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 5px;
+            font-size: 12px;
+        }
+        .status-step.active .status-icon { background: #388e3c; }
+        .status-label { font-size: 11px; color: #666; font-weight: 600; }
+        .status-step.active .status-label { color: #388e3c; }
     </style>
 </head>
 <body>
@@ -323,9 +375,12 @@
         <div class="search-container">
             <input type="text" id="search-input" placeholder="Products search karein..." onkeyup="searchProducts()">
         </div>
-        <button class="cart-btn" onclick="toggleCart()">
-            🛒 Cart <span class="cart-badge" id="cart-count">0</span>
-        </button>
+        <div class="nav-actions">
+            <button class="track-nav-btn" onclick="openTrackModal()">📦 Track Order</button>
+            <button class="cart-btn" onclick="toggleCart()">
+                🛒 Cart <span class="cart-badge" id="cart-count">0</span>
+            </button>
+        </div>
     </header>
 
     <!-- Banner -->
@@ -337,9 +392,7 @@
     <!-- Main Content -->
     <div class="container">
         <h2 class="section-title">Featured Products</h2>
-        <div class="product-grid" id="product-grid">
-            <!-- Dynamic Products Loading -->
-        </div>
+        <div class="product-grid" id="product-grid"></div>
     </div>
 
     <!-- Cart Sidebar -->
@@ -348,9 +401,7 @@
             <h3>Your Shopping Cart</h3>
             <span class="close-cart" onclick="toggleCart()">&times;</span>
         </div>
-        <div class="cart-items" id="cart-items">
-            <p>Cart abhi khali hai.</p>
-        </div>
+        <div class="cart-items" id="cart-items"><p>Cart abhi khali hai.</p></div>
         <div class="cart-footer">
             <h4>Total Amount: ₹<span id="cart-total">0</span></h4>
             <button class="checkout-btn" onclick="openCheckoutModal()">PLACE ORDER</button>
@@ -358,23 +409,78 @@
     </div>
 
     <!-- Checkout Modal Form -->
-    <div class="checkout-modal-overlay" id="checkout-overlay">
-        <div class="checkout-box">
-            <span class="close-checkout" onclick="closeCheckoutModal()">&times;</span>
-            <h2>Customer Details</h2>
+    <div class="modal-overlay" id="checkout-overlay">
+        <div class="modal-box">
+            <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
+            <h2>Checkout Details</h2>
             <form id="orderForm">
                 <input type="text" id="custName" placeholder="Aapka Naam (Customer Name)" required>
                 <input type="tel" id="custPhone" placeholder="Mobile Number" required>
-                <textarea id="custAddress" placeholder="Pura Address" rows="3" required></textarea>
-                <button type="submit" id="submitOrderBtn">Order Place Karein</button>
+                <textarea id="custAddress" placeholder="Pura Address" rows="2" required></textarea>
+                
+                <div class="payment-section">
+                    <label style="font-weight: bold; font-size: 14px;">Select Payment Method:</label>
+                    <select id="paymentMethod" onchange="handlePaymentChange()" required>
+                        <option value="UPI">Pay via UPI / QR Code (GPay, PhonePe, Paytm)</option>
+                        <option value="COD">Cash on Delivery (COD)</option>
+                    </select>
+
+                    <div class="qr-container" id="qrContainer">
+                        <p style="font-size: 12px; margin-top:8px; color: #555;">GPay / PhonePe / Paytm se QR Scan karke Pay karein:</p>
+                        <img id="upiQrImg" src="" alt="UPI QR Code">
+                        <input type="text" id="txnId" placeholder="UPI Transaction ID / Ref No. (Optional)">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitOrderBtn">Order Place Karein</button>
             </form>
         </div>
     </div>
 
-    <!-- Combined Script for Firebase Module & App Functionality -->
+    <!-- Order Tracking Modal -->
+    <div class="modal-overlay" id="tracking-overlay">
+        <div class="modal-box">
+            <span class="close-modal" onclick="closeTrackModal()">&times;</span>
+            <h2>Track Your Order</h2>
+            <div class="track-search-box">
+                <input type="text" id="trackOrderIdInput" placeholder="Enter Order ID (e.g. JS-123456)">
+                <button onclick="fetchOrderDetails()">Track</button>
+            </div>
+
+            <div class="order-result" id="orderResult">
+                <p><strong>Order ID:</strong> <span id="resOrderId"></span></p>
+                <p><strong>Customer Name:</strong> <span id="resName"></span></p>
+                <p style="margin-top:4px;"><strong>Total Amount:</strong> ₹<span id="resAmount"></span></p>
+                <p style="margin-top:4px; font-size:12px; color:#666;"><strong>Items:</strong> <span id="resItems"></span></p>
+                
+                <!-- Timeline Progress Bar -->
+                <div class="order-status-timeline">
+                    <div class="status-step" id="step-placed">
+                        <div class="status-icon">✓</div>
+                        <div class="status-label">Placed</div>
+                    </div>
+                    <div class="status-step" id="step-processing">
+                        <div class="status-icon">⚙</div>
+                        <div class="status-label">Processing</div>
+                    </div>
+                    <div class="status-step" id="step-shipped">
+                        <div class="status-icon">🚚</div>
+                        <div class="status-label">Shipped</div>
+                    </div>
+                    <div class="status-step" id="step-delivered">
+                        <div class="status-icon">📦</div>
+                        <div class="status-label">Delivered</div>
+                    </div>
+                </div>
+            </div>
+            <p id="trackError" style="color:red; display:none; font-size:13px; margin-top:10px;"></p>
+        </div>
+    </div>
+
+    <!-- Firebase & JS Modules -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
         // Firebase Config
         const firebaseConfig = {
@@ -389,81 +495,28 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // WhatsApp Mobile Number
         const myWhatsAppNumber = "919771556448";
+        const myUpiId = "kanhaiyakumar462@nyas";
 
-        // Products List
         const products = [
-            {
-                id: 1,
-                title: "Wireless Bluetooth Headphones",
-                price: 1299,
-                originalPrice: 2999,
-                discount: "56% off",
-                image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500"
-            },
-            {
-                id: 2,
-                title: "Smart Fitness Watch",
-                price: 1999,
-                originalPrice: 4999,
-                discount: "60% off",
-                image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500"
-            },
-            {
-                id: 3,
-                title: "Ergonomic Gaming Mouse",
-                price: 699,
-                originalPrice: 1499,
-                discount: "53% off",
-                image: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500"
-            },
-            {
-                id: 4,
-                title: "Casual Running Shoes",
-                price: 1499,
-                originalPrice: 2499,
-                discount: "40% off",
-                image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500"
-            },
-            {
-                id: 5,
-                title: "GLOW & LOVELY cream 50g",
-                price: 130,
-                originalPrice: 145,
-                discount : "15% off",
-                image: "https://images.apollo247.in/pub/media/catalog/product/8/9/8909106030527.01_1.png"
-            },
-            {
-                id: 6,
-                title: "VICCO cream 30g",
-                price: 130,
-                originalPrice: 150,
-                discount : "20% off",
-                image: "https://viccolabs.com/cdn/shop/files/4thImage_5230160b-7e36-4ab1-9cb4-f97219a86005.png?crop=center&height=3001&v=1744293315&width=3001"
-            },
-            {
-                id: 7,
-                title: "Pond's cream 23g",
-                price: 90,
-                originalPrice: 105,
-                discount : "15% off",
-                image: "https://ushopbd.com/cdn/shop/files/Ponds23lC.jpg?v=1748265912"
-            }
+            { id: 1, title: "Wireless Bluetooth Headphones", price: 1299, originalPrice: 2999, discount: "56% off", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500" },
+            { id: 2, title: "Smart Fitness Watch", price: 1999, originalPrice: 4999, discount: "60% off", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500" },
+            { id: 3, title: "Ergonomic Gaming Mouse", price: 699, originalPrice: 1499, discount: "53% off", image: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500" },
+            { id: 4, title: "Casual Running Shoes", price: 1499, originalPrice: 2499, discount: "40% off", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500" },
+            { id: 5, title: "GLOW & LOVELY cream 50g", price: 130, originalPrice: 145, discount: "15% off", image: "https://images.apollo247.in/pub/media/catalog/product/8/9/8909106030527.01_1.png" },
+            { id: 6, title: "VICCO cream 30g", price: 130, originalPrice: 150, discount: "20% off", image: "https://viccolabs.com/cdn/shop/files/4thImage_5230160b-7e36-4ab1-9cb4-f97219a86005.png?crop=center&height=3001&v=1744293315&width=3001" },
+            { id: 7, title: "Pond's cream 23g", price: 90, originalPrice: 105, discount: "15% off", image: "https://ushopbd.com/cdn/shop/files/Ponds23lC.jpg?v=1748265912" }
         ];
 
         let cart = [];
 
-        // Display Products
         function renderProducts(items) {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
-            
             if (items.length === 0) {
                 grid.innerHTML = '<p>Koi product nahi mila.</p>';
                 return;
             }
-
             items.forEach(product => {
                 grid.innerHTML += `
                     <div class="product-card">
@@ -480,7 +533,7 @@
             });
         }
 
-        // Window scope functions for onclick HTML attributes
+        // Global functions for onclick events
         window.searchProducts = function() {
             const query = document.getElementById('search-input').value.toLowerCase();
             const filtered = products.filter(p => p.title.toLowerCase().includes(query));
@@ -508,25 +561,47 @@
                 return;
             }
             document.getElementById('checkout-overlay').classList.add('active');
+            handlePaymentChange();
         };
 
         window.closeCheckoutModal = function() {
             document.getElementById('checkout-overlay').classList.remove('active');
         };
 
+        window.openTrackModal = function() {
+            document.getElementById('tracking-overlay').classList.add('active');
+        };
+
+        window.closeTrackModal = function() {
+            document.getElementById('tracking-overlay').classList.remove('active');
+            document.getElementById('orderResult').style.display = 'none';
+            document.getElementById('trackError').style.display = 'none';
+        };
+
+        window.handlePaymentChange = function() {
+            const method = document.getElementById('paymentMethod').value;
+            const qrContainer = document.getElementById('qrContainer');
+            const totalAmount = document.getElementById('cart-total').innerText;
+
+            if (method === 'UPI') {
+                qrContainer.style.display = 'block';
+                const upiUrl = `upi://pay?pa=${myUpiId}&pn=Jaynagar%20Store&am=${totalAmount}&cu=INR`;
+                document.getElementById('upiQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+            } else {
+                qrContainer.style.display = 'none';
+            }
+        };
+
         function updateCartUI() {
             document.getElementById('cart-count').innerText = cart.length;
             const cartItemsContainer = document.getElementById('cart-items');
-            
             if (cart.length === 0) {
                 cartItemsContainer.innerHTML = '<p>Cart abhi khali hai.</p>';
                 document.getElementById('cart-total').innerText = '0';
                 return;
             }
-
             cartItemsContainer.innerHTML = '';
             let total = 0;
-
             cart.forEach((item, index) => {
                 total += item.price;
                 cartItemsContainer.innerHTML += `
@@ -539,24 +614,27 @@
                     </div>
                 `;
             });
-
             document.getElementById('cart-total').innerText = total;
+        }
+
+        // Generate Random Order ID
+        function generateOrderId() {
+            return 'JS-' + Math.floor(100000 + Math.random() * 900000);
         }
 
         // Submit Order Logic
         document.getElementById('orderForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            if (cart.length === 0) {
-                alert("Cart khali hai! Pehle product add karein.");
-                return;
-            }
+            if (cart.length === 0) return;
 
             const name = document.getElementById('custName').value;
             const phone = document.getElementById('custPhone').value;
             const address = document.getElementById('custAddress').value;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            const txnId = document.getElementById('txnId').value || "N/A";
+            const orderId = generateOrderId();
 
-            let productDetailsList = cart.map(item => `${item.title} (₹${item.price})`).join(', ');
+            let productDetailsList = cart.map(item => item.title).join(', ');
             let totalAmount = document.getElementById('cart-total').innerText;
 
             const submitBtn = document.getElementById('submitOrderBtn');
@@ -564,42 +642,101 @@
             submitBtn.disabled = true;
 
             try {
-                // 1. Firebase Firestore database me Order Save karna
+                // 1. Firebase Firestore Data Save
                 await addDoc(collection(db, "orders"), {
+                    orderId: orderId,
                     customerName: name,
                     customerPhone: phone,
                     customerAddress: address,
+                    paymentMethod: paymentMethod,
+                    transactionId: txnId,
                     items: cart,
                     totalAmount: totalAmount,
+                    status: "Placed", // Default initial status
                     orderDate: new Date()
                 });
 
-                // 2. Direct WhatsApp Message URL
-                const message = `*Naya Order Aaya Hai!*%0A%0A*Naam:* ${encodeURIComponent(name)}%0A*Mobile:* ${encodeURIComponent(phone)}%0A*Address:* ${encodeURIComponent(address)}%0A%0A*Items:* ${encodeURIComponent(productDetailsList)}%0A*Total Price:* ₹${totalAmount}`;
+                // 2. WhatsApp Notification URL
+                const message = `*Naya Order Aaya Hai!*%0A%0A*Order ID:* ${orderId}%0A*Naam:* ${encodeURIComponent(name)}%0A*Mobile:* ${encodeURIComponent(phone)}%0A*Address:* ${encodeURIComponent(address)}%0A%0A*Items:* ${encodeURIComponent(productDetailsList)}%0A*Total Price:* ₹${totalAmount}%0A%0A*Payment Method:* ${paymentMethod}%0A*Txn ID:* ${encodeURIComponent(txnId)}`;
                 const whatsappUrl = `https://wa.me/${myWhatsAppNumber}?text=${message}`;
 
-                alert("Order successfully place ho gaya hai!");
+                alert(`Order Successful!\n\nAapka Order ID hai: ${orderId}\nKripya is Order ID ko note kar lein tracking ke liye.`);
                 
-                // Clear Cart
                 cart = [];
                 updateCartUI();
                 window.closeCheckoutModal();
                 window.toggleCart();
                 document.getElementById('orderForm').reset();
 
-                // Open WhatsApp
                 window.open(whatsappUrl, '_blank');
                 
             } catch (error) {
                 console.error("Error placing order: ", error);
-                alert("Order place karne me error aaya. Kripya Firestore Rules aur Connection check karein.");
+                alert("Order place karne me error aaya.");
             } finally {
                 submitBtn.innerText = "Order Place Karein";
                 submitBtn.disabled = false;
             }
         });
 
-        // Initialize Page
+        // Track Order Logic (Fetch from Firebase)
+        window.fetchOrderDetails = async function() {
+            const inputId = document.getElementById('trackOrderIdInput').value.trim();
+            const resultBox = document.getElementById('orderResult');
+            const errorBox = document.getElementById('trackError');
+
+            if (!inputId) {
+                alert("Kripya valid Order ID dalein.");
+                return;
+            }
+
+            resultBox.style.display = 'none';
+            errorBox.style.display = 'none';
+
+            try {
+                const q = query(collection(db, "orders"), where("orderId", "==", inputId));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    errorBox.innerText = "Koi order nahi mila. Kripya sahi Order ID check karein.";
+                    errorBox.style.display = 'block';
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    document.getElementById('resOrderId').innerText = data.orderId;
+                    document.getElementById('resName').innerText = data.customerName;
+                    document.getElementById('resAmount').innerText = data.totalAmount;
+                    document.getElementById('resItems').innerText = data.items.map(i => i.title).join(', ');
+
+                    // Update Stepper Progress UI
+                    updateStatusProgress(data.status || "Placed");
+                    resultBox.style.display = 'block';
+                });
+
+            } catch (err) {
+                console.error("Tracking Error: ", err);
+                errorBox.innerText = "Order status lane me samasya aayi.";
+                errorBox.style.display = 'block';
+            }
+        };
+
+        function updateStatusProgress(status) {
+            const steps = ['Placed', 'Processing', 'Shipped', 'Delivered'];
+            const currentIdx = steps.indexOf(status);
+
+            steps.forEach((s) => {
+                const el = document.getElementById(`step-${s.toLowerCase()}`);
+                if (el) el.classList.remove('active');
+            });
+
+            for (let i = 0; i <= (currentIdx === -1 ? 0 : currentIdx); i++) {
+                const el = document.getElementById(`step-${steps[i].toLowerCase()}`);
+                if (el) el.classList.add('active');
+            }
+        }
+
         renderProducts(products);
     </script>
 </body>
