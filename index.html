@@ -433,15 +433,15 @@
                     customerAddress: address,
                     items: cart,
                     totalAmount: totalAmount,
-                    
-                    catch (error) {
-                    console.error):
                         orderDate: new Date()
                 });
+                 catch (error) {
+                    console.error(error);
+            };
 
                 // 2. Direct WhatsApp Message URL
                 const message = `*Naya Order Aaya Hai!*%0A%0A*Naam:* ${name}%0A*Mobile:* ${phone}%0A*Address:* ${address}%0A%0A*Items:* ${productDetailsList}%0A*Total Price:* ₹${totalAmount}`;
-                const whatsappUrl = `https://wa.me/${myWhatsAppNumber}?text=${message}`;
+                const whatsappUrl = 'https://wa.me/919771556448?text=${message}\';\'
 
                 alert("Order successfully place ho gaya hai!");
                 
