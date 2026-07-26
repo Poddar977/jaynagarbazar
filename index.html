@@ -39,7 +39,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* Sub-Header Live Time Bar (Header ke Niche) */
+        /* Sub-Header Live Time Bar */
         .sub-header-clock-bar {
             background-color: #175ec2;
             color: #ffffff;
@@ -71,7 +71,7 @@
 
         .nav-actions {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             align-items: center;
         }
 
@@ -95,51 +95,6 @@
             padding: 2px 6px;
             border-radius: 50%;
             font-size: 12px;
-        }
-
-        /* Profile Dropdown Container */
-        .profile-menu-container {
-            position: relative;
-        }
-
-        .profile-dropdown {
-            position: absolute;
-            top: 110%;
-            right: 0;
-            background: white;
-            color: #333;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border-radius: 4px;
-            width: 180px;
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            z-index: 110;
-        }
-
-        .profile-dropdown.show {
-            display: flex;
-        }
-
-        .profile-dropdown-item {
-            padding: 12px 15px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            border-bottom: 1px solid #f0f0f0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: background 0.2s;
-        }
-
-        .profile-dropdown-item:hover {
-            background-color: #f8f9fa;
-            color: #2874f0;
-        }
-
-        .profile-dropdown-item.logout-item {
-            color: #d32f2f;
         }
 
         /* Banner */
@@ -405,11 +360,7 @@
             padding: 10px; border-radius: 4px; font-weight: bold; font-size: 13px; margin: 10px 0;
         }
 
-        .auth-toggle {
-            margin-top: 15px; font-size: 13px; text-align: center; color: #2874f0; cursor: pointer; text-decoration: underline;
-        }
-
-        /* Tracking & Order History Styles */
+        /* Tracking Styles */
         .track-search-box { display: flex; gap: 10px; margin-bottom: 20px; }
         .track-search-box input { margin-top: 0; flex: 1; }
         .track-search-box button { background: #2874f0; color: white; border: none; padding: 0 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
@@ -422,32 +373,6 @@
         .status-step.active .status-icon { background: #388e3c; }
         .status-label { font-size: 11px; color: #666; font-weight: 600; }
         .status-step.active .status-label { color: #388e3c; }
-
-        /* History List Cards */
-        .history-card {
-            background: #f8f9fa;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-        .history-card-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            font-weight: bold;
-            color: #2874f0;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 6px;
-            margin-bottom: 8px;
-        }
-        .history-badge {
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-        }
     </style>
 </head>
 <body>
@@ -461,24 +386,14 @@
         </div>
         
         <div class="nav-actions">
-            <!-- Profile Option with Dropdown -->
-            <div class="profile-menu-container">
-                <button class="nav-btn" id="profileBtn" onclick="toggleProfileMenu()">👤 Profile ▾</button>
-                <div class="profile-dropdown" id="profileDropdown">
-                    <div class="profile-dropdown-item" id="menuLogin" onclick="handleMenuAction('login')">🔑 Login / Sign Up</div>
-                    <div class="profile-dropdown-item" id="menuHistory" onclick="handleMenuAction('history')" style="display:none;">📜 Order History</div>
-                    <div class="profile-dropdown-item" onclick="handleMenuAction('track')">📦 Track Order</div>
-                    <div class="profile-dropdown-item logout-item" id="menuLogout" onclick="handleMenuAction('logout')" style="display:none;">🚪 Logout</div>
-                </div>
-            </div>
-
+            <button class="nav-btn" onclick="openTrackModal()">📦 Track Order</button>
             <button class="nav-btn" onclick="toggleCart()">
                 🛒 Cart <span class="cart-badge" id="cart-count">0</span>
             </button>
         </div>
     </header>
 
-    <!-- Header ke Niche Real Time/Date Notification Bar -->
+    <!-- Sub-Header Real Time/Date Bar -->
     <div class="sub-header-clock-bar">
         <span id="liveClockDate">📅 Date: Loading...</span>
         <span>|</span>
@@ -507,21 +422,6 @@
         <div class="cart-footer">
             <h4>Total Amount: ₹<span id="cart-total">0</span></h4>
             <button class="checkout-btn" onclick="openCheckoutModal()">PLACE ORDER</button>
-        </div>
-    </div>
-
-    <!-- Login/Signup Modal -->
-    <div class="modal-overlay" id="auth-overlay">
-        <div class="modal-box">
-            <span class="close-modal" onclick="closeAuthModal()">&times;</span>
-            <h2 id="authTitle">Login to Account</h2>
-            
-            <form id="authForm">
-                <input type="email" id="authEmail" placeholder="Email Address" required>
-                <input type="password" id="authPass" placeholder="Password (Min 6 Characters)" required>
-                <button type="submit" class="btn-submit" id="authSubmitBtn">Login</button>
-            </form>
-            <div class="auth-toggle" id="authToggleBtn" onclick="toggleAuthMode()">Don't have an account? Sign Up</div>
         </div>
     </div>
 
@@ -583,17 +483,6 @@
         </div>
     </div>
 
-    <!-- Order History Modal -->
-    <div class="modal-overlay" id="history-overlay">
-        <div class="modal-box">
-            <span class="close-modal" onclick="closeHistoryModal()">&times;</span>
-            <h2>My Order History</h2>
-            <div id="historyListContainer" style="margin-top: 15px;">
-                <p>Loading order history...</p>
-            </div>
-        </div>
-    </div>
-
     <!-- Real-time Clock Script -->
     <script>
         function updateLiveClock() {
@@ -620,7 +509,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
         import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA7f9PWSyws4XkzKq077sNdlF0J33DSVSo",
@@ -633,13 +521,9 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app);
 
         const myWhatsAppNumber = "919771556448";
         const myUpiId = "9771556448@ybl"; 
-
-        let currentUser = null;
-        let isSignUpMode = false;
 
         const products = [
             { id: 1, title: "Wireless Bluetooth Headphones", price: 1299, originalPrice: 2999, discount: "56% off", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500" },
@@ -679,87 +563,6 @@
             });
         }
 
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            const profileBtn = document.getElementById('profileBtn');
-            const menuLogin = document.getElementById('menuLogin');
-            const menuHistory = document.getElementById('menuHistory');
-            const menuLogout = document.getElementById('menuLogout');
-
-            if (user) {
-                const shortEmail = user.email.split('@')[0];
-                profileBtn.innerText = `👤 ${shortEmail} ▾`;
-                menuLogin.style.display = 'none';
-                menuHistory.style.display = 'flex';
-                menuLogout.style.display = 'flex';
-            } else {
-                profileBtn.innerText = `👤 Profile ▾`;
-                menuLogin.style.display = 'flex';
-                menuHistory.style.display = 'none';
-                menuLogout.style.display = 'none';
-            }
-        });
-
-        window.toggleProfileMenu = function() {
-            const dropdown = document.getElementById('profileDropdown');
-            dropdown.classList.toggle('show');
-        };
-
-        window.addEventListener('click', (e) => {
-            if (!e.target.matches('#profileBtn')) {
-                const dropdown = document.getElementById('profileDropdown');
-                if (dropdown && dropdown.classList.contains('show')) {
-                    dropdown.classList.remove('show');
-                }
-            }
-        });
-
-        window.handleMenuAction = function(action) {
-            document.getElementById('profileDropdown').classList.remove('show');
-            
-            if (action === 'login') {
-                document.getElementById('auth-overlay').classList.add('active');
-            } else if (action === 'track') {
-                openTrackModal();
-            } else if (action === 'history') {
-                openHistoryModal();
-            } else if (action === 'logout') {
-                if (confirm("Kya aap logout karna chahte hain?")) {
-                    signOut(auth);
-                }
-            }
-        };
-
-        window.closeAuthModal = function() {
-            document.getElementById('auth-overlay').classList.remove('active');
-        };
-
-        window.toggleAuthMode = function() {
-            isSignUpMode = !isSignUpMode;
-            document.getElementById('authTitle').innerText = isSignUpMode ? "Create New Account" : "Login to Account";
-            document.getElementById('authSubmitBtn').innerText = isSignUpMode ? "Sign Up" : "Login";
-            document.getElementById('authToggleBtn').innerText = isSignUpMode ? "Already have an account? Login" : "Don't have an account? Sign Up";
-        };
-
-        document.getElementById('authForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('authEmail').value;
-            const pass = document.getElementById('authPass').value;
-
-            try {
-                if (isSignUpMode) {
-                    await createUserWithEmailAndPassword(auth, email, pass);
-                    alert("Account successfully ban gaya hai!");
-                } else {
-                    await signInWithEmailAndPassword(auth, email, pass);
-                    alert("Login successful!");
-                }
-                closeAuthModal();
-            } catch (err) {
-                alert("Auth Error: " + err.message);
-            }
-        });
-
         window.searchProducts = function() {
             const query = document.getElementById('search-input').value.toLowerCase();
             const filtered = products.filter(p => p.title.toLowerCase().includes(query));
@@ -773,11 +576,6 @@
         };
 
         window.buyNow = function(productId) {
-            if (!currentUser) {
-                alert("Order karne ke liye pehle Login karein!");
-                document.getElementById('auth-overlay').classList.add('active');
-                return;
-            }
             const product = products.find(p => p.id === productId);
             cart = [product];
             updateCartUI();
@@ -794,11 +592,6 @@
         };
 
         window.openCheckoutModal = function() {
-            if (!currentUser) {
-                alert("Order place karne ke liye pehle Login karein!");
-                document.getElementById('auth-overlay').classList.add('active');
-                return;
-            }
             if (cart.length === 0) {
                 alert("Pehle cart me koi product add karein!");
                 return;
@@ -819,55 +612,6 @@
             document.getElementById('tracking-overlay').classList.remove('active');
             document.getElementById('orderResult').style.display = 'none';
             document.getElementById('trackError').style.display = 'none';
-        };
-
-        window.openHistoryModal = async function() {
-            if (!currentUser) return;
-            const historyOverlay = document.getElementById('history-overlay');
-            const historyContainer = document.getElementById('historyListContainer');
-            
-            historyOverlay.classList.add('active');
-            historyContainer.innerHTML = "<p>Loading your orders...</p>";
-
-            try {
-                const q = query(
-                    collection(db, "orders"), 
-                    where("userId", "==", currentUser.uid)
-                );
-                const snapshot = await getDocs(q);
-
-                if (snapshot.empty) {
-                    historyContainer.innerHTML = "<p>Aapne abhi tak koi order nahi kiya hai.</p>";
-                    return;
-                }
-
-                historyContainer.innerHTML = "";
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const itemNames = data.items.map(i => i.title).join(', ');
-                    
-                    historyContainer.innerHTML += `
-                        <div class="history-card">
-                            <div class="history-card-header">
-                                <span>Order ID: ${data.orderId}</span>
-                                <span class="history-badge">${data.status || 'Placed'}</span>
-                            </div>
-                            <div style="font-size:13px; font-weight:600; margin-bottom:4px;">${itemNames}</div>
-                            <div style="font-size:12px; color:#666;">
-                                Total Amount: <strong>₹${data.totalAmount}</strong> | Payment: ${data.paymentMethod}
-                            </div>
-                        </div>
-                    `;
-                });
-
-            } catch (err) {
-                console.error("History Fetch Error:", err);
-                historyContainer.innerHTML = "<p style='color:red;'>Order history load karne me samasya aayi.</p>";
-            }
-        };
-
-        window.closeHistoryModal = function() {
-            document.getElementById('history-overlay').classList.remove('active');
         };
 
         window.handlePaymentChange = function() {
@@ -919,11 +663,6 @@
             e.preventDefault();
             if (cart.length === 0) return;
 
-            if (!currentUser) {
-                alert("Order karne ke liye login zaruri hai.");
-                return;
-            }
-
             const name = document.getElementById('custName').value;
             const phone = document.getElementById('custPhone').value;
             const address = document.getElementById('custAddress').value;
@@ -941,8 +680,6 @@
             try {
                 await addDoc(collection(db, "orders"), {
                     orderId: orderId,
-                    userId: currentUser.uid,
-                    userEmail: currentUser.email,
                     customerName: name,
                     customerPhone: phone,
                     customerAddress: address,
@@ -954,7 +691,7 @@
                     orderDate: new Date()
                 });
 
-                const message = `*Naya Order Aaya Hai!*%0A%0A*Order ID:* ${orderId}%0A*Customer Email:* ${currentUser.email}%0A*Naam:* ${encodeURIComponent(name)}%0A*Mobile:* ${encodeURIComponent(phone)}%0A*Address:* ${encodeURIComponent(address)}%0A%0A*Items:* ${encodeURIComponent(productDetailsList)}%0A*Total Price:* ₹${totalAmount}%0A%0A*Payment Method:* ${paymentMethod}%0A*Txn ID:* ${encodeURIComponent(txnId)}`;
+                const message = `*Naya Order Aaya Hai!*%0A%0A*Order ID:* ${orderId}%0A*Naam:* ${encodeURIComponent(name)}%0A*Mobile:* ${encodeURIComponent(phone)}%0A*Address:* ${encodeURIComponent(address)}%0A%0A*Items:* ${encodeURIComponent(productDetailsList)}%0A*Total Price:* ₹${totalAmount}%0A%0A*Payment Method:* ${paymentMethod}%0A*Txn ID:* ${encodeURIComponent(txnId)}`;
                 const whatsappUrl = `https://wa.me/${myWhatsAppNumber}?text=${message}`;
 
                 alert(`Order Successful!\n\nAapka Order ID hai: ${orderId}\nTracking ke liye ise note kar lein.`);
