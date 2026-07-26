@@ -419,6 +419,7 @@
             // Prepare item list for WhatsApp message
             let productDetailsList = cart.map(item => `${item.title} (₹${item.price})`).join(', ');
             let totalAmount = document.getElementById('cart-total').innerText;
+            
 
             const submitBtn = document.getElementById('submitOrderBtn');
             submitBtn.innerText = "Placing Order...";
@@ -432,7 +433,10 @@
                     customerAddress: address,
                     items: cart,
                     totalAmount: totalAmount,
-                    orderDate: new Date()
+                    
+                    catch (error) {
+                    console.error):
+                        orderDate: new Date()
                 });
 
                 // 2. Direct WhatsApp Message URL
