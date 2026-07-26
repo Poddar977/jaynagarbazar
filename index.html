@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jaynagar Store E-Commerce</title>
+    <title>Jaynagar Store</title>
     <style>
         /* Base Styles */
         * {
@@ -51,16 +51,6 @@
             outline: none;
             border-radius: 2px 0 0 2px;
             font-size: 14px;
-        }
-
-        .search-container button {
-            background-color: #fff;
-            border: none;
-            padding: 10px 15px;
-            color: #2874f0;
-            cursor: pointer;
-            border-radius: 0 2px 2px 0;
-            font-weight: bold;
         }
 
         .cart-btn {
@@ -381,92 +371,28 @@
         </div>
     </div>
 
-    <!-- Firebase SDK Modules -->
+    <!-- Combined Script for Firebase Module & App Functionality -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";[cite: 1]
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-        // Firebase Config[cite: 1]
+        // Firebase Config
         const firebaseConfig = {
-            apiKey: "AIzaSyA7f9PWSyws4XkzKq077sNdlF0J33DSVSo",[cite: 1]
-            authDomain: "jaynagar-srote.firebaseapp.com",[cite: 1]
-            projectId: "jaynagar-srote",[cite: 1]
-            storageBucket: "jaynagar-srote.firebasestorage.app",[cite: 1]
-            messagingSenderId: "820632565818",[cite: 1]
-            appId: "1:820632565818:web:0b2f4676cecd799a801d03"[cite: 1]
+            apiKey: "AIzaSyA7f9PWSyws4XkzKq077sNdlF0J33DSVSo",
+            authDomain: "jaynagar-srote.firebaseapp.com",
+            projectId: "jaynagar-srote",
+            storageBucket: "jaynagar-srote.firebasestorage.app",
+            messagingSenderId: "820632565818",
+            appId: "1:820632565818:web:0b2f4676cecd799a801d03"
         };
 
-        const app = initializeApp(firebaseConfig);[cite: 1]
+        const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Apna WhatsApp Number Yahan Daalein (With 91 Country Code)
+        // WhatsApp Mobile Number
         const myWhatsAppNumber = "919771556448";
 
-        // Submit Order Logic
-        document.getElementById('orderForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            if (cart.length === 0) {
-                alert("Cart khali hai! Pehle product add karein.");
-                return;
-            }
-
-            const name = document.getElementById('custName').value;
-            const phone = document.getElementById('custPhone').value;
-            const address = document.getElementById('custAddress').value;
-        
-
-            // Prepare item list for WhatsApp message
-            let productDetailsList = cart.map(item => `${item.title} (₹${item.price})`).join(', ');
-            let totalAmount = document.getElementById('cart-total').innerText;
-            
-
-            const submitBtn = document.getElementById('submitOrderBtn');
-            submitBtn.innerText = "Placing Order...";
-            submitBtn.disabled = true;
-
-            try {
-                // 1. Firebase Firestore database me Order Save karna[cite: 1]
-                await addDoc(collection(db, "orders"), {
-                    customerName: name,
-                    customerPhone: phone,
-                    customerAddress: address,
-                    items: cart,
-                    totalAmount: totalAmount,
-                        orderDate: new Date()
-                });
-                 catch (error) {
-                    console.error(error);
-            };
-
-                // 2. Direct WhatsApp Message URL
-                const message = `*Naya Order Aaya Hai!*%0A%0A*Naam:* ${name}%0A*Mobile:* ${phone}%0A*Address:* ${address}%0A%0A*Items:* ${productDetailsList}%0A*Total Price:* ₹${totalAmount}`;
-                const whatsappUrl = 'https://wa.me/919771556448?text=${message}\';\'
-
-                alert("Order successfully place ho gaya hai!");
-                
-                // Clear Cart
-                cart = [];
-                updateCartUI();
-                closeCheckoutModal();
-                toggleCart();
-                document.getElementById('orderForm').reset();
-
-                // Open WhatsApp
-                window.open(whatsappUrl, '_blank');
-                
-            } catch (error) {
-                console.error("Error placing order: ", error);
-                alert("Order place karne me error aaya. Kripya firse try karein.");
-            } finally {
-                submitBtn.innerText = "Order Place Karein";
-                submitBtn.disabled = false;
-            }
-        });
-    </script>
-
-    <!-- Main Application Scripts -->
-    <script>
+        // Products List
         const products = [
             {
                 id: 1,
@@ -505,7 +431,7 @@
                 title: "GLOW & LOVELY cream 50g",
                 price: 130,
                 originalPrice: 145,
-                discount : "15off",
+                discount : "15% off",
                 image: "https://images.apollo247.in/pub/media/catalog/product/8/9/8909106030527.01_1.png"
             },
             {
@@ -513,7 +439,7 @@
                 title: "VICCO cream 30g",
                 price: 130,
                 originalPrice: 150,
-                discount : "20off",
+                discount : "20% off",
                 image: "https://viccolabs.com/cdn/shop/files/4thImage_5230160b-7e36-4ab1-9cb4-f97219a86005.png?crop=center&height=3001&v=1744293315&width=3001"
             },
             {
@@ -521,7 +447,7 @@
                 title: "Pond's cream 23g",
                 price: 90,
                 originalPrice: 105,
-                discount : "15off",
+                discount : "15% off",
                 image: "https://ushopbd.com/cdn/shop/files/Ponds23lC.jpg?v=1748265912"
             }
         ];
@@ -554,21 +480,40 @@
             });
         }
 
-        // Search Function
-        function searchProducts() {
+        // Window scope functions for onclick HTML attributes
+        window.searchProducts = function() {
             const query = document.getElementById('search-input').value.toLowerCase();
             const filtered = products.filter(p => p.title.toLowerCase().includes(query));
             renderProducts(filtered);
-        }
+        };
 
-        // Add to Cart Logic
-        function addToCart(productId) {
+        window.addToCart = function(productId) {
             const product = products.find(p => p.id === productId);
             cart.push(product);
             updateCartUI();
-        }
+        };
 
-        // Update Cart Interface
+        window.removeFromCart = function(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        };
+
+        window.toggleCart = function() {
+            document.getElementById('cart-modal').classList.toggle('open');
+        };
+
+        window.openCheckoutModal = function() {
+            if (cart.length === 0) {
+                alert("Pehle cart me koi product add karein!");
+                return;
+            }
+            document.getElementById('checkout-overlay').classList.add('active');
+        };
+
+        window.closeCheckoutModal = function() {
+            document.getElementById('checkout-overlay').classList.remove('active');
+        };
+
         function updateCartUI() {
             document.getElementById('cart-count').innerText = cart.length;
             const cartItemsContainer = document.getElementById('cart-items');
@@ -598,29 +543,61 @@
             document.getElementById('cart-total').innerText = total;
         }
 
-        // Remove from Cart
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCartUI();
-        }
+        // Submit Order Logic
+        document.getElementById('orderForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-        // Toggle Cart Sidebar
-        function toggleCart() {
-            document.getElementById('cart-modal').classList.toggle('open');
-        }
-
-        // Open/Close Checkout Modal Form
-        function openCheckoutModal() {
             if (cart.length === 0) {
-                alert("Pehle cart me koi product add karein!");
+                alert("Cart khali hai! Pehle product add karein.");
                 return;
             }
-            document.getElementById('checkout-overlay').classList.add('active');
-        }
 
-        function closeCheckoutModal() {
-            document.getElementById('checkout-overlay').classList.remove('active');
-        }
+            const name = document.getElementById('custName').value;
+            const phone = document.getElementById('custPhone').value;
+            const address = document.getElementById('custAddress').value;
+
+            let productDetailsList = cart.map(item => `${item.title} (₹${item.price})`).join(', ');
+            let totalAmount = document.getElementById('cart-total').innerText;
+
+            const submitBtn = document.getElementById('submitOrderBtn');
+            submitBtn.innerText = "Placing Order...";
+            submitBtn.disabled = true;
+
+            try {
+                // 1. Firebase Firestore database me Order Save karna
+                await addDoc(collection(db, "orders"), {
+                    customerName: name,
+                    customerPhone: phone,
+                    customerAddress: address,
+                    items: cart,
+                    totalAmount: totalAmount,
+                    orderDate: new Date()
+                });
+
+                // 2. Direct WhatsApp Message URL
+                const message = `*Naya Order Aaya Hai!*%0A%0A*Naam:* ${encodeURIComponent(name)}%0A*Mobile:* ${encodeURIComponent(phone)}%0A*Address:* ${encodeURIComponent(address)}%0A%0A*Items:* ${encodeURIComponent(productDetailsList)}%0A*Total Price:* ₹${totalAmount}`;
+                const whatsappUrl = `https://wa.me/${myWhatsAppNumber}?text=${message}`;
+
+                alert("Order successfully place ho gaya hai!");
+                
+                // Clear Cart
+                cart = [];
+                updateCartUI();
+                window.closeCheckoutModal();
+                window.toggleCart();
+                document.getElementById('orderForm').reset();
+
+                // Open WhatsApp
+                window.open(whatsappUrl, '_blank');
+                
+            } catch (error) {
+                console.error("Error placing order: ", error);
+                alert("Order place karne me error aaya. Kripya Firestore Rules aur Connection check karein.");
+            } finally {
+                submitBtn.innerText = "Order Place Karein";
+                submitBtn.disabled = false;
+            }
+        });
 
         // Initialize Page
         renderProducts(products);
