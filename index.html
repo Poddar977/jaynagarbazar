@@ -3,368 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jaynagar Store</title>
+    <title>Jaynagar Store - Home</title>
+    <!-- TensorFlow.js for Machine Learning -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
     <style>
-        /* Base Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background-color: #f1f2f6; color: #333; }
+        header { background-color: #2874f0; color: white; padding: 12px 5%; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .logo { font-size: 22px; font-weight: bold; font-style: italic; letter-spacing: 0.5px; cursor: pointer; }
+        .sub-header-clock-bar { background-color: #175ec2; color: #ffffff; text-align: center; padding: 6px 10px; font-size: 13px; font-weight: 600; display: flex; justify-content: center; align-items: center; gap: 15px; }
+        .category-nav-bar { background-color: #ffffff; padding: 10px 5%; display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid #e0e0e0; }
+        .category-btn { background-color: #f0f3f8; color: #333; border: 1px solid #dcdfe6; padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .category-btn:hover, .category-btn.active { background-color: #2874f0; color: white; border-color: #2874f0; }
+        
+        .sub-category-bar { background-color: #eef4ff; padding: 8px 5%; display: none; gap: 10px; overflow-x: auto; border-bottom: 1px solid #d0e1fd; white-space: nowrap; }
+        .sub-category-btn { background-color: #ffffff; color: #2874f0; border: 1px solid #2874f0; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .sub-category-btn:hover, .sub-category-btn.active { background-color: #fb641b; color: white; border-color: #fb641b; }
 
-        body {
-            background-color: #f1f2f6;
-            color: #333;
-        }
-
-        /* Header / Navbar */
-        header {
-            background-color: #2874f0;
-            color: white;
-            padding: 12px 5%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .logo {
-            font-size: 22px;
-            font-weight: bold;
-            font-style: italic;
-            letter-spacing: 0.5px;
-        }
-
-        /* Sub-Header Live Time Bar */
-        .sub-header-clock-bar {
-            background-color: #175ec2;
-            color: #ffffff;
-            text-align: center;
-            padding: 6px 10px;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            box-shadow: inset 0 -1px 2px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .search-container {
-            display: flex;
-            width: 35%;
-        }
-
-        .search-container input {
-            width: 100%;
-            padding: 10px 15px;
-            border: none;
-            outline: none;
-            border-radius: 2px 0 0 2px;
-            font-size: 14px;
-        }
-
-        .nav-actions {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .nav-btn {
-            background-color: #fff;
-            color: #2874f0;
-            border: none;
-            padding: 8px 15px;
-            font-weight: bold;
-            border-radius: 2px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 13px;
-        }
-
-        .cart-badge {
-            background-color: #ff9f00;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 50%;
-            font-size: 12px;
-        }
-
-        /* Banner */
-        .banner {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: white;
-            text-align: center;
-            padding: 40px 20px;
-            margin-bottom: 20px;
-        }
-
-        .banner h1 {
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
-
-        /* Main Container */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px 40px;
-        }
-
-        .section-title {
-            font-size: 20px;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        /* Product Grid */
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 15px;
-        }
-
-        .product-card {
-            background-color: white;
-            border-radius: 4px;
-            padding: 15px;
-            text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .product-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .product-card img {
-            width: 100%;
-            height: 180px;
-            object-fit: contain;
-            margin-bottom: 10px;
-        }
-
-        .product-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            height: 38px;
-            overflow: hidden;
-        }
-
-        .price-container {
-            margin-bottom: 12px;
-        }
-
-        .current-price {
-            font-size: 18px;
-            font-weight: bold;
-            color: #212121;
-        }
-
-        .original-price {
-            font-size: 13px;
-            color: #878787;
-            text-decoration: line-through;
-            margin-left: 6px;
-        }
-
-        .discount {
-            color: #388e3c;
-            font-size: 13px;
-            font-weight: bold;
-            margin-left: 6px;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 6px;
-        }
-
-        .add-btn {
-            background-color: #ff9f00;
-            color: white;
-            border: none;
-            padding: 10px 5px;
-            border-radius: 2px;
-            font-weight: bold;
-            cursor: pointer;
-            flex: 1;
-            font-size: 12px;
-            transition: background 0.2s;
-        }
-
+        .search-container { display: flex; width: 35%; }
+        .search-container input { width: 100%; padding: 10px 15px; border: none; outline: none; border-radius: 2px 0 0 2px; font-size: 14px; }
+        .nav-actions { display: flex; gap: 12px; align-items: center; }
+        .nav-btn { background-color: #fff; color: #2874f0; border: none; padding: 8px 15px; font-weight: bold; border-radius: 2px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; }
+        .cart-badge { background-color: #ff9f00; color: white; padding: 2px 6px; border-radius: 50%; font-size: 12px; }
+        .banner { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; text-align: center; padding: 30px 20px; margin-bottom: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 15px 40px; }
+        .section-title { font-size: 20px; margin-bottom: 15px; font-weight: 600; }
+        .ml-recommendation-section { background: #fff; padding: 15px; border-radius: 6px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid #ff9f00; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
+        .product-card { background-color: white; border-radius: 4px; padding: 15px; text-align: center; transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; justify-content: space-between; }
+        .product-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .product-card img { width: 100%; height: 180px; object-fit: contain; margin-bottom: 10px; cursor: pointer; }
+        .product-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; height: 38px; overflow: hidden; cursor: pointer; color: #2874f0; }
+        .rating-stars { color: #ffa41c; font-size: 13px; margin-bottom: 6px; }
+        .rating-count { color: #007185; font-size: 12px; margin-left: 4px; }
+        .price-container { margin-bottom: 10px; }
+        .current-price { font-size: 18px; font-weight: bold; color: #212121; }
+        .original-price { font-size: 13px; color: #878787; text-decoration: line-through; margin-left: 6px; }
+        .discount { color: #388e3c; font-size: 13px; font-weight: bold; margin-left: 6px; }
+        .btn-group { display: flex; gap: 6px; flex-direction: column; }
+        .row-btns { display: flex; gap: 6px; }
+        .add-btn { background-color: #ff9f00; color: white; border: none; padding: 8px 5px; border-radius: 2px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
         .add-btn:hover { background-color: #e68f00; }
-
-        .buy-now-btn {
-            background-color: #fb641b;
-            color: white;
-            border: none;
-            padding: 10px 5px;
-            border-radius: 2px;
-            font-weight: bold;
-            cursor: pointer;
-            flex: 1;
-            font-size: 12px;
-            transition: background 0.2s;
-        }
-
+        .buy-now-btn { background-color: #fb641b; color: white; border: none; padding: 8px 5px; border-radius: 2px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
         .buy-now-btn:hover { background-color: #e0530b; }
-
-        /* Cart Sidebar */
-        .cart-modal {
-            position: fixed;
-            top: 0;
-            right: -400px;
-            width: 350px;
-            height: 100%;
-            background-color: white;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.2);
-            transition: right 0.3s ease;
-            z-index: 200;
-            display: flex;
-            flex-direction: column;
-        }
-
+        .cart-modal { position: fixed; top: 0; right: -400px; width: 350px; height: 100%; background-color: white; box-shadow: -2px 0 10px rgba(0,0,0,0.2); transition: right 0.3s ease; z-index: 200; display: flex; flex-direction: column; }
         .cart-modal.open { right: 0; }
-
-        .cart-header {
-            background-color: #2874f0;
-            color: white;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .cart-items {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-        }
-
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #eee;
-            padding: 10px 0;
-        }
-
-        .cart-footer {
-            padding: 15px;
-            border-top: 1px solid #eee;
-            background: #f9f9f9;
-        }
-
-        .checkout-btn {
-            background-color: #fb641b;
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 12px;
-            font-weight: bold;
-            border-radius: 2px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
+        .cart-header { background-color: #2874f0; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .cart-items { flex: 1; overflow-y: auto; padding: 15px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
+        .cart-footer { padding: 15px; border-top: 1px solid #eee; background: #f9f9f9; }
+        .checkout-btn { background-color: #fb641b; color: white; border: none; width: 100%; padding: 12px; font-weight: bold; border-radius: 2px; cursor: pointer; margin-top: 10px; }
         .close-cart { cursor: pointer; font-size: 20px; }
-
-        /* Modal Overlays */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 300;
-        }
-
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 300; }
         .modal-overlay.active { display: flex; }
-
-        .modal-box {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 480px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            position: relative;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-box h2 {
-            margin-bottom: 15px;
-            font-size: 20px;
-            color: #2874f0;
-        }
-
-        .modal-box input, .modal-box textarea, .modal-box select {
-            width: 100%;
-            margin-top: 10px;
-            padding: 10px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            outline: none;
-            font-size: 14px;
-        }
-
-        .modal-box button.btn-submit {
-            background: #ff9f00;
-            color: white;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: 4px;
-        }
-
-        .modal-box button.btn-submit:hover { background: #fb641b; }
-
-        .close-modal {
-            position: absolute; right: 15px; top: 15px;
-            cursor: pointer; font-size: 22px; font-weight: bold;
-        }
-
-        .payment-section {
-            margin-top: 15px;
-            padding: 12px;
-            background: #f8f9fa;
-            border: 1px dashed #2874f0;
-            border-radius: 6px;
-            text-align: center;
-        }
-
+        .modal-box { background: white; padding: 25px; border-radius: 8px; width: 90%; max-width: 480px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; max-height: 90vh; overflow-y: auto; }
+        .modal-box h2 { margin-bottom: 15px; font-size: 20px; color: #2874f0; }
+        .modal-box input, .modal-box textarea, .modal-box select { width: 100%; margin-top: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; outline: none; font-size: 14px; }
+        .modal-box button.btn-submit { background: #ff9f00; color: white; border: none; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; padding: 12px; border-radius: 4px; }
+        .close-modal { position: absolute; right: 15px; top: 15px; cursor: pointer; font-size: 22px; font-weight: bold; }
+        .payment-section { margin-top: 15px; padding: 12px; background: #f8f9fa; border: 1px dashed #2874f0; border-radius: 6px; text-align: center; }
         .qr-container { display: none; text-align: center; margin-top: 10px; }
         .qr-container img { width: 170px; height: 170px; border: 1px solid #ddd; padding: 5px; border-radius: 6px; }
-
-        .direct-pay-btn {
-            display: block; background: #2874f0; color: white; text-decoration: none;
-            padding: 10px; border-radius: 4px; font-weight: bold; font-size: 13px; margin: 10px 0;
-        }
-
-        /* Tracking Styles */
+        .direct-pay-btn { display: block; background: #2874f0; color: white; text-decoration: none; padding: 10px; border-radius: 4px; font-weight: bold; font-size: 13px; margin: 10px 0; }
         .track-search-box { display: flex; gap: 10px; margin-bottom: 20px; }
         .track-search-box input { margin-top: 0; flex: 1; }
         .track-search-box button { background: #2874f0; color: white; border: none; padding: 0 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        
         .order-result { display: none; background: #f9f9f9; padding: 15px; border-radius: 6px; border: 1px solid #eee; }
         .order-status-timeline { margin-top: 15px; display: flex; justify-content: space-between; position: relative; }
         .order-status-timeline::before { content: ''; position: absolute; top: 12px; left: 10%; right: 10%; height: 3px; background: #ddd; z-index: 1; }
@@ -377,39 +80,53 @@
 </head>
 <body>
 
-    <!-- Header -->
     <header>
-        <div class="logo">Jaynagar Store</div>
-
+        <div class="logo" onclick="filterByCategory('all')">Jaynagar Store</div>
         <div class="search-container">
             <input type="text" id="search-input" placeholder="Products search karein..." onkeyup="searchProducts()">
         </div>
-        
         <div class="nav-actions">
             <button class="nav-btn" onclick="openTrackModal()">📦 Track Order</button>
-            <button class="nav-btn" onclick="toggleCart()">
-                🛒 Cart <span class="cart-badge" id="cart-count">0</span>
-            </button>
+            <button class="nav-btn" onclick="toggleCart()">🛒 Cart <span class="cart-badge" id="cart-count">0</span></button>
         </div>
     </header>
 
-    <!-- Sub-Header Real Time/Date Bar -->
     <div class="sub-header-clock-bar">
         <span id="liveClockDate">📅 Date: Loading...</span>
         <span>|</span>
         <span id="liveClockTime">⏰ Time: Loading...</span>
     </div>
 
-    <!-- Banner -->
-    <div class="banner">
-        <h1>Mega Savings Days!</h1>
-        <p>Best Deals on Electronics, Fashion & More</p>
+    <div class="category-nav-bar">
+        <button class="category-btn active" onclick="filterByCategory('all', this)">🛍️ All Products</button>
+        <button class="category-btn" onclick="filterByCategory('fashion', this)">👗 Fashion & Lingerie</button>
+        <button class="category-btn" onclick="filterByCategory('beauty', this)">💄 Beauty</button>
+        <button class="category-btn" onclick="filterByCategory('food', this)">🍕 Food</button>
+        <button class="category-btn" onclick="filterByCategory('gift', this)">🎁 Gift (Best Sellers)</button>
+        <button class="category-btn" onclick="filterByCategory('grocery', this)">🛒 Grocery</button>
     </div>
 
-    <!-- Main Content -->
+    <!-- Dynamic Sub-Category Bar -->
+    <div class="sub-category-bar" id="subCategoryBar" style="display: none;">
+        <span id="subBarLabel" style="font-size: 12px; font-weight: bold; color: #2874f0; align-self: center;">Filter:</span>
+        <div id="subCategoryButtonsContainer" style="display: flex; gap: 10px;"></div>
+    </div>
+
+    <div class="banner">
+        <h1>Mega Savings Days!</h1>
+        <p>Orders ₹1-₹99 carry ₹20 Delivery Charge | Orders ₹100+ have FREE Delivery | No Cancellation</p>
+    </div>
+
     <div class="container">
-        <h2 class="section-title">Featured Products</h2>
-        <div class="product-grid" id="product-grid"></div>
+        <div class="ml-recommendation-section" id="ml-section" style="display: none;">
+            <h2 class="section-title" style="color: #2874f0; font-size: 18px;">🤖 ML Recommended Products (Based on your Cart)</h2>
+            <div class="product-grid" id="recommended-grid"></div>
+        </div>
+
+        <h2 class="section-title" id="currentCategoryTitle">Featured Products</h2>
+        <div class="product-grid" id="product-grid">
+            <p style="grid-column: 1/-1; text-align: center;">Products load ho rahe hain...</p>
+        </div>
     </div>
 
     <!-- Cart Sidebar -->
@@ -420,8 +137,10 @@
         </div>
         <div class="cart-items" id="cart-items"><p>Cart abhi khali hai.</p></div>
         <div class="cart-footer">
+            <div style="font-size: 13px; margin-bottom: 5px;">Subtotal: ₹<span id="cart-subtotal">0</span></div>
+            <div style="font-size: 13px; margin-bottom: 5px;">Delivery Charge: ₹<span id="delivery-charge">0</span></div>
             <h4>Total Amount: ₹<span id="cart-total">0</span></h4>
-            <button class="checkout-btn" onclick="openCheckoutModal()">PLACE ORDER</button>
+            <button class="checkout-btn" id="checkoutBtnMain" onclick="openCheckoutModal()">PLACE ORDER</button>
         </div>
     </div>
 
@@ -430,9 +149,11 @@
         <div class="modal-box">
             <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
             <h2>Checkout Details</h2>
+            <p style="font-size: 11px; color: #d9534f; font-weight: bold; margin-bottom: 10px;">⚠️ Note: Ek baar order place hone ke baad cancel nahi kiya ja sakega.</p>
             <form id="orderForm">
                 <input type="text" id="custName" placeholder="Aapka Naam (Customer Name)" required>
-                <input type="tel" id="custPhone" placeholder="Mobile Number" required>
+                <input type="tel" id="custPhone" placeholder="Mobile Number (10 Digit Compulsory)" pattern="[0-9]{10}" maxlength="10" required>
+                <input type="text" id="custPincode" placeholder="Pincode (e.g. 847226)" pattern="[0-9]{6}" maxlength="6" required>
                 <textarea id="custAddress" placeholder="Pura Address" rows="2" required></textarea>
                 
                 <div class="payment-section">
@@ -451,7 +172,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn-submit" id="submitOrderBtn">Order Place Karein</button>
+                <button type="submit" class="btn-submit" id="submitOrderBtn">Order Place Karein (Final)</button>
             </form>
         </div>
     </div>
@@ -483,32 +204,22 @@
         </div>
     </div>
 
-    <!-- Real-time Clock Script -->
     <script>
         function updateLiveClock() {
             const clockDateEl = document.getElementById('liveClockDate');
             const clockTimeEl = document.getElementById('liveClockTime');
             if (!clockDateEl || !clockTimeEl) return;
-            
             const now = new Date();
-            const dateOptions = { day: '2-digit', month: 'short', year: 'numeric' };
-            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-            
-            const dateString = now.toLocaleDateString('en-IN', dateOptions);
-            const timeString = now.toLocaleTimeString('en-IN', timeOptions);
-            
-            clockDateEl.innerHTML = `📅 Date: ${dateString}`;
-            clockTimeEl.innerHTML = `⏰ Time: ${timeString}`;
+            clockDateEl.innerHTML = `📅 Date: ${now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}`;
+            clockTimeEl.innerHTML = `⏰ Time: ${now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}`;
         }
-        
         setInterval(updateLiveClock, 1000);
         updateLiveClock();
     </script>
 
-    <!-- Firebase & Application Script -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, getDocs, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA7f9PWSyws4XkzKq077sNdlF0J33DSVSo",
@@ -525,38 +236,211 @@
         const myWhatsAppNumber = "919771556448";
         const myUpiId = "9771556448@ybl"; 
 
-        const products = [
-            { id: 1, title: "Wireless Bluetooth Headphones", price: 1299, originalPrice: 2999, discount: "56% off", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500" },
-            { id: 2, title: "Smart Fitness Watch", price: 1999, originalPrice: 4999, discount: "60% off", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500" },
-            { id: 3, title: "Ergonomic Gaming Mouse", price: 699, originalPrice: 1499, discount: "53% off", image: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500" },
-            { id: 4, title: "Casual Running Shoes", price: 1499, originalPrice: 2499, discount: "40% off", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500" },
-            { id: 5, title: "GLOW & LOVELY cream 50g", price: 130, originalPrice: 145, discount: "15% off", image: "https://images.apollo247.in/pub/media/catalog/product/8/9/8909106030527.01_1.png" },
-            { id: 6, title: "VICCO cream 30g", price: 130, originalPrice: 150, discount: "20% off", image: "https://viccolabs.com/cdn/shop/files/4thImage_5230160b-7e36-4ab1-9cb4-f97219a86005.png?crop=center&height=3001&v=1744293315&width=3001" },
-            { id: 7, title: "Pond's cream 23g", price: 90, originalPrice: 105, discount: "15% off", image: "https://ushopbd.com/cdn/shop/files/Ponds23lC.jpg?v=1748265912" }
+        const initialProducts = [
+            { id: "g1", title: "Aashirvaad Shuddh Lassi", category: "grocery", price: 9, originalPrice: 15, discount: "40% off", image: "https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=500", rating: 4.8, reviewCount: 42, sizes: ["200ml"], description: "Refreshing and thick Aashirvaad fresh dairy lassi.", reviews: [{name: "Vikas", rating: 5, comment: "Bahut tasty aur refreshing hai!"}], isBestSeller: true },
+
+            // FOOD SUB-CATEGORIES (Fast Food & Daily Need)
+            { id: "fd1", title: "Crispy Veg Burger & Fries Combo", category: "food", subCategory: "fast-food", price: 149, originalPrice: 249, discount: "40% off", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500", rating: 4.6, reviewCount: 28, sizes: ["Standard"], description: "Juicy potato patty burger served with crispy salted french fries.", reviews: [{name: "Rohan", rating: 5, comment: "Super tasty burger!"}], isBestSeller: true },
+            { id: "fd2", title: "Cheesy Corn Pizza 7-inch", category: "food", subCategory: "fast-food", price: 199, originalPrice: 349, discount: "43% off", image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500", rating: 4.7, reviewCount: 36, sizes: ["7-inch", "10-inch"], description: "Loaded with extra mozzarella cheese and sweet corn kernels.", reviews: [{name: "Aman", rating: 5, comment: "Cheese is very stretchy!"}], isBestSeller: true },
+            { id: "fd3", title: "Fresh Amul Cow Milk 500ml", category: "food", subCategory: "daily-need", price: 32, originalPrice: 35, discount: "8% off", image: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500", rating: 4.9, reviewCount: 50, sizes: ["500ml", "1L"], description: "Pure and pasteurized fresh daily need cow milk packet.", reviews: [{name: "Sunita", rating: 5, comment: "Daily fresh milk delivered."}], isBestSeller: true },
+            { id: "fd4", title: "Fresh Brown Bread Loaf 400g", category: "food", subCategory: "daily-need", price: 45, originalPrice: 50, discount: "10% off", image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500", rating: 4.4, reviewCount: 19, sizes: ["400g"], description: "Healthy whole wheat brown bread for daily breakfast needs.", reviews: [{name: "Karan", rating: 4, comment: "Soft and fresh bread."}], isBestSeller: false },
+            { id: "fd5", title: "Delicious Chocolate Box Pack", category: "food", subCategory: "fast-food", price: 299, originalPrice: 499, discount: "40% off", image: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=500", rating: 4.8, reviewCount: 5, sizes: ["200g"], description: "Assorted premium roasted almond chocolates.", reviews: [], isBestSeller: true },
+
+            { id: "l1", title: "Women's Cotton Comfort Bra & Panty Set", category: "fashion", subCategory: "lingerie", price: 499, originalPrice: 999, discount: "50% off", image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500", rating: 4.6, reviewCount: 24, sizes: ["S", "M", "L", "XL"], description: "Premium breathable soft cotton fabric designed for everyday comfort with smooth elastic straps.", reviews: [{name: "Pooja", rating: 5, comment: "Soft cotton fabric and great fitting."}], isBestSeller: true },
+            { id: "l2", title: "Ladies Seamless Padded Bralette", category: "fashion", subCategory: "lingerie", price: 399, originalPrice: 799, discount: "50% off", image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=500", rating: 4.5, reviewCount: 18, sizes: ["Free Size", "S", "M", "L"], description: "Wirefree seamless bralette with removable pads, ideal for daily lounge and casual wear.", reviews: [{name: "Sita", rating: 4, comment: "Stretchable and smooth."}], isBestSeller: true },
+            { id: "l3", title: "Women's Satin Nightwear Sleepwear Gown", category: "fashion", subCategory: "lingerie", price: 699, originalPrice: 1499, discount: "53% off", image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500", rating: 4.7, reviewCount: 31, sizes: ["M", "L", "XL"], description: "Luxurious silky smooth satin night gown with delicate lace borders.", reviews: [{name: "Anjali", rating: 5, comment: "Very elegant satin nighty."}], isBestSeller: true },
+            { id: "l4", title: "Men's Premium Cotton Trunks (Pack of 3)", category: "fashion", subCategory: "lingerie", price: 449, originalPrice: 899, discount: "50% off", image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500", rating: 4.4, reviewCount: 15, sizes: ["M", "L", "XL", "XXL"], description: "Ultra-soft combed cotton innerwear trunks with anti-roll microfiber waistband.", reviews: [{name: "Rahul", rating: 4, comment: "Comfortable waistband."}], isBestSeller: false },
+
+            { id: "f1", title: "Men's Slim Fit Cotton T-Shirt", category: "fashion", subCategory: "mens", price: 499, originalPrice: 999, discount: "50% off", image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500", rating: 4.5, reviewCount: 14, sizes: ["S", "M", "L", "XL", "XXL"], description: "Solid round neck casual t-shirt crafted from 100% organic cotton for daily summers.", reviews: [{name: "Amit", rating: 5, comment: "Soft cotton and perfect fit!"}], isBestSeller: true },
+            { id: "f2", title: "Men's Stylish Blue Denim Jeans", category: "fashion", subCategory: "mens", price: 999, originalPrice: 1999, discount: "50% off", image: "https://images.unsplash.com/photo-1542272604-780c36856842?w=500", rating: 4.4, reviewCount: 22, sizes: ["30", "32", "34", "36"], description: "Classic mid-rise stretchable denim jeans with durable stitching and fade-resistant indigo wash.", reviews: [{name: "Suresh", rating: 4, comment: "Durable quality jeans."}], isBestSeller: true },
+            { id: "f3", title: "Men's Casual Checkered Shirt", category: "fashion", subCategory: "mens", price: 799, originalPrice: 1599, discount: "50% off", image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500", rating: 4.3, reviewCount: 19, sizes: ["M", "L", "XL"], description: "Smart casual full-sleeve checkered shirt suitable for office and weekend outings.", reviews: [{name: "Nikhil", rating: 5, comment: "Awesome fabric!"}], isBestSeller: true },
+            { id: "f4", title: "Wireless Bluetooth Headphones", category: "fashion", subCategory: "mens", price: 1299, originalPrice: 2999, discount: "56% off", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500", rating: 4.5, reviewCount: 2, sizes: ["Standard"], description: "Over-ear wireless headphones with deep bass and 30 hours playback.", reviews: [], isBestSeller: true },
+            { id: "f5", title: "Casual Running Sports Shoes", category: "fashion", subCategory: "mens", price: 1499, originalPrice: 2499, discount: "40% off", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500", rating: 4.7, reviewCount: 12, sizes: ["UK 7", "UK 8", "UK 9", "UK 10"], description: "Lightweight breathable mesh running shoes for maximum grip and comfort.", reviews: [], isBestSeller: true },
+
+            { id: "f6", title: "Ladies Casual Floral Print Top", category: "fashion", subCategory: "ladies", price: 599, originalPrice: 1299, discount: "53% off", image: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=500", rating: 4.6, reviewCount: 19, sizes: ["S", "M", "L", "XL"], description: "Trendy puff sleeve floral tunic top crafted with lightweight georgette fabric.", reviews: [{name: "Pooja", rating: 5, comment: "Beautiful print!"}], isBestSeller: true },
+            { id: "f7", title: "Ladies High-Waist Skinny Jeans", category: "fashion", subCategory: "ladies", price: 899, originalPrice: 1799, discount: "50% off", image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=500", rating: 4.5, reviewCount: 11, sizes: ["28", "30", "32", "34"], description: "Super stretchy high-waisted denim jeans that hug your curves comfortably.", reviews: [{name: "Neha", rating: 5, comment: "Comfortable stretch."}], isBestSeller: false },
+            { id: "f8", title: "Women's Designer Silk Saree", category: "fashion", subCategory: "ladies", price: 1299, originalPrice: 2999, discount: "56% off", image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=500", rating: 4.8, reviewCount: 35, sizes: ["Free Size (5.5m)"], description: "Traditional zari woven art silk saree with unstitched matching blouse piece.", reviews: [{name: "Anjali", rating: 5, comment: "Premium fabric silk."}], isBestSeller: true },
+
+            { id: "p4", title: "GLOW & LOVELY cream 50g", category: "beauty", price: 130, originalPrice: 145, discount: "15% off", image: "https://images.apollo247.in/pub/media/catalog/product/8/9/8909106030527.01_1.png", rating: 4.3, reviewCount: 1, sizes: ["50g"], description: "Advanced multi vitamin fairness cream.", reviews: [], isBestSeller: false },
+            { id: "p5", title: "VICCO cream 30g", category: "beauty", price: 130, originalPrice: 150, discount: "20% off", image: "https://viccolabs.com/cdn/shop/files/4thImage_5230160b-7e36-4ab1-9cb4-f97219a86005.png?crop=center&height=3001&v=1744293315&width=3001", rating: 4.6, reviewCount: 1, sizes: ["30g"], description: "Ayurvedic medicinal skin cream.", reviews: [], isBestSeller: true },
+            { id: "p9", title: "Basmati Rice 5kg Pack", category: "grocery", price: 450, originalPrice: 550, discount: "18% off", image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500", rating: 4.5, reviewCount: 8, sizes: ["5kg"], description: "Long grain aromatic aged basmati rice.", reviews: [], isBestSeller: false }
         ];
 
-        let cart = [];
+        let products = [...initialProducts];
+        let currentFilteredProducts = [...initialProducts];
+        let cart = JSON.parse(localStorage.getItem('store_cart')) || [];
+        updateCartUI();
+
+        window.filterByCategory = function(category, element) {
+            if (element) {
+                document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+                element.classList.add('active');
+            }
+            const titleEl = document.getElementById('currentCategoryTitle');
+            const subBar = document.getElementById('subCategoryBar');
+            const subContainer = document.getElementById('subCategoryButtonsContainer');
+            subContainer.innerHTML = '';
+
+            if (category === 'fashion') {
+                subBar.style.display = 'flex';
+                document.getElementById('subBarLabel').innerText = "Fashion Filter:";
+                subContainer.innerHTML = `
+                    <button class="sub-category-btn active" onclick="filterSubCat('all', this)">All Fashion</button>
+                    <button class="sub-category-btn" onclick="filterSubCat('lingerie', this)">👙 Lingerie & Innerwear</button>
+                    <button class="sub-category-btn" onclick="filterSubCat('mens', this)">👨 Men's Wear</button>
+                    <button class="sub-category-btn" onclick="filterSubCat('ladies', this)">👩 Ladies Wear</button>
+                `;
+                currentFilteredProducts = products.filter(p => (p.category || '').toLowerCase() === 'fashion');
+                titleEl.innerText = "👗 Fashion & Lingerie Collection";
+            } else if (category === 'food') {
+                subBar.style.display = 'flex';
+                document.getElementById('subBarLabel').innerText = "Food Filter:";
+                subContainer.innerHTML = `
+                    <button class="sub-category-btn active" onclick="filterSubCat('all', this)">All Food</button>
+                    <button class="sub-category-btn" onclick="filterSubCat('fast-food', this)">🍔 Fast Food</button>
+                    <button class="sub-category-btn" onclick="filterSubCat('daily-need', this)">🥛 Daily Need</button>
+                `;
+                currentFilteredProducts = products.filter(p => (p.category || '').toLowerCase() === 'food');
+                titleEl.innerText = "🍕 Food Collection";
+            } else {
+                subBar.style.display = 'none';
+                if (category === 'all') {
+                    currentFilteredProducts = [...products];
+                    titleEl.innerText = "Featured Products";
+                } else if (category === 'gift') {
+                    currentFilteredProducts = products.filter(p => p.isBestSeller || (p.rating && p.rating >= 4.3));
+                    titleEl.innerText = "🎁 Best Selling Gift Products";
+                } else {
+                    currentFilteredProducts = products.filter(p => (p.category || '').toLowerCase() === category.toLowerCase());
+                    titleEl.innerText = category.toUpperCase() + " Products";
+                }
+            }
+            renderProducts(currentFilteredProducts);
+        };
+
+        window.filterSubCat = function(subCat, element) {
+            if (element) {
+                document.querySelectorAll('.sub-category-btn').forEach(btn => btn.classList.remove('active'));
+                element.classList.add('active');
+            }
+            const titleEl = document.getElementById('currentCategoryTitle');
+            
+            // Check current active main category
+            const activeMain = document.querySelector('.category-btn.active').getAttribute('onclick');
+            let mainCat = activeMain.includes('fashion') ? 'fashion' : 'food';
+
+            const baseProducts = products.filter(p => (p.category || '').toLowerCase() === mainCat);
+
+            if (subCat === 'all') {
+                currentFilteredProducts = baseProducts;
+                titleEl.innerText = mainCat === 'fashion' ? "👗 All Fashion Collection" : "🍕 All Food Collection";
+            } else {
+                currentFilteredProducts = baseProducts.filter(p => (p.subCategory || '').toLowerCase() === subCat);
+                titleEl.innerText = subCat.replace('-', ' ').toUpperCase() + " Products";
+            }
+            renderProducts(currentFilteredProducts);
+        };
+
+        window.openProductPage = function(productId) {
+            window.open(`product.html?id=${productId}`, '_blank');
+        };
+
+        function calculateSimilarity(targetProduct, allItems) {
+            return allItems
+                .filter(p => String(p.id) !== String(targetProduct.id))
+                .map(product => {
+                    const priceDiff = Math.abs(product.price - targetProduct.price);
+                    const priceScore = 1 / (1 + priceDiff / 100);
+                    const words1 = targetProduct.title.toLowerCase().split(' ');
+                    const words2 = product.title.toLowerCase().split(' ');
+                    const common = words1.filter(w => words2.includes(w)).length;
+                    const textScore = common / Math.max(words1.length, words2.length);
+                    return { ...product, score: (priceScore * 0.4) + (textScore * 0.6) };
+                })
+                .sort((a, b) => b.score - a.score);
+        }
+
+        window.getMLRecommendations = function() {
+            if (cart.length === 0) {
+                document.getElementById('ml-section').style.display = 'none';
+                return;
+            }
+            const targetProduct = cart[cart.length - 1];
+            const topRecommended = calculateSimilarity(targetProduct, products).slice(0, 3);
+            if (topRecommended.length > 0) {
+                const grid = document.getElementById('recommended-grid');
+                grid.innerHTML = '';
+                topRecommended.forEach(product => {
+                    grid.innerHTML += `
+                        <div class="product-card" style="border: 1px solid #ff9f00;">
+                            <img src="${product.image}" alt="${product.title}" onclick="openProductPage('${product.id}')">
+                            <div class="product-title" onclick="openProductPage('${product.id}')">${product.title}</div>
+                            <div class="price-container"><span class="current-price">₹${product.price}</span></div>
+                            <button class="add-btn" onclick="addToCart('${product.id}')" style="width:100%;">ADD TO CART</button>
+                        </div>
+                    `;
+                });
+                document.getElementById('ml-section').style.display = 'block';
+            }
+        };
+
+        localStorage.setItem('store_products', JSON.stringify(products));
+
+        const qProducts = query(collection(db, "products"), orderBy("createdAt", "desc"));
+        onSnapshot(qProducts, (snapshot) => {
+            const adminProducts = [];
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                adminProducts.push({
+                    id: docSnap.id,
+                    title: data.name,
+                    category: data.category || 'fashion',
+                    subCategory: data.subCategory || 'mens',
+                    price: Number(data.price),
+                    originalPrice: data.originalPrice ? Number(data.originalPrice) : '',
+                    discount: data.discount || '',
+                    image: data.imageUrl || 'https://via.placeholder.com/200?text=No+Image',
+                    rating: data.rating || 4.0,
+                    reviewCount: data.reviewCount || 0,
+                    sizes: data.sizes || ["S", "M", "L", "XL"],
+                    description: data.description || "High quality product.",
+                    reviews: data.reviews || [],
+                    isBestSeller: data.isBestSeller || false
+                });
+            });
+            products = [...adminProducts, ...initialProducts];
+            localStorage.setItem('store_products', JSON.stringify(products));
+            filterByCategory('all');
+        }, (error) => {
+            renderProducts(initialProducts);
+        });
 
         function renderProducts(items) {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
             if (items.length === 0) {
-                grid.innerHTML = '<p>Koi product nahi mila.</p>';
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#666; padding: 20px;">Is section me abhi koi product nahi hai.</p>';
                 return;
             }
             items.forEach(product => {
+                const starRating = '⭐'.repeat(Math.round(product.rating || 4));
                 grid.innerHTML += `
                     <div class="product-card">
-                        <img src="${product.image}" alt="${product.title}">
-                        <div class="product-title">${product.title}</div>
+                        <img src="${product.image}" alt="${product.title}" onclick="openProductPage('${product.id}')" onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+                        <div class="product-title" onclick="openProductPage('${product.id}')">${product.title}</div>
+                        <div class="rating-stars" onclick="openProductPage('${product.id}')">
+                            ${starRating} <span class="rating-count">(${product.reviewCount || 0})</span>
+                        </div>
                         <div class="price-container">
                             <span class="current-price">₹${product.price}</span>
-                            <span class="original-price">₹${product.originalPrice}</span>
-                            <span class="discount">${product.discount}</span>
+                            ${product.originalPrice ? `<span class="original-price">₹${product.originalPrice}</span>` : ''}
+                            ${product.discount ? `<span class="discount">${product.discount}</span>` : ''}
                         </div>
                         <div class="btn-group">
-                            <button class="add-btn" onclick="addToCart(${product.id})">ADD TO CART</button>
-                            <button class="buy-now-btn" onclick="buyNow(${product.id})">BUY NOW</button>
+                            <div class="row-btns">
+                                <button class="add-btn" onclick="addToCart('${product.id}')">ADD TO CART</button>
+                                <button class="buy-now-btn" onclick="buyNow('${product.id}')">BUY NOW</button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -564,27 +448,38 @@
         }
 
         window.searchProducts = function() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const filtered = products.filter(p => p.title.toLowerCase().includes(query));
+            const queryVal = document.getElementById('search-input').value.toLowerCase();
+            const filtered = products.filter(p => p.title.toLowerCase().includes(queryVal));
             renderProducts(filtered);
         };
 
-        window.addToCart = function(productId) {
-            const product = products.find(p => p.id === productId);
-            cart.push(product);
-            updateCartUI();
+        window.addToCart = function(productId, selectedSize = 'Standard') {
+            const product = products.find(p => String(p.id) === String(productId));
+            if(product) {
+                cart.push({ ...product, selectedSize: selectedSize });
+                localStorage.setItem('store_cart', JSON.stringify(cart));
+                updateCartUI();
+                getMLRecommendations();
+                alert(`"${product.title}" cart me add ho gaya!`);
+            }
         };
 
-        window.buyNow = function(productId) {
-            const product = products.find(p => p.id === productId);
-            cart = [product];
-            updateCartUI();
-            openCheckoutModal();
+        window.buyNow = function(productId, selectedSize = 'Standard') {
+            const product = products.find(p => String(p.id) === String(productId));
+            if(product) {
+                cart = [{ ...product, selectedSize: selectedSize }];
+                localStorage.setItem('store_cart', JSON.stringify(cart));
+                updateCartUI();
+                getMLRecommendations();
+                openCheckoutModal();
+            }
         };
 
         window.removeFromCart = function(index) {
             cart.splice(index, 1);
+            localStorage.setItem('store_cart', JSON.stringify(cart));
             updateCartUI();
+            getMLRecommendations();
         };
 
         window.toggleCart = function() {
@@ -592,71 +487,56 @@
         };
 
         window.openCheckoutModal = function() {
-            if (cart.length === 0) {
-                alert("Pehle cart me koi product add karein!");
-                return;
-            }
+            if (cart.length === 0) { alert("Pehle cart me koi product add karein!"); return; }
             document.getElementById('checkout-overlay').classList.add('active');
             handlePaymentChange();
         };
 
-        window.closeCheckoutModal = function() {
-            document.getElementById('checkout-overlay').classList.remove('active');
-        };
-
-        window.openTrackModal = function() {
-            document.getElementById('tracking-overlay').classList.add('active');
-        };
-
-        window.closeTrackModal = function() {
-            document.getElementById('tracking-overlay').classList.remove('active');
-            document.getElementById('orderResult').style.display = 'none';
-            document.getElementById('trackError').style.display = 'none';
-        };
+        window.closeCheckoutModal = function() { document.getElementById('checkout-overlay').classList.remove('active'); };
+        window.openTrackModal = function() { document.getElementById('tracking-overlay').classList.add('active'); };
+        window.closeTrackModal = function() { document.getElementById('tracking-overlay').classList.remove('active'); document.getElementById('orderResult').style.display = 'none'; document.getElementById('trackError').style.display = 'none'; };
 
         window.handlePaymentChange = function() {
             const method = document.getElementById('paymentMethod').value;
             const qrContainer = document.getElementById('qrContainer');
             const totalAmount = document.getElementById('cart-total').innerText;
-
             if (method === 'UPI') {
                 qrContainer.style.display = 'block';
                 document.getElementById('merchantUpiText').innerText = myUpiId;
                 const upiString = `upi://pay?pa=${myUpiId}&pn=JaynagarStore&am=${totalAmount}&cu=INR&tn=OrderPayment`;
                 document.getElementById('directUpiBtn').href = upiString;
                 document.getElementById('upiQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiString)}`;
-            } else {
-                qrContainer.style.display = 'none';
-            }
+            } else { qrContainer.style.display = 'none'; }
         };
 
         function updateCartUI() {
             document.getElementById('cart-count').innerText = cart.length;
             const cartItemsContainer = document.getElementById('cart-items');
             if (cart.length === 0) {
-                cartItemsContainer.innerHTML = '<p>Cart abhi khali hai.</p>';
+                cartItemsContainer.innerHTML = '<p style="text-align:center; color:#666;">Cart abhi khali hai.</p>';
+                document.getElementById('cart-subtotal').innerText = '0';
+                document.getElementById('delivery-charge').innerText = '0';
                 document.getElementById('cart-total').innerText = '0';
                 return;
             }
             cartItemsContainer.innerHTML = '';
-            let total = 0;
+            let subtotal = 0;
             cart.forEach((item, index) => {
-                total += item.price;
+                subtotal += Number(item.price);
                 cartItemsContainer.innerHTML += `
                     <div class="cart-item">
-                        <div>
-                            <strong>${item.title}</strong>
-                            <br><small>₹${item.price}</small>
-                        </div>
+                        <div><strong>${item.title}</strong><br><small>Size: ${item.selectedSize || 'Std'} | ₹${item.price}</small></div>
                         <button onclick="removeFromCart(${index})" style="background:none; border:none; color:red; cursor:pointer;">Remove</button>
                     </div>
                 `;
             });
-            document.getElementById('cart-total').innerText = total;
-        }
 
-        function generateOrderId() {
-            return 'JS-' + Math.floor(100000 + Math.random() * 900000);
+            let deliveryCharge = (subtotal > 0 && subtotal <= 99) ? 20 : 0;
+            let finalTotal = subtotal + deliveryCharge;
+
+            document.getElementById('cart-subtotal').innerText = subtotal;
+            document.getElementById('delivery-charge').innerText = deliveryCharge;
+            document.getElementById('cart-total').innerText = finalTotal;
         }
 
         document.getElementById('orderForm').addEventListener('submit', async (e) => {
@@ -665,109 +545,32 @@
 
             const name = document.getElementById('custName').value;
             const phone = document.getElementById('custPhone').value;
+            const pincode = document.getElementById('custPincode').value;
             const address = document.getElementById('custAddress').value;
             const paymentMethod = document.getElementById('paymentMethod').value;
             const txnId = document.getElementById('txnId').value || "N/A";
-            const orderId = generateOrderId();
+            const orderId = 'JS-' + Math.floor(100000 + Math.random() * 900000);
+            const totalAmount = document.getElementById('cart-total').innerText;
 
-            let productDetailsList = cart.map(item => item.title).join(', ');
-            let totalAmount = document.getElementById('cart-total').innerText;
-
-            const submitBtn = document.getElementById('submitOrderBtn');
-            submitBtn.innerText = "Placing Order...";
-            submitBtn.disabled = true;
+            if (phone.length !== 10 || isNaN(phone)) {
+                alert("⚠️ Kripya valid 10 digit mobile number dalein!");
+                return;
+            }
 
             try {
                 await addDoc(collection(db, "orders"), {
-                    orderId: orderId,
-                    customerName: name,
-                    customerPhone: phone,
-                    customerAddress: address,
-                    paymentMethod: paymentMethod,
-                    transactionId: txnId,
-                    items: cart,
-                    totalAmount: totalAmount,
-                    status: "Placed",
-                    orderDate: new Date()
+                    orderId, customerName: name, customerPhone: phone, customerPincode: pincode, customerAddress: address, paymentMethod, transactionId: txnId, items: cart, totalAmount, status: "Placed", orderDate: new Date()
                 });
-
-                const message = `*Naya Order Aaya Hai!*%0A%0A*Order ID:* ${orderId}%0A*Naam:* ${encodeURIComponent(name)}%0A*Mobile:* ${encodeURIComponent(phone)}%0A*Address:* ${encodeURIComponent(address)}%0A%0A*Items:* ${encodeURIComponent(productDetailsList)}%0A*Total Price:* ₹${totalAmount}%0A%0A*Payment Method:* ${paymentMethod}%0A*Txn ID:* ${encodeURIComponent(txnId)}`;
-                const whatsappUrl = `https://wa.me/${myWhatsAppNumber}?text=${message}`;
-
-                alert(`Order Successful!\n\nAapka Order ID hai: ${orderId}\nTracking ke liye ise note kar lein.`);
-                
+                alert(`Order Successful!\nAapka Order ID hai: ${orderId}\n(Note: Ek baar order place hone ke baad cancel nahi ho sakega.)`);
                 cart = [];
+                localStorage.removeItem('store_cart');
                 updateCartUI();
                 window.closeCheckoutModal();
                 window.toggleCart();
                 document.getElementById('orderForm').reset();
-
-                window.open(whatsappUrl, '_blank');
-                
-            } catch (error) {
-                console.error("Error placing order: ", error);
-                alert("Order place karne me error aaya.");
-            } finally {
-                submitBtn.innerText = "Order Place Karein";
-                submitBtn.disabled = false;
-            }
+                window.open(`https://wa.me/${myWhatsAppNumber}?text=*Naya Order Aaya Hai!*%0AOrder ID: ${orderId}%0ANaam: ${encodeURIComponent(name)}%0APhone: ${phone}%0APincode: ${pincode}%0AAddress: ${encodeURIComponent(address)}%0ATotal Price: ₹${totalAmount}`, '_blank');
+            } catch (error) { alert("Order place karne me error aaya."); }
         });
-
-        window.fetchOrderDetails = async function() {
-            const inputId = document.getElementById('trackOrderIdInput').value.trim();
-            const resultBox = document.getElementById('orderResult');
-            const errorBox = document.getElementById('trackError');
-
-            if (!inputId) {
-                alert("Kripya valid Order ID dalein.");
-                return;
-            }
-
-            resultBox.style.display = 'none';
-            errorBox.style.display = 'none';
-
-            try {
-                const q = query(collection(db, "orders"), where("orderId", "==", inputId));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    errorBox.innerText = "Order nahi mila. Correct Order ID check karein.";
-                    errorBox.style.display = 'block';
-                    return;
-                }
-
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    document.getElementById('resOrderId').innerText = data.orderId;
-                    document.getElementById('resName').innerText = data.customerName;
-                    document.getElementById('resAmount').innerText = data.totalAmount;
-                    document.getElementById('resItems').innerText = data.items.map(i => i.title).join(', ');
-
-                    updateStatusProgress(data.status || "Placed");
-                    resultBox.style.display = 'block';
-                });
-
-            } catch (err) {
-                console.error("Tracking Error: ", err);
-                errorBox.innerText = "Tracking error aaya.";
-                errorBox.style.display = 'block';
-            }
-        };
-
-        function updateStatusProgress(status) {
-            const steps = ['Placed', 'Processing', 'Shipped', 'Delivered'];
-            const currentIdx = steps.indexOf(status);
-
-            steps.forEach((s) => {
-                const el = document.getElementById(`step-${s.toLowerCase()}`);
-                if (el) el.classList.remove('active');
-            });
-
-            for (let i = 0; i <= (currentIdx === -1 ? 0 : currentIdx); i++) {
-                const el = document.getElementById(`step-${steps[i].toLowerCase()}`);
-                if (el) el.classList.add('active');
-            }
-        }
 
         renderProducts(products);
     </script>
