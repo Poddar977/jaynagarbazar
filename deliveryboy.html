@@ -3,30 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delivery Boy Portal - Jaynagar Store</title>
+    <title>Delivery Partner Portal - Jaynagar Store</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
         body { background: #f1f5f9; color: #1e293b; padding-bottom: 40px; }
+        
         header { background: #0f172a; color: white; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
+        header h1 { font-size: 16px; font-weight: bold; }
+
         .container { max-width: 620px; margin: 20px auto; padding: 0 15px; }
 
         .login-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center; }
         .login-card input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin: 15px 0; font-size: 14px; text-align: center; outline: none; }
         .btn-green { background: #16a34a; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; }
 
-        .order-card { background: white; border-radius: 12px; padding: 18px; margin-bottom: 15px; border-left: 5px solid #2874f0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        /* Today Performance & Cash Tally */
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px; }
+        .stat-card { background: white; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; text-align: center; }
+        .stat-card h4 { font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
+        .stat-card .val { font-size: 18px; font-weight: bold; color: #0f172a; }
+
+        .order-card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 15px; border-left: 5px solid #2874f0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .order-card.food-card { border-left-color: #ea580c; }
-        .order-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; font-weight: bold; }
+        .order-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px; font-weight: bold; }
         
         .call-btn { display: inline-flex; align-items: center; background: #2563eb; color: white; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 12px; font-weight: 600; margin: 6px 0; }
         .map-btn { display: inline-flex; align-items: center; background: #0284c7; color: white; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 12px; font-weight: 600; }
 
-        .otp-container { background: #fdfdfd; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 14px; margin-top: 12px; text-align: center; }
-        .otp-container input { width: 150px; padding: 8px; text-align: center; font-size: 18px; letter-spacing: 4px; border: 2px solid #2874f0; border-radius: 6px; font-weight: bold; margin-bottom: 10px; }
+        /* Doorstep UPI Acceptance Box */
+        .upi-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px; margin-top: 10px; text-align: center; }
+        .upi-qr-img { width: 150px; height: 150px; border-radius: 8px; border: 1px solid #ddd; margin: 8px auto; display: none; background: white; padding: 4px; }
+
+        .otp-container { background: #fdfdfd; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 12px; margin-top: 10px; text-align: center; }
+        .otp-container input { width: 140px; padding: 8px; text-align: center; font-size: 18px; letter-spacing: 4px; border: 2px solid #2874f0; border-radius: 6px; font-weight: bold; margin: 6px 0; outline: none; }
         
-        .action-btns { display: flex; gap: 10px; justify-content: center; }
-        .verify-deliver-btn { background: #16a34a; color: white; border: none; padding: 9px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .cancel-otp-btn { background: #dc2626; color: white; border: none; padding: 9px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .action-btns { display: flex; gap: 8px; justify-content: center; margin-top: 6px; }
+        .verify-deliver-btn { background: #16a34a; color: white; border: none; padding: 9px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .cancel-otp-btn { background: #dc2626; color: white; border: none; padding: 9px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -37,15 +50,42 @@
     </header>
 
     <div class="container">
+        <!-- Login Screen -->
         <div class="login-card" id="boyLoginBox">
             <h2>Delivery Partner Login</h2>
-            <input type="tel" id="boyPhoneInput" placeholder="Enter Registered Mobile (10-Digit)" maxlength="10">
-            <button class="btn-green" onclick="loginDeliveryBoy()">Login</button>
+            <p style="font-size: 12px; color: #64748b; margin-top: 4px;">Apna registered 10-digit mobile number dalein:</p>
+            <input type="tel" id="boyPhoneInput" placeholder="Enter Mobile Number" maxlength="10">
+            <button class="btn-green" onclick="loginDeliveryBoy()">Login to Dashboard</button>
         </div>
 
+        <!-- Main Delivery Dashboard -->
         <div id="boyDashboard" style="display: none;">
-            <h3 style="font-size: 15px; margin-bottom:12px;">Active Deliveries (Auto Cleared on Cancel)</h3>
-            <div id="assignedOrdersList">Loading...</div>
+            <!-- Today 1-Day Hisab Cards (No History Confusion) -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>Today Delivered</h4>
+                    <div class="val" id="statTodayDelivered" style="color:#2563eb;">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Cash in Hand (COD)</h4>
+                    <div class="val" id="statTodayCash" style="color:#d97706;">₹0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Online UPI Collected</h4>
+                    <div class="val" id="statTodayUpi" style="color:#7c3aed;">₹0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Today Net Earning</h4>
+                    <div class="val" id="statTodayEarning" style="color:#16a34a;">₹0</div>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 style="font-size: 15px;">Active Assigned Deliveries</h3>
+                <small id="boyPhoneDisplay" style="color:#2563eb; font-weight:bold;"></small>
+            </div>
+
+            <div id="assignedOrdersList">Loading deliveries...</div>
         </div>
     </div>
 
@@ -65,12 +105,14 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        const STORE_UPI_VPA = "9771556448@ybl"; // Store UPI VPA for customer doorstep payments
+
         let activeBoyPhone = localStorage.getItem('delivery_boy_phone') || null;
         if (activeBoyPhone) showDashboard();
 
         window.loginDeliveryBoy = () => {
             const phone = document.getElementById('boyPhoneInput').value.trim();
-            if (phone.length !== 10) return alert("10-digit phone number dalein!");
+            if (phone.length !== 10 || isNaN(phone)) return alert("Valid 10-digit mobile number enter karein!");
             activeBoyPhone = phone;
             localStorage.setItem('delivery_boy_phone', phone);
             showDashboard();
@@ -78,49 +120,115 @@
 
         window.logoutBoy = () => { localStorage.removeItem('delivery_boy_phone'); location.reload(); };
 
+        function isToday(dateObj) {
+            if (!dateObj) return false;
+            const now = new Date();
+            return dateObj.getDate() === now.getDate() &&
+                   dateObj.getMonth() === now.getMonth() &&
+                   dateObj.getFullYear() === now.getFullYear();
+        }
+
+        // Toggle Dynamic QR code for Customer Doorstep Payment
+        window.toggleDoorstepUpi = function(orderId, amount, custName) {
+            const qrImg = document.getElementById(`qrImg_${orderId}`);
+            const btn = document.getElementById(`qrBtn_${orderId}`);
+            if (qrImg.style.display === 'block') {
+                qrImg.style.display = 'none';
+                btn.innerText = '📲 Show Dynamic UPI QR to Customer';
+            } else {
+                const upiUrl = `upi://pay?pa=${STORE_UPI_VPA}&pn=JaynagarStore&am=${amount}&cu=INR&tn=Order_${orderId.slice(-6)}`;
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiUrl)}`;
+                qrImg.style.display = 'block';
+                btn.innerText = '❌ Hide QR Code';
+            }
+        };
+
         function showDashboard() {
             document.getElementById('boyLoginBox').style.display = 'none';
             document.getElementById('boyDashboard').style.display = 'block';
             document.getElementById('logoutBtn').style.display = 'block';
+            document.getElementById('boyPhoneDisplay').innerText = `📞 ${activeBoyPhone}`;
 
             const q = query(collection(db, "orders"), where("assignedBoyPhone", "==", activeBoyPhone));
+            
             onSnapshot(q, (snapshot) => {
                 const listDiv = document.getElementById('assignedOrdersList');
                 listDiv.innerHTML = '';
-                let count = 0;
+                
+                let activeCount = 0;
+                let todayDeliveredCount = 0;
+                let todayCash = 0;
+                let todayUpi = 0;
 
                 snapshot.forEach(docSnap => {
-                    const order = docSnap.data();
-                    const docId = docSnap.id;
+                    const order = { id: docSnap.id, ...docSnap.data() };
                     const st = (order.status || '').toLowerCase();
+                    const amt = Number(order.totalAmount || 0);
 
-                    // Auto-remove delivered and cancelled orders
+                    // Today 1-day metrics calculation
+                    let eventDate = null;
+                    if (order.deliveredAt) eventDate = new Date(order.deliveredAt);
+                    else if (order.orderDate?.seconds) eventDate = new Date(order.orderDate.seconds * 1000);
+
+                    if (st === 'delivered' && isToday(eventDate)) {
+                        todayDeliveredCount++;
+                        const mode = (order.paymentMethod || 'COD').toUpperCase();
+                        if (mode.includes('UPI')) todayUpi += amt;
+                        else todayCash += amt;
+                    }
+
+                    // Auto-remove delivered and cancelled orders from active view
                     if (st === 'delivered' || st === 'cancelled') return;
-                    count++;
+
+                    activeCount++;
 
                     const hasFood = (order.items || []).some(i => (i.category || '').toLowerCase() === 'food');
                     const mapAnchor = order.mapLink ? `<a href="${order.mapLink}" target="_blank" class="map-btn">📍 Open Map</a>` : '';
+                    const itemsDesc = (order.items || []).map(i => `• ${i.name} (₹${i.price})`).join('<br>');
 
                     listDiv.innerHTML += `
                         <div class="order-card ${hasFood ? 'food-card' : ''}">
                             <div class="order-card-header">
                                 <span>Status: <strong style="color:#d97706;">${order.status}</strong></span>
-                                <span>Collect: ₹${order.totalAmount} (${order.paymentMethod})</span>
+                                <span>To Collect: <strong style="color:#16a34a; font-size:15px;">₹${order.totalAmount}</strong></span>
                             </div>
                             <p><strong>Customer:</strong> ${order.customerName}</p>
                             <a href="tel:${order.customerPhone}" class="call-btn">📞 Call (${order.customerPhone})</a>
-                            <p style="font-size:12px; color:#475569;">📍 ${order.customerAddress} (PIN: ${order.customerPincode})</p>
+                            <p style="font-size:12px; color:#475569; margin:4px 0;">📍 ${order.customerAddress} (PIN: ${order.customerPincode})</p>
                             ${mapAnchor}
 
+                            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:8px; margin:8px 0; font-size:12px;">
+                                <strong>Items:</strong><br>${itemsDesc}
+                            </div>
+
+                            <!-- Doorstep Dynamic UPI QR Code -->
+                            <div class="upi-box">
+                                <button type="button" id="qrBtn_${order.id}" onclick="toggleDoorstepUpi('${order.id}', '${order.totalAmount}', '${order.customerName}')" style="background:#2563eb; color:white; border:none; padding:7px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer;">
+                                    📲 Show Dynamic UPI QR to Customer
+                                </button>
+                                <img id="qrImg_${order.id}" class="upi-qr-img" alt="UPI QR">
+                                <p style="font-size:11px; color:#64748b; margin-top:4px;">Customer kisi bhi App (PhonePe / GPay / Paytm) se scan karke exact ₹${order.totalAmount} pay kar sakta hai.</p>
+                            </div>
+
+                            <!-- Delivery OTP & Payment Collection Selection -->
                             <div class="otp-container">
-                                <p style="font-size:12px; font-weight:bold; margin-bottom:5px;">Customer se 4-digit Delivery OTP lein:</p>
-                                <input type="text" id="otp_${docId}" placeholder="OTP" maxlength="4"><br>
+                                <div style="margin-bottom:6px;">
+                                    <label style="font-size:11px; font-weight:bold;">Final Payment Collected As:</label>
+                                    <select id="payMode_${order.id}" style="padding:4px 8px; border-radius:4px; font-size:12px; border:1px solid #cbd5e1; margin-left:4px;">
+                                        <option value="COD">💵 Cash on Delivery (Cash)</option>
+                                        <option value="UPI">📲 QR Code / Online UPI</option>
+                                    </select>
+                                </div>
+
+                                <p style="font-size:12px; font-weight:bold; color:#0f172a;">Customer se 4-digit Delivery OTP lein:</p>
+                                <input type="text" id="otp_${order.id}" placeholder="OTP" maxlength="4"><br>
+                                
                                 <div class="action-btns">
-                                    <button class="verify-deliver-btn" onclick="deliverOrder('${docId}', '${order.deliveryOtp}')">✅ Deliver</button>
+                                    <button class="verify-deliver-btn" onclick="deliverOrder('${order.id}', '${order.deliveryOtp}')">✅ Verify & Deliver</button>
                                     ${
                                         hasFood 
                                         ? `<button class="cancel-otp-btn" style="opacity:0.5; cursor:not-allowed;" onclick="alert('Food order cancel nahi kiya ja sakta!')">🚫 No Cancel</button>` 
-                                        : `<button class="cancel-otp-btn" onclick="cancelViaOtp('${docId}', '${order.deliveryOtp}')">❌ Cancel via OTP</button>`
+                                        : `<button class="cancel-otp-btn" onclick="cancelViaOtp('${order.id}', '${order.deliveryOtp}')">❌ Cancel via OTP</button>`
                                     }
                                 </div>
                             </div>
@@ -128,22 +236,50 @@
                     `;
                 });
 
-                if (count === 0) listDiv.innerHTML = '<p style="text-align:center; padding:30px; background:white; border-radius:8px;">Koi active delivery parcel nahi hai.</p>';
+                // Update 1-Day Hisab UI
+                document.getElementById('statTodayDelivered').innerText = `${todayDeliveredCount} Orders`;
+                document.getElementById('statTodayCash').innerText = `₹${todayCash}`;
+                document.getElementById('statTodayUpi').innerText = `₹${todayUpi}`;
+                // Partner earning: ₹20 per delivery minus 1.5% platform commission = ₹19.70 net
+                const netEarning = (todayDeliveredCount * 19.70).toFixed(1);
+                document.getElementById('statTodayEarning').innerText = `₹${netEarning}`;
+
+                if (activeCount === 0) {
+                    listDiv.innerHTML = '<p style="text-align:center; padding:30px; background:white; border-radius:8px; color:#64748b;">Aapke paas abhi koi active delivery parcel nahi hai.</p>';
+                }
             });
         }
 
-        window.deliverOrder = async (id, otp) => {
+        // Deliver Order with OTP & Selected Payment Mode Sync
+        window.deliverOrder = async (id, correctOtp) => {
             const entered = document.getElementById(`otp_${id}`).value.trim();
-            if (entered !== String(otp)) return alert("❌ Galat OTP!");
-            await updateDoc(doc(db, "orders", id), { status: "Delivered", deliveredAt: new Date().toISOString() });
-            alert("✅ Delivered!");
+            if (entered !== String(correctOtp)) return alert("❌ Galat OTP! Customer se sahi OTP lekar verify karein.");
+
+            const collectedMode = document.getElementById(`payMode_${id}`).value;
+
+            try {
+                await updateDoc(doc(db, "orders", id), {
+                    status: "Delivered",
+                    paymentMethod: collectedMode,
+                    paymentStatus: "Paid (Verified at Doorstep)",
+                    deliveredAt: new Date().toISOString()
+                });
+                alert(`✅ Order Delivered! Payment Mode (${collectedMode}) record ho gaya.`);
+            } catch(e) {
+                alert("Error: " + e.message);
+            }
         };
 
-        window.cancelViaOtp = async (id, otp) => {
+        // Cancel via OTP
+        window.cancelViaOtp = async (id, correctOtp) => {
             const entered = document.getElementById(`otp_${id}`).value.trim();
-            if (entered !== String(otp)) return alert("❌ Galat OTP! Cancellation bina OTP ke nahi hoga.");
+            if (entered !== String(correctOtp)) return alert("❌ Galat OTP! Cancellation bina OTP ke nahi hoga.");
             if (confirm("Cancel this order?")) {
-                await updateDoc(doc(db, "orders", id), { status: "Cancelled", closedAt: new Date().toISOString() });
+                await updateDoc(doc(db, "orders", id), {
+                    status: "Cancelled",
+                    cancelledBy: `Delivery Boy (${activeBoyPhone})`,
+                    closedAt: new Date().toISOString()
+                });
                 alert("Order cancelled!");
             }
         };
