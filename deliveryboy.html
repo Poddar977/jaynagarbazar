@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Boy Portal - Jaynagar Store</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background: #f1f5f9; color: #1e293b; padding-bottom: 40px; }
+        header { background: #0f172a; color: white; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
+        .container { max-width: 620px; margin: 20px auto; padding: 0 15px; }
+
+        .login-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center; }
+        .login-card input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin: 15px 0; font-size: 14px; text-align: center; outline: none; }
+        .btn-green { background: #16a34a; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; }
+
+        .order-card { background: white; border-radius: 12px; padding: 18px; margin-bottom: 15px; border-left: 5px solid #2874f0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .order-card.food-card { border-left-color: #ea580c; }
+        .order-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; font-weight: bold; }
+        
+        .call-btn { display: inline-flex; align-items: center; background: #2563eb; color: white; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 12px; font-weight: 600; margin: 6px 0; }
+        .map-btn { display: inline-flex; align-items: center; background: #0284c7; color: white; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 12px; font-weight: 600; }
+
+        .otp-container { background: #fdfdfd; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 14px; margin-top: 12px; text-align: center; }
+        .otp-container input { width: 150px; padding: 8px; text-align: center; font-size: 18px; letter-spacing: 4px; border: 2px solid #2874f0; border-radius: 6px; font-weight: bold; margin-bottom: 10px; }
+        
+        .action-btns { display: flex; gap: 10px; justify-content: center; }
+        .verify-deliver-btn { background: #16a34a; color: white; border: none; padding: 9px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .cancel-otp-btn { background: #dc2626; color: white; border: none; padding: 9px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🚴 Delivery Partner Portal</h1>
+        <button id="logoutBtn" onclick="logoutBoy()" style="display:none; background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer;">Logout</button>
+    </header>
+
+    <div class="container">
+        <div class="login-card" id="boyLoginBox">
+            <h2>Delivery Partner Login</h2>
+            <input type="tel" id="boyPhoneInput" placeholder="Enter Registered Mobile (10-Digit)" maxlength="10">
+            <button class="btn-green" onclick="loginDeliveryBoy()">Login</button>
+        </div>
+
+        <div id="boyDashboard" style="display: none;">
+            <h3 style="font-size: 15px; margin-bottom:12px;">Active Deliveries (Auto Cleared on Cancel)</h3>
+            <div id="assignedOrdersList">Loading...</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, query, where, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA7f9PWSyws4XkzKq077sNdlF0J33DSVSo",
+            authDomain: "jaynagar-srote.firebaseapp.com",
+            projectId: "jaynagar-srote",
+            storageBucket: "jaynagar-srote.firebasestorage.app",
+            messagingSenderId: "820632565818",
+            appId: "1:820632565818:web:0b2f4676cecd799a801d03"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let activeBoyPhone = localStorage.getItem('delivery_boy_phone') || null;
+        if (activeBoyPhone) showDashboard();
+
+        window.loginDeliveryBoy = () => {
+            const phone = document.getElementById('boyPhoneInput').value.trim();
+            if (phone.length !== 10) return alert("10-digit phone number dalein!");
+            activeBoyPhone = phone;
+            localStorage.setItem('delivery_boy_phone', phone);
+            showDashboard();
+        };
+
+        window.logoutBoy = () => { localStorage.removeItem('delivery_boy_phone'); location.reload(); };
+
+        function showDashboard() {
+            document.getElementById('boyLoginBox').style.display = 'none';
+            document.getElementById('boyDashboard').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'block';
+
+            const q = query(collection(db, "orders"), where("assignedBoyPhone", "==", activeBoyPhone));
+            onSnapshot(q, (snapshot) => {
+                const listDiv = document.getElementById('assignedOrdersList');
+                listDiv.innerHTML = '';
+                let count = 0;
+
+                snapshot.forEach(docSnap => {
+                    const order = docSnap.data();
+                    const docId = docSnap.id;
+                    const st = (order.status || '').toLowerCase();
+
+                    // Auto-remove delivered and cancelled orders
+                    if (st === 'delivered' || st === 'cancelled') return;
+                    count++;
+
+                    const hasFood = (order.items || []).some(i => (i.category || '').toLowerCase() === 'food');
+                    const mapAnchor = order.mapLink ? `<a href="${order.mapLink}" target="_blank" class="map-btn">📍 Open Map</a>` : '';
+
+                    listDiv.innerHTML += `
+                        <div class="order-card ${hasFood ? 'food-card' : ''}">
+                            <div class="order-card-header">
+                                <span>Status: <strong style="color:#d97706;">${order.status}</strong></span>
+                                <span>Collect: ₹${order.totalAmount} (${order.paymentMethod})</span>
+                            </div>
+                            <p><strong>Customer:</strong> ${order.customerName}</p>
+                            <a href="tel:${order.customerPhone}" class="call-btn">📞 Call (${order.customerPhone})</a>
+                            <p style="font-size:12px; color:#475569;">📍 ${order.customerAddress} (PIN: ${order.customerPincode})</p>
+                            ${mapAnchor}
+
+                            <div class="otp-container">
+                                <p style="font-size:12px; font-weight:bold; margin-bottom:5px;">Customer se 4-digit Delivery OTP lein:</p>
+                                <input type="text" id="otp_${docId}" placeholder="OTP" maxlength="4"><br>
+                                <div class="action-btns">
+                                    <button class="verify-deliver-btn" onclick="deliverOrder('${docId}', '${order.deliveryOtp}')">✅ Deliver</button>
+                                    ${
+                                        hasFood 
+                                        ? `<button class="cancel-otp-btn" style="opacity:0.5; cursor:not-allowed;" onclick="alert('Food order cancel nahi kiya ja sakta!')">🚫 No Cancel</button>` 
+                                        : `<button class="cancel-otp-btn" onclick="cancelViaOtp('${docId}', '${order.deliveryOtp}')">❌ Cancel via OTP</button>`
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                if (count === 0) listDiv.innerHTML = '<p style="text-align:center; padding:30px; background:white; border-radius:8px;">Koi active delivery parcel nahi hai.</p>';
+            });
+        }
+
+        window.deliverOrder = async (id, otp) => {
+            const entered = document.getElementById(`otp_${id}`).value.trim();
+            if (entered !== String(otp)) return alert("❌ Galat OTP!");
+            await updateDoc(doc(db, "orders", id), { status: "Delivered", deliveredAt: new Date().toISOString() });
+            alert("✅ Delivered!");
+        };
+
+        window.cancelViaOtp = async (id, otp) => {
+            const entered = document.getElementById(`otp_${id}`).value.trim();
+            if (entered !== String(otp)) return alert("❌ Galat OTP! Cancellation bina OTP ke nahi hoga.");
+            if (confirm("Cancel this order?")) {
+                await updateDoc(doc(db, "orders", id), { status: "Cancelled", closedAt: new Date().toISOString() });
+                alert("Order cancelled!");
+            }
+        };
+    </script>
+</body>
+</html>
