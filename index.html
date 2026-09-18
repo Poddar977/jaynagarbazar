@@ -69,9 +69,10 @@
         .cart-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
         .cart-footer { padding: 15px; border-top: 1px solid #eee; background: #f9f9f9; }
 
-        /* Terms Box */
         .terms-container { font-size: 12px; line-height: 1.6; color: #475569; max-height: 60vh; overflow-y: auto; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; margin-top: 10px; }
         .terms-container h3 { color: #0f172a; margin-top: 10px; font-size: 13px; }
+
+        .active-shop-pill { background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
@@ -94,6 +95,10 @@
                     <li onclick="openOrdersTab('previous')">📜 Delivered Orders</li>
                     <li onclick="openProfileModal()">✏️ Update Profile</li>
                     <li onclick="openTermsModal()">📄 Terms & Conditions</li>
+                    <!-- Seller / Restaurant Portal Direct Link -->
+                    <li onclick="window.open('https://poddar977.github.io/jaynagarbazar/restaurent.html', '_blank')" style="color:#ea580c; font-weight:bold; border-top:1px dashed #cbd5e1;">
+                        🏪 Seller
+                    </li>
                     <li onclick="handleLogout()" style="color:#ef4444;">🚪 Logout</li>
                 </ul>
             </div>
@@ -112,7 +117,7 @@
     <!-- Mode Switcher -->
     <div class="mode-switcher-container">
         <button class="mode-btn active" id="btnModeGeneral" onclick="switchAppMode('general')">🛍️ All Products Market</button>
-        <button class="mode-btn food-mode" id="btnModeFood" onclick="switchAppMode('food')">🍔 Fast Food & Restaurants (Swiggy Mode)</button>
+        <button class="mode-btn food-mode" id="btnModeFood" onclick="switchAppMode('food')">🍔 Fast Food & Restaurants</button>
     </div>
 
     <div class="category-nav-bar" id="generalCatNav">
@@ -130,7 +135,7 @@
             <div class="product-grid" id="generalProductGrid">Loading products...</div>
         </section>
 
-        <!-- SWIGGY FOOD MODE VIEW -->
+        <!-- FAST FOOD MODE VIEW -->
         <section id="sectionFoodStore" style="display:none;">
             <div class="restaurant-filter-box">
                 <div>
@@ -174,7 +179,7 @@
                     <input type="text" id="regPincode" placeholder="Pincode (e.g. 847226)" maxlength="6" style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
                     <textarea id="regAddress" placeholder="Full Delivery Address" style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;"></textarea>
                     
-                    <!-- Mandatory Terms & Conditions Checkbox -->
+                    <!-- Mandatory Terms Checkbox -->
                     <div style="display:flex; align-items:flex-start; gap:8px; margin-top:12px; text-align:left;">
                         <input type="checkbox" id="termsAgreementCheckbox" style="margin-top:3px; cursor:pointer;" required>
                         <label for="termsAgreementCheckbox" style="font-size:12px; color:#475569; cursor:pointer;">
@@ -214,22 +219,22 @@
                 <p>• Orders below ₹100: Delivery Charge = ₹20.<br>
                 • Orders of ₹100 or above: Delivery Charge = ₹0 (FREE Delivery).</p>
 
-                <h3>4. PAYMENT & REFUND POLICY</h3>
-                <p>• Currently, payments are collected through Cash on Delivery (COD) or verified methods.<br>
-                • Cancellation after order placement is not permitted. In case of spoiled food or wrong items, report immediately with photos/evidence for replacement or resolution.</p>
+                <h3>4. PAYMENT POLICY</h3>
+                <p>• Currently, orders are accepted via Cash on Delivery (COD).<br>
+                • Doorstep delivery ke waqt exact amount delivery boy ko cash pay karein.</p>
 
-                <h3>5. RESTAURANT & VENDOR POLICY</h3>
-                <p>• Restaurants charge a standard 2% platform commission on orders.<br>
-                • Delivery partners earn ₹20 per completed delivery (subject to 1.5% platform commission).</p>
+                <h3>5. RESTAURANT & SINGLE SHOP ORDER RULE</h3>
+                <p>• Food orders are processed separately from General Market products.<br>
+                • At any given time, food items can be ordered from ONLY ONE restaurant. Adding items from another restaurant replaces previous food items in the cart.</p>
 
                 <h3>6. 24x7 CUSTOMER SUPPORT</h3>
-                <p>Jaynagar Store Helpline: <strong>06246451082</strong> (Available 24×7 for order and delivery assistance).</p>
+                <p>Jaynagar Store Helpline: <strong>06246451082</strong> (Available 24×7 for order assistance).</p>
             </div>
             <button class="btn-submit" onclick="closeTermsModal()" style="margin-top:12px;">I Understand & Agree</button>
         </div>
     </div>
 
-    <!-- Orders Modal -->
+    <!-- Orders History Modal -->
     <div class="modal-overlay" id="orders-modal-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="closeOrdersModal()">&times;</span>
@@ -255,10 +260,11 @@
 
     <!-- Cart Modal -->
     <div class="cart-modal" id="cart-modal">
-        <div class="cart-header">
+        <div class="cart-header" id="cartHeaderEl">
             <h3>Shopping Cart</h3>
             <span class="close-modal" style="position:static;" onclick="toggleCart()">&times;</span>
         </div>
+        <div style="padding: 10px 15px 0;" id="cartNoticeBox"></div>
         <div class="cart-items" id="cart-items"><p>Cart khali hai.</p></div>
         <div class="cart-footer">
             <div style="font-size:13px; margin-bottom:5px;">Subtotal: ₹<span id="cart-subtotal">0</span></div>
@@ -268,7 +274,7 @@
         </div>
     </div>
 
-    <!-- Checkout Modal (COD ONLY - UPI REMOVED TEMPORARILY) -->
+    <!-- Checkout Modal (COD Mode) -->
     <div class="modal-overlay" id="checkout-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
@@ -279,7 +285,6 @@
                 <input type="text" id="custPincode" placeholder="Pincode" maxlength="6" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
                 <textarea id="custAddress" placeholder="Delivery Address" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;"></textarea>
                 
-                <!-- COD Payment Notice -->
                 <div style="margin-top:15px; padding:14px; background:#f8fafc; border:1px dashed #16a34a; border-radius:8px; text-align:center;">
                     <span style="font-size:18px;">💵</span>
                     <h4 style="color:#16a34a; margin:4px 0;">Cash on Delivery (COD)</h4>
@@ -435,7 +440,6 @@
             if (termsCheck) termsCheck.required = isSignupMode;
         };
 
-        // Form Submit with Mandatory Terms Condition
         document.getElementById('authForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('authEmail').value.trim();
@@ -482,7 +486,6 @@
             if (confirm("Logout?")) signOut(auth).then(() => location.reload());
         };
 
-        // Profile Modal
         window.openProfileModal = function() {
             document.getElementById('userMenuDropdown').classList.remove('show');
             if (!currentUser) return alert("Pehle login karein!");
@@ -525,7 +528,6 @@
             } catch(err) { alert("Profile update error: " + err.message); }
         });
 
-        // Orders History / Tracking
         window.openOrdersTab = async function(type) {
             document.getElementById('userMenuDropdown').classList.remove('show');
             if (!currentUser) return alert("Pehle login karein!");
@@ -584,7 +586,6 @@
         };
         window.closeOrdersModal = () => document.getElementById('orders-modal-overlay').classList.remove('active');
 
-        // Products & Shops Listener
         onSnapshot(collection(db, "products"), (snapshot) => {
             allProducts = [];
             snapshot.forEach(d => allProducts.push({ id: d.id, ...d.data() }));
@@ -715,33 +716,94 @@
             document.getElementById('restaurantMenuView').style.display = 'none';
         };
 
+        // 1. Add General Product (Cannot mix with Food)
         window.addToCart = (prodId) => {
             const p = allProducts.find(x => x.id === prodId);
-            if (p) { cart.push(p); saveCart(); }
+            if (!p) return;
+
+            const hasFood = cart.some(i => (i.category || '').toLowerCase() === 'food');
+            if (hasFood) {
+                const confirmClear = confirm("⚠️ Cart me pehle se Food/Restaurant order add hai.\n\nGeneral Market product add karne par cart se food items clear ho jayenge. Kya aap aage badhna chahte hain?");
+                if (!confirmClear) return;
+                cart = [];
+            }
+
+            cart.push(p);
+            saveCart();
+            alert(`"${p.name}" cart me add ho gaya!`);
         };
+
         window.buyNow = (prodId) => {
             const p = allProducts.find(x => x.id === prodId);
-            if (p) { cart = [p]; saveCart(); openCheckoutModal(); }
+            if (!p) return;
+            cart = [p];
+            saveCart();
+            openCheckoutModal();
         };
+
+        // 2. Add Food Product (Single Restaurant Rule - Auto-replace)
         window.addFoodToCart = (dishId, shopId, shopName) => {
             const p = allProducts.find(x => x.id === dishId);
-            if (p) { cart.push({ ...p, assignedShopId: shopId, assignedShopName: shopName }); saveCart(); }
+            if (!p) return;
+
+            const hasGeneral = cart.some(i => (i.category || '').toLowerCase() !== 'food');
+            if (hasGeneral) {
+                const confirmClearGen = confirm("⚠️ Aapke cart me General Market ke items hain.\n\nFood order alag se process hota hai. Kya aap cart clear karke is restaurant ka food add karna chahte hain?");
+                if (!confirmClearGen) return;
+                cart = [];
+            }
+
+            const existingFood = cart.find(i => (i.category || '').toLowerCase() === 'food' && i.assignedShopId);
+            if (existingFood && existingFood.assignedShopId !== shopId) {
+                const confirmReplace = confirm(`🍲 Single Restaurant Rule:\n\nAapke cart me pehle se "${existingFood.assignedShopName || 'Dusre Restaurant'}" ka order hai.\n\nEk bar me sirf ek hi restaurant se order ho sakta hai.\n\nKya aap purana order REPLACE karke "${shopName}" ka food add karna chahte hain?`);
+                if (!confirmReplace) return;
+                cart = [];
+            }
+
+            cart.push({ ...p, assignedShopId: shopId, assignedShopName: shopName });
+            saveCart();
+            alert(`"${p.name}" (${shopName}) cart me add ho gaya!`);
         };
+
         window.buyFoodNow = (dishId, shopId, shopName) => {
             const p = allProducts.find(x => x.id === dishId);
-            if (p) { cart = [{ ...p, assignedShopId: shopId, assignedShopName: shopName }]; saveCart(); openCheckoutModal(); }
+            if (!p) return;
+
+            cart = [{ ...p, assignedShopId: shopId, assignedShopName: shopName }];
+            saveCart();
+            openCheckoutModal();
         };
 
         function saveCart() {
             localStorage.setItem('store_cart', JSON.stringify(cart));
             updateCartUI();
         }
-        window.removeFromCart = (idx) => { cart.splice(idx, 1); saveCart(); };
+
+        window.removeFromCart = (idx) => { 
+            cart.splice(idx, 1); 
+            saveCart(); 
+        };
+
         window.toggleCart = () => document.getElementById('cart-modal').classList.toggle('open');
 
         function updateCartUI() {
             document.getElementById('cart-count').innerText = cart.length;
             const container = document.getElementById('cart-items');
+            const noticeBox = document.getElementById('cartNoticeBox');
+
+            const foodItem = cart.find(i => (i.category || '').toLowerCase() === 'food' && i.assignedShopId);
+
+            if (foodItem) {
+                noticeBox.innerHTML = `
+                    <div class="active-shop-pill">
+                        <span>🏪 Restaurant: <strong>${foodItem.assignedShopName || 'Kitchen'}</strong></span>
+                        <small style="color:#b45309; font-size:10px;">(Single Shop Mode)</small>
+                    </div>
+                `;
+            } else {
+                noticeBox.innerHTML = '';
+            }
+
             if (cart.length === 0) {
                 container.innerHTML = '<p style="text-align:center; color:#666; padding:15px;">Cart khali hai.</p>';
                 document.getElementById('cart-subtotal').innerText = '0';
@@ -767,14 +829,12 @@
                 `;
             });
 
-            // Delivery Charge Policy: < 100 Rs = 20 Rs, >= 100 Rs = FREE
             let del = (subtotal > 0 && subtotal < 100) ? 20 : 0;
             document.getElementById('cart-subtotal').innerText = subtotal;
             document.getElementById('delivery-charge').innerText = del;
             document.getElementById('cart-total').innerText = subtotal + del;
         }
 
-        // Checkout Modal (COD ONLY)
         window.openCheckoutModal = () => {
             if (!currentUser) { alert("Pehle login karein!"); toggleCart(); openAuthModal(); return; }
             if (cart.length === 0) return alert("Cart khali hai!");
@@ -788,7 +848,6 @@
         };
         window.closeCheckoutModal = () => document.getElementById('checkout-overlay').classList.remove('active');
 
-        // Confirm Order (Cash on Delivery)
         document.getElementById('orderForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentUser) return;
