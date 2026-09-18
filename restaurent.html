@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Portal - Jaynagar Store</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background: #f8fafc; color: #1e293b; display: flex; height: 100vh; overflow: hidden; }
+        
+        aside { width: 250px; background: #7c2d12; color: white; display: flex; flex-direction: column; flex-shrink: 0; }
+        aside .logo { padding: 20px; font-size: 18px; font-weight: bold; background: #431407; }
+        aside nav { flex: 1; padding: 15px 0; overflow-y: auto; }
+        aside nav a { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; color: #fed7aa; text-decoration: none; font-size: 14px; font-weight: 600; cursor: pointer; }
+        aside nav a:hover, aside nav a.active { background: #ea580c; color: white; }
+
+        main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        header { background: white; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
+
+        .content-body { padding: 25px 30px; flex: 1; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 18px; border-radius: 10px; border: 1px solid #e2e8f0; }
+        .stat-card h3 { font-size: 12px; color: #64748b; margin-bottom: 5px; text-transform: uppercase; }
+        .stat-card .val { font-size: 22px; font-weight: bold; color: #0f172a; }
+
+        .tab-section { display: none; }
+        .tab-section.active { display: block; }
+        .card { background: white; border-radius: 10px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+        table th { background: #f8fafc; padding: 10px 12px; border-bottom: 1px solid #e2e8f0; color: #475569; }
+        table td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; }
+        .btn-primary { background: #ea580c; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-kitchen { background: #f97316; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
+
+        .preview-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .preview-box { width: 60px; height: 60px; border-radius: 6px; border: 1px solid #ddd; object-fit: cover; }
+
+        .login-overlay { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 500; }
+        .login-card { background: white; border-radius: 12px; padding: 30px; width: 90%; max-width: 400px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-card">
+            <h2 style="color: #ea580c;">🍕 Kitchen Partner</h2>
+            <p style="font-size: 12px; color: #64748b; margin-bottom: 15px;">Admin dwara create kiya gaya Username & Password dalein:</p>
+            <form id="restaurantLoginForm">
+                <input type="text" id="logUsername" placeholder="Username" required>
+                <input type="password" id="logPassword" placeholder="Password" style="margin-top:10px;" required>
+                <button type="submit" class="btn-primary" style="width:100%; margin-top:15px; padding:12px;">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <aside>
+        <div class="logo">🍳 <span id="sidebarShopName">Kitchen</span></div>
+        <nav>
+            <a onclick="showTab('tab-live', this)" class="active">🔥 Live Kitchen Queue</a>
+            <a onclick="showTab('tab-hisab', this)">💰 Today Collection (No History)</a>
+            <a onclick="showTab('tab-add-product', this)">➕ Add Food Item (1-6 Photos)</a>
+            <a onclick="showTab('tab-menu', this)">📋 My Food Menu</a>
+        </nav>
+        <div style="padding:15px;">
+            <button onclick="logoutShop()" style="background:#431407; color:#fca5a5; border:none; width:100%; padding:8px; border-radius:6px; font-weight:bold; cursor:pointer;">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <main>
+        <header>
+            <h2 id="topBarShopTitle">Restaurant Panel</h2>
+            <span id="liveClock" style="font-size: 13px; font-weight: 600; color: #64748b;">Clock...</span>
+        </header>
+
+        <div class="content-body">
+            <!-- STRICTLY TODAY COLLECTION ONLY -->
+            <div class="stats-grid">
+                <div class="stat-card"><h3>Today Collection</h3><div class="val" id="statTodayCollection" style="color:#16a34a;">₹0</div></div>
+                <div class="stat-card"><h3>Delivered Today</h3><div class="val" id="statDeliveredToday" style="color:#2563eb;">0</div></div>
+                <div class="stat-card"><h3>Cancelled Today</h3><div class="val" id="statCancelledToday" style="color:#dc2626;">0</div></div>
+                <div class="stat-card"><h3>Today UPI</h3><div class="val" id="statTodayUpi" style="color:#7c3aed;">₹0</div></div>
+                <div class="stat-card"><h3>Today Cash (COD)</h3><div class="val" id="statTodayCash" style="color:#d97706;">₹0</div></div>
+            </div>
+
+            <!-- Tab 1: Live Kitchen Queue -->
+            <section id="tab-live" class="tab-section active">
+                <div class="card">
+                    <h2>🔥 Live Active Orders</h2>
+                    <table>
+                        <thead><tr><th>Time</th><th>Customer</th><th>Dishes</th><th>Total</th><th>OTP</th><th>Status</th><th>Assign Delivery Boy</th></tr></thead>
+                        <tbody id="liveOrdersTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Tab 2: Today Hisab Only -->
+            <section id="tab-hisab" class="tab-section">
+                <div class="card">
+                    <h2>💰 Today Order Hisab & Cash / UPI Breakdown</h2>
+                    <table>
+                        <thead><tr><th>Time</th><th>Customer</th><th>Dishes</th><th>Mode</th><th>Amount (₹)</th><th>Status</th></tr></thead>
+                        <tbody id="todayHisabTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Tab 3: Add Food Item with 1-6 Photos -->
+            <section id="tab-add-product" class="tab-section">
+                <div class="card">
+                    <h2>➕ Nayi Dish Add Karein (Image Link ya 1-6 Photos)</h2>
+                    <form id="addFoodItemForm">
+                        <div class="form-grid">
+                            <input type="text" id="foodTitle" placeholder="Food Dish Name" required>
+                            <input type="number" id="foodPrice" placeholder="Price (₹)" required>
+                            <input type="number" id="foodOriginalPrice" placeholder="Original MRP (Optional)">
+                            <select id="foodSubCategory" required>
+                                <option value="fast-food">Fast Food</option>
+                                <option value="daily-need">Daily Need / Milk</option>
+                                <option value="main-course">Main Course</option>
+                            </select>
+                            <input type="url" id="foodImageLink" placeholder="Option 1: Image Link">
+                            <div>
+                                <label style="font-size:12px; font-weight:bold;">Option 2: Photo Upload (1 to 6):</label>
+                                <input type="file" id="foodFilePhotos" accept="image/*" multiple onchange="previewFoodFiles(this)">
+                            </div>
+                        </div>
+                        <div class="preview-grid" id="foodPhotoPreview"></div>
+                        <textarea id="foodDesc" placeholder="Description..." style="margin-top:10px; height:50px;"></textarea>
+                        <button type="submit" class="btn-primary" style="margin-top:12px;">Live Karein</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Tab 4: Food Menu -->
+            <section id="tab-menu" class="tab-section">
+                <div class="card">
+                    <h2>📋 Aapki Shop Ka Menu</h2>
+                    <table>
+                        <thead><tr><th>Photos</th><th>Title</th><th>Category</th><th>Price</th><th>Action</th></tr></thead>
+                        <tbody id="menuTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        let foodPhotosArray = [];
+        function previewFoodFiles(input) {
+            const container = document.getElementById('foodPhotoPreview');
+            container.innerHTML = '';
+            foodPhotosArray = [];
+
+            if (input.files.length > 6) {
+                alert("Maximum 6 photos allowed!");
+                input.value = '';
+                return;
+            }
+
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    foodPhotosArray.push(e.target.result);
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'preview-box';
+                    container.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, doc, getDocs, onSnapshot, updateDoc, deleteDoc, serverTimestamp, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA7f9PWSyws4XkzKq077sNdlF0J33DSVSo",
+            authDomain: "jaynagar-srote.firebaseapp.com",
+            projectId: "jaynagar-srote",
+            storageBucket: "jaynagar-srote.firebasestorage.app",
+            messagingSenderId: "820632565818",
+            appId: "1:820632565818:web:0b2f4676cecd799a801d03"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let currentShop = JSON.parse(localStorage.getItem('rest_shop_session')) || null;
+
+        window.showTab = function(tabId, el) {
+            document.querySelectorAll('.tab-section').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('aside nav a').forEach(a => a.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            el.classList.add('active');
+        };
+
+        setInterval(() => {
+            document.getElementById('liveClock').innerText = new Date().toLocaleString('en-IN');
+        }, 1000);
+
+        if (currentShop) initApp();
+
+        document.getElementById('restaurantLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const u = document.getElementById('logUsername').value.trim().toLowerCase();
+            const p = document.getElementById('logPassword').value.trim();
+
+            const q = query(collection(db, "shops"), where("username", "==", u), where("password", "==", p));
+            const snap = await getDocs(q);
+            if (snap.empty) return alert("❌ Galat credentials!");
+
+            let sData = null;
+            snap.forEach(d => { sData = { id: d.id, ...d.data() }; });
+            currentShop = sData;
+            localStorage.setItem('rest_shop_session', JSON.stringify(sData));
+            initApp();
+        });
+
+        window.logoutShop = () => { localStorage.removeItem('rest_shop_session'); location.reload(); };
+
+        function isToday(dateObj) {
+            if (!dateObj) return false;
+            const today = new Date();
+            return dateObj.getDate() === today.getDate() && dateObj.getMonth() === today.getMonth() && dateObj.getFullYear() === today.getFullYear();
+        }
+
+        function initApp() {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('sidebarShopName').innerText = currentShop.shopName;
+            document.getElementById('topBarShopTitle').innerText = `🏪 ${currentShop.shopName} (PIN: ${currentShop.pincode || 'Local'})`;
+
+            const qOrders = query(collection(db, "orders"), where("assignedShopId", "==", currentShop.id));
+            onSnapshot(qOrders, (snapshot) => {
+                const liveTable = document.getElementById('liveOrdersTableBody');
+                const hisabTable = document.getElementById('todayHisabTableBody');
+                liveTable.innerHTML = '';
+                hisabTable.innerHTML = '';
+
+                let todayDelivered = 0, todayCancelled = 0, todayCollection = 0, todayUpi = 0, todayCash = 0;
+
+                snapshot.forEach(docSnap => {
+                    const order = { id: docSnap.id, ...docSnap.data() };
+                    const st = (order.status || 'Placed').toLowerCase();
+                    const rawDate = order.orderDate?.seconds ? new Date(order.orderDate.seconds * 1000) : new Date(order.orderDate || Date.now());
+                    const isOrderToday = isToday(rawDate);
+
+                    const itemsHtml = (order.items || []).map(i => `• ${i.name} (₹${i.price})`).join('<br>');
+
+                    if (st !== 'delivered' && st !== 'cancelled') {
+                        liveTable.innerHTML += `
+                            <tr>
+                                <td><small>${order.orderDateFormatted || 'Just now'}</small></td>
+                                <td><strong>${order.customerName}</strong><br><small>📞 ${order.customerPhone}</small></td>
+                                <td>${itemsHtml}</td>
+                                <td>₹${order.totalAmount} (${order.paymentMethod})</td>
+                                <td><strong>${order.deliveryOtp}</strong></td>
+                                <td>
+                                    <span style="background:#fed7aa; color:#c2410c; padding:3px 6px; border-radius:10px; font-size:11px;">${order.status}</span><br>
+                                    <button class="btn-kitchen" onclick="setOrderStatus('${order.id}', 'Preparing')">🍳 Preparing</button>
+                                    <button class="btn-kitchen" style="background:#ca8a04;" onclick="setOrderStatus('${order.id}', 'Food Ready')">🥡 Ready</button>
+                                </td>
+                                <td>
+                                    <input type="tel" id="boyPhone_${order.id}" placeholder="Boy Phone" value="${order.assignedBoyPhone || ''}" style="width:110px; font-size:11px; padding:3px;">
+                                    <button onclick="assignBoy('${order.id}')" class="btn-primary" style="padding:3px 6px; font-size:11px;">Assign</button>
+                                </td>
+                            </tr>
+                        `;
+                    }
+
+                    if (isOrderToday) {
+                        const amt = Number(order.totalAmount || 0);
+                        const payMethod = (order.paymentMethod || 'COD').toUpperCase();
+
+                        if (st === 'delivered') {
+                            todayDelivered++;
+                            todayCollection += amt;
+                            if (payMethod.includes('UPI')) todayUpi += amt; else todayCash += amt;
+                            hisabTable.innerHTML += `<tr><td><small>${order.orderDateFormatted||'Today'}</small></td><td>${order.customerName}</td><td>${itemsHtml}</td><td>${payMethod}</td><td>₹${amt}</td><td><span style="color:green; font-weight:bold;">Delivered</span></td></tr>`;
+                        } else if (st === 'cancelled') {
+                            todayCancelled++;
+                            hisabTable.innerHTML += `<tr><td><small>${order.orderDateFormatted||'Today'}</small></td><td>${order.customerName}</td><td>${itemsHtml}</td><td>${payMethod}</td><td>₹${amt}</td><td><span style="color:red; font-weight:bold;">Cancelled</span></td></tr>`;
+                        }
+                    }
+                });
+
+                document.getElementById('statTodayCollection').innerText = `₹${todayCollection}`;
+                document.getElementById('statDeliveredToday').innerText = todayDelivered;
+                document.getElementById('statCancelledToday').innerText = todayCancelled;
+                document.getElementById('statTodayUpi').innerText = `₹${todayUpi}`;
+                document.getElementById('statTodayCash').innerText = `₹${todayCash}`;
+            });
+
+            // Restaurant Menu
+            const qMenu = query(collection(db, "products"), where("shopId", "==", currentShop.id));
+            onSnapshot(qMenu, (snapshot) => {
+                const tbody = document.getElementById('menuTableBody');
+                tbody.innerHTML = '';
+                snapshot.forEach(docSnap => {
+                    const p = docSnap.data();
+                    const pCount = p.images ? p.images.length : 1;
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><img src="${p.imageUrl || (p.images ? p.images[0] : '')}" style="width:40px; height:40px; border-radius:4px; object-fit:cover;"><br><small>${pCount} photo(s)</small></td>
+                            <td><strong>${p.name}</strong></td>
+                            <td>${p.subCategory}</td>
+                            <td>₹${p.price}</td>
+                            <td><button onclick="delDish('${docSnap.id}')" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Delete</button></td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        window.setOrderStatus = async (id, st) => await updateDoc(doc(db, "orders", id), { status: st });
+        window.assignBoy = async (id) => {
+            const phone = document.getElementById(`boyPhone_${id}`).value.trim();
+            if (phone.length !== 10) return alert("10-digit phone dalein!");
+            await updateDoc(doc(db, "orders", id), { assignedBoyPhone: phone, status: "Assigned" });
+            alert("Delivery boy assign ho gaya!");
+        };
+
+        // Add Dish (1 to 6 Photos Support)
+        document.getElementById('addFoodItemForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('foodTitle').value.trim();
+            const price = Number(document.getElementById('foodPrice').value);
+            const originalPrice = Number(document.getElementById('foodOriginalPrice').value) || '';
+            const subCategory = document.getElementById('foodSubCategory').value;
+            const desc = document.getElementById('foodDesc').value.trim();
+            const link = document.getElementById('foodImageLink').value.trim();
+
+            let photos = [];
+            if (foodPhotosArray.length > 0) photos = foodPhotosArray;
+            else if (link) photos = [link];
+            else return alert("Photo link dalein ya 1-6 photos upload karein!");
+
+            try {
+                await addDoc(collection(db, "products"), {
+                    name, price, originalPrice, category: "food", subCategory, description: desc,
+                    shopName: currentShop.shopName,
+                    shopId: currentShop.id,
+                    imageUrl: photos[0],
+                    images: photos,
+                    createdAt: serverTimestamp()
+                });
+                alert("✅ Dish menu me add ho gayi!");
+                document.getElementById('addFoodItemForm').reset();
+                document.getElementById('foodPhotoPreview').innerHTML = '';
+                foodPhotosArray = [];
+                showTab('tab-menu', document.querySelectorAll('aside nav a')[3]);
+            } catch(err) { alert("Error: " + err.message); }
+        });
+
+        window.delDish = async (id) => { if (confirm("Delete dish?")) await deleteDoc(doc(db, "products", id)); };
+    </script>
+</body>
+</html>
