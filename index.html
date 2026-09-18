@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jaynagar Store - Hybrid Super App</title>
-    <meta name="google-site-verification" content="72NquAkB-h-rhGmC663QSuZ3Y40bASxjPp0xk2tme2w" />
-    <!-- TensorFlow.js for ML Recommendation -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
         body { background-color: #f1f2f6; color: #333; }
@@ -62,12 +59,19 @@
         .close-modal { position: absolute; right: 15px; top: 15px; cursor: pointer; font-size: 22px; font-weight: bold; width: 30px; height: 30px; border-radius: 50%; background: #f1f2f6; display: flex; align-items: center; justify-content: center; }
         .btn-submit { background: #2874f0; color: white; border: none; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; padding: 12px; border-radius: 25px; }
 
-        .cart-modal { position: fixed; top: 0; right: -400px; width: 350px; height: 100%; background-color: white; box-shadow: -2px 0 10px rgba(0,0,0,0.2); transition: right 0.3s ease; z-index: 200; display: flex; flex-direction: column; }
+        .cart-modal { position: fixed; top: 0; right: -420px; width: 360px; height: 100%; background-color: white; box-shadow: -2px 0 10px rgba(0,0,0,0.2); transition: right 0.3s ease; z-index: 200; display: flex; flex-direction: column; }
         .cart-modal.open { right: 0; }
         .cart-header { background-color: #2874f0; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         .cart-items { flex: 1; overflow-y: auto; padding: 15px; }
-        .cart-item { display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
+        .cart-item { display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #eee; padding: 12px 0; }
         .cart-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
+        
+        /* Quantity Counter Buttons */
+        .qty-controls { display: inline-flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 20px; background: #f8fafc; overflow: hidden; margin-top: 5px; }
+        .qty-btn { background: #f1f5f9; border: none; width: 26px; height: 26px; cursor: pointer; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; color: #1e293b; }
+        .qty-btn:hover { background: #e2e8f0; }
+        .qty-val { min-width: 28px; text-align: center; font-size: 12px; font-weight: bold; }
+
         .cart-footer { padding: 15px; border-top: 1px solid #eee; background: #f9f9f9; }
 
         .terms-container { font-size: 12px; line-height: 1.6; color: #475569; max-height: 60vh; overflow-y: auto; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; margin-top: 10px; }
@@ -96,7 +100,6 @@
                     <li onclick="openOrdersTab('previous')">📜 Delivered Orders</li>
                     <li onclick="openProfileModal()">✏️ Update Profile</li>
                     <li onclick="openTermsModal()">📄 Terms & Conditions</li>
-                    <!-- Seller / Restaurant Portal Direct Link -->
                     <li onclick="window.open('https://poddar977.github.io/jaynagarbazar/restaurent.html', '_blank')" style="color:#ea580c; font-weight:bold; border-top:1px dashed #cbd5e1;">
                         🏪 Seller
                     </li>
@@ -115,7 +118,6 @@
         <span id="liveClockTime">⏰ Time: Loading...</span>
     </div>
 
-    <!-- Mode Switcher -->
     <div class="mode-switcher-container">
         <button class="mode-btn active" id="btnModeGeneral" onclick="switchAppMode('general')">🛍️ All Products Market</button>
         <button class="mode-btn food-mode" id="btnModeFood" onclick="switchAppMode('food')">🍔 Fast Food & Restaurants</button>
@@ -148,13 +150,11 @@
                 </div>
             </div>
 
-            <!-- Restaurant Directory -->
             <div id="restaurantDirectoryView">
                 <h3 style="font-size:16px; margin-bottom:12px;">Active Restaurants in Jaynagar</h3>
                 <div class="restaurant-grid" id="restaurantCardsContainer">Loading restaurants...</div>
             </div>
 
-            <!-- Restaurant Food Menu -->
             <div id="restaurantMenuView" style="display:none;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:white; padding:12px 18px; border-radius:10px; border:1px solid #fed7aa;">
                     <div>
@@ -168,7 +168,7 @@
         </section>
     </div>
 
-    <!-- Login / Sign Up Modal with Mandatory Terms Checkbox -->
+    <!-- Login Modal -->
     <div class="modal-overlay" id="auth-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="closeAuthModal()">&times;</span>
@@ -180,7 +180,6 @@
                     <input type="text" id="regPincode" placeholder="Pincode (e.g. 847226)" maxlength="6" style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
                     <textarea id="regAddress" placeholder="Full Delivery Address" style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;"></textarea>
                     
-                    <!-- Mandatory Terms Checkbox -->
                     <div style="display:flex; align-items:flex-start; gap:8px; margin-top:12px; text-align:left;">
                         <input type="checkbox" id="termsAgreementCheckbox" style="margin-top:3px; cursor:pointer;" required>
                         <label for="termsAgreementCheckbox" style="font-size:12px; color:#475569; cursor:pointer;">
@@ -200,36 +199,22 @@
         </div>
     </div>
 
-    <!-- Terms & Conditions Modal -->
+    <!-- Terms Modal -->
     <div class="modal-overlay" id="terms-overlay">
         <div class="modal-box" style="max-width:700px;">
             <span class="close-modal" onclick="closeTermsModal()">&times;</span>
             <h2 style="color:#0f172a;">Jaynagar Store - Terms & Conditions</h2>
             <div class="terms-container">
                 <p><strong>Jaynagar Store</strong> is an online e-commerce and local delivery platform that connects customers with registered restaurants, vendors, and delivery partners.</p>
-                
                 <h3>1. CUSTOMER TERMS & ORDER CANCELLATION</h3>
                 <p>• Customers must provide correct Name, Phone Number, Delivery Address, and PIN code.<br>
-                • <strong>Strict No Cancellation:</strong> Once an order has been successfully placed and confirmed, customer-initiated cancellation is NOT permitted for Fast Food, Restaurant orders, Grocery, Daily Needs, Fashion, or other items.</p>
-
+                • <strong>Strict No Cancellation:</strong> Once an order has been successfully placed and confirmed, customer-initiated cancellation is NOT permitted.</p>
                 <h3>2. OTP DELIVERY VERIFICATION</h3>
-                <p>• Jaynagar Store uses an OTP-based delivery verification system.<br>
-                • Customer must share the 4-digit Delivery OTP with the delivery partner ONLY after physically receiving and inspecting the order package at doorstep.</p>
-
+                <p>• Customer must share the 4-digit Delivery OTP with the delivery partner ONLY after physically receiving the order at doorstep.</p>
                 <h3>3. DELIVERY CHARGES</h3>
-                <p>• Orders below ₹100: Delivery Charge = ₹20.<br>
-                • Orders of ₹100 or above: Delivery Charge = ₹0 (FREE Delivery).</p>
-
-                <h3>4. PAYMENT POLICY</h3>
-                <p>• Currently, orders are accepted via Cash on Delivery (COD).<br>
-                • Doorstep delivery ke waqt exact amount delivery boy ko cash pay karein.</p>
-
-                <h3>5. RESTAURANT & SINGLE SHOP ORDER RULE</h3>
-                <p>• Food orders are processed separately from General Market products.<br>
-                • At any given time, food items can be ordered from ONLY ONE restaurant. Adding items from another restaurant replaces previous food items in the cart.</p>
-
-                <h3>6. 24x7 CUSTOMER SUPPORT</h3>
-                <p>Jaynagar Store Helpline: <strong>06246451082</strong> (Available 24×7 for order assistance).</p>
+                <p>• Orders below ₹100: Delivery Charge = ₹20.<br>• Orders of ₹100 or above: FREE Delivery (₹0).</p>
+                <h3>4. 24x7 CUSTOMER SUPPORT</h3>
+                <p>Helpline: <strong>06246451082</strong></p>
             </div>
             <button class="btn-submit" onclick="closeTermsModal()" style="margin-top:12px;">I Understand & Agree</button>
         </div>
@@ -259,7 +244,7 @@
         </div>
     </div>
 
-    <!-- Cart Modal -->
+    <!-- Cart Modal with Quantity Controls -->
     <div class="cart-modal" id="cart-modal">
         <div class="cart-header" id="cartHeaderEl">
             <h3>Shopping Cart</h3>
@@ -269,13 +254,13 @@
         <div class="cart-items" id="cart-items"><p>Cart khali hai.</p></div>
         <div class="cart-footer">
             <div style="font-size:13px; margin-bottom:5px;">Subtotal: ₹<span id="cart-subtotal">0</span></div>
-            <div style="font-size:13px; margin-bottom:5px;">Delivery Charge: ₹<span id="delivery-charge">0</span></div>
+            <div style="font-size:13px; margin-bottom:5px; color:#c2410c; font-weight:bold;">Delivery Charge: ₹<span id="delivery-charge">0</span></div>
             <h4>Total: ₹<span id="cart-total">0</span></h4>
             <button class="btn-submit" onclick="openCheckoutModal()" style="background:#fb641b;">PLACE ORDER</button>
         </div>
     </div>
 
-    <!-- Checkout Modal (COD Mode) -->
+    <!-- Checkout Modal -->
     <div class="modal-overlay" id="checkout-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
@@ -287,9 +272,9 @@
                 <textarea id="custAddress" placeholder="Delivery Address" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;"></textarea>
                 
                 <div style="margin-top:15px; padding:14px; background:#f8fafc; border:1px dashed #16a34a; border-radius:8px; text-align:center;">
-                    <span style="font-size:18px;">💵</span>
-                    <h4 style="color:#16a34a; margin:4px 0;">Cash on Delivery (COD)</h4>
-                    <p style="font-size:12px; color:#64748b;">Parcel receive hone par delivery partner ko cash dein.</p>
+                    <span style="font-size:18px;">💵 / 📲</span>
+                    <h4 style="color:#16a34a; margin:4px 0;">Cash on Delivery / Doorstep UPI</h4>
+                    <p style="font-size:12px; color:#64748b;">Parcel receive hone par cash dein ya delivery partner ke QR code par online pay karein.</p>
                 </div>
 
                 <button type="submit" class="btn-submit" style="background:#fb641b;">Confirm Order</button>
@@ -313,12 +298,8 @@
             window.open(`product.html?id=${productId}`, '_blank');
         };
 
-        window.openTermsModal = function() {
-            document.getElementById('terms-overlay').classList.add('active');
-        };
-        window.closeTermsModal = function() {
-            document.getElementById('terms-overlay').classList.remove('active');
-        };
+        window.openTermsModal = function() { document.getElementById('terms-overlay').classList.add('active'); };
+        window.closeTermsModal = function() { document.getElementById('terms-overlay').classList.remove('active'); };
     </script>
 
     <script type="module">
@@ -352,6 +333,16 @@
         let selectedShopForMenu = null;
 
         updateCartUI();
+
+        // Check if redirected from product.html via "Direct Buy"
+        window.addEventListener('load', () => {
+            if (localStorage.getItem('open_checkout_direct') === 'true') {
+                localStorage.removeItem('open_checkout_direct');
+                setTimeout(() => {
+                    openCheckoutModal();
+                }, 400);
+            }
+        });
 
         window.switchAppMode = function(mode) {
             currentMode = mode;
@@ -449,10 +440,7 @@
             try {
                 if (isSignupMode) {
                     const termsAccepted = document.getElementById('termsAgreementCheckbox').checked;
-                    if (!termsAccepted) {
-                        alert("⚠️ Registration ke liye Jaynagar Store ke Terms & Conditions accept karna anivarya hai!");
-                        return;
-                    }
+                    if (!termsAccepted) return alert("⚠️ Registration ke liye Terms & Conditions accept karna anivarya hai!");
 
                     const name = document.getElementById('regName').value.trim();
                     const phone = document.getElementById('regPhone').value.trim();
@@ -460,21 +448,11 @@
                     const address = document.getElementById('regAddress').value.trim();
 
                     const cred = await createUserWithEmailAndPassword(auth, email, pass);
-                    const pData = { 
-                        uid: cred.user.uid, 
-                        userEmail: email, 
-                        fullName: name, 
-                        phone, 
-                        pincode, 
-                        address, 
-                        termsAccepted: true,
-                        termsAcceptedAt: new Date().toISOString(),
-                        createdAt: new Date().toISOString() 
-                    };
+                    const pData = { uid: cred.user.uid, userEmail: email, fullName: name, phone, pincode, address, termsAccepted: true, createdAt: new Date().toISOString() };
                     await setDoc(doc(db, "users", cred.user.uid), pData);
                     currentUserProfile = pData;
                     localStorage.setItem('user_profile', JSON.stringify(pData));
-                    alert("✅ Account successfully ban gaya! Terms & Conditions accepted.");
+                    alert("✅ Account ban gaya!");
                 } else {
                     await signInWithEmailAndPassword(auth, email, pass);
                     alert("✅ Login successful!");
@@ -490,12 +468,10 @@
         window.openProfileModal = function() {
             document.getElementById('userMenuDropdown').classList.remove('show');
             if (!currentUser) return alert("Pehle login karein!");
-
             document.getElementById('profName').value = currentUserProfile?.fullName || '';
             document.getElementById('profPhone').value = currentUserProfile?.phone || '';
             document.getElementById('profAddress').value = currentUserProfile?.address || '';
             document.getElementById('profPincode').value = currentUserProfile?.pincode || '';
-
             document.getElementById('profile-overlay').classList.add('active');
         };
         window.closeProfileModal = () => document.getElementById('profile-overlay').classList.remove('active');
@@ -503,24 +479,13 @@
         document.getElementById('profileUpdateForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentUser) return;
-
             const name = document.getElementById('profName').value.trim();
             const phone = document.getElementById('profPhone').value.trim();
             const address = document.getElementById('profAddress').value.trim();
             const pincode = document.getElementById('profPincode').value.trim();
 
-            if (phone.length !== 10 || isNaN(phone)) return alert("Valid 10 digit phone dalein!");
-            if (pincode.length !== 6 || isNaN(pincode)) return alert("Valid 6 digit pincode dalein!");
-
             try {
-                const updated = {
-                    uid: currentUser.uid,
-                    userEmail: currentUser.email,
-                    fullName: name,
-                    phone: phone,
-                    address: address,
-                    pincode: pincode
-                };
+                const updated = { uid: currentUser.uid, userEmail: currentUser.email, fullName: name, phone, address, pincode };
                 await setDoc(doc(db, "users", currentUser.uid), updated, { merge: true });
                 currentUserProfile = updated;
                 localStorage.setItem('user_profile', JSON.stringify(updated));
@@ -542,11 +507,7 @@
             try {
                 const q = query(collection(db, "orders"), where("userEmail", "==", currentUser.email));
                 const snap = await getDocs(q);
-
-                if (snap.empty) {
-                    container.innerHTML = '<p style="text-align:center; padding:20px;">Koi order record nahi mila.</p>';
-                    return;
-                }
+                if (snap.empty) { container.innerHTML = '<p style="text-align:center; padding:20px;">Koi order record nahi mila.</p>'; return; }
 
                 let list = [];
                 snap.forEach(d => list.push({ id: d.id, ...d.data() }));
@@ -568,7 +529,7 @@
 
                 container.innerHTML = '';
                 filtered.forEach(o => {
-                    const itemsDesc = (o.items || []).map(i => `${i.name || i.title} (₹${i.price})`).join(', ');
+                    const itemsDesc = (o.items || []).map(i => `${i.name} (x${i.qty||1} = ₹${(i.price)*(i.qty||1)})`).join(', ');
                     container.innerHTML += `
                         <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px; margin-bottom:10px;">
                             <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
@@ -576,7 +537,7 @@
                                 <span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:bold;">${o.status}</span>
                             </div>
                             <p style="font-size:13px;"><strong>Items:</strong> ${itemsDesc}</p>
-                            <p style="font-size:13px;"><strong>Total:</strong> ₹${o.totalAmount} (${o.paymentMethod})</p>
+                            <p style="font-size:13px;"><strong>Total:</strong> ₹${o.totalAmount} (${o.paymentMethod || 'COD'})</p>
                             <div style="margin-top:6px; font-size:12px; color:#15803d; font-weight:bold;">
                                 🔑 Delivery Confirmation OTP: ${o.deliveryOtp || 'N/A'}
                             </div>
@@ -607,15 +568,10 @@
         function renderGeneralProducts(items) {
             const grid = document.getElementById('generalProductGrid');
             grid.innerHTML = '';
-
-            if (items.length === 0) {
-                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:20px;">Products nahi mile.</p>';
-                return;
-            }
+            if (items.length === 0) { grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:20px;">Products nahi mile.</p>'; return; }
 
             items.forEach((p) => {
                 const img = (p.images && p.images.length > 0) ? p.images[0] : (p.imageUrl || 'https://via.placeholder.com/200');
-
                 grid.innerHTML += `
                     <div class="product-card">
                         <img src="${img}" class="card-main-img" alt="${p.name}" onclick="openProductDetail('${p.id}')">
@@ -625,7 +581,7 @@
                             ${p.originalPrice ? `<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:5px;">₹${p.originalPrice}</span>` : ''}
                         </div>
                         <div style="display:flex; gap:6px;">
-                            <button class="add-btn-round" onclick="addToCart('${p.id}')">🛒 Cart</button>
+                            <button class="add-btn-round" onclick="addToCart('${p.id}')">🛒 Add</button>
                             <button class="buy-now-round" onclick="buyNow('${p.id}')">⚡ Buy</button>
                         </div>
                     </div>
@@ -657,9 +613,11 @@
 
             list.forEach(shop => {
                 const dishCount = allProducts.filter(p => (p.category || '').toLowerCase() === 'food' && (p.shopName === shop.shopName || p.shopId === shop.id)).length;
+                const shopBanner = shop.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500';
+
                 container.innerHTML += `
                     <div class="restaurant-card" onclick="openRestaurantMenu('${shop.id}')">
-                        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500" class="restaurant-img" alt="${shop.shopName}">
+                        <img src="${shopBanner}" class="restaurant-img" alt="${shop.shopName}">
                         <div class="restaurant-info">
                             <h3 style="font-size:16px; margin-bottom:3px;">${shop.shopName}</h3>
                             <p style="font-size:12px; color:#64748b;">📍 ${shop.address || 'Market'} (PIN: ${shop.pincode || 'Local'})</p>
@@ -686,7 +644,6 @@
 
             const grid = document.getElementById('foodDishesGrid');
             grid.innerHTML = '';
-
             const shopDishes = allProducts.filter(p => (p.category || '').toLowerCase() === 'food' && (p.shopName === shop.shopName || p.shopId === shop.id));
 
             if (shopDishes.length === 0) {
@@ -696,7 +653,6 @@
 
             shopDishes.forEach((dish) => {
                 const img = (dish.images && dish.images.length > 0) ? dish.images[0] : (dish.imageUrl || 'https://via.placeholder.com/200');
-
                 grid.innerHTML += `
                     <div class="product-card" style="border:1px solid #fed7aa;">
                         <img src="${img}" class="card-main-img" alt="${dish.name}" onclick="openProductDetail('${dish.id}')">
@@ -717,62 +673,92 @@
             document.getElementById('restaurantMenuView').style.display = 'none';
         };
 
-        // 1. Add General Product (Cannot mix with Food)
+        // =========================================================
+        // CART LOGIC WITH SAME-ITEM QUANTITY (+ / -) MANAGEMENT
+        // =========================================================
+
         window.addToCart = (prodId) => {
             const p = allProducts.find(x => x.id === prodId);
             if (!p) return;
 
             const hasFood = cart.some(i => (i.category || '').toLowerCase() === 'food');
             if (hasFood) {
-                const confirmClear = confirm("⚠️ Cart me pehle se Food/Restaurant order add hai.\n\nGeneral Market product add karne par cart se food items clear ho jayenge. Kya aap aage badhna chahte hain?");
+                const confirmClear = confirm("Cart me Food item hai. General product add karne par Food items clear ho jayenge. Continue?");
                 if (!confirmClear) return;
                 cart = [];
             }
 
-            cart.push(p);
+            // Check if same item already in cart -> increase quantity
+            const existing = cart.find(i => i.id === prodId);
+            if (existing) {
+                existing.qty = (existing.qty || 1) + 1;
+            } else {
+                cart.push({ ...p, qty: 1 });
+            }
+
             saveCart();
-            alert(`"${p.name}" cart me add ho gaya!`);
+            document.getElementById('cart-modal').classList.add('open');
         };
 
         window.buyNow = (prodId) => {
             const p = allProducts.find(x => x.id === prodId);
             if (!p) return;
-            cart = [p];
+            cart = [{ ...p, qty: 1 }];
             saveCart();
             openCheckoutModal();
         };
 
-        // 2. Add Food Product (Single Restaurant Rule - Auto-replace)
         window.addFoodToCart = (dishId, shopId, shopName) => {
             const p = allProducts.find(x => x.id === dishId);
             if (!p) return;
 
             const hasGeneral = cart.some(i => (i.category || '').toLowerCase() !== 'food');
             if (hasGeneral) {
-                const confirmClearGen = confirm("⚠️ Aapke cart me General Market ke items hain.\n\nFood order alag se process hota hai. Kya aap cart clear karke is restaurant ka food add karna chahte hain?");
+                const confirmClearGen = confirm("General market items cart me hain. Food item add karne par unhe clear karein?");
                 if (!confirmClearGen) return;
                 cart = [];
             }
 
             const existingFood = cart.find(i => (i.category || '').toLowerCase() === 'food' && i.assignedShopId);
             if (existingFood && existingFood.assignedShopId !== shopId) {
-                const confirmReplace = confirm(`🍲 Single Restaurant Rule:\n\nAapke cart me pehle se "${existingFood.assignedShopName || 'Dusre Restaurant'}" ka order hai.\n\nEk bar me sirf ek hi restaurant se order ho sakta hai.\n\nKya aap purana order REPLACE karke "${shopName}" ka food add karna chahte hain?`);
+                const confirmReplace = confirm(`Single Restaurant Rule:\n\nAapke cart me pehle se "${existingFood.assignedShopName || 'Dusre Restaurant'}" ka order hai.\n\nKya aap purana order REPLACE karke "${shopName}" ka food add karna chahte hain?`);
                 if (!confirmReplace) return;
                 cart = [];
             }
 
-            cart.push({ ...p, assignedShopId: shopId, assignedShopName: shopName });
+            // Check if same food item already in cart -> increase quantity
+            const existingDish = cart.find(i => i.id === dishId);
+            if (existingDish) {
+                existingDish.qty = (existingDish.qty || 1) + 1;
+            } else {
+                cart.push({ ...p, assignedShopId: shopId, assignedShopName: shopName, qty: 1 });
+            }
+
             saveCart();
-            alert(`"${p.name}" (${shopName}) cart me add ho gaya!`);
+            document.getElementById('cart-modal').classList.add('open');
         };
 
         window.buyFoodNow = (dishId, shopId, shopName) => {
             const p = allProducts.find(x => x.id === dishId);
             if (!p) return;
-
-            cart = [{ ...p, assignedShopId: shopId, assignedShopName: shopName }];
+            cart = [{ ...p, assignedShopId: shopId, assignedShopName: shopName, qty: 1 }];
             saveCart();
             openCheckoutModal();
+        };
+
+        // Quantity Increment / Decrement Functions
+        window.changeCartQty = (index, delta) => {
+            if (!cart[index]) return;
+            cart[index].qty = (cart[index].qty || 1) + delta;
+            if (cart[index].qty <= 0) {
+                cart.splice(index, 1);
+            }
+            saveCart();
+        };
+
+        window.removeFromCart = (idx) => { 
+            cart.splice(idx, 1); 
+            saveCart(); 
         };
 
         function saveCart() {
@@ -780,20 +766,17 @@
             updateCartUI();
         }
 
-        window.removeFromCart = (idx) => { 
-            cart.splice(idx, 1); 
-            saveCart(); 
-        };
-
         window.toggleCart = () => document.getElementById('cart-modal').classList.toggle('open');
 
         function updateCartUI() {
-            document.getElementById('cart-count').innerText = cart.length;
+            // Count total item units (e.g., 2 burger + 1 fries = 3 items badge)
+            const totalUnits = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+            document.getElementById('cart-count').innerText = totalUnits;
+
             const container = document.getElementById('cart-items');
             const noticeBox = document.getElementById('cartNoticeBox');
 
             const foodItem = cart.find(i => (i.category || '').toLowerCase() === 'food' && i.assignedShopId);
-
             if (foodItem) {
                 noticeBox.innerHTML = `
                     <div class="active-shop-pill">
@@ -816,20 +799,31 @@
             container.innerHTML = '';
             let subtotal = 0;
             cart.forEach((item, index) => {
-                subtotal += Number(item.price);
+                const itemQty = item.qty || 1;
+                const itemTotal = Number(item.price) * itemQty;
+                subtotal += itemTotal;
+
                 const displayImg = (item.images && item.images.length > 0) ? item.images[0] : (item.imageUrl || 'https://via.placeholder.com/50');
                 container.innerHTML += `
                     <div class="cart-item">
                         <img src="${displayImg}" alt="">
                         <div style="flex:1;">
-                            <strong>${item.name}</strong><br>
-                            <small>₹${item.price} ${item.assignedShopName ? '• ' + item.assignedShopName : ''}</small>
+                            <strong style="font-size:13px;">${item.name}</strong><br>
+                            <small style="color:#64748b;">₹${item.price} each ${item.assignedShopName ? '• ' + item.assignedShopName : ''}</small>
+                            <br>
+                            <div class="qty-controls">
+                                <button type="button" class="qty-btn" onclick="changeCartQty(${index}, -1)">−</button>
+                                <span class="qty-val">${itemQty}</span>
+                                <button type="button" class="qty-btn" onclick="changeCartQty(${index}, 1)">+</button>
+                            </div>
+                            <span style="font-size:12px; font-weight:bold; margin-left:8px; color:#0f172a;">= ₹${itemTotal}</span>
                         </div>
-                        <button onclick="removeFromCart(${index})" style="background:none; border:none; color:red; font-weight:bold; cursor:pointer;">✕</button>
+                        <button onclick="removeFromCart(${index})" style="background:none; border:none; color:red; font-size:16px; font-weight:bold; cursor:pointer; padding:5px;">✕</button>
                     </div>
                 `;
             });
 
+            // Delivery Charge Policy: < 100 Rs = 20 Rs, >= 100 Rs = FREE
             let del = (subtotal > 0 && subtotal < 100) ? 20 : 0;
             document.getElementById('cart-subtotal').innerText = subtotal;
             document.getElementById('delivery-charge').innerText = del;
@@ -857,6 +851,9 @@
             const phone = document.getElementById('custPhone').value.trim();
             const pincode = document.getElementById('custPincode').value.trim();
             const address = document.getElementById('custAddress').value.trim();
+            
+            const subtotalVal = Number(document.getElementById('cart-subtotal').innerText);
+            const deliveryChargeVal = Number(document.getElementById('delivery-charge').innerText);
             const totalAmount = document.getElementById('cart-total').innerText;
             const deliveryOtp = Math.floor(1000 + Math.random() * 9000).toString();
 
@@ -878,23 +875,25 @@
                     paymentMethod: "COD",
                     paymentStatus: "Pending (Cash On Delivery)",
                     items: cart,
-                    totalAmount,
+                    subtotal: subtotalVal,
+                    deliveryCharge: deliveryChargeVal,
+                    totalAmount: totalAmount,
                     status: "Placed",
-                    deliveryOtp,
-                    assignedShopId,
-                    assignedShopName,
+                    deliveryOtp: deliveryOtp,
+                    assignedShopId: assignedShopId,
+                    assignedShopName: assignedShopName,
                     orderDate: serverTimestamp(),
                     orderDateFormatted: formattedDate
                 });
 
-                alert(`🎉 Order Confirm ho gaya!\n\nDelivery Confirmation OTP: ${deliveryOtp}\nPayment: Cash on Delivery (COD)`);
+                alert(`🎉 Order Confirm ho gaya!\n\nDelivery Confirmation OTP: ${deliveryOtp}\nPayment: Cash on Delivery / Doorstep UPI`);
                 cart = [];
                 saveCart();
                 closeCheckoutModal();
                 toggleCart();
 
-                const itemsText = cart.map(i => `- ${i.name} (₹${i.price})`).join('%0A');
-                window.open(`https://wa.me/${deliveryBoyWhatsAppNumber}?text=🚚 *Naya COD Order*%0AClient: ${encodeURIComponent(name)}%0APhone: ${phone}%0APIN: ${pincode}%0AItems: ${itemsText}%0ATotal: ₹${totalAmount}%0APayment: Cash on Delivery%0AOTP: ${deliveryOtp}`, '_blank');
+                const itemsText = cart.map(i => `- ${i.name} (x${i.qty||1})`).join('%0A');
+                window.open(`https://wa.me/${deliveryBoyWhatsAppNumber}?text=🚚 *Naya Order*%0AClient: ${encodeURIComponent(name)}%0APhone: ${phone}%0APIN: ${pincode}%0AItems: ${itemsText}%0ASubtotal: ₹${subtotalVal}%0ADelivery Charge: ₹${deliveryChargeVal}%0ATotal: ₹${totalAmount}%0AOTP: ${deliveryOtp}`, '_blank');
             } catch(err) { alert("Order error: " + err.message); }
         });
 
