@@ -32,7 +32,6 @@
         table th { background: #f8fafc; padding: 10px 12px; border-bottom: 1px solid #e2e8f0; color: #475569; }
         table td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
         
-        /* Clickable customer row */
         .clickable-customer-row { cursor: pointer; transition: background-color 0.2s; }
         .clickable-customer-row:hover { background-color: #e0f2fe !important; }
 
@@ -40,25 +39,25 @@
         input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; }
         .btn-primary { background: #2874f0; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-danger { background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
+        .btn-print { background: #0284c7; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
+        .btn-print:hover { background: #0369a1; }
 
         .status-pill { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
-        .status-placed { background: #e0f2fe; color: #0369a1; }
-        .status-assigned { background: #fef3c7; color: #b45309; }
-        .status-delivered { background: #dcfce7; color: #15803d; }
-        .status-cancelled { background: #fee2e2; color: #b91c1c; }
 
         .preview-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
         .preview-box { width: 60px; height: 60px; border-radius: 6px; border: 1px solid #ddd; object-fit: cover; }
 
-        /* Modal Styles */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 500; }
         .modal-overlay.active { display: flex; }
         .modal-box { background: white; padding: 25px; border-radius: 14px; width: 92%; max-width: 750px; box-shadow: 0 6px 30px rgba(0,0,0,0.25); position: relative; max-height: 85vh; overflow-y: auto; }
         .close-modal-btn { position: absolute; right: 18px; top: 18px; cursor: pointer; font-size: 20px; font-weight: bold; width: 32px; height: 32px; border-radius: 50%; background: #f1f2f6; display: flex; align-items: center; justify-content: center; border: none; }
-        .close-modal-btn:hover { background: #e2e8f0; }
 
-        .audit-order-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 12px; border-left: 4px solid #2874f0; }
-        .audit-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #cbd5e1; padding-bottom: 8px; margin-bottom: 8px; font-size: 12px; }
+        /* Thermal POS Receipt Area */
+        @media print {
+            body * { visibility: hidden; }
+            #adminPrintableBill, #adminPrintableBill * { visibility: visible; }
+            #adminPrintableBill { position: absolute; left: 0; top: 0; width: 80mm; font-family: monospace; color: black; padding: 5px; }
+        }
     </style>
 </head>
 <body>
@@ -75,8 +74,8 @@
                 <span class="nav-count" id="badgeFoodOrders" style="background:#ea580c; display:none;">0</span>
             </a>
             <a onclick="showTab('tab-hisab', this)">💰 Payment & Boys</a>
-            <a onclick="showTab('tab-shops', this)">🏪 Add / Manage Shops</a>
-            <a onclick="showTab('tab-delivered', this)">📜 Delivered & Cancelled</a>
+            <a onclick="showTab('tab-shops', this)">🏪 Manage Shops</a>
+            <a onclick="showTab('tab-delivered', this)">📜 Delivered History</a>
             <a onclick="showTab('tab-products', this)">🛍️ Products (1-6 Photos)</a>
             <a onclick="showTab('tab-users', this)">👥 Customers</a>
         </nav>
@@ -92,7 +91,6 @@
             <div class="stats-grid">
                 <div class="stat-card"><h3>Total Revenue</h3><div class="val" id="statRevenue" style="color:#16a34a;">₹0</div></div>
                 <div class="stat-card"><h3>Cash (COD)</h3><div class="val" id="statTotalCash" style="color:#d97706;">₹0</div></div>
-                <div class="stat-card"><h3>UPI Payments</h3><div class="val" id="statTotalUpi" style="color:#7c3aed;">₹0</div></div>
                 <div class="stat-card"><h3>Live Food</h3><div class="val" id="statFood" style="color:#ea580c;">0</div></div>
                 <div class="stat-card"><h3>Live General</h3><div class="val" id="statGeneral" style="color:#2874f0;">0</div></div>
             </div>
@@ -103,7 +101,7 @@
                     <h2>📦 General Live Orders Queue</h2>
                     <table>
                         <thead>
-                            <tr><th>Time</th><th>Customer</th><th>Address</th><th>Items</th><th>Total</th><th>OTP</th><th>Status</th><th>Assign Boy</th><th>Action</th></tr>
+                            <tr><th>Time</th><th>Customer</th><th>Address</th><th>Items</th><th>Total</th><th>OTP</th><th>Status</th><th>Receipt</th><th>Assign Boy</th><th>Action</th></tr>
                         </thead>
                         <tbody id="generalOrdersTableBody"></tbody>
                     </table>
@@ -113,23 +111,23 @@
             <!-- TAB 2: Food Live -->
             <section id="tab-food" class="tab-section">
                 <div class="card" style="border-left:5px solid #ea580c;">
-                    <h2>🍕 Live Food Orders (Auto Assigned to Kitchen)</h2>
+                    <h2>🍕 Live Food Orders (Auto Assigned)</h2>
                     <table>
                         <thead>
-                            <tr><th>Time</th><th>Food Items</th><th>Customer</th><th>Total</th><th>OTP</th><th>Status</th><th>Kitchen Shop</th><th>Assign Boy</th><th>Action</th></tr>
+                            <tr><th>Time</th><th>Food Items</th><th>Customer</th><th>Total</th><th>OTP</th><th>Status</th><th>Kitchen Shop</th><th>Receipt</th><th>Assign Boy</th><th>Action</th></tr>
                         </thead>
                         <tbody id="foodOrdersTableBody"></tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- TAB 3: Delivery Boys & Financials -->
+            <!-- TAB 3: Delivery Boys Audit -->
             <section id="tab-hisab" class="tab-section">
                 <div class="card">
                     <h2>🚴 Delivery Boy Performance & Cash Collection Audit</h2>
                     <table>
                         <thead>
-                            <tr><th>Delivery Boy Phone</th><th>Delivered Count</th><th>Cash Collected</th><th>Online UPI Paid</th><th>Total Value</th></tr>
+                            <tr><th>Delivery Boy Phone</th><th>Delivered Count</th><th>Cash Collected</th><th>Online Paid</th><th>Total Handled</th></tr>
                         </thead>
                         <tbody id="deliveryBoyAuditBody"></tbody>
                     </table>
@@ -144,10 +142,10 @@
                         <div class="form-grid">
                             <input type="text" id="shopNameInput" placeholder="Shop Name" required>
                             <input type="text" id="shopOwnerInput" placeholder="Owner Name" required>
-                            <input type="tel" id="shopPhoneInput" placeholder="Contact Mobile (10-Digit)" pattern="[0-9]{10}" maxlength="10" required>
-                            <input type="text" id="shopPincodeInput" placeholder="Delivery Pincode (e.g. 847226)" pattern="[0-9]{6}" maxlength="6" required>
-                            <input type="text" id="shopAddressInput" placeholder="Full Shop Address" required>
-                            <input type="text" id="shopUserInput" placeholder="Username (e.g. burgerpoint)" required>
+                            <input type="tel" id="shopPhoneInput" placeholder="Mobile Number" maxlength="10" required>
+                            <input type="text" id="shopPincodeInput" placeholder="Pincode (6-digit)" maxlength="6" required>
+                            <input type="text" id="shopAddressInput" placeholder="Shop Address" required>
+                            <input type="text" id="shopUserInput" placeholder="Username" required>
                             <input type="text" id="shopPassInput" placeholder="Password" required>
                         </div>
                         <button type="submit" class="btn-primary" style="margin-top:12px;">Shop Account Banayein</button>
@@ -173,15 +171,16 @@
                 </div>
             </section>
 
-            <!-- TAB 6: Products Management -->
+            <!-- TAB 6: Products Management (Auto-Discount + 1-6 Photos) -->
             <section id="tab-products" class="tab-section">
                 <div class="card">
-                    <h2>+ Naya Product Add Karein (Photo URL ya 1-6 Photos Upload)</h2>
+                    <h2>+ Naya Product Add Karein (Auto-Discount + Photo Upload)</h2>
                     <form id="addProductForm">
                         <div class="form-grid">
                             <input type="text" id="prodName" placeholder="Product Title / Name" required>
                             <input type="number" id="prodPrice" placeholder="Selling Price (₹)" required>
-                            <input type="number" id="prodOriginalPrice" placeholder="Original MRP (Optional)">
+                            <input type="number" id="prodOriginalPrice" placeholder="Original Price / MRP (₹)">
+                            <input type="text" id="prodDiscount" placeholder="Discount (Auto Calculated)" readonly style="background:#f1f5f9; font-weight:bold; color:#16a34a;">
                             <select id="prodCategory" required>
                                 <option value="fashion">Fashion & Lingerie</option>
                                 <option value="food">Food</option>
@@ -189,17 +188,15 @@
                                 <option value="grocery">Grocery</option>
                                 <option value="gift">Gift</option>
                             </select>
-                            <input type="text" id="prodSubCategory" placeholder="Sub-category">
-                            
+                            <input type="text" id="prodSubCategory" placeholder="Sub-category (e.g. fast-food, mens)">
                             <input type="url" id="prodImageLink" placeholder="Option 1: Image URL Link">
                             <div>
-                                <label style="font-size:12px; font-weight:bold;">Option 2: Photo Upload (Min 1, Max 6):</label>
+                                <label style="font-size:12px; font-weight:bold;">Option 2: Upload Photos (Min 1, Max 6):</label>
                                 <input type="file" id="prodFilePhotos" accept="image/*" multiple onchange="previewSelectedFiles(this)">
                             </div>
                         </div>
-                        
                         <div class="preview-grid" id="photoPreviewContainer"></div>
-                        <textarea id="prodDesc" placeholder="Description..." style="margin-top:10px; height:50px;"></textarea>
+                        <textarea id="prodDesc" placeholder="Product Description..." style="margin-top:10px; height:50px;"></textarea>
                         <button type="submit" class="btn-primary" style="margin-top:10px;">Publish Product</button>
                     </form>
                 </div>
@@ -207,13 +204,13 @@
                 <div class="card">
                     <h2>Store Catalog</h2>
                     <table>
-                        <thead><tr><th>Images</th><th>Name</th><th>Category</th><th>Price</th><th>Action</th></tr></thead>
+                        <thead><tr><th>Images</th><th>Name</th><th>Category</th><th>Price (MRP)</th><th>Discount</th><th>Action</th></tr></thead>
                         <tbody id="productsTableBody"></tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- TAB 7: Customers List (Clickable Row) -->
+            <!-- TAB 7: Customers List -->
             <section id="tab-users" class="tab-section">
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -229,19 +226,42 @@
         </div>
     </main>
 
-    <!-- Customer Order History Audit Modal -->
+    <!-- Hidden Bill Container for Thermal Printer (Delivery Breakdown Included, OTP Excluded) -->
+    <div id="adminPrintableBill" style="display:none;"></div>
+
+    <!-- Customer History Modal -->
     <div class="modal-overlay" id="customerAuditModal">
         <div class="modal-box">
             <button class="close-modal-btn" onclick="closeCustomerAudit()">&times;</button>
-            <h2 id="modalCustName" style="color: #0f172a;">Customer Order History</h2>
+            <h2 id="modalCustName">Customer History</h2>
             <p id="modalCustEmail" style="font-size:12px; color:#64748b; margin-bottom:15px;"></p>
             <div id="modalOrdersContainer">Loading...</div>
         </div>
     </div>
 
     <script>
-        let base64PhotosArray = [];
+        // Auto-Calculate Discount Logic
+        const priceInput = document.getElementById('prodPrice');
+        const origPriceInput = document.getElementById('prodOriginalPrice');
+        const discountInput = document.getElementById('prodDiscount');
 
+        function autoCalculateDiscount() {
+            const sellPrice = parseFloat(priceInput.value);
+            const origPrice = parseFloat(origPriceInput.value);
+
+            if (!isNaN(origPrice) && !isNaN(sellPrice) && origPrice > 0 && origPrice > sellPrice) {
+                const discountPercent = Math.round(((origPrice - sellPrice) / origPrice) * 100);
+                discountInput.value = `${discountPercent}% OFF`;
+            } else {
+                discountInput.value = '';
+            }
+        }
+
+        priceInput.addEventListener('input', autoCalculateDiscount);
+        origPriceInput.addEventListener('input', autoCalculateDiscount);
+
+        // Preview 1 to 6 Photos Upload
+        let base64PhotosArray = [];
         function previewSelectedFiles(input) {
             const container = document.getElementById('photoPreviewContainer');
             container.innerHTML = '';
@@ -284,7 +304,28 @@
         const db = getFirestore(app);
 
         const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
-        let allShopsList = [];
+        let isFirstLoad = true;
+        let knownOrders = new Set();
+        let ordersDataCache = {};
+
+        function playBellAlarm() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = ctx.currentTime;
+                [0, 0.25, 0.5, 0.75].forEach((delay, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = "sine";
+                    osc.frequency.setValueAtTime(idx % 2 === 0 ? 880 : 1046.5, now + delay);
+                    gain.gain.setValueAtTime(0.5, now + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.22);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + delay);
+                    osc.stop(now + delay + 0.22);
+                });
+            } catch(e) {}
+        }
 
         window.showTab = function(tabId, el) {
             document.querySelectorAll('.tab-section').forEach(t => t.classList.remove('active'));
@@ -297,228 +338,9 @@
             document.getElementById('liveClock').innerText = new Date().toLocaleString('en-IN');
         }, 1000);
 
-        // 1. Customers Table Rendering with Click Event
-        onSnapshot(collection(db, "users"), (snapshot) => {
-            const tbody = document.getElementById('usersTableBody');
-            tbody.innerHTML = '';
-
-            if (snapshot.empty) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">Koi user registered nahi hai.</td></tr>';
-                return;
-            }
-
-            snapshot.forEach(docSnap => {
-                const u = docSnap.data();
-                const userEmail = (u.userEmail || u.email || '').trim();
-                const userName = (u.fullName || 'Customer').trim();
-                const phone = u.phone || 'N/A';
-                const address = u.address ? `${u.address} (PIN: ${u.pincode || ''})` : 'N/A';
-                const orderCount = u.totalOrdersCount || 0;
-
-                const tr = document.createElement('tr');
-                tr.className = 'clickable-customer-row';
-                tr.title = "Click to view customer's order history";
-                
-                tr.innerHTML = `
-                    <td><strong>${userName}</strong></td>
-                    <td>${userEmail}</td>
-                    <td>${phone}</td>
-                    <td>${address}</td>
-                    <td><strong style="color:#2874f0;">${orderCount}</strong></td>
-                    <td><button class="btn-primary" style="padding:4px 10px; font-size:11px;">🔍 View Orders</button></td>
-                `;
-
-                tr.addEventListener('click', () => {
-                    window.viewCustomerOrderHistory(userEmail, userName);
-                });
-
-                tbody.appendChild(tr);
-            });
-        });
-
-        // 2. Customer Order History Audit Modal
-        window.viewCustomerOrderHistory = async function(customerEmail, customerName) {
-            if (!customerEmail) {
-                alert("Is customer ka email address record me nahi mila!");
-                return;
-            }
-
-            const modal = document.getElementById('customerAuditModal');
-            document.getElementById('modalCustName').innerText = `Customer History: ${customerName}`;
-            document.getElementById('modalCustEmail').innerText = `Email: ${customerEmail}`;
-            const container = document.getElementById('modalOrdersContainer');
-            container.innerHTML = '<p style="text-align:center; padding:25px; color:#2874f0;">Orders search ho rahe hain...</p>';
-            
-            modal.classList.add('active');
-
-            try {
-                const q = query(collection(db, "orders"), where("userEmail", "==", customerEmail));
-                const snap = await getDocs(q);
-
-                if (snap.empty) {
-                    container.innerHTML = '<p style="text-align:center; padding:25px; color:#64748b;">Is customer ka koi order record nahi mila.</p>';
-                    return;
-                }
-
-                let userOrders = [];
-                snap.forEach(d => userOrders.push({ id: d.id, ...d.data() }));
-
-                // Date-Wise Sort: Newest First
-                userOrders.sort((a, b) => {
-                    let dateA = a.orderDate ? (a.orderDate.seconds ? a.orderDate.seconds * 1000 : new Date(a.orderDate).getTime()) : 0;
-                    let dateB = b.orderDate ? (b.orderDate.seconds ? b.orderDate.seconds * 1000 : new Date(b.orderDate).getTime()) : 0;
-                    return dateB - dateA;
-                });
-
-                container.innerHTML = `<p style="font-size:12px; margin-bottom:12px; color:#475569;">Total <strong>${userOrders.length}</strong> orders record found:</p>`;
-
-                userOrders.forEach((o) => {
-                    const itemsDesc = (o.items || []).map(i => `${i.name || i.title} (₹${i.price})`).join(', ');
-                    const st = (o.status || 'Placed').toLowerCase();
-
-                    container.innerHTML += `
-                        <div class="audit-order-card">
-                            <div class="audit-header">
-                                <strong>📅 Date: ${o.orderDateFormatted || 'Just now'}</strong>
-                                <span class="status-pill status-${st}">${o.status || 'Placed'}</span>
-                            </div>
-                            <div style="font-size:12px; color:#334155; margin-bottom:4px;">
-                                <strong>Phone:</strong> ${o.customerPhone || 'N/A'} | <strong>Payment:</strong> ${o.paymentMethod || 'COD'} | <strong>Total:</strong> ₹${o.totalAmount}
-                            </div>
-                            <div style="font-size:12px; color:#64748b; margin-bottom:6px;">
-                                <strong>Address:</strong> ${o.customerAddress || 'N/A'} (PIN: ${o.customerPincode || ''})
-                            </div>
-                            <div style="font-size:13px;"><strong>Items:</strong> ${itemsDesc}</div>
-                            <div style="margin-top:8px; font-size:11px; color:#15803d; font-weight:bold;">
-                                🔑 Delivery OTP Recorded: ${o.deliveryOtp || 'N/A'}
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch(e) {
-                container.innerHTML = `<p style="color:red; text-align:center; padding:15px;">Error: ${e.message}</p>`;
-            }
-        };
-
-        window.closeCustomerAudit = function() {
-            document.getElementById('customerAuditModal').classList.remove('active');
-        };
-
-        document.getElementById('customerAuditModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('customerAuditModal')) {
-                window.closeCustomerAudit();
-            }
-        });
-
-        // Manage Shops
-        onSnapshot(collection(db, "shops"), (snapshot) => {
-            const tbody = document.getElementById('shopsTableBody');
-            tbody.innerHTML = '';
-            allShopsList = [];
-
-            snapshot.forEach(docSnap => {
-                const s = { id: docSnap.id, ...docSnap.data() };
-                allShopsList.push(s);
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${s.shopName}</strong></td>
-                        <td>${s.ownerName}</td>
-                        <td>${s.phone}</td>
-                        <td><strong>${s.pincode || 'N/A'}</strong></td>
-                        <td><code>${s.username}</code></td>
-                        <td><code>${s.password}</code></td>
-                        <td><button class="btn-danger" onclick="deleteShop('${s.id}')">Delete</button></td>
-                    </tr>
-                `;
-            });
-        });
-
-        document.getElementById('addShopForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const shopName = document.getElementById('shopNameInput').value.trim();
-            const ownerName = document.getElementById('shopOwnerInput').value.trim();
-            const phone = document.getElementById('shopPhoneInput').value.trim();
-            const pincode = document.getElementById('shopPincodeInput').value.trim();
-            const address = document.getElementById('shopAddressInput').value.trim();
-            const username = document.getElementById('shopUserInput').value.trim().toLowerCase();
-            const password = document.getElementById('shopPassInput').value.trim();
-
-            try {
-                const qU = query(collection(db, "shops"), where("username", "==", username));
-                const snap = await getDocs(qU);
-                if (!snap.empty) return alert("⚠️ Username pehle se booked hai!");
-
-                await addDoc(collection(db, "shops"), {
-                    shopName, ownerName, phone, pincode, address, username, password,
-                    createdAt: serverTimestamp()
-                });
-                alert(`✅ Shop Registered! PIN: ${pincode}, User: ${username}`);
-                document.getElementById('addShopForm').reset();
-            } catch(err) { alert("Error: " + err.message); }
-        });
-
-        window.deleteShop = async (id) => { if (confirm("Delete this shop?")) await deleteDoc(doc(db, "shops", id)); };
-
-        // Products Management
-        document.getElementById('addProductForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('prodName').value.trim();
-            const price = Number(document.getElementById('prodPrice').value);
-            const originalPrice = Number(document.getElementById('prodOriginalPrice').value) || '';
-            const category = document.getElementById('prodCategory').value;
-            const subCategory = document.getElementById('prodSubCategory').value.trim();
-            const desc = document.getElementById('prodDesc').value.trim();
-            const imgLink = document.getElementById('prodImageLink').value.trim();
-
-            let imagesArray = [];
-            if (base64PhotosArray.length > 0) {
-                imagesArray = base64PhotosArray;
-            } else if (imgLink) {
-                imagesArray = [imgLink];
-            } else {
-                return alert("Kripya ya to Image URL link dalein ya photo upload karein (min 1 photo)!");
-            }
-
-            try {
-                await addDoc(collection(db, "products"), {
-                    name, price, originalPrice, category, subCategory, description: desc,
-                    imageUrl: imagesArray[0],
-                    images: imagesArray,
-                    createdAt: serverTimestamp()
-                });
-                alert("✅ Product publish ho gaya!");
-                document.getElementById('addProductForm').reset();
-                document.getElementById('photoPreviewContainer').innerHTML = '';
-                base64PhotosArray = [];
-            } catch(err) { alert("Error: " + err.message); }
-        });
-
-        onSnapshot(collection(db, "products"), (snapshot) => {
-            const tbody = document.getElementById('productsTableBody');
-            tbody.innerHTML = '';
-            snapshot.forEach(docSnap => {
-                const p = docSnap.data();
-                const photosCount = (p.images && p.images.length > 0) ? p.images.length : 1;
-                tbody.innerHTML += `
-                    <tr>
-                        <td>
-                            <img src="${p.imageUrl || (p.images ? p.images[0] : '')}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
-                            <br><small style="color:#64748b;">${photosCount} Photo(s)</small>
-                        </td>
-                        <td><strong>${p.name}</strong></td>
-                        <td>${p.category}</td>
-                        <td>₹${p.price}</td>
-                        <td><button onclick="deleteProd('${docSnap.id}')" class="btn-danger">Delete</button></td>
-                    </tr>
-                `;
-            });
-        });
-
-        window.deleteProd = async (id) => { if (confirm("Delete product?")) await deleteDoc(doc(db, "products", id)); };
-
-        // Orders Realtime
+        // Orders Realtime Listener with Bill Print & Auto Confirmation
         onSnapshot(collection(db, "orders"), async (snapshot) => {
-            let totalRevenue = 0, totalCash = 0, totalUpi = 0;
+            let totalRevenue = 0, totalCash = 0;
             let foodCount = 0, generalCount = 0;
             let boyStats = {};
             const now = Date.now();
@@ -535,27 +357,30 @@
 
             for (const docSnap of snapshot.docs) {
                 const order = { id: docSnap.id, ...docSnap.data() };
+                ordersDataCache[order.id] = order;
+
+                if (!isFirstLoad && !knownOrders.has(docSnap.id)) {
+                    playBellAlarm();
+                }
+                knownOrders.add(docSnap.id);
+
                 const st = (order.status || 'Placed').toLowerCase();
                 const amt = Number(order.totalAmount || 0);
-                const payMethod = (order.paymentMethod || 'COD').toUpperCase();
 
                 if (st === 'delivered' || st === 'cancelled') {
-                    let closedTime = order.closedAt ? new Date(order.closedAt).getTime() : 
-                                     (order.deliveredAt ? new Date(order.deliveredAt).getTime() : now);
+                    let closedTime = order.closedAt ? new Date(order.closedAt).getTime() : (order.deliveredAt ? new Date(order.deliveredAt).getTime() : now);
                     if (now - closedTime >= TWENTY_FOUR_HOURS_MS) {
                         try { await deleteDoc(doc(db, "orders", order.id)); } catch (err) {}
                         continue;
                     }
-
                     if (st === 'delivered') {
                         totalRevenue += amt;
-                        if (payMethod.includes('UPI')) totalUpi += amt; else totalCash += amt;
-
+                        totalCash += amt;
                         if (order.assignedBoyPhone) {
                             const b = order.assignedBoyPhone;
-                            if (!boyStats[b]) boyStats[b] = { count: 0, cash: 0, upi: 0 };
+                            if (!boyStats[b]) boyStats[b] = { count: 0, cash: 0 };
                             boyStats[b].count++;
-                            if (payMethod.includes('UPI')) boyStats[b].upi += amt; else boyStats[b].cash += amt;
+                            boyStats[b].cash += amt;
                         }
                     }
 
@@ -566,7 +391,7 @@
                             <td>${order.paymentMethod}</td>
                             <td>₹${order.totalAmount}</td>
                             <td>${order.assignedBoyPhone || '-'}</td>
-                            <td><span class="status-pill status-${st}">${order.status}</span></td>
+                            <td><span class="status-pill">${order.status}</span></td>
                         </tr>
                     `;
                 } else {
@@ -580,10 +405,11 @@
                                 <td><strong>${order.customerName}</strong><br><small>📞 ${order.customerPhone}</small></td>
                                 <td>₹${order.totalAmount}</td>
                                 <td><strong>${order.deliveryOtp}</strong></td>
-                                <td><span class="status-pill status-${st}">${order.status}</span></td>
-                                <td><strong style="color:#ea580c;">${order.assignedShopName || 'Auto Linked'}</strong></td>
+                                <td><span style="background:${st==='confirmed'?'#dbeafe':'#fed7aa'}; color:${st==='confirmed'?'#1d4ed8':'#c2410c'}; padding:3px 6px; border-radius:10px; font-weight:bold; font-size:11px;">${order.status}</span></td>
+                                <td><strong style="color:#ea580c;">${order.assignedShopName || 'Kitchen'}</strong></td>
+                                <td><button class="btn-print" onclick="printAdminBill('${order.id}')">🖨️ Bill</button></td>
                                 <td>
-                                    <input type="tel" id="boy_${order.id}" placeholder="Boy Phone" value="${order.assignedBoyPhone || ''}" style="width:105px; font-size:11px; padding:3px;">
+                                    <input type="tel" id="boy_${order.id}" placeholder="Boy Phone" value="${order.assignedBoyPhone || ''}" style="width:100px; font-size:11px; padding:3px;">
                                     <button onclick="assignBoy('${order.id}')" class="btn-primary" style="padding:3px 6px;">Assign</button>
                                 </td>
                                 <td><button onclick="cancelOrder('${order.id}')" class="btn-danger">Cancel</button></td>
@@ -599,9 +425,10 @@
                                 <td>${(order.items||[]).map(i=>i.name).join(', ')}</td>
                                 <td>₹${order.totalAmount}</td>
                                 <td><strong>${order.deliveryOtp}</strong></td>
-                                <td><span class="status-pill status-${st}">${order.status}</span></td>
+                                <td><span style="background:${st==='confirmed'?'#dbeafe':'#fed7aa'}; color:${st==='confirmed'?'#1d4ed8':'#c2410c'}; padding:3px 6px; border-radius:10px; font-weight:bold; font-size:11px;">${order.status}</span></td>
+                                <td><button class="btn-print" onclick="printAdminBill('${order.id}')">🖨️ Bill</button></td>
                                 <td>
-                                    <input type="tel" id="boy_${order.id}" placeholder="Boy Phone" value="${order.assignedBoyPhone || ''}" style="width:105px; font-size:11px; padding:3px;">
+                                    <input type="tel" id="boy_${order.id}" placeholder="Boy Phone" value="${order.assignedBoyPhone || ''}" style="width:100px; font-size:11px; padding:3px;">
                                     <button onclick="assignBoy('${order.id}')" class="btn-primary" style="padding:3px 6px;">Assign</button>
                                 </td>
                                 <td><button onclick="cancelOrder('${order.id}')" class="btn-danger">Cancel</button></td>
@@ -611,6 +438,8 @@
                 }
             }
 
+            isFirstLoad = false;
+
             Object.keys(boyStats).forEach(phone => {
                 const b = boyStats[phone];
                 auditTable.innerHTML += `
@@ -618,18 +447,88 @@
                         <td><strong>📞 ${phone}</strong></td>
                         <td>${b.count} Orders</td>
                         <td><strong style="color:#d97706;">₹${b.cash} (Cash)</strong></td>
-                        <td>₹${b.upi}</td>
-                        <td>₹${b.cash + b.upi}</td>
+                        <td>₹0</td>
+                        <td>₹${b.cash}</td>
                     </tr>
                 `;
             });
 
             document.getElementById('statRevenue').innerText = `₹${totalRevenue}`;
             document.getElementById('statTotalCash').innerText = `₹${totalCash}`;
-            document.getElementById('statTotalUpi').innerText = `₹${totalUpi}`;
             document.getElementById('statFood').innerText = foodCount;
             document.getElementById('statGeneral').innerText = generalCount;
         });
+
+        // 1-Click Bill Print & Auto Confirmation in Admin (With Itemized Delivery Charge Breakdown, OTP Excluded)
+        window.printAdminBill = async function(orderId) {
+            const order = ordersDataCache[orderId];
+            if (!order) return alert("Order data nahi mila!");
+
+            const invoiceArea = document.getElementById('adminPrintableBill');
+            invoiceArea.style.display = 'block';
+
+            let itemsRow = (order.items || []).map(i => `
+                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px;">
+                    <span>${i.name} (x1)</span>
+                    <span>₹${i.price}</span>
+                </div>
+            `).join('');
+
+            const deliveryCharge = Number(order.deliveryCharge !== undefined ? order.deliveryCharge : (Number(order.totalAmount) < 100 ? 20 : 0));
+            const subtotal = order.subtotal !== undefined ? order.subtotal : (Number(order.totalAmount) - deliveryCharge);
+
+            invoiceArea.innerHTML = `
+                <div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">
+                    <h3 style="margin:0; font-size:16px;">JAYNAGAR STORE</h3>
+                    <p style="margin:0; font-size:10px;">Official Invoice Receipt</p>
+                    <p style="margin:0; font-size:10px;">${order.orderDateFormatted || new Date().toLocaleString()}</p>
+                </div>
+                <div style="font-size:11px; margin-bottom:5px; border-bottom:1px dashed #000; padding-bottom:5px;">
+                    <strong>Customer:</strong> ${order.customerName}<br>
+                    <strong>Phone:</strong> ${order.customerPhone}<br>
+                    <strong>Address:</strong> ${order.customerAddress} (PIN: ${order.customerPincode})
+                </div>
+                <div style="margin-bottom:5px; border-bottom:1px dashed #000; padding-bottom:5px;">
+                    <div style="font-weight:bold; font-size:11px; margin-bottom:3px;">ITEMS:</div>
+                    ${itemsRow}
+                </div>
+                
+                <!-- Charges Breakdown -->
+                <div style="font-size:12px; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
+                        <span>Item Subtotal:</span>
+                        <span>₹${subtotal}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                        <span>Delivery Charge:</span>
+                        <span>${deliveryCharge > 0 ? `+ ₹${deliveryCharge}` : 'FREE (₹0)'}</span>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px; margin-bottom:5px;">
+                    <span>FINAL PAYABLE:</span>
+                    <span>₹${order.totalAmount}</span>
+                </div>
+                <div style="text-align:center; font-size:10px; border-top:1px dashed #000; padding-top:5px; margin-top:5px;">
+                    Payment: ${order.paymentMethod || 'COD'}<br>
+                    Helpline: 06246451082<br>
+                    <em>Doorstep OTP verification compulsory</em>
+                </div>
+            `;
+
+            window.print();
+            invoiceArea.style.display = 'none';
+
+            // Auto-Confirm Order on Bill Print
+            try {
+                if ((order.status || '').toLowerCase() === 'placed') {
+                    await updateDoc(doc(db, "orders", orderId), {
+                        status: "Confirmed",
+                        billPrintedAt: new Date().toISOString()
+                    });
+                }
+            } catch(e) {}
+        };
 
         window.assignBoy = async (id) => {
             const phone = document.getElementById(`boy_${id}`).value.trim();
@@ -643,6 +542,137 @@
                 await updateDoc(doc(db, "orders", id), { status: "Cancelled", closedAt: new Date().toISOString() });
             }
         };
+
+        // Manage Customers & History
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const u = docSnap.data();
+                const tr = document.createElement('tr');
+                tr.className = 'clickable-customer-row';
+                tr.innerHTML = `
+                    <td><strong>${u.fullName||'User'}</strong></td>
+                    <td>${u.userEmail||u.email}</td>
+                    <td>${u.phone||'-'}</td>
+                    <td>${u.address||'-'}</td>
+                    <td>${u.totalOrdersCount||0}</td>
+                    <td><button class="btn-primary" style="padding:3px 8px; font-size:11px;">View</button></td>
+                `;
+                tr.addEventListener('click', () => viewCustomerAudit(u.userEmail||u.email, u.fullName));
+                tbody.appendChild(tr);
+            });
+        });
+
+        window.viewCustomerAudit = async function(email, name) {
+            const modal = document.getElementById('customerAuditModal');
+            document.getElementById('modalCustName').innerText = `History: ${name}`;
+            document.getElementById('modalCustEmail').innerText = `Email: ${email}`;
+            const container = document.getElementById('modalOrdersContainer');
+            container.innerHTML = 'Searching orders...';
+            modal.classList.add('active');
+
+            try {
+                const q = query(collection(db, "orders"), where("userEmail", "==", email));
+                const snap = await getDocs(q);
+                if (snap.empty) { container.innerHTML = 'Koi order record nahi mila.'; return; }
+                container.innerHTML = '';
+                snap.forEach(d => {
+                    const o = d.data();
+                    container.innerHTML += `
+                        <div style="background:#f8fafc; border:1px solid #ddd; padding:10px; border-radius:8px; margin-bottom:8px;">
+                            <strong>Date:</strong> ${o.orderDateFormatted || 'N/A'} | <strong>Status:</strong> ${o.status}<br>
+                            <strong>Amount:</strong> ₹${o.totalAmount} | <strong>OTP:</strong> ${o.deliveryOtp}<br>
+                            <strong>Items:</strong> ${(o.items||[]).map(i=>i.name).join(', ')}
+                        </div>
+                    `;
+                });
+            } catch(e) { container.innerHTML = 'Error: ' + e.message; }
+        };
+
+        window.closeCustomerAudit = () => document.getElementById('customerAuditModal').classList.remove('active');
+
+        // Manage Shops
+        document.getElementById('addShopForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const shopName = document.getElementById('shopNameInput').value.trim();
+            const ownerName = document.getElementById('shopOwnerInput').value.trim();
+            const phone = document.getElementById('shopPhoneInput').value.trim();
+            const pincode = document.getElementById('shopPincodeInput').value.trim();
+            const address = document.getElementById('shopAddressInput').value.trim();
+            const username = document.getElementById('shopUserInput').value.trim().toLowerCase();
+            const password = document.getElementById('shopPassInput').value.trim();
+
+            try {
+                await addDoc(collection(db, "shops"), {
+                    shopName, ownerName, phone, pincode, address, username, password,
+                    createdAt: serverTimestamp()
+                });
+                alert(`✅ Shop Registered! User: ${username}`);
+                document.getElementById('addShopForm').reset();
+            } catch(err) { alert("Error: " + err.message); }
+        });
+
+        onSnapshot(collection(db, "shops"), (snapshot) => {
+            const tbody = document.getElementById('shopsTableBody');
+            tbody.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const s = docSnap.data();
+                tbody.innerHTML += `<tr><td><strong>${s.shopName}</strong></td><td>${s.ownerName}</td><td>${s.phone}</td><td>${s.pincode}</td><td><code>${s.username}</code></td><td><code>${s.password}</code></td><td><button class="btn-danger" onclick="deleteShop('${docSnap.id}')">Delete</button></td></tr>`;
+            });
+        });
+
+        window.deleteShop = async (id) => { if (confirm("Delete shop?")) await deleteDoc(doc(db, "shops", id)); };
+
+        // Publish Product (Saves Auto Discount & 1-6 Photos)
+        document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('prodName').value.trim();
+            const price = Number(document.getElementById('prodPrice').value);
+            const originalPrice = Number(document.getElementById('prodOriginalPrice').value) || '';
+            const discount = document.getElementById('prodDiscount').value.trim();
+            const category = document.getElementById('prodCategory').value;
+            const subCategory = document.getElementById('prodSubCategory').value.trim();
+            const desc = document.getElementById('prodDesc').value.trim();
+            const imgLink = document.getElementById('prodImageLink').value.trim();
+
+            let photos = [];
+            if (base64PhotosArray.length > 0) photos = base64PhotosArray;
+            else if (imgLink) photos = [imgLink];
+            else return alert("Photo link dalein ya 1-6 photos upload karein!");
+
+            try {
+                await addDoc(collection(db, "products"), {
+                    name, price, originalPrice, discount, category, subCategory, description: desc,
+                    imageUrl: photos[0],
+                    images: photos,
+                    createdAt: serverTimestamp()
+                });
+                alert("✅ Product publish ho gaya!");
+                document.getElementById('addProductForm').reset();
+                document.getElementById('photoPreviewContainer').innerHTML = '';
+                base64PhotosArray = [];
+            } catch(err) { alert("Error: " + err.message); }
+        });
+
+        onSnapshot(collection(db, "products"), (snapshot) => {
+            const tbody = document.getElementById('productsTableBody');
+            tbody.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const p = docSnap.data();
+                tbody.innerHTML += `
+                    <tr>
+                        <td><img src="${p.imageUrl||''}" style="width:35px; height:35px; border-radius:4px; object-fit:cover;"></td>
+                        <td><strong>${p.name}</strong></td>
+                        <td>${p.category}</td>
+                        <td>₹${p.price} ${p.originalPrice ? `<span style="text-decoration:line-through; color:#888; font-size:11px;">(₹${p.originalPrice})</span>` : ''}</td>
+                        <td><strong style="color:#16a34a;">${p.discount || '-'}</strong></td>
+                        <td><button onclick="delProd('${docSnap.id}')" class="btn-danger">Delete</button></td>
+                    </tr>
+                `;
+            });
+        });
+        window.delProd = async (id) => { if (confirm("Delete product?")) await deleteDoc(doc(db, "products", id)); };
     </script>
 </body>
 </html>
