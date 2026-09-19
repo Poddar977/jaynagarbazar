@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jaynagar Store </title>
-    <meta name="google-site-verification" content="72NquAkB-h-rhGmC663QSuZ3Y40bASxjPp0xk2tme2w" />
+    <title>Jaynagar Store - Hybrid Super App</title>
+    <link rel="preconnect" href="https://firestore.googleapis.com">
+    <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
         body { background-color: #f1f2f6; color: #333; }
@@ -46,27 +47,26 @@
         .restaurant-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; margin-bottom: 30px; }
         .restaurant-card { background: white; border-radius: 14px; overflow: hidden; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s; }
         .restaurant-card:hover { transform: translateY(-4px); border-color: #ea580c; box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
-        .restaurant-img { width: 100%; height: 140px; object-fit: cover; }
+        .restaurant-img { width: 100%; height: 140px; object-fit: cover; background: #e2e8f0; }
         .restaurant-info { padding: 12px 15px; }
 
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
-        .product-card { background-color: white; border-radius: 12px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #e2e8f0; }
+        .product-card { background-color: white; border-radius: 12px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #e2e8f0; contain: content; }
         
-        .card-main-img { width: 100%; height: 160px; object-fit: contain; margin-bottom: 8px; border-radius: 8px; cursor: pointer; }
+        .card-main-img { width: 100%; height: 160px; object-fit: contain; margin-bottom: 8px; border-radius: 8px; cursor: pointer; background: #f8fafc; }
         .product-title { font-size: 14px; font-weight: 600; height: 38px; overflow: hidden; color: #2874f0; margin-bottom: 6px; cursor: pointer; }
         .add-btn-round { background-color: #ff9f00; color: white; border: none; padding: 8px 10px; border-radius: 20px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
         .buy-now-round { background-color: #fb641b; color: white; border: none; padding: 8px 10px; border-radius: 20px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
 
         .discount-tag { color: #16a34a; font-weight: bold; font-size: 12px; margin-left: 6px; background: #dcfce7; padding: 2px 6px; border-radius: 4px; }
 
-        /* Modal Styles */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 300; }
         .modal-overlay.active { display: flex; }
         .modal-box { background: white; padding: 25px; border-radius: 16px; width: 92%; max-width: 550px; max-height: 90vh; overflow-y: auto; position: relative; }
         .close-modal { position: absolute; right: 15px; top: 15px; cursor: pointer; font-size: 22px; font-weight: bold; width: 30px; height: 30px; border-radius: 50%; background: #f1f2f6; display: flex; align-items: center; justify-content: center; }
         .btn-submit { background: #2874f0; color: white; border: none; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; padding: 12px; border-radius: 25px; }
 
-        .cart-modal { position: fixed; top: 0; right: -420px; width: 360px; height: 100%; background-color: white; box-shadow: -2px 0 10px rgba(0,0,0,0.2); transition: right 0.3s ease; z-index: 200; display: flex; flex-direction: column; }
+        .cart-modal { position: fixed; top: 0; right: -420px; width: 360px; height: 100%; background-color: white; box-shadow: -2px 0 10px rgba(0,0,0,0.2); transition: right 0.25s ease; z-index: 200; display: flex; flex-direction: column; }
         .cart-modal.open { right: 0; }
         .cart-header { background-color: #2874f0; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         .cart-items { flex: 1; overflow-y: auto; padding: 15px; }
@@ -77,12 +77,10 @@
         .qty-btn { background: #f1f5f9; border: none; width: 26px; height: 26px; cursor: pointer; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; color: #1e293b; }
         .qty-btn:hover { background: #e2e8f0; }
         .qty-val { min-width: 28px; text-align: center; font-size: 12px; font-weight: bold; }
-
         .cart-footer { padding: 15px; border-top: 1px solid #eee; background: #f9f9f9; }
 
         .terms-container { font-size: 12px; line-height: 1.6; color: #475569; max-height: 60vh; overflow-y: auto; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; margin-top: 10px; }
         .terms-container h3 { color: #0f172a; margin-top: 10px; font-size: 13px; }
-
         .active-shop-pill { background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
@@ -130,7 +128,7 @@
         <button class="mode-btn food-mode" id="btnModeFood" onclick="switchAppMode('food')">🍔 Fast Food & Restaurants</button>
     </div>
 
-    <!-- Main Categories Bar -->
+    <!-- Categories Bar -->
     <div class="category-nav-bar" id="generalCatNav">
         <button class="category-btn active" onclick="filterCategory('all', this)">🛍️ All Market Items</button>
         <button class="category-btn" onclick="filterCategory('fashion', this)">👗 Fashion</button>
@@ -150,8 +148,14 @@
     <div class="container">
         <!-- GENERAL MARKET VIEW -->
         <section id="sectionGeneralStore">
+            <!-- Sunday Personalized Feed Placeholder -->
+            <div id="sundayRecommendationFeed"></div>
+
             <h2 style="font-size:18px; margin-bottom:15px;" id="marketViewTitle">Featured Products</h2>
-            <div class="product-grid" id="generalProductGrid">Loading products...</div>
+            <div class="product-grid" id="generalProductGrid"></div>
+
+            <!-- Monday to Saturday Bottom Feed Placeholder -->
+            <div id="weekdayBottomFeed"></div>
         </section>
 
         <!-- FAST FOOD MODE VIEW -->
@@ -168,7 +172,7 @@
 
             <div id="restaurantDirectoryView">
                 <h3 style="font-size:16px; margin-bottom:12px;">Active Restaurants in Jaynagar</h3>
-                <div class="restaurant-grid" id="restaurantCardsContainer">Loading restaurants...</div>
+                <div class="restaurant-grid" id="restaurantCardsContainer"></div>
             </div>
 
             <div id="restaurantMenuView" style="display:none;">
@@ -184,7 +188,7 @@
         </section>
     </div>
 
-    <!-- Login Modal -->
+    <!-- Modals -->
     <div class="modal-overlay" id="auth-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="closeAuthModal()">&times;</span>
@@ -199,7 +203,7 @@
                     <div style="display:flex; align-items:flex-start; gap:8px; margin-top:12px; text-align:left;">
                         <input type="checkbox" id="termsAgreementCheckbox" style="margin-top:3px; cursor:pointer;" required>
                         <label for="termsAgreementCheckbox" style="font-size:12px; color:#475569; cursor:pointer;">
-                            Main Jaynagar Store ke <a href="javascript:void(0)" onclick="openTermsModal()" style="color:#2874f0; font-weight:bold; text-decoration:underline;">Terms & Conditions</a> se sehmat hoon aur accept karta hoon (Compulsory).
+                            Main Jaynagar Store ke <a href="javascript:void(0)" onclick="openTermsModal()" style="color:#2874f0; font-weight:bold; text-decoration:underline;">Terms & Conditions</a> se sehmat hoon (Compulsory).
                         </label>
                     </div>
                 </div>
@@ -215,37 +219,30 @@
         </div>
     </div>
 
-    <!-- Terms Modal -->
     <div class="modal-overlay" id="terms-overlay">
         <div class="modal-box" style="max-width:700px;">
             <span class="close-modal" onclick="closeTermsModal()">&times;</span>
             <h2 style="color:#0f172a;">Jaynagar Store - Terms & Conditions</h2>
             <div class="terms-container">
-                <p><strong>Jaynagar Store</strong> is an online e-commerce and local delivery platform that connects customers with registered restaurants, vendors, and delivery partners.</p>
-                <h3>1. CUSTOMER TERMS & ORDER CANCELLATION</h3>
-                <p>• Customers must provide correct Name, Phone Number, Delivery Address, and PIN code.<br>
-                • <strong>Strict No Cancellation:</strong> Once an order has been successfully placed and confirmed, customer-initiated cancellation is NOT permitted.</p>
-                <h3>2. OTP DELIVERY VERIFICATION</h3>
-                <p>• Customer must share the 4-digit Delivery OTP with the delivery partner ONLY after physically receiving the order at doorstep.</p>
-                <h3>3. DELIVERY CHARGES</h3>
-                <p>• Orders below ₹100: Delivery Charge = ₹20.<br>• Orders of ₹100 or above: FREE Delivery (₹0).</p>
-                <h3>4. 24x7 CUSTOMER SUPPORT</h3>
-                <p>Helpline: <strong>06246451082</strong></p>
+                <p><strong>Jaynagar Store</strong> is an online e-commerce and local delivery platform.</p>
+                <h3>1. STRICT NO CANCELLATION</h3>
+                <p>Once placed, orders cannot be cancelled by customer.</p>
+                <h3>2. DELIVERY CHARGES</h3>
+                <p>Below ₹100: ₹20. ₹100 or above: FREE Delivery.</p>
             </div>
-            <button class="btn-submit" onclick="closeTermsModal()" style="margin-top:12px;">I Understand & Agree</button>
+            <button class="btn-submit" onclick="closeTermsModal()" style="margin-top:12px;">I Agree</button>
         </div>
     </div>
 
-    <!-- Orders History Modal -->
+    <!-- Orders History Modal with Image Support -->
     <div class="modal-overlay" id="orders-modal-overlay">
-        <div class="modal-box">
+        <div class="modal-box" style="max-width: 620px;">
             <span class="close-modal" onclick="closeOrdersModal()">&times;</span>
             <h2 id="ordersModalTitle">My Orders</h2>
             <div id="ordersListContainer" style="margin-top:15px;">Loading...</div>
         </div>
     </div>
 
-    <!-- Profile Modal -->
     <div class="modal-overlay" id="profile-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="closeProfileModal()">&times;</span>
@@ -260,7 +257,6 @@
         </div>
     </div>
 
-    <!-- Cart Modal with Quantity Controls -->
     <div class="cart-modal" id="cart-modal">
         <div class="cart-header" id="cartHeaderEl">
             <h3>Shopping Cart</h3>
@@ -276,7 +272,6 @@
         </div>
     </div>
 
-    <!-- Checkout Modal -->
     <div class="modal-overlay" id="checkout-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
@@ -290,9 +285,8 @@
                 <div style="margin-top:15px; padding:14px; background:#f8fafc; border:1px dashed #16a34a; border-radius:8px; text-align:center;">
                     <span style="font-size:18px;">💵 / 📲</span>
                     <h4 style="color:#16a34a; margin:4px 0;">Cash on Delivery / Doorstep UPI</h4>
-                    <p style="font-size:12px; color:#64748b;">Parcel receive hone par cash dein ya delivery partner ke QR code par online pay karein.</p>
+                    <p style="font-size:12px; color:#64748b;">Parcel lene par cash dein ya delivery boy ke QR par pay karein.</p>
                 </div>
-
                 <button type="submit" class="btn-submit" style="background:#fb641b;">Confirm Order</button>
             </form>
         </div>
@@ -310,12 +304,9 @@
         setInterval(updateLiveClock, 1000);
         updateLiveClock();
 
-        window.openProductDetail = function(productId) {
-            window.open(`product.html?id=${productId}`, '_blank');
-        };
-
-        window.openTermsModal = function() { document.getElementById('terms-overlay').classList.add('active'); };
-        window.closeTermsModal = function() { document.getElementById('terms-overlay').classList.remove('active'); };
+        window.openProductDetail = (id) => window.open(`product.html?id=${id}`, '_blank');
+        window.openTermsModal = () => document.getElementById('terms-overlay').classList.add('active');
+        window.closeTermsModal = () => document.getElementById('terms-overlay').classList.remove('active');
     </script>
 
     <script type="module">
@@ -335,16 +326,14 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-
         const deliveryBoyWhatsAppNumber = "919771556448";
 
         let currentUser = null;
         let currentUserProfile = JSON.parse(localStorage.getItem('user_profile')) || null;
         let isSignupMode = false;
-        let isAuthReady = false;
 
-        let allProducts = [];
-        let allShops = [];
+        let allProducts = JSON.parse(localStorage.getItem('cached_products')) || [];
+        let allShops = JSON.parse(localStorage.getItem('cached_shops')) || [];
         let cart = JSON.parse(localStorage.getItem('store_cart')) || [];
         let currentMode = 'general';
         let activeCategory = 'all';
@@ -353,7 +342,9 @@
 
         updateCartUI();
 
-        // Helper to get formatted discount tag
+        if (allProducts.length > 0) renderFilteredProducts();
+        if (allShops.length > 0) renderRestaurants();
+
         function getDiscountMarkup(p) {
             let disc = p.discount;
             if (!disc && p.originalPrice && Number(p.originalPrice) > Number(p.price)) {
@@ -392,46 +383,36 @@
             }
         };
 
-        // Auth state listener with direct checkout auto-trigger
+        if (localStorage.getItem('open_checkout_direct') === 'true') {
+            localStorage.removeItem('open_checkout_direct');
+            setTimeout(() => { openCheckoutModal(); }, 100);
+        }
+
+        if (currentUserProfile) {
+            const userAvatarBtn = document.getElementById('userAvatarBtn');
+            userAvatarBtn.innerText = (currentUserProfile.fullName || 'U').charAt(0).toUpperCase();
+            document.getElementById('userMenuName').innerText = currentUserProfile.fullName || "Customer";
+            document.getElementById('userMenuEmail').innerText = currentUserProfile.userEmail || "";
+            if (currentUserProfile.pincode) {
+                document.getElementById('foodPincodeFilter').value = currentUserProfile.pincode;
+            }
+        }
+
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
-            isAuthReady = true;
-            const userAvatarBtn = document.getElementById('userAvatarBtn');
-            const menuName = document.getElementById('userMenuName');
-            const menuEmail = document.getElementById('userMenuEmail');
-
             if (user) {
-                try {
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
-                    if (userDoc.exists()) {
-                        currentUserProfile = userDoc.data();
-                        localStorage.setItem('user_profile', JSON.stringify(currentUserProfile));
-                    }
-                } catch(e) {}
-
-                const initial = (currentUserProfile?.fullName || user.email).charAt(0).toUpperCase();
-                userAvatarBtn.innerText = initial;
-                userAvatarBtn.style.background = "#fff";
-                userAvatarBtn.style.color = "#2874f0";
-                menuName.innerText = currentUserProfile?.fullName || "Customer";
-                menuEmail.innerText = user.email;
-
-                if (currentUserProfile?.pincode) {
-                    document.getElementById('foodPincodeFilter').value = currentUserProfile.pincode;
-                }
-            } else {
-                currentUserProfile = JSON.parse(localStorage.getItem('user_profile')) || null;
                 if (!currentUserProfile) {
-                    userAvatarBtn.innerText = "👤";
-                    menuName.innerText = "Welcome, Guest";
-                    menuEmail.innerText = "Login to order";
+                    try {
+                        const userDoc = await getDoc(doc(db, "users", user.uid));
+                        if (userDoc.exists()) {
+                            currentUserProfile = userDoc.data();
+                            localStorage.setItem('user_profile', JSON.stringify(currentUserProfile));
+                            document.getElementById('userAvatarBtn').innerText = (currentUserProfile.fullName || user.email).charAt(0).toUpperCase();
+                            document.getElementById('userMenuName').innerText = currentUserProfile.fullName;
+                            document.getElementById('userMenuEmail').innerText = user.email;
+                        }
+                    } catch(e) {}
                 }
-            }
-
-            // Direct checkout trigger from product.html
-            if (localStorage.getItem('open_checkout_direct') === 'true') {
-                localStorage.removeItem('open_checkout_direct');
-                setTimeout(() => { openCheckoutModal(); }, 200);
             }
         });
 
@@ -458,8 +439,6 @@
             document.getElementById('authSubmitBtn').innerText = isSignupMode ? "Sign Up" : "Login";
             document.getElementById('authToggleText').innerText = isSignupMode ? "Already registered? " : "Naye customer hain? ";
             document.getElementById('authToggleLink').innerText = isSignupMode ? "Login here" : "Naya Account Banayein";
-            const termsCheck = document.getElementById('termsAgreementCheckbox');
-            if (termsCheck) termsCheck.required = isSignupMode;
         };
 
         document.getElementById('authForm').addEventListener('submit', async (e) => {
@@ -470,7 +449,7 @@
             try {
                 if (isSignupMode) {
                     const termsAccepted = document.getElementById('termsAgreementCheckbox').checked;
-                    if (!termsAccepted) return alert("⚠️ Registration ke liye Terms & Conditions accept karna anivarya hai!");
+                    if (!termsAccepted) return alert("⚠️ Terms accept karein!");
 
                     const name = document.getElementById('regName').value.trim();
                     const phone = document.getElementById('regPhone').value.trim();
@@ -478,7 +457,7 @@
                     const address = document.getElementById('regAddress').value.trim();
 
                     const cred = await createUserWithEmailAndPassword(auth, email, pass);
-                    const pData = { uid: cred.user.uid, userEmail: email, fullName: name, phone, pincode, address, termsAccepted: true, createdAt: new Date().toISOString() };
+                    const pData = { uid: cred.user.uid, userEmail: email, fullName: name, phone, pincode, address, createdAt: new Date().toISOString() };
                     await setDoc(doc(db, "users", cred.user.uid), pData);
                     currentUserProfile = pData;
                     localStorage.setItem('user_profile', JSON.stringify(pData));
@@ -500,12 +479,12 @@
 
         window.openProfileModal = function() {
             document.getElementById('userMenuDropdown').classList.remove('show');
-            const activeProf = currentUserProfile || (currentUser ? { fullName: '', phone: '', address: '', pincode: '' } : null);
-            if (!activeProf && !currentUser) return alert("Pehle login karein!");
-            document.getElementById('profName').value = activeProf?.fullName || '';
-            document.getElementById('profPhone').value = activeProf?.phone || '';
-            document.getElementById('profAddress').value = activeProf?.address || '';
-            document.getElementById('profPincode').value = activeProf?.pincode || '';
+            const prof = currentUserProfile || {};
+            if (!currentUser && !currentUserProfile) return alert("Pehle login karein!");
+            document.getElementById('profName').value = prof.fullName || '';
+            document.getElementById('profPhone').value = prof.phone || '';
+            document.getElementById('profAddress').value = prof.address || '';
+            document.getElementById('profPincode').value = prof.pincode || '';
             document.getElementById('profile-overlay').classList.add('active');
         };
         window.closeProfileModal = () => document.getElementById('profile-overlay').classList.remove('active');
@@ -518,18 +497,19 @@
             const pincode = document.getElementById('profPincode').value.trim();
 
             try {
-                const uid = currentUser ? currentUser.uid : (currentUserProfile?.uid || 'guest_user');
+                const uid = currentUser ? currentUser.uid : (currentUserProfile?.uid || 'guest');
                 const updated = { uid, userEmail: currentUser?.email || currentUserProfile?.userEmail || '', fullName: name, phone, address, pincode };
                 if (currentUser) {
                     await setDoc(doc(db, "users", currentUser.uid), updated, { merge: true });
                 }
                 currentUserProfile = updated;
                 localStorage.setItem('user_profile', JSON.stringify(updated));
-                alert("✅ Profile successfully update ho gayi!");
+                alert("✅ Profile updated!");
                 closeProfileModal();
-            } catch(err) { alert("Profile update error: " + err.message); }
+            } catch(err) { alert("Error: " + err.message); }
         });
 
+        // Orders View with Product Images & Status
         window.openOrdersTab = async function(type) {
             document.getElementById('userMenuDropdown').classList.remove('show');
             const email = currentUser?.email || currentUserProfile?.userEmail;
@@ -544,15 +524,11 @@
             try {
                 const q = query(collection(db, "orders"), where("userEmail", "==", email));
                 const snap = await getDocs(q);
-                if (snap.empty) { container.innerHTML = '<p style="text-align:center; padding:20px;">Koi order record nahi mila.</p>'; return; }
+                if (snap.empty) { container.innerHTML = '<p style="text-align:center; padding:20px;">Koi order nahi mila.</p>'; return; }
 
                 let list = [];
                 snap.forEach(d => list.push({ id: d.id, ...d.data() }));
-                list.sort((a, b) => {
-                    let tA = a.orderDate?.seconds ? a.orderDate.seconds * 1000 : new Date(a.orderDate).getTime();
-                    let tB = b.orderDate?.seconds ? b.orderDate.seconds * 1000 : new Date(b.orderDate).getTime();
-                    return tB - tA;
-                });
+                list.sort((a, b) => (b.orderDate?.seconds || 0) - (a.orderDate?.seconds || 0));
 
                 let filtered = list.filter(o => {
                     const st = (o.status || '').toLowerCase();
@@ -566,17 +542,49 @@
 
                 container.innerHTML = '';
                 filtered.forEach(o => {
-                    const itemsDesc = (o.items || []).map(i => `${i.name} (x${i.qty||1} = ₹${(i.price)*(i.qty||1)})`).join(', ');
-                    container.innerHTML += `
-                        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px; margin-bottom:10px;">
-                            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                                <strong>📅 ${o.orderDateFormatted || 'Just now'}</strong>
-                                <span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:bold;">${o.status}</span>
+                    const itemsMarkup = (o.items || []).map(i => {
+                        const itemImg = (i.images && i.images.length > 0) ? i.images[0] : (i.imageUrl || 'https://via.placeholder.com/60');
+                        return `
+                            <div style="display:flex; align-items:center; gap:12px; background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:8px 10px; margin-bottom:6px;">
+                                <img src="${itemImg}" style="width:52px; height:52px; object-fit:contain; border-radius:6px; background:#f8fafc; border:1px solid #cbd5e1;" loading="lazy">
+                                <div style="flex:1;">
+                                    <strong style="font-size:13px; color:#0f172a; display:block;">${i.name}</strong>
+                                    <small style="color:#64748b; font-size:12px;">Qty: <strong>${i.qty || 1}</strong> | Price: ₹${i.price}</small>
+                                </div>
+                                <strong style="font-size:13px; color:#16a34a;">₹${Number(i.price) * (i.qty || 1)}</strong>
                             </div>
-                            <p style="font-size:13px;"><strong>Items:</strong> ${itemsDesc}</p>
-                            <p style="font-size:13px;"><strong>Total:</strong> ₹${o.totalAmount} (${o.paymentMethod || 'COD'})</p>
-                            <div style="margin-top:6px; font-size:12px; color:#15803d; font-weight:bold;">
-                                🔑 Delivery Confirmation OTP: ${o.deliveryOtp || 'N/A'}
+                        `;
+                    }).join('');
+
+                    const isFood = (o.items || []).some(i => (i.category || '').toLowerCase() === 'food');
+                    const deliveryFee = o.deliveryCharge !== undefined ? Number(o.deliveryCharge) : (Number(o.totalAmount) < 100 ? 20 : 0);
+
+                    container.innerHTML += `
+                        <div style="background:#f8fafc; border:1px solid ${isFood ? '#fdba74' : '#e2e8f0'}; border-radius:12px; padding:14px; margin-bottom:12px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px dashed #cbd5e1; padding-bottom:8px;">
+                                <div>
+                                    <strong style="font-size:12px; color:#475569;">📅 ${o.orderDateFormatted || 'Just now'}</strong><br>
+                                    ${o.assignedShopName ? `<small style="color:#ea580c; font-weight:bold;">🏪 ${o.assignedShopName}</small>` : ''}
+                                </div>
+                                <span style="background:${o.status === 'Delivered' ? '#dcfce7' : (o.status === 'Confirmed' ? '#dbeafe' : '#ffedd5')}; color:${o.status === 'Delivered' ? '#15803d' : (o.status === 'Confirmed' ? '#1d4ed8' : '#c2410c')}; padding:4px 10px; border-radius:14px; font-size:11px; font-weight:bold;">
+                                    ${o.status || 'Placed'}
+                                </span>
+                            </div>
+
+                            <div style="margin-bottom:10px;">
+                                ${itemsMarkup}
+                            </div>
+
+                            <div style="font-size:12px; color:#64748b; display:flex; justify-content:space-between; margin-bottom:4px;">
+                                <span>Delivery Charge:</span>
+                                <span>${deliveryFee > 0 ? `+ ₹${deliveryFee}` : 'FREE (₹0)'}</span>
+                            </div>
+
+                            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #cbd5e1; padding-top:8px;">
+                                <strong style="font-size:14px; color:#0f172a;">Total: ₹${o.totalAmount} (${o.paymentMethod || 'COD'})</strong>
+                                <div style="font-size:12px; background:#f0fdf4; border:1px solid #86efac; color:#166534; padding:3px 8px; border-radius:6px; font-weight:bold;">
+                                    🔑 OTP: ${o.deliveryOtp || 'N/A'}
+                                </div>
                             </div>
                         </div>
                     `;
@@ -585,25 +593,24 @@
         };
         window.closeOrdersModal = () => document.getElementById('orders-modal-overlay').classList.remove('active');
 
-        // Products & Shops Listener
+        // Background Realtime Sync & Local Cache
         onSnapshot(collection(db, "products"), (snapshot) => {
-            allProducts = [];
-            snapshot.forEach(d => allProducts.push({ id: d.id, ...d.data() }));
-
-            if (currentMode === 'general') {
-                renderFilteredProducts();
-            } else if (selectedShopForMenu) {
-                openRestaurantMenu(selectedShopForMenu);
-            }
+            const fresh = [];
+            snapshot.forEach(d => fresh.push({ id: d.id, ...d.data() }));
+            allProducts = fresh;
+            localStorage.setItem('cached_products', JSON.stringify(fresh));
+            if (currentMode === 'general') renderFilteredProducts();
+            else if (selectedShopForMenu) openRestaurantMenu(selectedShopForMenu);
         });
 
         onSnapshot(collection(db, "shops"), (snapshot) => {
-            allShops = [];
-            snapshot.forEach(d => allShops.push({ id: d.id, ...d.data() }));
+            const freshShops = [];
+            snapshot.forEach(d => freshShops.push({ id: d.id, ...d.data() }));
+            allShops = freshShops;
+            localStorage.setItem('cached_shops', JSON.stringify(freshShops));
             if (currentMode === 'food') renderRestaurants();
         });
 
-        // Category & Sub-category Filter
         window.filterCategory = function(cat, el) {
             document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
@@ -627,14 +634,83 @@
             renderFilteredProducts();
         };
 
+        // Conditional ML & Day-based Recommendation Engine
+        function handleSmartRecommendationFeed() {
+            const sundayContainer = document.getElementById('sundayRecommendationFeed');
+            const weekdayContainer = document.getElementById('weekdayBottomFeed');
+            if (!sundayContainer || !weekdayContainer) return;
+
+            const today = new Date().getDay(); // 0 = Sunday, 1-6 = Mon-Sat
+            const history = JSON.parse(localStorage.getItem('user_category_history')) || {};
+
+            let favoriteCat = null;
+            let highestViews = 0;
+            for (const [cat, count] of Object.entries(history)) {
+                if (count >= 2 && count > highestViews) {
+                    highestViews = count;
+                    favoriteCat = cat;
+                }
+            }
+
+            if (!favoriteCat) {
+                sundayContainer.innerHTML = '';
+                weekdayContainer.innerHTML = '';
+                return;
+            }
+
+            const matchedProducts = allProducts.filter(p => {
+                if (p.categories && Array.isArray(p.categories)) return p.categories.includes(favoriteCat);
+                return (p.category || '').toLowerCase() === favoriteCat;
+            }).slice(0, 4);
+
+            if (matchedProducts.length === 0) return;
+
+            const feedCardsHtml = matchedProducts.map(p => {
+                const img = (p.images && p.images.length > 0) ? p.images[0] : (p.imageUrl || 'https://via.placeholder.com/200');
+                const discBadge = getDiscountMarkup(p);
+                return `
+                    <div class="product-card" onclick="openProductDetail('${p.id}')">
+                        <img src="${img}" class="card-main-img" loading="lazy">
+                        <div class="product-title">${p.name}</div>
+                        <div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">
+                            <span style="font-size:16px; font-weight:bold;">₹${p.price}</span>
+                            ${discBadge}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Condition 1: Sunday -> Spotlight on top
+            if (today === 0) {
+                sundayContainer.innerHTML = `
+                    <div style="background:linear-gradient(135deg, #fdf2f8, #fbcfe8); border:1px solid #f472b6; border-radius:12px; padding:15px; margin-bottom:25px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                            <h3 style="color:#9d174d; font-size:16px;">✨ Sunday Picked For You (${favoriteCat.toUpperCase()})</h3>
+                            <span style="font-size:11px; background:#db2777; color:white; padding:3px 8px; border-radius:10px; font-weight:bold;">Special Recommendation</span>
+                        </div>
+                        <div class="product-grid">${feedCardsHtml}</div>
+                    </div>
+                `;
+                weekdayContainer.innerHTML = '';
+            } 
+            // Condition 2: Mon to Sat -> Lazy loaded at the bottom
+            else {
+                sundayContainer.innerHTML = '';
+                weekdayContainer.innerHTML = `
+                    <div style="margin-top:35px; border-top:2px dashed #cbd5e1; padding-top:20px;">
+                        <h3 style="font-size:15px; color:#475569; margin-bottom:12px;">Recommended Based on Your Interest</h3>
+                        <div class="product-grid">${feedCardsHtml}</div>
+                    </div>
+                `;
+            }
+        }
+
         function renderFilteredProducts() {
             let list = allProducts.filter(p => (p.category || '').toLowerCase() !== 'food' && (!p.categories || !p.categories.includes('food')));
 
             if (activeCategory !== 'all') {
                 list = list.filter(p => {
-                    if (p.categories && Array.isArray(p.categories)) {
-                        return p.categories.includes(activeCategory);
-                    }
+                    if (p.categories && Array.isArray(p.categories)) return p.categories.includes(activeCategory);
                     return (p.category || '').toLowerCase() === activeCategory;
                 });
             }
@@ -644,19 +720,22 @@
             }
 
             const grid = document.getElementById('generalProductGrid');
-            grid.innerHTML = '';
+            if (!grid) return;
+
             if (list.length === 0) {
-                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:30px; color:#64748b;">Is category me koi product uplabdh nahi hai.</p>';
+                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:30px; color:#64748b;">Is category me koi product nahi mila.</p>';
                 return;
             }
 
-            list.forEach((p) => {
+            let htmlBuffer = '';
+            for (let i = 0; i < list.length; i++) {
+                const p = list[i];
                 const img = (p.images && p.images.length > 0) ? p.images[0] : (p.imageUrl || 'https://via.placeholder.com/200');
                 const discBadge = getDiscountMarkup(p);
 
-                grid.innerHTML += `
+                htmlBuffer += `
                     <div class="product-card">
-                        <img src="${img}" class="card-main-img" alt="${p.name}" onclick="openProductDetail('${p.id}')">
+                        <img src="${img}" class="card-main-img" loading="lazy" alt="${p.name}" onclick="openProductDetail('${p.id}')">
                         <div class="product-title" onclick="openProductDetail('${p.id}')">${p.name}</div>
                         <div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">
                             <span style="font-size:17px; font-weight:bold;">₹${p.price}</span>
@@ -669,13 +748,16 @@
                         </div>
                     </div>
                 `;
-            });
+            }
+            grid.innerHTML = htmlBuffer;
+
+            // Trigger Smart Feed Condition Check
+            handleSmartRecommendationFeed();
         }
 
-        // Restaurant Rendering
         function renderRestaurants() {
             const container = document.getElementById('restaurantCardsContainer');
-            container.innerHTML = '';
+            if (!container) return;
             const pin = document.getElementById('foodPincodeFilter').value.trim();
 
             let list = allShops;
@@ -688,13 +770,15 @@
                 return;
             }
 
-            list.forEach(shop => {
+            let html = '';
+            for (let i = 0; i < list.length; i++) {
+                const shop = list[i];
                 const dishCount = allProducts.filter(p => (p.category || '').toLowerCase() === 'food' && (p.shopName === shop.shopName || p.shopId === shop.id)).length;
                 const shopBanner = shop.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500';
 
-                container.innerHTML += `
+                html += `
                     <div class="restaurant-card" onclick="openRestaurantMenu('${shop.id}')">
-                        <img src="${shopBanner}" class="restaurant-img" alt="${shop.shopName}">
+                        <img src="${shopBanner}" class="restaurant-img" loading="lazy" alt="${shop.shopName}">
                         <div class="restaurant-info">
                             <h3 style="font-size:16px; margin-bottom:3px;">${shop.shopName}</h3>
                             <p style="font-size:12px; color:#64748b;">📍 ${shop.address || 'Market'} (PIN: ${shop.pincode || 'Local'})</p>
@@ -705,7 +789,8 @@
                         </div>
                     </div>
                 `;
-            });
+            }
+            container.innerHTML = html;
         }
         window.filterRestaurantsByPincode = () => renderRestaurants();
 
@@ -720,21 +805,22 @@
             document.getElementById('menuShopPincode').innerText = `PIN: ${shop.pincode || 'Local'}`;
 
             const grid = document.getElementById('foodDishesGrid');
-            grid.innerHTML = '';
             const shopDishes = allProducts.filter(p => (p.category || '').toLowerCase() === 'food' && (p.shopName === shop.shopName || p.shopId === shop.id));
 
             if (shopDishes.length === 0) {
-                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:30px;">Is restaurant ka koi food item live nahi hai.</p>';
+                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:30px;">Is restaurant ka koi item live nahi hai.</p>';
                 return;
             }
 
-            shopDishes.forEach((dish) => {
+            let html = '';
+            for (let i = 0; i < shopDishes.length; i++) {
+                const dish = shopDishes[i];
                 const img = (dish.images && dish.images.length > 0) ? dish.images[0] : (dish.imageUrl || 'https://via.placeholder.com/200');
                 const discBadge = getDiscountMarkup(dish);
 
-                grid.innerHTML += `
+                html += `
                     <div class="product-card" style="border:1px solid #fed7aa;">
-                        <img src="${img}" class="card-main-img" alt="${dish.name}" onclick="openProductDetail('${dish.id}')">
+                        <img src="${img}" class="card-main-img" loading="lazy" alt="${dish.name}" onclick="openProductDetail('${dish.id}')">
                         <div class="product-title" style="color:#ea580c;" onclick="openProductDetail('${dish.id}')">${dish.name}</div>
                         <div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">
                             <span style="font-size:16px; font-weight:bold;">₹${dish.price}</span>
@@ -747,7 +833,8 @@
                         </div>
                     </div>
                 `;
-            });
+            }
+            grid.innerHTML = html;
         };
 
         window.backToRestaurantList = () => {
@@ -756,15 +843,13 @@
             document.getElementById('restaurantMenuView').style.display = 'none';
         };
 
-        // Cart Actions
         window.addToCart = (prodId) => {
             const p = allProducts.find(x => x.id === prodId);
             if (!p) return;
 
             const hasFood = cart.some(i => (i.category || '').toLowerCase() === 'food');
             if (hasFood) {
-                const confirmClear = confirm("Cart me Food item hai. General product add karne par Food items clear ho jayenge. Continue?");
-                if (!confirmClear) return;
+                if (!confirm("Cart me Food item hai. General product add karne par Food items clear ho jayenge. Continue?")) return;
                 cart = [];
             }
 
@@ -790,15 +875,13 @@
 
             const hasGeneral = cart.some(i => (i.category || '').toLowerCase() !== 'food');
             if (hasGeneral) {
-                const confirmClearGen = confirm("General market items cart me hain. Food item add karne par unhe clear karein?");
-                if (!confirmClearGen) return;
+                if (!confirm("General items cart me hain. Food item add karne par clear karein?")) return;
                 cart = [];
             }
 
             const existingFood = cart.find(i => (i.category || '').toLowerCase() === 'food' && i.assignedShopId);
             if (existingFood && existingFood.assignedShopId !== shopId) {
-                const confirmReplace = confirm(`Single Restaurant Rule:\n\nAapke cart me pehle se "${existingFood.assignedShopName || 'Dusre Restaurant'}" ka order hai.\n\nKya aap purana order REPLACE karke "${shopName}" ka food add karna chahte hain?`);
-                if (!confirmReplace) return;
+                if (!confirm(`Pehle se "${existingFood.assignedShopName}" ka order hai. Replace karein?`)) return;
                 cart = [];
             }
 
@@ -837,7 +920,6 @@
         function updateCartUI() {
             const totalUnits = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
             document.getElementById('cart-count').innerText = totalUnits;
-
             const container = document.getElementById('cart-items');
             const noticeBox = document.getElementById('cartNoticeBox');
 
@@ -846,7 +928,7 @@
                 noticeBox.innerHTML = `
                     <div class="active-shop-pill">
                         <span>🏪 Restaurant: <strong>${foodItem.assignedShopName || 'Kitchen'}</strong></span>
-                        <small style="color:#b45309; font-size:10px;">(Single Shop Mode)</small>
+                        <small style="color:#b45309; font-size:10px;">(Single Shop)</small>
                     </div>
                 `;
             } else {
@@ -863,30 +945,30 @@
 
             container.innerHTML = '';
             let subtotal = 0;
-            cart.forEach((item, index) => {
+            for (let i = 0; i < cart.length; i++) {
+                const item = cart[i];
                 const itemQty = item.qty || 1;
                 const itemTotal = Number(item.price) * itemQty;
                 subtotal += itemTotal;
-
                 const displayImg = (item.images && item.images.length > 0) ? item.images[0] : (item.imageUrl || 'https://via.placeholder.com/50');
+                
                 container.innerHTML += `
                     <div class="cart-item">
-                        <img src="${displayImg}" alt="">
+                        <img src="${displayImg}" loading="lazy" alt="">
                         <div style="flex:1;">
                             <strong style="font-size:13px;">${item.name}</strong><br>
-                            <small style="color:#64748b;">₹${item.price} each ${item.assignedShopName ? '• ' + item.assignedShopName : ''}</small>
-                            <br>
+                            <small style="color:#64748b;">₹${item.price}</small><br>
                             <div class="qty-controls">
-                                <button type="button" class="qty-btn" onclick="changeCartQty(${index}, -1)">−</button>
+                                <button type="button" class="qty-btn" onclick="changeCartQty(${i}, -1)">−</button>
                                 <span class="qty-val">${itemQty}</span>
-                                <button type="button" class="qty-btn" onclick="changeCartQty(${index}, 1)">+</button>
+                                <button type="button" class="qty-btn" onclick="changeCartQty(${i}, 1)">+</button>
                             </div>
-                            <span style="font-size:12px; font-weight:bold; margin-left:8px; color:#0f172a;">= ₹${itemTotal}</span>
+                            <span style="font-size:12px; font-weight:bold; margin-left:8px;">= ₹${itemTotal}</span>
                         </div>
-                        <button onclick="removeFromCart(${index})" style="background:none; border:none; color:red; font-size:16px; font-weight:bold; cursor:pointer; padding:5px;">✕</button>
+                        <button onclick="removeFromCart(${i})" style="background:none; border:none; color:red; font-size:16px; font-weight:bold; cursor:pointer;">✕</button>
                     </div>
                 `;
-            });
+            }
 
             let del = (subtotal > 0 && subtotal < 100) ? 20 : 0;
             document.getElementById('cart-subtotal').innerText = subtotal;
@@ -894,10 +976,9 @@
             document.getElementById('cart-total').innerText = subtotal + del;
         }
 
-        // Checkout Trigger (checks active Firebase auth or stored profile to prevent duplicate login prompt)
         window.openCheckoutModal = () => {
-            const hasUserSession = currentUser || currentUserProfile || localStorage.getItem('user_profile');
-            if (!hasUserSession) {
+            const profile = currentUserProfile || JSON.parse(localStorage.getItem('user_profile')) || null;
+            if (!currentUser && !profile) {
                 alert("Pehle login karein!");
                 toggleCart();
                 openAuthModal();
@@ -905,11 +986,10 @@
             }
             if (cart.length === 0) return alert("Cart khali hai!");
 
-            const profile = currentUserProfile || JSON.parse(localStorage.getItem('user_profile')) || {};
-            document.getElementById('custName').value = profile.fullName || '';
-            document.getElementById('custPhone').value = profile.phone || '';
-            document.getElementById('custPincode').value = profile.pincode || '';
-            document.getElementById('custAddress').value = profile.address || '';
+            document.getElementById('custName').value = profile?.fullName || '';
+            document.getElementById('custPhone').value = profile?.phone || '';
+            document.getElementById('custPincode').value = profile?.pincode || '';
+            document.getElementById('custAddress').value = profile?.address || '';
 
             document.getElementById('checkout-overlay').classList.add('active');
         };
@@ -959,7 +1039,7 @@
                     orderDateFormatted: formattedDate
                 });
 
-                alert(`🎉 Order Confirm ho gaya!\n\nDelivery Confirmation OTP: ${deliveryOtp}\nPayment: Cash on Delivery / Doorstep UPI`);
+                alert(`🎉 Order Confirm ho gaya!\n\nOTP: ${deliveryOtp}\nPayment: COD / UPI`);
                 cart = [];
                 saveCart();
                 closeCheckoutModal();
@@ -967,7 +1047,7 @@
 
                 const itemsText = cart.map(i => `- ${i.name} (x${i.qty||1})`).join('%0A');
                 window.open(`https://wa.me/${deliveryBoyWhatsAppNumber}?text=🚚 *Naya Order*%0AClient: ${encodeURIComponent(name)}%0APhone: ${phone}%0APIN: ${pincode}%0AItems: ${itemsText}%0ASubtotal: ₹${subtotalVal}%0ADelivery Charge: ₹${deliveryChargeVal}%0ATotal: ₹${totalAmount}%0AOTP: ${deliveryOtp}`, '_blank');
-            } catch(err) { alert("Order error: " + err.message); }
+            } catch(err) { alert("Error: " + err.message); }
         });
 
         window.handleSearch = () => {
@@ -979,17 +1059,17 @@
                     return p.name.toLowerCase().includes(q) || (p.subCategory || '').toLowerCase().includes(q);
                 });
                 const grid = document.getElementById('generalProductGrid');
-                grid.innerHTML = '';
                 if (list.length === 0) {
                     grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:30px; color:#64748b;">Koi item nahi mila.</p>';
                     return;
                 }
+                let html = '';
                 list.forEach((p) => {
                     const img = (p.images && p.images.length > 0) ? p.images[0] : (p.imageUrl || 'https://via.placeholder.com/200');
                     const discBadge = getDiscountMarkup(p);
-                    grid.innerHTML += `
+                    html += `
                         <div class="product-card">
-                            <img src="${img}" class="card-main-img" alt="${p.name}" onclick="openProductDetail('${p.id}')">
+                            <img src="${img}" class="card-main-img" loading="lazy" alt="${p.name}" onclick="openProductDetail('${p.id}')">
                             <div class="product-title" onclick="openProductDetail('${p.id}')">${p.name}</div>
                             <div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">
                                 <span style="font-size:17px; font-weight:bold;">₹${p.price}</span>
@@ -1003,6 +1083,7 @@
                         </div>
                     `;
                 });
+                grid.innerHTML = html;
             } else {
                 renderRestaurants();
             }
