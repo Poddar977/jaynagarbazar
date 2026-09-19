@@ -44,15 +44,20 @@
 
         .status-pill { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
 
+        .cat-checkbox-group { display: flex; gap: 15px; flex-wrap: wrap; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; }
+        .cat-checkbox-group label { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .cat-checkbox-group input { width: auto; }
+
         .preview-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
         .preview-box { width: 60px; height: 60px; border-radius: 6px; border: 1px solid #ddd; object-fit: cover; }
+        .variant-row { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+        .variant-row input { flex: 1; }
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 500; }
         .modal-overlay.active { display: flex; }
         .modal-box { background: white; padding: 25px; border-radius: 14px; width: 92%; max-width: 750px; box-shadow: 0 6px 30px rgba(0,0,0,0.25); position: relative; max-height: 85vh; overflow-y: auto; }
         .close-modal-btn { position: absolute; right: 18px; top: 18px; cursor: pointer; font-size: 20px; font-weight: bold; width: 32px; height: 32px; border-radius: 50%; background: #f1f2f6; display: flex; align-items: center; justify-content: center; border: none; }
 
-        /* Thermal POS Receipt Area */
         @media print {
             body * { visibility: hidden; }
             #adminPrintableBill, #adminPrintableBill * { visibility: visible; }
@@ -76,7 +81,7 @@
             <a onclick="showTab('tab-hisab', this)">💰 Payment & Boys</a>
             <a onclick="showTab('tab-shops', this)">🏪 Manage Shops</a>
             <a onclick="showTab('tab-delivered', this)">📜 Delivered History</a>
-            <a onclick="showTab('tab-products', this)">🛍️ Products (1-6 Photos)</a>
+            <a onclick="showTab('tab-products', this)">🛍️ Products (Variants & Photos)</a>
             <a onclick="showTab('tab-users', this)">👥 Customers</a>
         </nav>
     </aside>
@@ -171,31 +176,64 @@
                 </div>
             </section>
 
-            <!-- TAB 6: Products Management (Auto-Discount + 1-6 Photos) -->
+            <!-- TAB 6: Products Management (Multi-Category + Variants + Photos) -->
             <section id="tab-products" class="tab-section">
                 <div class="card">
-                    <h2>+ Naya Product Add Karein (Auto-Discount + Photo Upload)</h2>
+                    <h2>+ Naya Product Add Karein (Multi-Category + Size Variants)</h2>
                     <form id="addProductForm">
                         <div class="form-grid">
                             <input type="text" id="prodName" placeholder="Product Title / Name" required>
-                            <input type="number" id="prodPrice" placeholder="Selling Price (₹)" required>
+                            <input type="number" id="prodPrice" placeholder="Base Selling Price (₹)" required>
                             <input type="number" id="prodOriginalPrice" placeholder="Original Price / MRP (₹)">
                             <input type="text" id="prodDiscount" placeholder="Discount (Auto Calculated)" readonly style="background:#f1f5f9; font-weight:bold; color:#16a34a;">
-                            <select id="prodCategory" required>
-                                <option value="fashion">Fashion & Lingerie</option>
-                                <option value="food">Food</option>
-                                <option value="beauty">Beauty</option>
-                                <option value="grocery">Grocery</option>
-                                <option value="gift">Gift</option>
-                            </select>
-                            <input type="text" id="prodSubCategory" placeholder="Sub-category (e.g. fast-food, mens)">
+                            
+                            <div>
+                                <label style="font-size:11px; font-weight:bold;">Sub-Category (Fashion / Needs):</label>
+                                <select id="prodSubCategory">
+                                    <option value="none">Normal / General</option>
+                                    <option value="lingerie">Fashion: Lingerie / Innerwear</option>
+                                    <option value="women">Fashion: Women Dresses</option>
+                                    <option value="men">Fashion: Men Wear</option>
+                                    <option value="cosmetics">Beauty: Cosmetics & Makeup</option>
+                                    <option value="skincare">Beauty: Skin & Hair Care</option>
+                                    <option value="daily-need">Grocery: Daily Needs / Packets</option>
+                                    <option value="gift-combo">Gift: Hamper / Combo Box</option>
+                                </select>
+                            </div>
+
                             <input type="url" id="prodImageLink" placeholder="Option 1: Image URL Link">
                             <div>
-                                <label style="font-size:12px; font-weight:bold;">Option 2: Upload Photos (Min 1, Max 6):</label>
+                                <label style="font-size:11px; font-weight:bold;">Option 2: Upload Photos (1-6):</label>
                                 <input type="file" id="prodFilePhotos" accept="image/*" multiple onchange="previewSelectedFiles(this)">
                             </div>
                         </div>
+
+                        <!-- Multi-Category Select Checkboxes -->
+                        <div style="margin-top:12px;">
+                            <label style="font-size:12px; font-weight:bold; display:block; margin-bottom:6px;">Categories (Multiple select kar sakte hain e.g. Beauty + Grocery + Gift):</label>
+                            <div class="cat-checkbox-group">
+                                <label><input type="checkbox" name="productCats" value="fashion"> 👗 Fashion</label>
+                                <label><input type="checkbox" name="productCats" value="beauty"> 💄 Beauty</label>
+                                <label><input type="checkbox" name="productCats" value="grocery"> 🛒 Grocery</label>
+                                <label><input type="checkbox" name="productCats" value="gift"> 🎁 Gift</label>
+                                <label><input type="checkbox" name="productCats" value="food"> 🍔 Food</label>
+                            </div>
+                        </div>
+
                         <div class="preview-grid" id="photoPreviewContainer"></div>
+
+                        <!-- Dynamic Variants Builder (Sizes, Weights) -->
+                        <div style="margin-top:15px; padding:15px; background:#f8fafc; border:1px dashed #2874f0; border-radius:8px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                                <div>
+                                    <strong style="font-size:13px; color:#0f172a;">📏 Size / Weight Variants:</strong>
+                                    <p style="font-size:11px; color:#64748b;">(e.g. 75cm:199, 80cm:215 ya 500g:40, 1kg:75)</p>
+                                </div>
+                                <button type="button" onclick="addVariantRow()" style="background:#16a34a; color:white; border:none; padding:6px 12px; border-radius:4px; font-weight:bold; font-size:12px; cursor:pointer;">+ Add Size/Weight</button>
+                            </div>
+                            <div id="variantsContainer"></div>
+                        </div>
+
                         <textarea id="prodDesc" placeholder="Product Description..." style="margin-top:10px; height:50px;"></textarea>
                         <button type="submit" class="btn-primary" style="margin-top:10px;">Publish Product</button>
                     </form>
@@ -204,7 +242,7 @@
                 <div class="card">
                     <h2>Store Catalog</h2>
                     <table>
-                        <thead><tr><th>Images</th><th>Name</th><th>Category</th><th>Price (MRP)</th><th>Discount</th><th>Action</th></tr></thead>
+                        <thead><tr><th>Image</th><th>Name</th><th>Categories</th><th>Price</th><th>Sub-Category</th><th>Action</th></tr></thead>
                         <tbody id="productsTableBody"></tbody>
                     </table>
                 </div>
@@ -215,7 +253,7 @@
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                         <h2>👥 Customers</h2>
-                        <small style="color:#2874f0; font-weight:700;">👉 Kisi bhi customer row par click karein date-wise order history dekhne ke liye</small>
+                        <small style="color:#2874f0; font-weight:700;">👉 Kisi bhi customer row par click karein order history dekhne ke liye</small>
                     </div>
                     <table>
                         <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Address</th><th>Orders</th><th>Action</th></tr></thead>
@@ -226,7 +264,7 @@
         </div>
     </main>
 
-    <!-- Hidden Bill Container for Thermal Printer (Delivery Breakdown Included, OTP Excluded) -->
+    <!-- Hidden Bill Container for Thermal Printer -->
     <div id="adminPrintableBill" style="display:none;"></div>
 
     <!-- Customer History Modal -->
@@ -259,6 +297,19 @@
 
         priceInput.addEventListener('input', autoCalculateDiscount);
         origPriceInput.addEventListener('input', autoCalculateDiscount);
+
+        // Dynamic Variants Input Rows
+        window.addVariantRow = function(valName = '', valPrice = '') {
+            const container = document.getElementById('variantsContainer');
+            const row = document.createElement('div');
+            row.className = 'variant-row';
+            row.innerHTML = `
+                <input type="text" placeholder="Size/Weight (e.g. 75cm, 50ml, 1kg)" value="${valName}" class="v-name" style="padding:6px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;">
+                <input type="number" placeholder="Price for this size (₹)" value="${valPrice}" class="v-price" style="padding:6px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;">
+                <button type="button" onclick="this.parentElement.remove()" style="background:#ef4444; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">✕</button>
+            `;
+            container.appendChild(row);
+        };
 
         // Preview 1 to 6 Photos Upload
         let base64PhotosArray = [];
@@ -338,7 +389,7 @@
             document.getElementById('liveClock').innerText = new Date().toLocaleString('en-IN');
         }, 1000);
 
-        // Orders Realtime Listener with Bill Print & Auto Confirmation
+        // Orders Realtime
         onSnapshot(collection(db, "orders"), async (snapshot) => {
             let totalRevenue = 0, totalCash = 0;
             let foodCount = 0, generalCount = 0;
@@ -401,7 +452,7 @@
                         foodTable.innerHTML += `
                             <tr>
                                 <td><small>${order.orderDateFormatted || 'Just now'}</small></td>
-                                <td>${(order.items||[]).map(i=>i.name).join(', ')}</td>
+                                <td>${(order.items||[]).map(i=>`${i.name} (x${i.qty||1})`).join(', ')}</td>
                                 <td><strong>${order.customerName}</strong><br><small>📞 ${order.customerPhone}</small></td>
                                 <td>₹${order.totalAmount}</td>
                                 <td><strong>${order.deliveryOtp}</strong></td>
@@ -422,7 +473,7 @@
                                 <td><small>${order.orderDateFormatted || 'Just now'}</small></td>
                                 <td><strong>${order.customerName}</strong><br><small>📞 ${order.customerPhone}</small></td>
                                 <td>${order.customerAddress}</td>
-                                <td>${(order.items||[]).map(i=>i.name).join(', ')}</td>
+                                <td>${(order.items||[]).map(i=>`${i.name} (x${i.qty||1})`).join(', ')}</td>
                                 <td>₹${order.totalAmount}</td>
                                 <td><strong>${order.deliveryOtp}</strong></td>
                                 <td><span style="background:${st==='confirmed'?'#dbeafe':'#fed7aa'}; color:${st==='confirmed'?'#1d4ed8':'#c2410c'}; padding:3px 6px; border-radius:10px; font-weight:bold; font-size:11px;">${order.status}</span></td>
@@ -459,7 +510,7 @@
             document.getElementById('statGeneral').innerText = generalCount;
         });
 
-        // 1-Click Bill Print & Auto Confirmation in Admin (With Itemized Delivery Charge Breakdown, OTP Excluded)
+        // 1-Click Bill Print
         window.printAdminBill = async function(orderId) {
             const order = ordersDataCache[orderId];
             if (!order) return alert("Order data nahi mila!");
@@ -469,8 +520,8 @@
 
             let itemsRow = (order.items || []).map(i => `
                 <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px;">
-                    <span>${i.name} (x1)</span>
-                    <span>₹${i.price}</span>
+                    <span>${i.name} (x${i.qty||1})</span>
+                    <span>₹${(i.price)*(i.qty||1)}</span>
                 </div>
             `).join('');
 
@@ -493,7 +544,6 @@
                     ${itemsRow}
                 </div>
                 
-                <!-- Charges Breakdown -->
                 <div style="font-size:12px; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
                         <span>Item Subtotal:</span>
@@ -519,7 +569,6 @@
             window.print();
             invoiceArea.style.display = 'none';
 
-            // Auto-Confirm Order on Bill Print
             try {
                 if ((order.status || '').toLowerCase() === 'placed') {
                     await updateDoc(doc(db, "orders", orderId), {
@@ -543,7 +592,7 @@
             }
         };
 
-        // Manage Customers & History
+        // Customer History
         onSnapshot(collection(db, "users"), (snapshot) => {
             const tbody = document.getElementById('usersTableBody');
             tbody.innerHTML = '';
@@ -583,7 +632,7 @@
                         <div style="background:#f8fafc; border:1px solid #ddd; padding:10px; border-radius:8px; margin-bottom:8px;">
                             <strong>Date:</strong> ${o.orderDateFormatted || 'N/A'} | <strong>Status:</strong> ${o.status}<br>
                             <strong>Amount:</strong> ₹${o.totalAmount} | <strong>OTP:</strong> ${o.deliveryOtp}<br>
-                            <strong>Items:</strong> ${(o.items||[]).map(i=>i.name).join(', ')}
+                            <strong>Items:</strong> ${(o.items||[]).map(i=>`${i.name} (x${i.qty||1})`).join(', ')}
                         </div>
                     `;
                 });
@@ -621,20 +670,35 @@
                 tbody.innerHTML += `<tr><td><strong>${s.shopName}</strong></td><td>${s.ownerName}</td><td>${s.phone}</td><td>${s.pincode}</td><td><code>${s.username}</code></td><td><code>${s.password}</code></td><td><button class="btn-danger" onclick="deleteShop('${docSnap.id}')">Delete</button></td></tr>`;
             });
         });
-
         window.deleteShop = async (id) => { if (confirm("Delete shop?")) await deleteDoc(doc(db, "shops", id)); };
 
-        // Publish Product (Saves Auto Discount & 1-6 Photos)
+        // Publish Product (Saves Multi-Categories + Variants + 1-6 Photos)
         document.getElementById('addProductForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('prodName').value.trim();
             const price = Number(document.getElementById('prodPrice').value);
             const originalPrice = Number(document.getElementById('prodOriginalPrice').value) || '';
             const discount = document.getElementById('prodDiscount').value.trim();
-            const category = document.getElementById('prodCategory').value;
-            const subCategory = document.getElementById('prodSubCategory').value.trim();
+            const subCategory = document.getElementById('prodSubCategory').value;
             const desc = document.getElementById('prodDesc').value.trim();
             const imgLink = document.getElementById('prodImageLink').value.trim();
+
+            // Extract Selected Categories
+            const selectedCats = Array.from(document.querySelectorAll('input[name="productCats"]:checked')).map(cb => cb.value);
+            if (selectedCats.length === 0) return alert("Kam se kam ek Category select karein!");
+
+            // Extract Variants
+            const vNames = document.querySelectorAll('.v-name');
+            const vPrices = document.querySelectorAll('.v-price');
+            let variantsList = [];
+
+            vNames.forEach((nEl, idx) => {
+                const vName = nEl.value.trim();
+                const vPrice = Number(vPrices[idx].value);
+                if (vName && !isNaN(vPrice) && vPrice > 0) {
+                    variantsList.push({ size: vName, price: vPrice });
+                }
+            });
 
             let photos = [];
             if (base64PhotosArray.length > 0) photos = base64PhotosArray;
@@ -643,14 +707,24 @@
 
             try {
                 await addDoc(collection(db, "products"), {
-                    name, price, originalPrice, discount, category, subCategory, description: desc,
+                    name,
+                    price,
+                    originalPrice,
+                    discount,
+                    categories: selectedCats,
+                    category: selectedCats[0],
+                    subCategory,
+                    description: desc,
                     imageUrl: photos[0],
                     images: photos,
+                    hasVariants: variantsList.length > 0,
+                    sizes: variantsList,
                     createdAt: serverTimestamp()
                 });
                 alert("✅ Product publish ho gaya!");
                 document.getElementById('addProductForm').reset();
                 document.getElementById('photoPreviewContainer').innerHTML = '';
+                document.getElementById('variantsContainer').innerHTML = '';
                 base64PhotosArray = [];
             } catch(err) { alert("Error: " + err.message); }
         });
@@ -660,13 +734,15 @@
             tbody.innerHTML = '';
             snapshot.forEach(docSnap => {
                 const p = docSnap.data();
+                const cats = p.categories ? p.categories.join(', ') : p.category;
+                const vCount = (p.sizes && p.sizes.length > 0) ? `${p.sizes.length} Variants` : 'Single';
                 tbody.innerHTML += `
                     <tr>
                         <td><img src="${p.imageUrl||''}" style="width:35px; height:35px; border-radius:4px; object-fit:cover;"></td>
                         <td><strong>${p.name}</strong></td>
-                        <td>${p.category}</td>
+                        <td><span style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:6px; font-weight:bold; font-size:11px;">${cats}</span></td>
                         <td>₹${p.price} ${p.originalPrice ? `<span style="text-decoration:line-through; color:#888; font-size:11px;">(₹${p.originalPrice})</span>` : ''}</td>
-                        <td><strong style="color:#16a34a;">${p.discount || '-'}</strong></td>
+                        <td><span style="background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:10px; font-weight:bold; font-size:11px;">${vCount}</span></td>
                         <td><button onclick="delProd('${docSnap.id}')" class="btn-danger">Delete</button></td>
                     </tr>
                 `;
