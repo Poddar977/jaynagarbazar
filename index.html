@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jaynagar Store</title>
-     <meta name="google-site-verification" content="72NquAkB-h-rhGmC663QSuZ3Y40bASxjPp0xk2tme2w" />
+    <title>Jaynagar Store </title>
+    <meta name="google-site-verification" content="72NquAkB-h-rhGmC663QSuZ3Y40bASxjPp0xk2tme2w" />
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
         body { background-color: #f1f2f6; color: #333; }
@@ -21,6 +21,10 @@
         .category-nav-bar { background-color: #ffffff; padding: 10px 5%; display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid #e0e0e0; }
         .category-btn { background-color: #f0f3f8; color: #333; border: 1px solid #dcdfe6; padding: 7px 18px; border-radius: 25px; font-size: 13px; font-weight: 600; cursor: pointer; }
         .category-btn.active { background-color: #2874f0; color: white; }
+
+        .sub-cat-bar { display: none; background: #fdf2f8; padding: 8px 5%; gap: 8px; overflow-x: auto; border-bottom: 1px dashed #f472b6; }
+        .sub-cat-btn { background: white; border: 1px solid #fbcfe8; color: #be185d; padding: 5px 14px; border-radius: 15px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .sub-cat-btn.active { background: #db2777; color: white; }
 
         .search-container { display: flex; width: 32%; }
         .search-container input { width: 100%; padding: 10px 18px; border: none; outline: none; border-radius: 25px 0 0 25px; font-size: 14px; }
@@ -46,12 +50,14 @@
         .restaurant-info { padding: 12px 15px; }
 
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
-        .product-card { background-color: white; border-radius: 12px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
+        .product-card { background-color: white; border-radius: 12px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #e2e8f0; }
         
         .card-main-img { width: 100%; height: 160px; object-fit: contain; margin-bottom: 8px; border-radius: 8px; cursor: pointer; }
         .product-title { font-size: 14px; font-weight: 600; height: 38px; overflow: hidden; color: #2874f0; margin-bottom: 6px; cursor: pointer; }
         .add-btn-round { background-color: #ff9f00; color: white; border: none; padding: 8px 10px; border-radius: 20px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
         .buy-now-round { background-color: #fb641b; color: white; border: none; padding: 8px 10px; border-radius: 20px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
+
+        .discount-tag { color: #16a34a; font-weight: bold; font-size: 12px; margin-left: 6px; background: #dcfce7; padding: 2px 6px; border-radius: 4px; }
 
         /* Modal Styles */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 300; }
@@ -67,7 +73,6 @@
         .cart-item { display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #eee; padding: 12px 0; }
         .cart-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
         
-        /* Quantity Counter Buttons */
         .qty-controls { display: inline-flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 20px; background: #f8fafc; overflow: hidden; margin-top: 5px; }
         .qty-btn { background: #f1f5f9; border: none; width: 26px; height: 26px; cursor: pointer; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; color: #1e293b; }
         .qty-btn:hover { background: #e2e8f0; }
@@ -86,7 +91,7 @@
     <header>
         <div class="logo" onclick="switchAppMode('general')">Jaynagar Store</div>
         <div class="search-container">
-            <input type="text" id="search-input" placeholder="Search item, dish or shop..." onkeyup="handleSearch()">
+            <input type="text" id="search-input" placeholder="Search item, dish or category..." onkeyup="handleSearch()">
             <button class="search-btn-round" onclick="handleSearch()">🔍</button>
         </div>
         <div class="nav-actions">
@@ -119,23 +124,33 @@
         <span id="liveClockTime">⏰ Time: Loading...</span>
     </div>
 
+    <!-- Mode Switcher -->
     <div class="mode-switcher-container">
         <button class="mode-btn active" id="btnModeGeneral" onclick="switchAppMode('general')">🛍️ All Products Market</button>
         <button class="mode-btn food-mode" id="btnModeFood" onclick="switchAppMode('food')">🍔 Fast Food & Restaurants</button>
     </div>
 
+    <!-- Main Categories Bar -->
     <div class="category-nav-bar" id="generalCatNav">
-        <button class="category-btn active" onclick="filterGenCategory('all', this)">🛍️ All Market Items</button>
-        <button class="category-btn" onclick="filterGenCategory('fashion', this)">👗 Fashion</button>
-        <button class="category-btn" onclick="filterGenCategory('beauty', this)">💄 Beauty</button>
-        <button class="category-btn" onclick="filterGenCategory('grocery', this)">🛒 Grocery</button>
-        <button class="category-btn" onclick="filterGenCategory('gift', this)">🎁 Gifts</button>
+        <button class="category-btn active" onclick="filterCategory('all', this)">🛍️ All Market Items</button>
+        <button class="category-btn" onclick="filterCategory('fashion', this)">👗 Fashion</button>
+        <button class="category-btn" onclick="filterCategory('beauty', this)">💄 Beauty</button>
+        <button class="category-btn" onclick="filterCategory('grocery', this)">🛒 Grocery</button>
+        <button class="category-btn" onclick="filterCategory('gift', this)">🎁 Gifts</button>
+    </div>
+
+    <!-- Fashion Sub-Categories Bar -->
+    <div class="sub-cat-bar" id="fashionSubCatBar">
+        <button class="sub-cat-btn active" onclick="filterSubCat('all', this)">All Fashion</button>
+        <button class="sub-cat-btn" onclick="filterSubCat('lingerie', this)">👙 Lingerie & Innerwear</button>
+        <button class="sub-cat-btn" onclick="filterSubCat('women', this)">👗 Women Dresses</button>
+        <button class="sub-cat-btn" onclick="filterSubCat('men', this)">👕 Men Wear</button>
     </div>
 
     <div class="container">
         <!-- GENERAL MARKET VIEW -->
         <section id="sectionGeneralStore">
-            <h2 style="font-size:18px; margin-bottom:15px;">Featured Products</h2>
+            <h2 style="font-size:18px; margin-bottom:15px;" id="marketViewTitle">Featured Products</h2>
             <div class="product-grid" id="generalProductGrid">Loading products...</div>
         </section>
 
@@ -326,24 +341,27 @@
         let currentUser = null;
         let currentUserProfile = JSON.parse(localStorage.getItem('user_profile')) || null;
         let isSignupMode = false;
+        let isAuthReady = false;
 
         let allProducts = [];
         let allShops = [];
         let cart = JSON.parse(localStorage.getItem('store_cart')) || [];
         let currentMode = 'general';
+        let activeCategory = 'all';
+        let activeSubCategory = 'all';
         let selectedShopForMenu = null;
 
         updateCartUI();
 
-        // Check if redirected from product.html via "Direct Buy"
-        window.addEventListener('load', () => {
-            if (localStorage.getItem('open_checkout_direct') === 'true') {
-                localStorage.removeItem('open_checkout_direct');
-                setTimeout(() => {
-                    openCheckoutModal();
-                }, 400);
+        // Helper to get formatted discount tag
+        function getDiscountMarkup(p) {
+            let disc = p.discount;
+            if (!disc && p.originalPrice && Number(p.originalPrice) > Number(p.price)) {
+                const perc = Math.round(((Number(p.originalPrice) - Number(p.price)) / Number(p.originalPrice)) * 100);
+                if (perc > 0) disc = `${perc}% OFF`;
             }
-        });
+            return disc ? `<span class="discount-tag">${disc}</span>` : '';
+        }
 
         window.switchAppMode = function(mode) {
             currentMode = mode;
@@ -352,6 +370,7 @@
             const secGen = document.getElementById('sectionGeneralStore');
             const secFood = document.getElementById('sectionFoodStore');
             const genNav = document.getElementById('generalCatNav');
+            const subBar = document.getElementById('fashionSubCatBar');
 
             if (mode === 'general') {
                 btnGen.classList.add('active');
@@ -359,20 +378,24 @@
                 secGen.style.display = 'block';
                 secFood.style.display = 'none';
                 genNav.style.display = 'flex';
-                renderGeneralProducts(allProducts.filter(p => (p.category || '').toLowerCase() !== 'food'));
+                if (activeCategory === 'fashion') subBar.style.display = 'flex';
+                renderFilteredProducts();
             } else {
                 btnFood.classList.add('active');
                 btnGen.classList.remove('active');
                 secGen.style.display = 'none';
                 secFood.style.display = 'block';
                 genNav.style.display = 'none';
+                subBar.style.display = 'none';
                 backToRestaurantList();
                 renderRestaurants();
             }
         };
 
+        // Auth state listener with direct checkout auto-trigger
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
+            isAuthReady = true;
             const userAvatarBtn = document.getElementById('userAvatarBtn');
             const menuName = document.getElementById('userMenuName');
             const menuEmail = document.getElementById('userMenuEmail');
@@ -397,16 +420,23 @@
                     document.getElementById('foodPincodeFilter').value = currentUserProfile.pincode;
                 }
             } else {
-                currentUserProfile = null;
-                localStorage.removeItem('user_profile');
-                userAvatarBtn.innerText = "👤";
-                menuName.innerText = "Welcome, Guest";
-                menuEmail.innerText = "Login to order";
+                currentUserProfile = JSON.parse(localStorage.getItem('user_profile')) || null;
+                if (!currentUserProfile) {
+                    userAvatarBtn.innerText = "👤";
+                    menuName.innerText = "Welcome, Guest";
+                    menuEmail.innerText = "Login to order";
+                }
+            }
+
+            // Direct checkout trigger from product.html
+            if (localStorage.getItem('open_checkout_direct') === 'true') {
+                localStorage.removeItem('open_checkout_direct');
+                setTimeout(() => { openCheckoutModal(); }, 200);
             }
         });
 
         window.handleUserIconClick = () => {
-            if (!currentUser) openAuthModal();
+            if (!currentUser && !currentUserProfile) openAuthModal();
             else document.getElementById('userMenuDropdown').classList.toggle('show');
         };
 
@@ -428,7 +458,6 @@
             document.getElementById('authSubmitBtn').innerText = isSignupMode ? "Sign Up" : "Login";
             document.getElementById('authToggleText').innerText = isSignupMode ? "Already registered? " : "Naye customer hain? ";
             document.getElementById('authToggleLink').innerText = isSignupMode ? "Login here" : "Naya Account Banayein";
-            
             const termsCheck = document.getElementById('termsAgreementCheckbox');
             if (termsCheck) termsCheck.required = isSignupMode;
         };
@@ -463,31 +492,37 @@
         });
 
         window.handleLogout = () => {
-            if (confirm("Logout?")) signOut(auth).then(() => location.reload());
+            if (confirm("Logout?")) {
+                localStorage.removeItem('user_profile');
+                signOut(auth).then(() => location.reload());
+            }
         };
 
         window.openProfileModal = function() {
             document.getElementById('userMenuDropdown').classList.remove('show');
-            if (!currentUser) return alert("Pehle login karein!");
-            document.getElementById('profName').value = currentUserProfile?.fullName || '';
-            document.getElementById('profPhone').value = currentUserProfile?.phone || '';
-            document.getElementById('profAddress').value = currentUserProfile?.address || '';
-            document.getElementById('profPincode').value = currentUserProfile?.pincode || '';
+            const activeProf = currentUserProfile || (currentUser ? { fullName: '', phone: '', address: '', pincode: '' } : null);
+            if (!activeProf && !currentUser) return alert("Pehle login karein!");
+            document.getElementById('profName').value = activeProf?.fullName || '';
+            document.getElementById('profPhone').value = activeProf?.phone || '';
+            document.getElementById('profAddress').value = activeProf?.address || '';
+            document.getElementById('profPincode').value = activeProf?.pincode || '';
             document.getElementById('profile-overlay').classList.add('active');
         };
         window.closeProfileModal = () => document.getElementById('profile-overlay').classList.remove('active');
 
         document.getElementById('profileUpdateForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!currentUser) return;
             const name = document.getElementById('profName').value.trim();
             const phone = document.getElementById('profPhone').value.trim();
             const address = document.getElementById('profAddress').value.trim();
             const pincode = document.getElementById('profPincode').value.trim();
 
             try {
-                const updated = { uid: currentUser.uid, userEmail: currentUser.email, fullName: name, phone, address, pincode };
-                await setDoc(doc(db, "users", currentUser.uid), updated, { merge: true });
+                const uid = currentUser ? currentUser.uid : (currentUserProfile?.uid || 'guest_user');
+                const updated = { uid, userEmail: currentUser?.email || currentUserProfile?.userEmail || '', fullName: name, phone, address, pincode };
+                if (currentUser) {
+                    await setDoc(doc(db, "users", currentUser.uid), updated, { merge: true });
+                }
                 currentUserProfile = updated;
                 localStorage.setItem('user_profile', JSON.stringify(updated));
                 alert("✅ Profile successfully update ho gayi!");
@@ -497,7 +532,8 @@
 
         window.openOrdersTab = async function(type) {
             document.getElementById('userMenuDropdown').classList.remove('show');
-            if (!currentUser) return alert("Pehle login karein!");
+            const email = currentUser?.email || currentUserProfile?.userEmail;
+            if (!email) return alert("Pehle login karein!");
 
             const modal = document.getElementById('orders-modal-overlay');
             const container = document.getElementById('ordersListContainer');
@@ -506,7 +542,7 @@
             modal.classList.add('active');
 
             try {
-                const q = query(collection(db, "orders"), where("userEmail", "==", currentUser.email));
+                const q = query(collection(db, "orders"), where("userEmail", "==", email));
                 const snap = await getDocs(q);
                 if (snap.empty) { container.innerHTML = '<p style="text-align:center; padding:20px;">Koi order record nahi mila.</p>'; return; }
 
@@ -549,12 +585,13 @@
         };
         window.closeOrdersModal = () => document.getElementById('orders-modal-overlay').classList.remove('active');
 
+        // Products & Shops Listener
         onSnapshot(collection(db, "products"), (snapshot) => {
             allProducts = [];
             snapshot.forEach(d => allProducts.push({ id: d.id, ...d.data() }));
 
             if (currentMode === 'general') {
-                renderGeneralProducts(allProducts.filter(p => (p.category || '').toLowerCase() !== 'food'));
+                renderFilteredProducts();
             } else if (selectedShopForMenu) {
                 openRestaurantMenu(selectedShopForMenu);
             }
@@ -566,20 +603,65 @@
             if (currentMode === 'food') renderRestaurants();
         });
 
-        function renderGeneralProducts(items) {
+        // Category & Sub-category Filter
+        window.filterCategory = function(cat, el) {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            activeCategory = cat;
+            activeSubCategory = 'all';
+
+            const subBar = document.getElementById('fashionSubCatBar');
+            if (cat === 'fashion') {
+                subBar.style.display = 'flex';
+                document.querySelectorAll('.sub-cat-btn').forEach((b, i) => { if (i===0) b.classList.add('active'); else b.classList.remove('active'); });
+            } else {
+                subBar.style.display = 'none';
+            }
+            renderFilteredProducts();
+        };
+
+        window.filterSubCat = function(subCat, el) {
+            document.querySelectorAll('.sub-cat-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            activeSubCategory = subCat;
+            renderFilteredProducts();
+        };
+
+        function renderFilteredProducts() {
+            let list = allProducts.filter(p => (p.category || '').toLowerCase() !== 'food' && (!p.categories || !p.categories.includes('food')));
+
+            if (activeCategory !== 'all') {
+                list = list.filter(p => {
+                    if (p.categories && Array.isArray(p.categories)) {
+                        return p.categories.includes(activeCategory);
+                    }
+                    return (p.category || '').toLowerCase() === activeCategory;
+                });
+            }
+
+            if (activeSubCategory !== 'all') {
+                list = list.filter(p => (p.subCategory || '').toLowerCase() === activeSubCategory);
+            }
+
             const grid = document.getElementById('generalProductGrid');
             grid.innerHTML = '';
-            if (items.length === 0) { grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:20px;">Products nahi mile.</p>'; return; }
+            if (list.length === 0) {
+                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:30px; color:#64748b;">Is category me koi product uplabdh nahi hai.</p>';
+                return;
+            }
 
-            items.forEach((p) => {
+            list.forEach((p) => {
                 const img = (p.images && p.images.length > 0) ? p.images[0] : (p.imageUrl || 'https://via.placeholder.com/200');
+                const discBadge = getDiscountMarkup(p);
+
                 grid.innerHTML += `
                     <div class="product-card">
                         <img src="${img}" class="card-main-img" alt="${p.name}" onclick="openProductDetail('${p.id}')">
                         <div class="product-title" onclick="openProductDetail('${p.id}')">${p.name}</div>
-                        <div style="margin:6px 0;">
+                        <div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">
                             <span style="font-size:17px; font-weight:bold;">₹${p.price}</span>
-                            ${p.originalPrice ? `<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:5px;">₹${p.originalPrice}</span>` : ''}
+                            ${p.originalPrice ? `<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:6px;">₹${p.originalPrice}</span>` : ''}
+                            ${discBadge}
                         </div>
                         <div style="display:flex; gap:6px;">
                             <button class="add-btn-round" onclick="addToCart('${p.id}')">🛒 Add</button>
@@ -590,13 +672,7 @@
             });
         }
 
-        window.filterGenCategory = (cat, el) => {
-            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-            if (el) el.classList.add('active');
-            if (cat === 'all') renderGeneralProducts(allProducts.filter(p => (p.category || '').toLowerCase() !== 'food'));
-            else renderGeneralProducts(allProducts.filter(p => (p.category || '').toLowerCase() === cat));
-        };
-
+        // Restaurant Rendering
         function renderRestaurants() {
             const container = document.getElementById('restaurantCardsContainer');
             container.innerHTML = '';
@@ -654,11 +730,17 @@
 
             shopDishes.forEach((dish) => {
                 const img = (dish.images && dish.images.length > 0) ? dish.images[0] : (dish.imageUrl || 'https://via.placeholder.com/200');
+                const discBadge = getDiscountMarkup(dish);
+
                 grid.innerHTML += `
                     <div class="product-card" style="border:1px solid #fed7aa;">
                         <img src="${img}" class="card-main-img" alt="${dish.name}" onclick="openProductDetail('${dish.id}')">
                         <div class="product-title" style="color:#ea580c;" onclick="openProductDetail('${dish.id}')">${dish.name}</div>
-                        <div style="font-size:16px; font-weight:bold; margin-bottom:8px;">₹${dish.price}</div>
+                        <div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">
+                            <span style="font-size:16px; font-weight:bold;">₹${dish.price}</span>
+                            ${dish.originalPrice ? `<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:6px;">₹${dish.originalPrice}</span>` : ''}
+                            ${discBadge}
+                        </div>
                         <div style="display:flex; gap:6px;">
                             <button class="add-btn-round" style="background:#ea580c;" onclick="addFoodToCart('${dish.id}', '${shop.id}', '${shop.shopName}')">🛒 Add</button>
                             <button class="buy-now-round" onclick="buyFoodNow('${dish.id}', '${shop.id}', '${shop.shopName}')">⚡ Order</button>
@@ -674,10 +756,7 @@
             document.getElementById('restaurantMenuView').style.display = 'none';
         };
 
-        // =========================================================
-        // CART LOGIC WITH SAME-ITEM QUANTITY (+ / -) MANAGEMENT
-        // =========================================================
-
+        // Cart Actions
         window.addToCart = (prodId) => {
             const p = allProducts.find(x => x.id === prodId);
             if (!p) return;
@@ -689,13 +768,9 @@
                 cart = [];
             }
 
-            // Check if same item already in cart -> increase quantity
             const existing = cart.find(i => i.id === prodId);
-            if (existing) {
-                existing.qty = (existing.qty || 1) + 1;
-            } else {
-                cart.push({ ...p, qty: 1 });
-            }
+            if (existing) existing.qty = (existing.qty || 1) + 1;
+            else cart.push({ ...p, qty: 1 });
 
             saveCart();
             document.getElementById('cart-modal').classList.add('open');
@@ -727,13 +802,9 @@
                 cart = [];
             }
 
-            // Check if same food item already in cart -> increase quantity
             const existingDish = cart.find(i => i.id === dishId);
-            if (existingDish) {
-                existingDish.qty = (existingDish.qty || 1) + 1;
-            } else {
-                cart.push({ ...p, assignedShopId: shopId, assignedShopName: shopName, qty: 1 });
-            }
+            if (existingDish) existingDish.qty = (existingDish.qty || 1) + 1;
+            else cart.push({ ...p, assignedShopId: shopId, assignedShopName: shopName, qty: 1 });
 
             saveCart();
             document.getElementById('cart-modal').classList.add('open');
@@ -747,20 +818,14 @@
             openCheckoutModal();
         };
 
-        // Quantity Increment / Decrement Functions
         window.changeCartQty = (index, delta) => {
             if (!cart[index]) return;
             cart[index].qty = (cart[index].qty || 1) + delta;
-            if (cart[index].qty <= 0) {
-                cart.splice(index, 1);
-            }
+            if (cart[index].qty <= 0) cart.splice(index, 1);
             saveCart();
         };
 
-        window.removeFromCart = (idx) => { 
-            cart.splice(idx, 1); 
-            saveCart(); 
-        };
+        window.removeFromCart = (idx) => { cart.splice(idx, 1); saveCart(); };
 
         function saveCart() {
             localStorage.setItem('store_cart', JSON.stringify(cart));
@@ -770,7 +835,6 @@
         window.toggleCart = () => document.getElementById('cart-modal').classList.toggle('open');
 
         function updateCartUI() {
-            // Count total item units (e.g., 2 burger + 1 fries = 3 items badge)
             const totalUnits = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
             document.getElementById('cart-count').innerText = totalUnits;
 
@@ -824,21 +888,28 @@
                 `;
             });
 
-            // Delivery Charge Policy: < 100 Rs = 20 Rs, >= 100 Rs = FREE
             let del = (subtotal > 0 && subtotal < 100) ? 20 : 0;
             document.getElementById('cart-subtotal').innerText = subtotal;
             document.getElementById('delivery-charge').innerText = del;
             document.getElementById('cart-total').innerText = subtotal + del;
         }
 
+        // Checkout Trigger (checks active Firebase auth or stored profile to prevent duplicate login prompt)
         window.openCheckoutModal = () => {
-            if (!currentUser) { alert("Pehle login karein!"); toggleCart(); openAuthModal(); return; }
+            const hasUserSession = currentUser || currentUserProfile || localStorage.getItem('user_profile');
+            if (!hasUserSession) {
+                alert("Pehle login karein!");
+                toggleCart();
+                openAuthModal();
+                return;
+            }
             if (cart.length === 0) return alert("Cart khali hai!");
 
-            document.getElementById('custName').value = currentUserProfile?.fullName || '';
-            document.getElementById('custPhone').value = currentUserProfile?.phone || '';
-            document.getElementById('custPincode').value = currentUserProfile?.pincode || '';
-            document.getElementById('custAddress').value = currentUserProfile?.address || '';
+            const profile = currentUserProfile || JSON.parse(localStorage.getItem('user_profile')) || {};
+            document.getElementById('custName').value = profile.fullName || '';
+            document.getElementById('custPhone').value = profile.phone || '';
+            document.getElementById('custPincode').value = profile.pincode || '';
+            document.getElementById('custAddress').value = profile.address || '';
 
             document.getElementById('checkout-overlay').classList.add('active');
         };
@@ -846,7 +917,8 @@
 
         document.getElementById('orderForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!currentUser) return;
+            const profile = currentUserProfile || JSON.parse(localStorage.getItem('user_profile')) || {};
+            const email = currentUser?.email || profile.userEmail || 'customer@store.local';
 
             const name = document.getElementById('custName').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
@@ -867,8 +939,8 @@
 
             try {
                 await addDoc(collection(db, "orders"), {
-                    userEmail: currentUser.email,
-                    userId: currentUser.uid,
+                    userEmail: email,
+                    userId: currentUser ? currentUser.uid : (profile.uid || 'guest'),
                     customerName: name,
                     customerPhone: phone,
                     customerPincode: pincode,
@@ -901,7 +973,36 @@
         window.handleSearch = () => {
             const q = document.getElementById('search-input').value.toLowerCase().trim();
             if (currentMode === 'general') {
-                renderGeneralProducts(allProducts.filter(p => (p.category || '').toLowerCase() !== 'food' && p.name.toLowerCase().includes(q)));
+                const list = allProducts.filter(p => {
+                    const isFood = (p.category || '').toLowerCase() === 'food' || (p.categories && p.categories.includes('food'));
+                    if (isFood) return false;
+                    return p.name.toLowerCase().includes(q) || (p.subCategory || '').toLowerCase().includes(q);
+                });
+                const grid = document.getElementById('generalProductGrid');
+                grid.innerHTML = '';
+                if (list.length === 0) {
+                    grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:30px; color:#64748b;">Koi item nahi mila.</p>';
+                    return;
+                }
+                list.forEach((p) => {
+                    const img = (p.images && p.images.length > 0) ? p.images[0] : (p.imageUrl || 'https://via.placeholder.com/200');
+                    const discBadge = getDiscountMarkup(p);
+                    grid.innerHTML += `
+                        <div class="product-card">
+                            <img src="${img}" class="card-main-img" alt="${p.name}" onclick="openProductDetail('${p.id}')">
+                            <div class="product-title" onclick="openProductDetail('${p.id}')">${p.name}</div>
+                            <div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">
+                                <span style="font-size:17px; font-weight:bold;">₹${p.price}</span>
+                                ${p.originalPrice ? `<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:6px;">₹${p.originalPrice}</span>` : ''}
+                                ${discBadge}
+                            </div>
+                            <div style="display:flex; gap:6px;">
+                                <button class="add-btn-round" onclick="addToCart('${p.id}')">🛒 Add</button>
+                                <button class="buy-now-round" onclick="buyNow('${p.id}')">⚡ Buy</button>
+                            </div>
+                        </div>
+                    `;
+                });
             } else {
                 renderRestaurants();
             }
