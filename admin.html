@@ -50,8 +50,9 @@
 
         .preview-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
         .preview-box { width: 60px; height: 60px; border-radius: 6px; border: 1px solid #ddd; object-fit: cover; }
-        .variant-row { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
-        .variant-row input { flex: 1; }
+        
+        /* Variant Row Grid Layout with Live Discount Pill */
+        .variant-row { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr auto; gap: 8px; align-items: center; margin-bottom: 8px; background: #fff; padding: 8px; border-radius: 6px; border: 1px solid #e2e8f0; }
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 500; }
         .modal-overlay.active { display: flex; }
@@ -176,21 +177,17 @@
                 </div>
             </section>
 
-            <!-- TAB 6: Products Management (Multi-Category + Variants + Photos) -->
+            <!-- TAB 6: Products Management (Clean Header + Variant-wise Auto-Discount) -->
             <section id="tab-products" class="tab-section">
                 <div class="card">
-                    <h2>+ Naya Product Add Karein (Multi-Category + Size Variants)</h2>
+                    <h2>+ Naya Product Add Karein (Individual Size MRP, Selling Price & Auto-Discount)</h2>
                     <form id="addProductForm">
                         <div class="form-grid">
                             <input type="text" id="prodName" placeholder="Product Title / Name" required>
-                            <input type="number" id="prodPrice" placeholder="Base Selling Price (₹)" required>
-                            <input type="number" id="prodOriginalPrice" placeholder="Original Price / MRP (₹)">
-                            <input type="text" id="prodDiscount" placeholder="Discount (Auto Calculated)" readonly style="background:#f1f5f9; font-weight:bold; color:#16a34a;">
                             
                             <div>
-                                <label style="font-size:11px; font-weight:bold;">Sub-Category (Fashion / Needs):</label>
                                 <select id="prodSubCategory">
-                                    <option value="none">Normal / General</option>
+                                    <option value="none">Sub-Category: Normal / General</option>
                                     <option value="lingerie">Fashion: Lingerie / Innerwear</option>
                                     <option value="women">Fashion: Women Dresses</option>
                                     <option value="men">Fashion: Men Wear</option>
@@ -203,14 +200,13 @@
 
                             <input type="url" id="prodImageLink" placeholder="Option 1: Image URL Link">
                             <div>
-                                <label style="font-size:11px; font-weight:bold;">Option 2: Upload Photos (1-6):</label>
                                 <input type="file" id="prodFilePhotos" accept="image/*" multiple onchange="previewSelectedFiles(this)">
                             </div>
                         </div>
 
                         <!-- Multi-Category Select Checkboxes -->
-                        <div style="margin-top:12px;">
-                            <label style="font-size:12px; font-weight:bold; display:block; margin-bottom:6px;">Categories (Multiple select kar sakte hain e.g. Beauty + Grocery + Gift):</label>
+                        <div style="margin-top:14px;">
+                            <label style="font-size:12px; font-weight:bold; display:block; margin-bottom:6px;">Categories (Multi-Select Supported):</label>
                             <div class="cat-checkbox-group">
                                 <label><input type="checkbox" name="productCats" value="fashion"> 👗 Fashion</label>
                                 <label><input type="checkbox" name="productCats" value="beauty"> 💄 Beauty</label>
@@ -222,27 +218,27 @@
 
                         <div class="preview-grid" id="photoPreviewContainer"></div>
 
-                        <!-- Dynamic Variants Builder (Sizes, Weights) -->
-                        <div style="margin-top:15px; padding:15px; background:#f8fafc; border:1px dashed #2874f0; border-radius:8px;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <!-- Dynamic Variants Builder (Har Size Ka Alag MRP, Selling Price & Auto-Discount) -->
+                        <div style="margin-top:16px; padding:15px; background:#f8fafc; border:1px dashed #2874f0; border-radius:8px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                                 <div>
-                                    <strong style="font-size:13px; color:#0f172a;">📏 Size / Weight Variants:</strong>
-                                    <p style="font-size:11px; color:#64748b;">(e.g. 75cm:199, 80cm:215 ya 500g:40, 1kg:75)</p>
+                                    <strong style="font-size:13px; color:#0f172a;">📏 Size / Weight Variants (Har Size Ka Alag MRP, Selling Price & Auto-Discount):</strong>
+                                    <p style="font-size:11px; color:#64748b; margin-top:2px;">Example: Size: <code>75cm</code> | Selling Price: <code>₹199</code> | MRP: <code>₹228</code> -> Discount auto-calculate ho jayega.</p>
                                 </div>
-                                <button type="button" onclick="addVariantRow()" style="background:#16a34a; color:white; border:none; padding:6px 12px; border-radius:4px; font-weight:bold; font-size:12px; cursor:pointer;">+ Add Size/Weight</button>
+                                <button type="button" onclick="addVariantRow()" style="background:#16a34a; color:white; border:none; padding:7px 14px; border-radius:4px; font-weight:bold; font-size:12px; cursor:pointer;">+ Add Size Variant</button>
                             </div>
                             <div id="variantsContainer"></div>
                         </div>
 
-                        <textarea id="prodDesc" placeholder="Product Description..." style="margin-top:10px; height:50px;"></textarea>
-                        <button type="submit" class="btn-primary" style="margin-top:10px;">Publish Product</button>
+                        <textarea id="prodDesc" placeholder="Product Description..." style="margin-top:12px; height:60px;"></textarea>
+                        <button type="submit" class="btn-primary" style="margin-top:12px; padding:10px 20px;">Publish Product</button>
                     </form>
                 </div>
 
                 <div class="card">
                     <h2>Store Catalog</h2>
                     <table>
-                        <thead><tr><th>Image</th><th>Name</th><th>Categories</th><th>Price</th><th>Sub-Category</th><th>Action</th></tr></thead>
+                        <thead><tr><th>Image</th><th>Name</th><th>Categories</th><th>Price</th><th>Variants</th><th>Action</th></tr></thead>
                         <tbody id="productsTableBody"></tbody>
                     </table>
                 </div>
@@ -253,7 +249,7 @@
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                         <h2>👥 Customers</h2>
-                        <small style="color:#2874f0; font-weight:700;">👉 Kisi bhi customer row par click karein order history dekhne ke liye</small>
+                        <small style="color:#2874f0; font-weight:700;">👉 Customer row par click karein order history dekhne ke liye</small>
                     </div>
                     <table>
                         <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Address</th><th>Orders</th><th>Action</th></tr></thead>
@@ -264,10 +260,8 @@
         </div>
     </main>
 
-    <!-- Hidden Bill Container for Thermal Printer -->
     <div id="adminPrintableBill" style="display:none;"></div>
 
-    <!-- Customer History Modal -->
     <div class="modal-overlay" id="customerAuditModal">
         <div class="modal-box">
             <button class="close-modal-btn" onclick="closeCustomerAudit()">&times;</button>
@@ -278,40 +272,54 @@
     </div>
 
     <script>
-        // Auto-Calculate Discount Logic
-        const priceInput = document.getElementById('prodPrice');
-        const origPriceInput = document.getElementById('prodOriginalPrice');
-        const discountInput = document.getElementById('prodDiscount');
+        // Live auto-calculation of discount percentage for each variant row
+        function calculateRowDiscount(row) {
+            const priceInput = row.querySelector('.v-price');
+            const origPriceInput = row.querySelector('.v-orig-price');
+            const discountPill = row.querySelector('.v-discount-pill');
 
-        function autoCalculateDiscount() {
-            const sellPrice = parseFloat(priceInput.value);
-            const origPrice = parseFloat(origPriceInput.value);
+            const price = parseFloat(priceInput.value);
+            const orig = parseFloat(origPriceInput.value);
 
-            if (!isNaN(origPrice) && !isNaN(sellPrice) && origPrice > 0 && origPrice > sellPrice) {
-                const discountPercent = Math.round(((origPrice - sellPrice) / origPrice) * 100);
-                discountInput.value = `${discountPercent}% OFF`;
+            if (!isNaN(price) && !isNaN(orig) && orig > price && price > 0) {
+                const perc = Math.round(((orig - price) / orig) * 100);
+                discountPill.value = `${perc}% OFF`;
+                discountPill.style.color = "#16a34a";
             } else {
-                discountInput.value = '';
+                discountPill.value = '';
             }
         }
 
-        priceInput.addEventListener('input', autoCalculateDiscount);
-        origPriceInput.addEventListener('input', autoCalculateDiscount);
-
-        // Dynamic Variants Input Rows
-        window.addVariantRow = function(valName = '', valPrice = '') {
+        // Add Dynamic Variant Row with Auto Calculated Discount Field
+        window.addVariantRow = function(valName = '', valPrice = '', valOrigPrice = '', valDisc = '') {
             const container = document.getElementById('variantsContainer');
             const row = document.createElement('div');
             row.className = 'variant-row';
             row.innerHTML = `
-                <input type="text" placeholder="Size/Weight (e.g. 75cm, 50ml, 1kg)" value="${valName}" class="v-name" style="padding:6px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;">
-                <input type="number" placeholder="Price for this size (₹)" value="${valPrice}" class="v-price" style="padding:6px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;">
-                <button type="button" onclick="this.parentElement.remove()" style="background:#ef4444; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-weight:bold;">✕</button>
+                <input type="text" placeholder="Size (e.g. 75cm, 1kg)" value="${valName}" class="v-name" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;" required>
+                <input type="number" placeholder="Selling Price (₹)" value="${valPrice}" class="v-price" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;" required>
+                <input type="number" placeholder="Original MRP (₹)" value="${valOrigPrice}" class="v-orig-price" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;">
+                <input type="text" placeholder="Discount" value="${valDisc}" class="v-discount-pill" readonly style="padding:7px 10px; border:1px solid #bbf7d0; background:#f0fdf4; border-radius:4px; font-size:12px; font-weight:bold; color:#16a34a;">
+                <button type="button" onclick="this.parentElement.remove()" style="background:#ef4444; color:white; border:none; padding:7px 12px; border-radius:4px; cursor:pointer; font-weight:bold;">✕</button>
             `;
+
+            const priceInp = row.querySelector('.v-price');
+            const origInp = row.querySelector('.v-orig-price');
+
+            priceInp.addEventListener('input', () => calculateRowDiscount(row));
+            origInp.addEventListener('input', () => calculateRowDiscount(row));
+
             container.appendChild(row);
+            if (valPrice && valOrigPrice) calculateRowDiscount(row);
         };
 
-        // Preview 1 to 6 Photos Upload
+        // Initialize with one default row on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('variantsContainer').children.length === 0) {
+                addVariantRow();
+            }
+        });
+
         let base64PhotosArray = [];
         function previewSelectedFiles(input) {
             const container = document.getElementById('photoPreviewContainer');
@@ -389,7 +397,6 @@
             document.getElementById('liveClock').innerText = new Date().toLocaleString('en-IN');
         }, 1000);
 
-        // Orders Realtime
         onSnapshot(collection(db, "orders"), async (snapshot) => {
             let totalRevenue = 0, totalCash = 0;
             let foodCount = 0, generalCount = 0;
@@ -592,7 +599,6 @@
             }
         };
 
-        // Customer History
         onSnapshot(collection(db, "users"), (snapshot) => {
             const tbody = document.getElementById('usersTableBody');
             tbody.innerHTML = '';
@@ -641,7 +647,6 @@
 
         window.closeCustomerAudit = () => document.getElementById('customerAuditModal').classList.remove('active');
 
-        // Manage Shops
         document.getElementById('addShopForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const shopName = document.getElementById('shopNameInput').value.trim();
@@ -672,33 +677,50 @@
         });
         window.deleteShop = async (id) => { if (confirm("Delete shop?")) await deleteDoc(doc(db, "shops", id)); };
 
-        // Publish Product (Saves Multi-Categories + Variants + 1-6 Photos)
+        // Publish Product (Saves Individual Variant MRP, Selling Price & Auto Discount)
         document.getElementById('addProductForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('prodName').value.trim();
-            const price = Number(document.getElementById('prodPrice').value);
-            const originalPrice = Number(document.getElementById('prodOriginalPrice').value) || '';
-            const discount = document.getElementById('prodDiscount').value.trim();
             const subCategory = document.getElementById('prodSubCategory').value;
             const desc = document.getElementById('prodDesc').value.trim();
             const imgLink = document.getElementById('prodImageLink').value.trim();
 
-            // Extract Selected Categories
             const selectedCats = Array.from(document.querySelectorAll('input[name="productCats"]:checked')).map(cb => cb.value);
             if (selectedCats.length === 0) return alert("Kam se kam ek Category select karein!");
 
             // Extract Variants
             const vNames = document.querySelectorAll('.v-name');
             const vPrices = document.querySelectorAll('.v-price');
+            const vOrigPrices = document.querySelectorAll('.v-orig-price');
             let variantsList = [];
 
             vNames.forEach((nEl, idx) => {
                 const vName = nEl.value.trim();
                 const vPrice = Number(vPrices[idx].value);
+                const vOrig = Number(vOrigPrices[idx].value) || '';
+                
                 if (vName && !isNaN(vPrice) && vPrice > 0) {
-                    variantsList.push({ size: vName, price: vPrice });
+                    let vDisc = '';
+                    if (vOrig && vOrig > vPrice) {
+                        vDisc = `${Math.round(((vOrig - vPrice) / vOrig) * 100)}% OFF`;
+                    }
+                    variantsList.push({ 
+                        size: vName, 
+                        price: vPrice, 
+                        originalPrice: vOrig,
+                        discount: vDisc
+                    });
                 }
             });
+
+            if (variantsList.length === 0) {
+                return alert("Kam se kam 1 Size/Variant (Size Name aur Selling Price) add karein!");
+            }
+
+            // Primary display price is derived from first variant
+            const defaultBasePrice = variantsList[0].price;
+            const defaultOriginalPrice = variantsList[0].originalPrice || '';
+            const defaultDiscount = variantsList[0].discount || '';
 
             let photos = [];
             if (base64PhotosArray.length > 0) photos = base64PhotosArray;
@@ -708,16 +730,16 @@
             try {
                 await addDoc(collection(db, "products"), {
                     name,
-                    price,
-                    originalPrice,
-                    discount,
+                    price: defaultBasePrice,
+                    originalPrice: defaultOriginalPrice,
+                    discount: defaultDiscount,
                     categories: selectedCats,
                     category: selectedCats[0],
                     subCategory,
                     description: desc,
                     imageUrl: photos[0],
                     images: photos,
-                    hasVariants: variantsList.length > 0,
+                    hasVariants: true,
                     sizes: variantsList,
                     createdAt: serverTimestamp()
                 });
@@ -726,6 +748,7 @@
                 document.getElementById('photoPreviewContainer').innerHTML = '';
                 document.getElementById('variantsContainer').innerHTML = '';
                 base64PhotosArray = [];
+                addVariantRow();
             } catch(err) { alert("Error: " + err.message); }
         });
 
@@ -735,7 +758,7 @@
             snapshot.forEach(docSnap => {
                 const p = docSnap.data();
                 const cats = p.categories ? p.categories.join(', ') : p.category;
-                const vCount = (p.sizes && p.sizes.length > 0) ? `${p.sizes.length} Variants` : 'Single';
+                const vCount = (p.sizes && p.sizes.length > 0) ? `${p.sizes.length} Sizes` : 'Single';
                 tbody.innerHTML += `
                     <tr>
                         <td><img src="${p.imageUrl||''}" style="width:35px; height:35px; border-radius:4px; object-fit:cover;"></td>
