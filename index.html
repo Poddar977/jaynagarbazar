@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jaynagar Store</title>
     <meta name="google-site-verification" content="72NquAkB-h-rhGmC663QSuZ3Y40bASxjPp0xk2tme2w" />
+    <title>Jaynagar Store - Hybrid Super App</title>
     <link rel="preconnect" href="https://firestore.googleapis.com">
     <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
     <style>
@@ -63,7 +63,7 @@
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 300; }
         .modal-overlay.active { display: flex; }
-        .modal-box { background: white; padding: 25px; border-radius: 16px; width: 92%; max-width: 550px; max-height: 90vh; overflow-y: auto; position: relative; }
+        .modal-box { background: white; padding: 25px; border-radius: 16px; width: 92%; max-width: 620px; max-height: 90vh; overflow-y: auto; position: relative; }
         .close-modal { position: absolute; right: 15px; top: 15px; cursor: pointer; font-size: 22px; font-weight: bold; width: 30px; height: 30px; border-radius: 50%; background: #f1f2f6; display: flex; align-items: center; justify-content: center; }
         .btn-submit { background: #2874f0; color: white; border: none; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; padding: 12px; border-radius: 25px; }
 
@@ -76,13 +76,23 @@
         
         .qty-controls { display: inline-flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 20px; background: #f8fafc; overflow: hidden; margin-top: 5px; }
         .qty-btn { background: #f1f5f9; border: none; width: 26px; height: 26px; cursor: pointer; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; color: #1e293b; }
-        .qty-btn:hover { background: #e2e8f0; }
         .qty-val { min-width: 28px; text-align: center; font-size: 12px; font-weight: bold; }
         .cart-footer { padding: 15px; border-top: 1px solid #eee; background: #f9f9f9; }
 
         .terms-container { font-size: 12px; line-height: 1.6; color: #475569; max-height: 60vh; overflow-y: auto; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; margin-top: 10px; }
         .terms-container h3 { color: #0f172a; margin-top: 10px; font-size: 13px; }
         .active-shop-pill { background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* Delivery Tracker Timeline Styles */
+        .tracker-steps { display: flex; justify-content: space-between; position: relative; margin: 15px 0 10px; }
+        .tracker-steps::before { content: ''; position: absolute; top: 12px; left: 15px; right: 15px; height: 3px; background: #e2e8f0; z-index: 1; }
+        .step-point { position: relative; z-index: 2; text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .step-dot { width: 26px; height: 26px; border-radius: 50%; background: white; border: 3px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #64748b; margin-bottom: 4px; }
+        .step-point.active .step-dot { border-color: #2874f0; background: #2874f0; color: white; box-shadow: 0 0 0 3px rgba(40,116,240,0.2); }
+        .step-point.completed .step-dot { border-color: #16a34a; background: #16a34a; color: white; }
+        .step-label { font-size: 10px; color: #64748b; font-weight: 600; }
+        .step-point.active .step-label { color: #2874f0; font-weight: bold; }
+        .step-point.completed .step-label { color: #16a34a; }
     </style>
 </head>
 <body>
@@ -101,8 +111,8 @@
                     <small id="userMenuEmail"></small>
                 </div>
                 <ul class="user-menu-list">
-                    <li onclick="openOrdersTab('current')">🚚 Current Orders & Status</li>
-                    <li onclick="openOrdersTab('previous')">📜 Delivered Orders</li>
+                    <li onclick="openOrdersTab('current')">🚚 Track Current Orders & Status</li>
+                    <li onclick="openOrdersTab('previous')">📜 Delivered Orders History</li>
                     <li onclick="openProfileModal()">✏️ Update Profile</li>
                     <li onclick="openTermsModal()">📄 Terms & Conditions</li>
                     <li onclick="window.open('https://poddar977.github.io/jaynagarbazar/restaurent.html', '_blank')" style="color:#ea580c; font-weight:bold; border-top:1px dashed #cbd5e1;">
@@ -235,11 +245,11 @@
         </div>
     </div>
 
-    <!-- Orders History Modal with Image Support -->
+    <!-- Delivery Tracking Modal with Product Images & Status Timeline -->
     <div class="modal-overlay" id="orders-modal-overlay">
-        <div class="modal-box" style="max-width: 620px;">
+        <div class="modal-box" style="max-width: 650px;">
             <span class="close-modal" onclick="closeOrdersModal()">&times;</span>
-            <h2 id="ordersModalTitle">My Orders</h2>
+            <h2 id="ordersModalTitle">🚚 Live Delivery Tracking & Status</h2>
             <div id="ordersListContainer" style="margin-top:15px;">Loading...</div>
         </div>
     </div>
@@ -510,7 +520,42 @@
             } catch(err) { alert("Error: " + err.message); }
         });
 
-        // Orders View with Product Images & Status
+        // Helper to generate Delivery Tracker Progress Bar
+        function getDeliveryTrackerBar(status) {
+            const st = (status || 'Placed').toLowerCase();
+            let p1 = 'completed', p2 = '', p3 = '', p4 = '';
+
+            if (st === 'confirmed' || st === 'preparing') {
+                p1 = 'completed'; p2 = 'active';
+            } else if (st === 'assigned' || st === 'food ready' || st === 'out for delivery') {
+                p1 = 'completed'; p2 = 'completed'; p3 = 'active';
+            } else if (st === 'delivered') {
+                p1 = 'completed'; p2 = 'completed'; p3 = 'completed'; p4 = 'completed';
+            }
+
+            return `
+                <div class="tracker-steps">
+                    <div class="step-point ${p1}">
+                        <div class="step-dot">✓</div>
+                        <span class="step-label">Placed</span>
+                    </div>
+                    <div class="step-point ${p2}">
+                        <div class="step-dot">${p2==='active'?'●':'2'}</div>
+                        <span class="step-label">Confirmed</span>
+                    </div>
+                    <div class="step-point ${p3}">
+                        <div class="step-dot">${p3==='active'?'●':'3'}</div>
+                        <span class="step-label">Out for Delivery</span>
+                    </div>
+                    <div class="step-point ${p4}">
+                        <div class="step-dot">${p4==='completed'?'✓':'4'}</div>
+                        <span class="step-label">Delivered</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Live Delivery Tracking Modal with Product Images & Complete Details
         window.openOrdersTab = async function(type) {
             document.getElementById('userMenuDropdown').classList.remove('show');
             const email = currentUser?.email || currentUserProfile?.userEmail;
@@ -518,7 +563,7 @@
 
             const modal = document.getElementById('orders-modal-overlay');
             const container = document.getElementById('ordersListContainer');
-            document.getElementById('ordersModalTitle').innerText = (type === 'current') ? "🚚 Track Current Orders" : "📜 Delivered Orders History";
+            document.getElementById('ordersModalTitle').innerText = (type === 'current') ? "🚚 Live Delivery Tracking & Status" : "📜 Delivered Orders History";
             container.innerHTML = 'Orders load ho rahe hain...';
             modal.classList.add('active');
 
@@ -546,45 +591,64 @@
                     const itemsMarkup = (o.items || []).map(i => {
                         const itemImg = (i.images && i.images.length > 0) ? i.images[0] : (i.imageUrl || 'https://via.placeholder.com/60');
                         return `
-                            <div style="display:flex; align-items:center; gap:12px; background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:8px 10px; margin-bottom:6px;">
-                                <img src="${itemImg}" style="width:52px; height:52px; object-fit:contain; border-radius:6px; background:#f8fafc; border:1px solid #cbd5e1;" loading="lazy">
+                            <div style="display:flex; align-items:center; gap:12px; background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:10px; margin-bottom:8px;">
+                                <img src="${itemImg}" style="width:58px; height:58px; object-fit:contain; border-radius:8px; background:#f8fafc; border:1px solid #cbd5e1;" loading="lazy">
                                 <div style="flex:1;">
-                                    <strong style="font-size:13px; color:#0f172a; display:block;">${i.name}</strong>
-                                    <small style="color:#64748b; font-size:12px;">Qty: <strong>${i.qty || 1}</strong> | Price: ₹${i.price}</small>
+                                    <strong style="font-size:14px; color:#0f172a; display:block;">${i.name}</strong>
+                                    <div style="color:#64748b; font-size:12px; margin-top:3px;">
+                                        Qty: <strong>${i.qty || 1}</strong> | Rate: ₹${i.price}
+                                        ${i.selectedSize ? `<span style="background:#fce7f3; color:#be185d; padding:1px 6px; border-radius:4px; margin-left:6px; font-weight:bold;">Size: ${i.selectedSize}</span>` : ''}
+                                    </div>
                                 </div>
-                                <strong style="font-size:13px; color:#16a34a;">₹${Number(i.price) * (i.qty || 1)}</strong>
+                                <strong style="font-size:14px; color:#16a34a;">₹${Number(i.price) * (i.qty || 1)}</strong>
                             </div>
                         `;
                     }).join('');
 
                     const isFood = (o.items || []).some(i => (i.category || '').toLowerCase() === 'food');
                     const deliveryFee = o.deliveryCharge !== undefined ? Number(o.deliveryCharge) : (Number(o.totalAmount) < 100 ? 20 : 0);
+                    const trackerBarHtml = (type === 'current') ? getDeliveryTrackerBar(o.status) : '';
 
                     container.innerHTML += `
-                        <div style="background:#f8fafc; border:1px solid ${isFood ? '#fdba74' : '#e2e8f0'}; border-radius:12px; padding:14px; margin-bottom:12px;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px dashed #cbd5e1; padding-bottom:8px;">
+                        <div style="background:#f8fafc; border:1.5px solid ${isFood ? '#fdba74' : '#e2e8f0'}; border-radius:14px; padding:16px; margin-bottom:15px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; border-bottom:1px dashed #cbd5e1; padding-bottom:8px;">
                                 <div>
-                                    <strong style="font-size:12px; color:#475569;">📅 ${o.orderDateFormatted || 'Just now'}</strong><br>
-                                    ${o.assignedShopName ? `<small style="color:#ea580c; font-weight:bold;">🏪 ${o.assignedShopName}</small>` : ''}
+                                    <strong style="font-size:13px; color:#0f172a;">📅 Order Time: ${o.orderDateFormatted || 'Just now'}</strong><br>
+                                    ${o.assignedShopName ? `<small style="color:#ea580c; font-weight:bold; font-size:12px;">🏪 Seller: ${o.assignedShopName}</small><br>` : ''}
+                                    <small style="color:#64748b; font-size:11px;">📍 Deliver To: ${o.customerAddress || 'Local'}</small>
                                 </div>
-                                <span style="background:${o.status === 'Delivered' ? '#dcfce7' : (o.status === 'Confirmed' ? '#dbeafe' : '#ffedd5')}; color:${o.status === 'Delivered' ? '#15803d' : (o.status === 'Confirmed' ? '#1d4ed8' : '#c2410c')}; padding:4px 10px; border-radius:14px; font-size:11px; font-weight:bold;">
+                                <span style="background:${o.status === 'Delivered' ? '#dcfce7' : (o.status === 'Confirmed' ? '#dbeafe' : '#ffedd5')}; color:${o.status === 'Delivered' ? '#15803d' : (o.status === 'Confirmed' ? '#1d4ed8' : '#c2410c')}; padding:4px 12px; border-radius:14px; font-size:11px; font-weight:bold; text-transform:uppercase;">
                                     ${o.status || 'Placed'}
                                 </span>
                             </div>
 
-                            <div style="margin-bottom:10px;">
+                            <!-- Live Progress Timeline (For active orders) -->
+                            ${trackerBarHtml}
+
+                            <!-- Products Ordered with Images -->
+                            <div style="margin: 12px 0 8px;">
+                                <div style="font-size:11px; font-weight:bold; color:#475569; margin-bottom:6px; text-transform:uppercase;">Ordered Products:</div>
                                 ${itemsMarkup}
                             </div>
 
                             <div style="font-size:12px; color:#64748b; display:flex; justify-content:space-between; margin-bottom:4px;">
-                                <span>Delivery Charge:</span>
-                                <span>${deliveryFee > 0 ? `+ ₹${deliveryFee}` : 'FREE (₹0)'}</span>
+                                <span>Item Subtotal:</span>
+                                <span>₹${o.subtotal || (Number(o.totalAmount) - deliveryFee)}</span>
                             </div>
 
-                            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #cbd5e1; padding-top:8px;">
-                                <strong style="font-size:14px; color:#0f172a;">Total: ₹${o.totalAmount} (${o.paymentMethod || 'COD'})</strong>
-                                <div style="font-size:12px; background:#f0fdf4; border:1px solid #86efac; color:#166534; padding:3px 8px; border-radius:6px; font-weight:bold;">
-                                    🔑 OTP: ${o.deliveryOtp || 'N/A'}
+                            <div style="font-size:12px; color:#64748b; display:flex; justify-content:space-between; margin-bottom:6px;">
+                                <span>Delivery Charge:</span>
+                                <span style="font-weight:bold; color:${deliveryFee > 0 ? '#ea580c' : '#16a34a'};">${deliveryFee > 0 ? `+ ₹${deliveryFee}` : 'FREE (₹0)'}</span>
+                            </div>
+
+                            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #cbd5e1; padding-top:10px; margin-top:4px;">
+                                <div>
+                                    <strong style="font-size:15px; color:#0f172a;">Final Amount: ₹${o.totalAmount}</strong><br>
+                                    <small style="color:#64748b; font-size:11px;">Payment Mode: <strong>${o.paymentMethod || 'COD'}</strong></small>
+                                </div>
+                                <div style="font-size:13px; background:#f0fdf4; border:1.5px solid #86efac; color:#166534; padding:5px 12px; border-radius:8px; font-weight:bold; text-align:right;">
+                                    🔑 OTP: ${o.deliveryOtp || 'N/A'}<br>
+                                    <small style="font-size:9px; color:#15803d; font-weight:normal;">Share only at delivery</small>
                                 </div>
                             </div>
                         </div>
@@ -635,13 +699,12 @@
             renderFilteredProducts();
         };
 
-        // Conditional ML & Day-based Recommendation Engine
         function handleSmartRecommendationFeed() {
             const sundayContainer = document.getElementById('sundayRecommendationFeed');
             const weekdayContainer = document.getElementById('weekdayBottomFeed');
             if (!sundayContainer || !weekdayContainer) return;
 
-            const today = new Date().getDay(); // 0 = Sunday, 1-6 = Mon-Sat
+            const today = new Date().getDay();
             const history = JSON.parse(localStorage.getItem('user_category_history')) || {};
 
             let favoriteCat = null;
@@ -681,7 +744,6 @@
                 `;
             }).join('');
 
-            // Condition 1: Sunday -> Spotlight on top
             if (today === 0) {
                 sundayContainer.innerHTML = `
                     <div style="background:linear-gradient(135deg, #fdf2f8, #fbcfe8); border:1px solid #f472b6; border-radius:12px; padding:15px; margin-bottom:25px;">
@@ -693,9 +755,7 @@
                     </div>
                 `;
                 weekdayContainer.innerHTML = '';
-            } 
-            // Condition 2: Mon to Sat -> Lazy loaded at the bottom
-            else {
+            } else {
                 sundayContainer.innerHTML = '';
                 weekdayContainer.innerHTML = `
                     <div style="margin-top:35px; border-top:2px dashed #cbd5e1; padding-top:20px;">
@@ -751,8 +811,6 @@
                 `;
             }
             grid.innerHTML = htmlBuffer;
-
-            // Trigger Smart Feed Condition Check
             handleSmartRecommendationFeed();
         }
 
