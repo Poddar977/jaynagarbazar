@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jaynagar Store - Admin Master Control</title>
+    <title>ksindo - Admin Master Control</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
         body { background: #f4f6f9; color: #333; display: flex; height: 100vh; overflow: hidden; }
@@ -38,6 +38,7 @@
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
         input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; }
         .btn-primary { background: #2874f0; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-edit { background: #0284c7; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; margin-right: 4px; }
         .btn-danger { background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
         .btn-print { background: #0284c7; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
         .btn-print:hover { background: #0369a1; }
@@ -51,7 +52,6 @@
         .preview-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
         .preview-box { width: 60px; height: 60px; border-radius: 6px; border: 1px solid #ddd; object-fit: cover; }
         
-        /* Variant Row Grid Layout with Live Discount Pill */
         .variant-row { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr auto; gap: 8px; align-items: center; margin-bottom: 8px; background: #fff; padding: 8px; border-radius: 6px; border: 1px solid #e2e8f0; }
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 500; }
@@ -69,7 +69,7 @@
 <body>
 
     <aside>
-        <div class="logo">⚡ Jaynagar Master</div>
+        <div class="logo">⚡ ksindo Master</div>
         <nav>
             <a onclick="showTab('tab-orders', this)" class="active">
                 <span>📦 General Live</span>
@@ -147,7 +147,7 @@
                     <form id="addShopForm">
                         <div class="form-grid">
                             <input type="text" id="shopNameInput" placeholder="Shop Name" required>
-                            <input type="text" id="shopOwnerInput" placeholder="Owner Name" required>
+                            <input type="text" id="ownerNameInput" placeholder="Owner Name" required>
                             <input type="tel" id="shopPhoneInput" placeholder="Mobile Number" maxlength="10" required>
                             <input type="text" id="shopPincodeInput" placeholder="Pincode (6-digit)" maxlength="6" required>
                             <input type="text" id="shopAddressInput" placeholder="Shop Address" required>
@@ -177,11 +177,12 @@
                 </div>
             </section>
 
-            <!-- TAB 6: Products Management (Clean Header + Variant-wise Auto-Discount) -->
+            <!-- TAB 6: Products Management -->
             <section id="tab-products" class="tab-section">
                 <div class="card">
-                    <h2>+ Naya Product Add Karein (Individual Size MRP, Selling Price & Auto-Discount)</h2>
+                    <h2 id="productFormHeader">+ Naya Product Add Karein (Individual Size MRP, Selling Price & Auto-Discount)</h2>
                     <form id="addProductForm">
+                        <input type="hidden" id="editProductId" value="">
                         <div class="form-grid">
                             <input type="text" id="prodName" placeholder="Product Title / Name" required>
                             
@@ -218,7 +219,7 @@
 
                         <div class="preview-grid" id="photoPreviewContainer"></div>
 
-                        <!-- Dynamic Variants Builder (Har Size Ka Alag MRP, Selling Price & Auto-Discount) -->
+                        <!-- Dynamic Variants Builder -->
                         <div style="margin-top:16px; padding:15px; background:#f8fafc; border:1px dashed #2874f0; border-radius:8px;">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                                 <div>
@@ -231,7 +232,10 @@
                         </div>
 
                         <textarea id="prodDesc" placeholder="Product Description..." style="margin-top:12px; height:60px;"></textarea>
-                        <button type="submit" class="btn-primary" style="margin-top:12px; padding:10px 20px;">Publish Product</button>
+                        <div style="display:flex; gap:10px; margin-top:12px;">
+                            <button type="submit" class="btn-primary" id="productSubmitBtn" style="padding:10px 20px;">Publish Product</button>
+                            <button type="button" class="btn-danger" id="cancelEditBtn" onclick="resetProductForm()" style="display:none; padding:10px 18px;">Cancel Edit</button>
+                        </div>
                     </form>
                 </div>
 
@@ -272,7 +276,6 @@
     </div>
 
     <script>
-        // Live auto-calculation of discount percentage for each variant row
         function calculateRowDiscount(row) {
             const priceInput = row.querySelector('.v-price');
             const origPriceInput = row.querySelector('.v-orig-price');
@@ -283,37 +286,38 @@
 
             if (!isNaN(price) && !isNaN(orig) && orig > price && price > 0) {
                 const perc = Math.round(((orig - price) / orig) * 100);
-                discountPill.value = `${perc}% OFF`;
+                discountPill.value = perc + "% OFF";
                 discountPill.style.color = "#16a34a";
             } else {
                 discountPill.value = '';
             }
         }
 
-        // Add Dynamic Variant Row with Auto Calculated Discount Field
-        window.addVariantRow = function(valName = '', valPrice = '', valOrigPrice = '', valDisc = '') {
+        window.addVariantRow = function(valName, valPrice, valOrigPrice, valDisc) {
+            valName = valName || '';
+            valPrice = valPrice || '';
+            valOrigPrice = valOrigPrice || '';
+            valDisc = valDisc || '';
             const container = document.getElementById('variantsContainer');
             const row = document.createElement('div');
             row.className = 'variant-row';
-            row.innerHTML = `
-                <input type="text" placeholder="Size (e.g. 75cm, 1kg)" value="${valName}" class="v-name" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;" required>
-                <input type="number" placeholder="Selling Price (₹)" value="${valPrice}" class="v-price" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;" required>
-                <input type="number" placeholder="Original MRP (₹)" value="${valOrigPrice}" class="v-orig-price" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;">
-                <input type="text" placeholder="Discount" value="${valDisc}" class="v-discount-pill" readonly style="padding:7px 10px; border:1px solid #bbf7d0; background:#f0fdf4; border-radius:4px; font-size:12px; font-weight:bold; color:#16a34a;">
-                <button type="button" onclick="this.parentElement.remove()" style="background:#ef4444; color:white; border:none; padding:7px 12px; border-radius:4px; cursor:pointer; font-weight:bold;">✕</button>
-            `;
+            row.innerHTML = 
+                '<input type="text" placeholder="Size (e.g. 75cm, 1kg)" value="' + valName + '" class="v-name" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;" required>' +
+                '<input type="number" placeholder="Selling Price (₹)" value="' + valPrice + '" class="v-price" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;" required>' +
+                '<input type="number" placeholder="Original MRP (₹)" value="' + valOrigPrice + '" class="v-orig-price" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;">' +
+                '<input type="text" placeholder="Discount" value="' + valDisc + '" class="v-discount-pill" readonly style="padding:7px 10px; border:1px solid #bbf7d0; background:#f0fdf4; border-radius:4px; font-size:12px; font-weight:bold; color:#16a34a;">' +
+                '<button type="button" onclick="this.parentElement.remove()" style="background:#ef4444; color:white; border:none; padding:7px 12px; border-radius:4px; cursor:pointer; font-weight:bold;">✕</button>';
 
             const priceInp = row.querySelector('.v-price');
             const origInp = row.querySelector('.v-orig-price');
 
-            priceInp.addEventListener('input', () => calculateRowDiscount(row));
-            origInp.addEventListener('input', () => calculateRowDiscount(row));
+            priceInp.addEventListener('input', function() { calculateRowDiscount(row); });
+            origInp.addEventListener('input', function() { calculateRowDiscount(row); });
 
             container.appendChild(row);
             if (valPrice && valOrigPrice) calculateRowDiscount(row);
         };
 
-        // Initialize with one default row on page load
         window.addEventListener('DOMContentLoaded', () => {
             if (document.getElementById('variantsContainer').children.length === 0) {
                 addVariantRow();
@@ -366,6 +370,7 @@
         let isFirstLoad = true;
         let knownOrders = new Set();
         let ordersDataCache = {};
+        let productsDataCache = {};
 
         function playBellAlarm() {
             try {
@@ -442,56 +447,57 @@
                         }
                     }
 
-                    historyTable.innerHTML += `
-                        <tr>
-                            <td><small>${order.orderDateFormatted || 'Done'}</small></td>
-                            <td>${order.customerName}</td>
-                            <td>${order.paymentMethod}</td>
-                            <td>₹${order.totalAmount}</td>
-                            <td>${order.assignedBoyPhone || '-'}</td>
-                            <td><span class="status-pill">${order.status}</span></td>
-                        </tr>
-                    `;
+                    historyTable.innerHTML += 
+                        '<tr>' +
+                            '<td><small>' + (order.orderDateFormatted || 'Done') + '</small></td>' +
+                            '<td>' + (order.customerName || '') + '</td>' +
+                            '<td>' + (order.paymentMethod || 'COD') + '</td>' +
+                            '<td>₹' + order.totalAmount + '</td>' +
+                            '<td>' + (order.assignedBoyPhone || '-') + '</td>' +
+                            '<td><span class="status-pill">' + order.status + '</span></td>' +
+                        '</tr>';
                 } else {
                     const hasFood = (order.items || []).some(i => (i.category || '').toLowerCase() === 'food');
+                    const itemsText = (order.items || []).map(i => i.name + ' (x' + (i.qty || 1) + ')').join(', ');
+                    const statusColor = (st === 'confirmed') ? '#dbeafe' : '#fed7aa';
+                    const textColor = (st === 'confirmed') ? '#1d4ed8' : '#c2410c';
+
                     if (hasFood) {
                         foodCount++;
-                        foodTable.innerHTML += `
-                            <tr>
-                                <td><small>${order.orderDateFormatted || 'Just now'}</small></td>
-                                <td>${(order.items||[]).map(i=>`${i.name} (x${i.qty||1})`).join(', ')}</td>
-                                <td><strong>${order.customerName}</strong><br><small>📞 ${order.customerPhone}</small></td>
-                                <td>₹${order.totalAmount}</td>
-                                <td><strong>${order.deliveryOtp}</strong></td>
-                                <td><span style="background:${st==='confirmed'?'#dbeafe':'#fed7aa'}; color:${st==='confirmed'?'#1d4ed8':'#c2410c'}; padding:3px 6px; border-radius:10px; font-weight:bold; font-size:11px;">${order.status}</span></td>
-                                <td><strong style="color:#ea580c;">${order.assignedShopName || 'Kitchen'}</strong></td>
-                                <td><button class="btn-print" onclick="printAdminBill('${order.id}')">🖨️ Bill</button></td>
-                                <td>
-                                    <input type="tel" id="boy_${order.id}" placeholder="Boy Phone" value="${order.assignedBoyPhone || ''}" style="width:100px; font-size:11px; padding:3px;">
-                                    <button onclick="assignBoy('${order.id}')" class="btn-primary" style="padding:3px 6px;">Assign</button>
-                                </td>
-                                <td><button onclick="cancelOrder('${order.id}')" class="btn-danger">Cancel</button></td>
-                            </tr>
-                        `;
+                        foodTable.innerHTML += 
+                            '<tr>' +
+                                '<td><small>' + (order.orderDateFormatted || 'Just now') + '</small></td>' +
+                                '<td>' + itemsText + '</td>' +
+                                '<td><strong>' + (order.customerName || '') + '</strong><br><small>📞 ' + (order.customerPhone || '') + '</small></td>' +
+                                '<td>₹' + order.totalAmount + '</td>' +
+                                '<td><strong>' + (order.deliveryOtp || 'N/A') + '</strong></td>' +
+                                '<td><span style="background:' + statusColor + '; color:' + textColor + '; padding:3px 6px; border-radius:10px; font-weight:bold; font-size:11px;">' + order.status + '</span></td>' +
+                                '<td><strong style="color:#ea580c;">' + (order.assignedShopName || 'Kitchen') + '</strong></td>' +
+                                '<td><button class="btn-print" onclick="printAdminBill(\'' + order.id + '\')">🖨️ Bill</button></td>' +
+                                '<td>' +
+                                    '<input type="tel" id="boy_' + order.id + '" placeholder="Boy Phone" value="' + (order.assignedBoyPhone || '') + '" style="width:100px; font-size:11px; padding:3px;"> ' +
+                                    '<button onclick="assignBoy(\'' + order.id + '\')" class="btn-primary" style="padding:3px 6px;">Assign</button>' +
+                                '</td>' +
+                                '<td><button onclick="cancelOrder(\'' + order.id + '\')" class="btn-danger">Cancel</button></td>' +
+                            '</tr>';
                     } else {
                         generalCount++;
-                        generalTable.innerHTML += `
-                            <tr>
-                                <td><small>${order.orderDateFormatted || 'Just now'}</small></td>
-                                <td><strong>${order.customerName}</strong><br><small>📞 ${order.customerPhone}</small></td>
-                                <td>${order.customerAddress}</td>
-                                <td>${(order.items||[]).map(i=>`${i.name} (x${i.qty||1})`).join(', ')}</td>
-                                <td>₹${order.totalAmount}</td>
-                                <td><strong>${order.deliveryOtp}</strong></td>
-                                <td><span style="background:${st==='confirmed'?'#dbeafe':'#fed7aa'}; color:${st==='confirmed'?'#1d4ed8':'#c2410c'}; padding:3px 6px; border-radius:10px; font-weight:bold; font-size:11px;">${order.status}</span></td>
-                                <td><button class="btn-print" onclick="printAdminBill('${order.id}')">🖨️ Bill</button></td>
-                                <td>
-                                    <input type="tel" id="boy_${order.id}" placeholder="Boy Phone" value="${order.assignedBoyPhone || ''}" style="width:100px; font-size:11px; padding:3px;">
-                                    <button onclick="assignBoy('${order.id}')" class="btn-primary" style="padding:3px 6px;">Assign</button>
-                                </td>
-                                <td><button onclick="cancelOrder('${order.id}')" class="btn-danger">Cancel</button></td>
-                            </tr>
-                        `;
+                        generalTable.innerHTML += 
+                            '<tr>' +
+                                '<td><small>' + (order.orderDateFormatted || 'Just now') + '</small></td>' +
+                                '<td><strong>' + (order.customerName || '') + '</strong><br><small>📞 ' + (order.customerPhone || '') + '</small></td>' +
+                                '<td>' + (order.customerAddress || '') + '</td>' +
+                                '<td>' + itemsText + '</td>' +
+                                '<td>₹' + order.totalAmount + '</td>' +
+                                '<td><strong>' + (order.deliveryOtp || 'N/A') + '</strong></td>' +
+                                '<td><span style="background:' + statusColor + '; color:' + textColor + '; padding:3px 6px; border-radius:10px; font-weight:bold; font-size:11px;">' + order.status + '</span></td>' +
+                                '<td><button class="btn-print" onclick="printAdminBill(\'' + order.id + '\')">🖨️ Bill</button></td>' +
+                                '<td>' +
+                                    '<input type="tel" id="boy_' + order.id + '" placeholder="Boy Phone" value="' + (order.assignedBoyPhone || '') + '" style="width:100px; font-size:11px; padding:3px;"> ' +
+                                    '<button onclick="assignBoy(\'' + order.id + '\')" class="btn-primary" style="padding:3px 6px;">Assign</button>' +
+                                '</td>' +
+                                '<td><button onclick="cancelOrder(\'' + order.id + '\')" class="btn-danger">Cancel</button></td>' +
+                            '</tr>';
                     }
                 }
             }
@@ -500,24 +506,23 @@
 
             Object.keys(boyStats).forEach(phone => {
                 const b = boyStats[phone];
-                auditTable.innerHTML += `
-                    <tr>
-                        <td><strong>📞 ${phone}</strong></td>
-                        <td>${b.count} Orders</td>
-                        <td><strong style="color:#d97706;">₹${b.cash} (Cash)</strong></td>
-                        <td>₹0</td>
-                        <td>₹${b.cash}</td>
-                    </tr>
-                `;
+                auditTable.innerHTML += 
+                    '<tr>' +
+                        '<td><strong>📞 ' + phone + '</strong></td>' +
+                        '<td>' + b.count + ' Orders</td>' +
+                        '<td><strong style="color:#d97706;">₹' + b.cash + ' (Cash)</strong></td>' +
+                        '<td>₹0</td>' +
+                        '<td>₹' + b.cash + '</td>' +
+                    '</tr>';
             });
 
-            document.getElementById('statRevenue').innerText = `₹${totalRevenue}`;
-            document.getElementById('statTotalCash').innerText = `₹${totalCash}`;
+            document.getElementById('statRevenue').innerText = '₹' + totalRevenue;
+            document.getElementById('statTotalCash').innerText = '₹' + totalCash;
             document.getElementById('statFood').innerText = foodCount;
             document.getElementById('statGeneral').innerText = generalCount;
         });
 
-        // 1-Click Bill Print
+        // 1-Click Bill Print (Header updated to KSINDO)
         window.printAdminBill = async function(orderId) {
             const order = ordersDataCache[orderId];
             if (!order) return alert("Order data nahi mila!");
@@ -525,53 +530,50 @@
             const invoiceArea = document.getElementById('adminPrintableBill');
             invoiceArea.style.display = 'block';
 
-            let itemsRow = (order.items || []).map(i => `
-                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px;">
-                    <span>${i.name} (x${i.qty||1})</span>
-                    <span>₹${(i.price)*(i.qty||1)}</span>
-                </div>
-            `).join('');
+            let itemsRow = (order.items || []).map(i => 
+                '<div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px;">' +
+                    '<span>' + i.name + ' (x' + (i.qty || 1) + ')</span>' +
+                    '<span>₹' + ((i.price) * (i.qty || 1)) + '</span>' +
+                '</div>'
+            ).join('');
 
             const deliveryCharge = Number(order.deliveryCharge !== undefined ? order.deliveryCharge : (Number(order.totalAmount) < 100 ? 20 : 0));
             const subtotal = order.subtotal !== undefined ? order.subtotal : (Number(order.totalAmount) - deliveryCharge);
 
-            invoiceArea.innerHTML = `
-                <div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">
-                    <h3 style="margin:0; font-size:16px;">JAYNAGAR STORE</h3>
-                    <p style="margin:0; font-size:10px;">Official Invoice Receipt</p>
-                    <p style="margin:0; font-size:10px;">${order.orderDateFormatted || new Date().toLocaleString()}</p>
-                </div>
-                <div style="font-size:11px; margin-bottom:5px; border-bottom:1px dashed #000; padding-bottom:5px;">
-                    <strong>Customer:</strong> ${order.customerName}<br>
-                    <strong>Phone:</strong> ${order.customerPhone}<br>
-                    <strong>Address:</strong> ${order.customerAddress} (PIN: ${order.customerPincode})
-                </div>
-                <div style="margin-bottom:5px; border-bottom:1px dashed #000; padding-bottom:5px;">
-                    <div style="font-weight:bold; font-size:11px; margin-bottom:3px;">ITEMS:</div>
-                    ${itemsRow}
-                </div>
-                
-                <div style="font-size:12px; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
-                        <span>Item Subtotal:</span>
-                        <span>₹${subtotal}</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-weight:bold;">
-                        <span>Delivery Charge:</span>
-                        <span>${deliveryCharge > 0 ? `+ ₹${deliveryCharge}` : 'FREE (₹0)'}</span>
-                    </div>
-                </div>
-
-                <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px; margin-bottom:5px;">
-                    <span>FINAL PAYABLE:</span>
-                    <span>₹${order.totalAmount}</span>
-                </div>
-                <div style="text-align:center; font-size:10px; border-top:1px dashed #000; padding-top:5px; margin-top:5px;">
-                    Payment: ${order.paymentMethod || 'COD'}<br>
-                    Helpline: 06246451082<br>
-                    <em>Doorstep OTP verification compulsory</em>
-                </div>
-            `;
+            invoiceArea.innerHTML = 
+                '<div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">' +
+                    '<h3 style="margin:0; font-size:16px;">KSINDO</h3>' +
+                    '<p style="margin:0; font-size:10px;">Official Invoice Receipt</p>' +
+                    '<p style="margin:0; font-size:10px;">' + (order.orderDateFormatted || new Date().toLocaleString()) + '</p>' +
+                '</div>' +
+                '<div style="font-size:11px; margin-bottom:5px; border-bottom:1px dashed #000; padding-bottom:5px;">' +
+                    '<strong>Customer:</strong> ' + (order.customerName || '') + '<br>' +
+                    '<strong>Phone:</strong> ' + (order.customerPhone || '') + '<br>' +
+                    '<strong>Address:</strong> ' + (order.customerAddress || '') + ' (PIN: ' + (order.customerPincode || '') + ')' +
+                '</div>' +
+                '<div style="margin-bottom:5px; border-bottom:1px dashed #000; padding-bottom:5px;">' +
+                    '<div style="font-weight:bold; font-size:11px; margin-bottom:3px;">ITEMS:</div>' +
+                    itemsRow +
+                '</div>' +
+                '<div style="font-size:12px; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">' +
+                    '<div style="display:flex; justify-content:space-between; margin-bottom:2px;">' +
+                        '<span>Item Subtotal:</span>' +
+                        '<span>₹' + subtotal + '</span>' +
+                    '</div>' +
+                    '<div style="display:flex; justify-content:space-between; font-weight:bold;">' +
+                        '<span>Delivery Charge:</span>' +
+                        '<span>' + (deliveryCharge > 0 ? ('+ ₹' + deliveryCharge) : 'FREE (₹0)') + '</span>' +
+                    '</div>' +
+                '</div>' +
+                '<div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px; margin-bottom:5px;">' +
+                    '<span>FINAL PAYABLE:</span>' +
+                    '<span>₹' + order.totalAmount + '</span>' +
+                '</div>' +
+                '<div style="text-align:center; font-size:10px; border-top:1px dashed #000; padding-top:5px; margin-top:5px;">' +
+                    'Payment: ' + (order.paymentMethod || 'COD') + '<br>' +
+                    'Helpline: 8252731656 , 06246451082<br>' +
+                    '<em>Doorstep OTP verification compulsory</em>' +
+                '</div>';
 
             window.print();
             invoiceArea.style.display = 'none';
@@ -587,7 +589,7 @@
         };
 
         window.assignBoy = async (id) => {
-            const phone = document.getElementById(`boy_${id}`).value.trim();
+            const phone = document.getElementById('boy_' + id).value.trim();
             if (phone.length !== 10) return alert("10-digit phone number dalein!");
             await updateDoc(doc(db, "orders", id), { assignedBoyPhone: phone, status: "Assigned" });
             alert("Delivery boy assigned!");
@@ -606,23 +608,22 @@
                 const u = docSnap.data();
                 const tr = document.createElement('tr');
                 tr.className = 'clickable-customer-row';
-                tr.innerHTML = `
-                    <td><strong>${u.fullName||'User'}</strong></td>
-                    <td>${u.userEmail||u.email}</td>
-                    <td>${u.phone||'-'}</td>
-                    <td>${u.address||'-'}</td>
-                    <td>${u.totalOrdersCount||0}</td>
-                    <td><button class="btn-primary" style="padding:3px 8px; font-size:11px;">View</button></td>
-                `;
-                tr.addEventListener('click', () => viewCustomerAudit(u.userEmail||u.email, u.fullName));
+                tr.innerHTML = 
+                    '<td><strong>' + (u.fullName || 'User') + '</strong></td>' +
+                    '<td>' + (u.userEmail || u.email || '') + '</td>' +
+                    '<td>' + (u.phone || '-') + '</td>' +
+                    '<td>' + (u.address || '-') + '</td>' +
+                    '<td>' + (u.totalOrdersCount || 0) + '</td>' +
+                    '<td><button class="btn-primary" style="padding:3px 8px; font-size:11px;">View</button></td>';
+                tr.addEventListener('click', () => viewCustomerAudit(u.userEmail || u.email, u.fullName));
                 tbody.appendChild(tr);
             });
         });
 
         window.viewCustomerAudit = async function(email, name) {
             const modal = document.getElementById('customerAuditModal');
-            document.getElementById('modalCustName').innerText = `History: ${name}`;
-            document.getElementById('modalCustEmail').innerText = `Email: ${email}`;
+            document.getElementById('modalCustName').innerText = 'History: ' + (name || 'Customer');
+            document.getElementById('modalCustEmail').innerText = 'Email: ' + (email || '');
             const container = document.getElementById('modalOrdersContainer');
             container.innerHTML = 'Searching orders...';
             modal.classList.add('active');
@@ -634,13 +635,13 @@
                 container.innerHTML = '';
                 snap.forEach(d => {
                     const o = d.data();
-                    container.innerHTML += `
-                        <div style="background:#f8fafc; border:1px solid #ddd; padding:10px; border-radius:8px; margin-bottom:8px;">
-                            <strong>Date:</strong> ${o.orderDateFormatted || 'N/A'} | <strong>Status:</strong> ${o.status}<br>
-                            <strong>Amount:</strong> ₹${o.totalAmount} | <strong>OTP:</strong> ${o.deliveryOtp}<br>
-                            <strong>Items:</strong> ${(o.items||[]).map(i=>`${i.name} (x${i.qty||1})`).join(', ')}
-                        </div>
-                    `;
+                    const itemNames = (o.items || []).map(i => i.name + ' (x' + (i.qty || 1) + ')').join(', ');
+                    container.innerHTML += 
+                        '<div style="background:#f8fafc; border:1px solid #ddd; padding:10px; border-radius:8px; margin-bottom:8px;">' +
+                            '<strong>Date:</strong> ' + (o.orderDateFormatted || 'N/A') + ' | <strong>Status:</strong> ' + o.status + '<br>' +
+                            '<strong>Amount:</strong> ₹' + o.totalAmount + ' | <strong>OTP:</strong> ' + (o.deliveryOtp || 'N/A') + '<br>' +
+                            '<strong>Items:</strong> ' + itemNames +
+                        '</div>';
                 });
             } catch(e) { container.innerHTML = 'Error: ' + e.message; }
         };
@@ -650,7 +651,7 @@
         document.getElementById('addShopForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const shopName = document.getElementById('shopNameInput').value.trim();
-            const ownerName = document.getElementById('shopOwnerInput').value.trim();
+            const ownerName = document.getElementById('ownerNameInput').value.trim();
             const phone = document.getElementById('shopPhoneInput').value.trim();
             const pincode = document.getElementById('shopPincodeInput').value.trim();
             const address = document.getElementById('shopAddressInput').value.trim();
@@ -662,7 +663,7 @@
                     shopName, ownerName, phone, pincode, address, username, password,
                     createdAt: serverTimestamp()
                 });
-                alert(`✅ Shop Registered! User: ${username}`);
+                alert('✅ Shop Registered! User: ' + username);
                 document.getElementById('addShopForm').reset();
             } catch(err) { alert("Error: " + err.message); }
         });
@@ -672,14 +673,69 @@
             tbody.innerHTML = '';
             snapshot.forEach(docSnap => {
                 const s = docSnap.data();
-                tbody.innerHTML += `<tr><td><strong>${s.shopName}</strong></td><td>${s.ownerName}</td><td>${s.phone}</td><td>${s.pincode}</td><td><code>${s.username}</code></td><td><code>${s.password}</code></td><td><button class="btn-danger" onclick="deleteShop('${docSnap.id}')">Delete</button></td></tr>`;
+                tbody.innerHTML += 
+                    '<tr>' +
+                        '<td><strong>' + s.shopName + '</strong></td>' +
+                        '<td>' + s.ownerName + '</td>' +
+                        '<td>' + s.phone + '</td>' +
+                        '<td>' + (s.pincode || '-') + '</td>' +
+                        '<td><code>' + s.username + '</code></td>' +
+                        '<td><code>' + s.password + '</code></td>' +
+                        '<td><button class="btn-danger" onclick="deleteShop(\'' + docSnap.id + '\')">Delete</button></td>' +
+                    '</tr>';
             });
         });
         window.deleteShop = async (id) => { if (confirm("Delete shop?")) await deleteDoc(doc(db, "shops", id)); };
 
-        // Publish Product (Saves Individual Variant MRP, Selling Price & Auto Discount)
+        // PRODUCT EDIT SYSTEM
+        window.editProduct = function(productId) {
+            const p = productsDataCache[productId];
+            if (!p) return alert("Product data load nahi ho paya!");
+
+            document.getElementById('editProductId').value = productId;
+            document.getElementById('prodName').value = p.name || '';
+            document.getElementById('prodSubCategory').value = p.subCategory || 'none';
+            document.getElementById('prodImageLink').value = p.imageUrl || '';
+            document.getElementById('prodDesc').value = p.description || '';
+
+            const selectedCats = p.categories || [p.category];
+            document.querySelectorAll('input[name="productCats"]').forEach(cb => {
+                cb.checked = selectedCats.includes(cb.value);
+            });
+
+            const container = document.getElementById('variantsContainer');
+            container.innerHTML = '';
+            if (p.sizes && p.sizes.length > 0) {
+                p.sizes.forEach(v => {
+                    addVariantRow(v.size, v.price, v.originalPrice, v.discount || '');
+                });
+            } else {
+                addVariantRow('Default', p.price, p.originalPrice, p.discount || '');
+            }
+
+            document.getElementById('productFormHeader').innerText = '✏️ Edit Product: ' + p.name;
+            document.getElementById('productSubmitBtn').innerText = 'Update Product';
+            document.getElementById('cancelEditBtn').style.display = 'inline-block';
+
+            window.scrollTo({ top: document.getElementById('tab-products').offsetTop, behavior: 'smooth' });
+        };
+
+        window.resetProductForm = function() {
+            document.getElementById('addProductForm').reset();
+            document.getElementById('editProductId').value = '';
+            document.getElementById('productFormHeader').innerText = '+ Naya Product Add Karein (Individual Size MRP, Selling Price & Auto-Discount)';
+            document.getElementById('productSubmitBtn').innerText = 'Publish Product';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+            document.getElementById('photoPreviewContainer').innerHTML = '';
+            document.getElementById('variantsContainer').innerHTML = '';
+            base64PhotosArray = [];
+            addVariantRow();
+        };
+
+        // Publish OR Update Product
         document.getElementById('addProductForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const editId = document.getElementById('editProductId').value;
             const name = document.getElementById('prodName').value.trim();
             const subCategory = document.getElementById('prodSubCategory').value;
             const desc = document.getElementById('prodDesc').value.trim();
@@ -688,7 +744,6 @@
             const selectedCats = Array.from(document.querySelectorAll('input[name="productCats"]:checked')).map(cb => cb.value);
             if (selectedCats.length === 0) return alert("Kam se kam ek Category select karein!");
 
-            // Extract Variants
             const vNames = document.querySelectorAll('.v-name');
             const vPrices = document.querySelectorAll('.v-price');
             const vOrigPrices = document.querySelectorAll('.v-orig-price');
@@ -702,7 +757,7 @@
                 if (vName && !isNaN(vPrice) && vPrice > 0) {
                     let vDisc = '';
                     if (vOrig && vOrig > vPrice) {
-                        vDisc = `${Math.round(((vOrig - vPrice) / vOrig) * 100)}% OFF`;
+                        vDisc = Math.round(((vOrig - vPrice) / vOrig) * 100) + '% OFF';
                     }
                     variantsList.push({ 
                         size: vName, 
@@ -717,18 +772,23 @@
                 return alert("Kam se kam 1 Size/Variant (Size Name aur Selling Price) add karein!");
             }
 
-            // Primary display price is derived from first variant
             const defaultBasePrice = variantsList[0].price;
             const defaultOriginalPrice = variantsList[0].originalPrice || '';
             const defaultDiscount = variantsList[0].discount || '';
 
             let photos = [];
-            if (base64PhotosArray.length > 0) photos = base64PhotosArray;
-            else if (imgLink) photos = [imgLink];
-            else return alert("Photo link dalein ya 1-6 photos upload karein!");
+            if (base64PhotosArray.length > 0) {
+                photos = base64PhotosArray;
+            } else if (imgLink) {
+                photos = [imgLink];
+            } else if (editId && productsDataCache[editId]) {
+                photos = productsDataCache[editId].images || [productsDataCache[editId].imageUrl];
+            } else {
+                return alert("Photo link dalein ya 1-6 photos upload karein!");
+            }
 
             try {
-                await addDoc(collection(db, "products"), {
+                const productData = {
                     name,
                     price: defaultBasePrice,
                     originalPrice: defaultOriginalPrice,
@@ -740,38 +800,59 @@
                     imageUrl: photos[0],
                     images: photos,
                     hasVariants: true,
-                    sizes: variantsList,
-                    createdAt: serverTimestamp()
-                });
-                alert("✅ Product publish ho gaya!");
-                document.getElementById('addProductForm').reset();
-                document.getElementById('photoPreviewContainer').innerHTML = '';
-                document.getElementById('variantsContainer').innerHTML = '';
-                base64PhotosArray = [];
-                addVariantRow();
+                    sizes: variantsList
+                };
+
+                if (editId) {
+                    await updateDoc(doc(db, "products", editId), {
+                        ...productData,
+                        updatedAt: serverTimestamp()
+                    });
+                    alert("✅ Product successfully update ho gaya!");
+                } else {
+                    await addDoc(collection(db, "products"), {
+                        ...productData,
+                        createdAt: serverTimestamp()
+                    });
+                    alert("✅ Product publish ho gaya!");
+                }
+
+                resetProductForm();
             } catch(err) { alert("Error: " + err.message); }
         });
 
         onSnapshot(collection(db, "products"), (snapshot) => {
             const tbody = document.getElementById('productsTableBody');
             tbody.innerHTML = '';
+            productsDataCache = {};
+
             snapshot.forEach(docSnap => {
-                const p = docSnap.data();
+                const p = { id: docSnap.id, ...docSnap.data() };
+                productsDataCache[p.id] = p;
+
                 const cats = p.categories ? p.categories.join(', ') : p.category;
-                const vCount = (p.sizes && p.sizes.length > 0) ? `${p.sizes.length} Sizes` : 'Single';
-                tbody.innerHTML += `
-                    <tr>
-                        <td><img src="${p.imageUrl||''}" style="width:35px; height:35px; border-radius:4px; object-fit:cover;"></td>
-                        <td><strong>${p.name}</strong></td>
-                        <td><span style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:6px; font-weight:bold; font-size:11px;">${cats}</span></td>
-                        <td>₹${p.price} ${p.originalPrice ? `<span style="text-decoration:line-through; color:#888; font-size:11px;">(₹${p.originalPrice})</span>` : ''}</td>
-                        <td><span style="background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:10px; font-weight:bold; font-size:11px;">${vCount}</span></td>
-                        <td><button onclick="delProd('${docSnap.id}')" class="btn-danger">Delete</button></td>
-                    </tr>
-                `;
+                const vCount = (p.sizes && p.sizes.length > 0) ? (p.sizes.length + ' Sizes') : 'Single';
+                const origMarkup = p.originalPrice ? ('<span style="text-decoration:line-through; color:#888; font-size:11px;">(₹' + p.originalPrice + ')</span>') : '';
+                const imgUrl = p.imageUrl || (p.images ? p.images[0] : '');
+
+                tbody.innerHTML += 
+                    '<tr>' +
+                        '<td><img src="' + imgUrl + '" style="width:35px; height:35px; border-radius:4px; object-fit:cover;"></td>' +
+                        '<td><strong>' + p.name + '</strong></td>' +
+                        '<td><span style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:6px; font-weight:bold; font-size:11px;">' + cats + '</span></td>' +
+                        '<td>₹' + p.price + ' ' + origMarkup + '</td>' +
+                        '<td><span style="background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:10px; font-weight:bold; font-size:11px;">' + vCount + '</span></td>' +
+                        '<td>' +
+                            '<button onclick="editProduct(\'' + p.id + '\')" class="btn-edit">✏️ Edit</button>' +
+                            '<button onclick="delProd(\'' + p.id + '\')" class="btn-danger">Delete</button>' +
+                        '</td>' +
+                    '</tr>';
             });
         });
-        window.delProd = async (id) => { if (confirm("Delete product?")) await deleteDoc(doc(db, "products", id)); };
+
+        window.delProd = async (id) => { 
+            if (confirm("Delete product?")) await deleteDoc(doc(db, "products", id)); 
+        };
     </script>
 </body>
 </html>
