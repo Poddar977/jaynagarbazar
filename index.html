@@ -4,43 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="72NquAkB-h-rhGmC663QSuZ3Y40bASxjPp0xk2tme2w" />
-    <title>Jaynagar Bazar</title>
+    <title>ksindo</title>
     <link rel="preconnect" href="https://firestore.googleapis.com">
     <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background-color: #f1f2f6; color: #333; }
+        body { background-color: #f8fafc; color: #333; }
         
-        header { background-color: #2874f0; color: white; padding: 12px 5%; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .logo { font-size: 22px; font-weight: bold; font-style: italic; cursor: pointer; }
-        .sub-header-clock-bar { background-color: #175ec2; color: #ffffff; text-align: center; padding: 6px 10px; font-size: 13px; font-weight: 600; display: flex; justify-content: center; align-items: center; gap: 15px; }
+        header { background-color: #0f172a; color: white; padding: 12px 5%; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .logo { 
+            font-size: 24px; 
+            font-weight: 900; 
+            font-style: italic; 
+            cursor: pointer; 
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #ff007f, #a855f7, #06b6d4, #facc15);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: #ff007f;
+        }
+        .sub-header-clock-bar { background: linear-gradient(90deg, #15803d, #ca8a04, #15803d); color: #ffffff; text-align: center; padding: 6px 10px; font-size: 13px; font-weight: 600; display: flex; justify-content: center; align-items: center; gap: 15px; }
 
         .mode-switcher-container { display: flex; justify-content: center; background: #ffffff; padding: 10px 5%; gap: 15px; border-bottom: 2px solid #e2e8f0; }
         .mode-btn { flex: 1; max-width: 320px; padding: 12px 20px; border-radius: 30px; border: 2px solid #e2e8f0; background: #f8fafc; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
-        .mode-btn.active { border-color: #2874f0; background: #2874f0; color: white; }
+        .mode-btn.active { border-color: #16a34a; background: #16a34a; color: white; }
         .mode-btn.food-mode.active { border-color: #ea580c; background: #ea580c; color: white; }
 
-        .category-nav-bar { background-color: #ffffff; padding: 10px 5%; display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid #e0e0e0; }
-        .category-btn { background-color: #f0f3f8; color: #333; border: 1px solid #dcdfe6; padding: 7px 18px; border-radius: 25px; font-size: 13px; font-weight: 600; cursor: pointer; }
-        .category-btn.active { background-color: #2874f0; color: white; }
+        .category-nav-bar { background-color: #ffffff; padding: 10px 5%; display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid #e2e8f0; }
+        .category-btn { background-color: #fef9c3; color: #854d0e; border: 1px solid #fef08a; padding: 7px 18px; border-radius: 25px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .category-btn.active { background-color: #16a34a; color: white; border-color: #16a34a; }
 
-        .sub-cat-bar { display: none; background: #fdf2f8; padding: 8px 5%; gap: 8px; overflow-x: auto; border-bottom: 1px dashed #f472b6; }
-        .sub-cat-btn { background: white; border: 1px solid #fbcfe8; color: #be185d; padding: 5px 14px; border-radius: 15px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .sub-cat-btn.active { background: #db2777; color: white; }
+        .sub-cat-bar { display: none; background: #fefce8; padding: 8px 5%; gap: 8px; overflow-x: auto; border-bottom: 1px dashed #ca8a04; }
+        .sub-cat-btn { background: white; border: 1px solid #fde047; color: #854d0e; padding: 5px 14px; border-radius: 15px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .sub-cat-btn.active { background: #ca8a04; color: white; }
 
         .search-container { display: flex; width: 32%; }
         .search-container input { width: 100%; padding: 10px 18px; border: none; outline: none; border-radius: 25px 0 0 25px; font-size: 14px; }
-        .search-btn-round { background: white; border: none; border-radius: 0 25px 25px 0; padding: 0 14px; cursor: pointer; color: #2874f0; }
+        .search-btn-round { background: white; border: none; border-radius: 0 25px 25px 0; padding: 0 14px; cursor: pointer; color: #16a34a; font-weight: bold; }
 
         .nav-actions { display: flex; gap: 12px; align-items: center; position: relative; }
-        .nav-round-btn { background-color: #fff; color: #2874f0; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 17px; position: relative; }
-        .cart-badge { background-color: #ff9f00; color: white; padding: 2px 6px; border-radius: 12px; font-size: 11px; position: absolute; top: -4px; right: -4px; font-weight: bold; }
+        .nav-round-btn { background-color: #fff; color: #0f172a; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 17px; position: relative; font-weight: bold; }
+        .cart-badge { background-color: #ca8a04; color: white; padding: 2px 6px; border-radius: 12px; font-size: 11px; position: absolute; top: -4px; right: -4px; font-weight: bold; }
 
         .user-menu-dropdown { display: none; position: absolute; top: 48px; right: 0; background: white; min-width: 250px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.2); z-index: 250; overflow: hidden; border: 1px solid #eaeaea; }
         .user-menu-dropdown.show { display: block; }
         .user-menu-list { list-style: none; padding: 6px 0; }
         .user-menu-list li { padding: 10px 16px; font-size: 13px; font-weight: 600; color: #444; cursor: pointer; }
-        .user-menu-list li:hover { background-color: #f1f5f9; color: #2874f0; }
+        .user-menu-list li:hover { background-color: #f1f5f9; color: #16a34a; }
 
         .container { max-width: 1200px; margin: 0 auto; padding: 20px 15px 40px; }
 
@@ -52,53 +64,65 @@
         .restaurant-info { padding: 12px 15px; }
 
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
-        .product-card { background-color: white; border-radius: 12px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #e2e8f0; contain: content; }
+        .product-card { 
+            background-color: #fffdf0; 
+            border-radius: 12px; 
+            padding: 15px; 
+            text-align: center; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            border: 2px solid #facc15; 
+            contain: content; 
+            box-shadow: 0 4px 10px rgba(202, 138, 4, 0.08); 
+            transition: transform 0.2s;
+        }
+        .product-card:hover { transform: translateY(-3px); }
         
-        .card-main-img { width: 100%; height: 160px; object-fit: contain; margin-bottom: 8px; border-radius: 8px; cursor: pointer; background: #f8fafc; }
-        .product-title { font-size: 14px; font-weight: 600; height: 38px; overflow: hidden; color: #2874f0; margin-bottom: 6px; cursor: pointer; }
-        .add-btn-round { background-color: #ff9f00; color: white; border: none; padding: 8px 10px; border-radius: 20px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
-        .buy-now-round { background-color: #fb641b; color: white; border: none; padding: 8px 10px; border-radius: 20px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
+        .card-main-img { width: 100%; height: 160px; object-fit: contain; margin-bottom: 8px; border-radius: 8px; cursor: pointer; background: #ffffff; border: 1px solid #fef08a; }
+        .product-title { font-size: 14px; font-weight: 700; height: 38px; overflow: hidden; color: #166534; margin-bottom: 6px; cursor: pointer; }
+        .add-btn-round { background: linear-gradient(135deg, #eab308, #ca8a04); color: white; border: none; padding: 8px 10px; border-radius: 20px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
+        .buy-now-round { background: linear-gradient(135deg, #22c55e, #15803d); color: white; border: none; padding: 8px 10px; border-radius: 20px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
 
-        .discount-tag { color: #16a34a; font-weight: bold; font-size: 12px; margin-left: 6px; background: #dcfce7; padding: 2px 6px; border-radius: 4px; }
+        .discount-tag { color: #15803d; font-weight: bold; font-size: 12px; margin-left: 6px; background: #bbf7d0; padding: 2px 6px; border-radius: 4px; border: 1px solid #86efac; }
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 300; }
         .modal-overlay.active { display: flex; }
         .modal-box { background: white; padding: 25px; border-radius: 16px; width: 92%; max-width: 620px; max-height: 90vh; overflow-y: auto; position: relative; }
         .close-modal { position: absolute; right: 15px; top: 15px; cursor: pointer; font-size: 22px; font-weight: bold; width: 30px; height: 30px; border-radius: 50%; background: #f1f2f6; display: flex; align-items: center; justify-content: center; }
-        .btn-submit { background: #2874f0; color: white; border: none; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; padding: 12px; border-radius: 25px; }
+        .btn-submit { background: #16a34a; color: white; border: none; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; padding: 12px; border-radius: 25px; }
 
         .cart-modal { position: fixed; top: 0; right: -420px; width: 360px; height: 100%; background-color: white; box-shadow: -2px 0 10px rgba(0,0,0,0.2); transition: right 0.25s ease; z-index: 200; display: flex; flex-direction: column; }
         .cart-modal.open { right: 0; }
-        .cart-header { background-color: #2874f0; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .cart-header { background-color: #0f172a; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         .cart-items { flex: 1; overflow-y: auto; padding: 15px; }
         .cart-item { display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #eee; padding: 12px 0; }
         .cart-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
         
-        .qty-controls { display: inline-flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 20px; background: #f8fafc; overflow: hidden; margin-top: 5px; }
-        .qty-btn { background: #f1f5f9; border: none; width: 26px; height: 26px; cursor: pointer; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; color: #1e293b; }
+        .qty-controls { display: inline-flex; align-items: center; border: 1px solid #facc15; border-radius: 20px; background: #fefce8; overflow: hidden; margin-top: 5px; }
+        .qty-btn { background: #fef08a; border: none; width: 26px; height: 26px; cursor: pointer; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; color: #854d0e; }
         .qty-val { min-width: 28px; text-align: center; font-size: 12px; font-weight: bold; }
-        .cart-footer { padding: 15px; border-top: 1px solid #eee; background: #f9f9f9; }
+        .cart-footer { padding: 15px; border-top: 1px solid #eee; background: #fffdf0; }
 
         .terms-container { font-size: 12px; line-height: 1.6; color: #475569; max-height: 60vh; overflow-y: auto; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; margin-top: 10px; }
         .terms-container h3 { color: #0f172a; margin-top: 10px; font-size: 13px; }
         .active-shop-pill { background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* Delivery Tracker Timeline Styles */
         .tracker-steps { display: flex; justify-content: space-between; position: relative; margin: 15px 0 10px; }
         .tracker-steps::before { content: ''; position: absolute; top: 12px; left: 15px; right: 15px; height: 3px; background: #e2e8f0; z-index: 1; }
         .step-point { position: relative; z-index: 2; text-align: center; display: flex; flex-direction: column; align-items: center; }
         .step-dot { width: 26px; height: 26px; border-radius: 50%; background: white; border: 3px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #64748b; margin-bottom: 4px; }
-        .step-point.active .step-dot { border-color: #2874f0; background: #2874f0; color: white; box-shadow: 0 0 0 3px rgba(40,116,240,0.2); }
-        .step-point.completed .step-dot { border-color: #16a34a; background: #16a34a; color: white; }
+        .step-point.active .step-dot { border-color: #16a34a; background: #16a34a; color: white; box-shadow: 0 0 0 3px rgba(22,163,74,0.2); }
+        .step-point.completed .step-dot { border-color: #15803d; background: #15803d; color: white; }
         .step-label { font-size: 10px; color: #64748b; font-weight: 600; }
-        .step-point.active .step-label { color: #2874f0; font-weight: bold; }
-        .step-point.completed .step-label { color: #16a34a; }
+        .step-point.active .step-label { color: #16a34a; font-weight: bold; }
+        .step-point.completed .step-label { color: #15803d; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo" onclick="switchAppMode('general')">Jaynagar Store</div>
+        <div class="logo" onclick="switchAppMode('general')">ksindo</div>
         <div class="search-container">
             <input type="text" id="search-input" placeholder="Search item, dish or category..." onkeyup="handleSearch()">
             <button class="search-btn-round" onclick="handleSearch()">🔍</button>
@@ -106,7 +130,7 @@
         <div class="nav-actions">
             <button class="nav-round-btn" id="userAvatarBtn" onclick="handleUserIconClick()">👤</button>
             <div class="user-menu-dropdown" id="userMenuDropdown">
-                <div style="background:#2874f0; color:white; padding:12px; text-align:center;">
+                <div style="background:#0f172a; color:white; padding:12px; text-align:center;">
                     <h4 id="userMenuName">Welcome, Guest</h4>
                     <small id="userMenuEmail"></small>
                 </div>
@@ -162,7 +186,7 @@
             <!-- Sunday Personalized Feed Placeholder -->
             <div id="sundayRecommendationFeed"></div>
 
-            <h2 style="font-size:18px; margin-bottom:15px;" id="marketViewTitle">Featured Products</h2>
+            <h2 style="font-size:18px; margin-bottom:15px; color:#15803d; font-weight:800;" id="marketViewTitle">Featured Products</h2>
             <div class="product-grid" id="generalProductGrid"></div>
 
             <!-- Monday to Saturday Bottom Feed Placeholder -->
@@ -182,7 +206,7 @@
             </div>
 
             <div id="restaurantDirectoryView">
-                <h3 style="font-size:16px; margin-bottom:12px;">Active Restaurants in Jaynagar</h3>
+                <h3 style="font-size:16px; margin-bottom:12px;">Active Restaurants in ksindo</h3>
                 <div class="restaurant-grid" id="restaurantCardsContainer"></div>
             </div>
 
@@ -203,7 +227,7 @@
     <div class="modal-overlay" id="auth-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="closeAuthModal()">&times;</span>
-            <h2 id="authModalTitle">Customer Login</h2>
+            <h2 id="authModalTitle">ksindo Customer Login</h2>
             <form id="authForm">
                 <div id="signupFields" style="display:none;">
                     <input type="text" id="regName" placeholder="Full Name" style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
@@ -214,7 +238,7 @@
                     <div style="display:flex; align-items:flex-start; gap:8px; margin-top:12px; text-align:left;">
                         <input type="checkbox" id="termsAgreementCheckbox" style="margin-top:3px; cursor:pointer;" required>
                         <label for="termsAgreementCheckbox" style="font-size:12px; color:#475569; cursor:pointer;">
-                            Main Jaynagar Store ke <a href="javascript:void(0)" onclick="openTermsModal()" style="color:#2874f0; font-weight:bold; text-decoration:underline;">Terms & Conditions</a> se sehmat hoon (Compulsory).
+                            Main ksindo ke <a href="javascript:void(0)" onclick="openTermsModal()" style="color:#16a34a; font-weight:bold; text-decoration:underline;">Terms & Conditions</a> se sehmat hoon (Compulsory).
                         </label>
                     </div>
                 </div>
@@ -225,7 +249,7 @@
             </form>
             <p style="text-align:center; margin-top:15px; font-size:13px;">
                 <span id="authToggleText">Naye customer hain? </span>
-                <a href="javascript:void(0)" onclick="toggleAuthMode()" id="authToggleLink" style="color:#2874f0; font-weight:bold;">Naya Account Banayein</a>
+                <a href="javascript:void(0)" onclick="toggleAuthMode()" id="authToggleLink" style="color:#16a34a; font-weight:bold;">Naya Account Banayein</a>
             </p>
         </div>
     </div>
@@ -233,9 +257,9 @@
     <div class="modal-overlay" id="terms-overlay">
         <div class="modal-box" style="max-width:700px;">
             <span class="close-modal" onclick="closeTermsModal()">&times;</span>
-            <h2 style="color:#0f172a;">Jaynagar Store - Terms & Conditions</h2>
+            <h2 style="color:#0f172a;">ksindo - Terms & Conditions</h2>
             <div class="terms-container">
-                <p><strong>Jaynagar Store</strong> is an online e-commerce and local delivery platform.</p>
+                <p><strong>ksindo</strong> is an online e-commerce and local delivery platform.</p>
                 <h3>1. STRICT NO CANCELLATION</h3>
                 <p>Once placed, orders cannot be cancelled by customer.</p>
                 <h3>2. DELIVERY CHARGES</h3>
@@ -270,7 +294,7 @@
 
     <div class="cart-modal" id="cart-modal">
         <div class="cart-header" id="cartHeaderEl">
-            <h3>Shopping Cart</h3>
+            <h3>ksindo Shopping Cart</h3>
             <span class="close-modal" style="position:static;" onclick="toggleCart()">&times;</span>
         </div>
         <div style="padding: 10px 15px 0;" id="cartNoticeBox"></div>
@@ -279,7 +303,7 @@
             <div style="font-size:13px; margin-bottom:5px;">Subtotal: ₹<span id="cart-subtotal">0</span></div>
             <div style="font-size:13px; margin-bottom:5px; color:#c2410c; font-weight:bold;">Delivery Charge: ₹<span id="delivery-charge">0</span></div>
             <h4>Total: ₹<span id="cart-total">0</span></h4>
-            <button class="btn-submit" onclick="openCheckoutModal()" style="background:#fb641b;">PLACE ORDER</button>
+            <button class="btn-submit" onclick="openCheckoutModal()" style="background:#16a34a;">PLACE ORDER</button>
         </div>
     </div>
 
@@ -293,12 +317,12 @@
                 <input type="text" id="custPincode" placeholder="Pincode" maxlength="6" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
                 <textarea id="custAddress" placeholder="Delivery Address" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;"></textarea>
                 
-                <div style="margin-top:15px; padding:14px; background:#f8fafc; border:1px dashed #16a34a; border-radius:8px; text-align:center;">
+                <div style="margin-top:15px; padding:14px; background:#f0fdf4; border:1px dashed #16a34a; border-radius:8px; text-align:center;">
                     <span style="font-size:18px;">💵 / 📲</span>
                     <h4 style="color:#16a34a; margin:4px 0;">Cash on Delivery / Doorstep UPI</h4>
                     <p style="font-size:12px; color:#64748b;">Parcel lene par cash dein ya delivery boy ke QR par pay karein.</p>
                 </div>
-                <button type="submit" class="btn-submit" style="background:#fb641b;">Confirm Order</button>
+                <button type="submit" class="btn-submit" style="background:#16a34a;">Confirm Order</button>
             </form>
         </div>
     </div>
@@ -520,7 +544,6 @@
             } catch(err) { alert("Error: " + err.message); }
         });
 
-        // Helper to generate Delivery Tracker Progress Bar
         function getDeliveryTrackerBar(status) {
             const st = (status || 'Placed').toLowerCase();
             let p1 = 'completed', p2 = '', p3 = '', p4 = '';
@@ -555,7 +578,6 @@
             `;
         }
 
-        // Live Delivery Tracking Modal with Product Images & Complete Details
         window.openOrdersTab = async function(type) {
             document.getElementById('userMenuDropdown').classList.remove('show');
             const email = currentUser?.email || currentUserProfile?.userEmail;
@@ -622,10 +644,8 @@
                                 </span>
                             </div>
 
-                            <!-- Live Progress Timeline (For active orders) -->
                             ${trackerBarHtml}
 
-                            <!-- Products Ordered with Images -->
                             <div style="margin: 12px 0 8px;">
                                 <div style="font-size:11px; font-weight:bold; color:#475569; margin-bottom:6px; text-transform:uppercase;">Ordered Products:</div>
                                 ${itemsMarkup}
@@ -658,7 +678,6 @@
         };
         window.closeOrdersModal = () => document.getElementById('orders-modal-overlay').classList.remove('active');
 
-        // Background Realtime Sync & Local Cache
         onSnapshot(collection(db, "products"), (snapshot) => {
             const fresh = [];
             snapshot.forEach(d => fresh.push({ id: d.id, ...d.data() }));
@@ -737,7 +756,7 @@
                         <img src="${img}" class="card-main-img" loading="lazy">
                         <div class="product-title">${p.name}</div>
                         <div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">
-                            <span style="font-size:16px; font-weight:bold;">₹${p.price}</span>
+                            <span style="font-size:16px; font-weight:800; color:#15803d;">₹${p.price}</span>
                             ${discBadge}
                         </div>
                     </div>
@@ -746,10 +765,10 @@
 
             if (today === 0) {
                 sundayContainer.innerHTML = `
-                    <div style="background:linear-gradient(135deg, #fdf2f8, #fbcfe8); border:1px solid #f472b6; border-radius:12px; padding:15px; margin-bottom:25px;">
+                    <div style="background:linear-gradient(135deg, #fefce8, #fef08a); border:2px solid #ca8a04; border-radius:14px; padding:15px; margin-bottom:25px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                            <h3 style="color:#9d174d; font-size:16px;">✨ Sunday Picked For You (${favoriteCat.toUpperCase()})</h3>
-                            <span style="font-size:11px; background:#db2777; color:white; padding:3px 8px; border-radius:10px; font-weight:bold;">Special Recommendation</span>
+                            <h3 style="color:#854d0e; font-size:16px; font-weight:800;">✨ Sunday Picked For You (${favoriteCat.toUpperCase()})</h3>
+                            <span style="font-size:11px; background:#ca8a04; color:white; padding:3px 8px; border-radius:10px; font-weight:bold;">Special Recommendation</span>
                         </div>
                         <div class="product-grid">${feedCardsHtml}</div>
                     </div>
@@ -758,8 +777,8 @@
             } else {
                 sundayContainer.innerHTML = '';
                 weekdayContainer.innerHTML = `
-                    <div style="margin-top:35px; border-top:2px dashed #cbd5e1; padding-top:20px;">
-                        <h3 style="font-size:15px; color:#475569; margin-bottom:12px;">Recommended Based on Your Interest</h3>
+                    <div style="margin-top:35px; border-top:2px dashed #ca8a04; padding-top:20px;">
+                        <h3 style="font-size:15px; color:#15803d; font-weight:800; margin-bottom:12px;">Recommended Based on Your Interest</h3>
                         <div class="product-grid">${feedCardsHtml}</div>
                     </div>
                 `;
@@ -799,7 +818,7 @@
                         <img src="${img}" class="card-main-img" loading="lazy" alt="${p.name}" onclick="openProductDetail('${p.id}')">
                         <div class="product-title" onclick="openProductDetail('${p.id}')">${p.name}</div>
                         <div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">
-                            <span style="font-size:17px; font-weight:bold;">₹${p.price}</span>
+                            <span style="font-size:18px; font-weight:900; color:#15803d;">₹${p.price}</span>
                             ${p.originalPrice ? `<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:6px;">₹${p.originalPrice}</span>` : ''}
                             ${discBadge}
                         </div>
@@ -878,11 +897,11 @@
                 const discBadge = getDiscountMarkup(dish);
 
                 html += `
-                    <div class="product-card" style="border:1px solid #fed7aa;">
+                    <div class="product-card" style="border:1px solid #fed7aa; background:#fffaf0;">
                         <img src="${img}" class="card-main-img" loading="lazy" alt="${dish.name}" onclick="openProductDetail('${dish.id}')">
                         <div class="product-title" style="color:#ea580c;" onclick="openProductDetail('${dish.id}')">${dish.name}</div>
                         <div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">
-                            <span style="font-size:16px; font-weight:bold;">₹${dish.price}</span>
+                            <span style="font-size:16px; font-weight:800; color:#15803d;">₹${dish.price}</span>
                             ${dish.originalPrice ? `<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:6px;">₹${dish.originalPrice}</span>` : ''}
                             ${discBadge}
                         </div>
@@ -1015,14 +1034,14 @@
                     <div class="cart-item">
                         <img src="${displayImg}" loading="lazy" alt="">
                         <div style="flex:1;">
-                            <strong style="font-size:13px;">${item.name}</strong><br>
+                            <strong style="font-size:13px; color:#166534;">${item.name}</strong><br>
                             <small style="color:#64748b;">₹${item.price}</small><br>
                             <div class="qty-controls">
                                 <button type="button" class="qty-btn" onclick="changeCartQty(${i}, -1)">−</button>
                                 <span class="qty-val">${itemQty}</span>
                                 <button type="button" class="qty-btn" onclick="changeCartQty(${i}, 1)">+</button>
                             </div>
-                            <span style="font-size:12px; font-weight:bold; margin-left:8px;">= ₹${itemTotal}</span>
+                            <span style="font-size:12px; font-weight:bold; margin-left:8px; color:#15803d;">= ₹${itemTotal}</span>
                         </div>
                         <button onclick="removeFromCart(${i})" style="background:none; border:none; color:red; font-size:16px; font-weight:bold; cursor:pointer;">✕</button>
                     </div>
@@ -1057,7 +1076,7 @@
         document.getElementById('orderForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const profile = currentUserProfile || JSON.parse(localStorage.getItem('user_profile')) || {};
-            const email = currentUser?.email || profile.userEmail || 'customer@store.local';
+            const email = currentUser?.email || profile.userEmail || 'customer@ksindo.local';
 
             const name = document.getElementById('custName').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
@@ -1105,7 +1124,7 @@
                 toggleCart();
 
                 const itemsText = cart.map(i => `- ${i.name} (x${i.qty||1})`).join('%0A');
-                window.open(`https://wa.me/${deliveryBoyWhatsAppNumber}?text=🚚 *Naya Order*%0AClient: ${encodeURIComponent(name)}%0APhone: ${phone}%0APIN: ${pincode}%0AItems: ${itemsText}%0ASubtotal: ₹${subtotalVal}%0ADelivery Charge: ₹${deliveryChargeVal}%0ATotal: ₹${totalAmount}%0AOTP: ${deliveryOtp}`, '_blank');
+                window.open(`https://wa.me/${deliveryBoyWhatsAppNumber}?text=🚚 *Naya Order (ksindo)*%0AClient: ${encodeURIComponent(name)}%0APhone: ${phone}%0APIN: ${pincode}%0AItems: ${itemsText}%0ASubtotal: ₹${subtotalVal}%0ADelivery Charge: ₹${deliveryChargeVal}%0ATotal: ₹${totalAmount}%0AOTP: ${deliveryOtp}`, '_blank');
             } catch(err) { alert("Error: " + err.message); }
         });
 
@@ -1131,7 +1150,7 @@
                             <img src="${img}" class="card-main-img" loading="lazy" alt="${p.name}" onclick="openProductDetail('${p.id}')">
                             <div class="product-title" onclick="openProductDetail('${p.id}')">${p.name}</div>
                             <div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">
-                                <span style="font-size:17px; font-weight:bold;">₹${p.price}</span>
+                                <span style="font-size:18px; font-weight:900; color:#15803d;">₹${p.price}</span>
                                 ${p.originalPrice ? `<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:6px;">₹${p.originalPrice}</span>` : ''}
                                 ${discBadge}
                             </div>
