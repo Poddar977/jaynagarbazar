@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Portal - Jaynagar Store</title>
+    <title>ksindo - Admin Master Control</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background: #f8fafc; color: #1e293b; display: flex; height: 100vh; overflow: hidden; }
+        body { background: #f4f6f9; color: #333; display: flex; height: 100vh; overflow: hidden; }
         
-        aside { width: 250px; background: #7c2d12; color: white; display: flex; flex-direction: column; flex-shrink: 0; }
-        aside .logo { padding: 20px; font-size: 18px; font-weight: bold; background: #431407; }
+        aside { width: 250px; background: #1e293b; color: white; display: flex; flex-direction: column; flex-shrink: 0; }
+        aside .logo { padding: 20px; font-size: 18px; font-weight: bold; background: #0f172a; }
         aside nav { flex: 1; padding: 15px 0; overflow-y: auto; }
-        aside nav a { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; color: #fed7aa; text-decoration: none; font-size: 14px; font-weight: 600; cursor: pointer; }
-        aside nav a:hover, aside nav a.active { background: #ea580c; color: white; }
+        aside nav a { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; color: #cbd5e1; text-decoration: none; font-size: 14px; font-weight: 600; cursor: pointer; }
+        aside nav a:hover, aside nav a.active { background: #2874f0; color: white; }
+        .nav-count { background: #ef4444; color: white; padding: 2px 7px; border-radius: 12px; font-size: 11px; font-weight: bold; }
 
         main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
         header { background: white; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
-
+        
         .content-body { padding: 25px 30px; flex: 1; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .stat-card { background: white; padding: 18px; border-radius: 10px; border: 1px solid #e2e8f0; }
@@ -25,218 +26,312 @@
 
         .tab-section { display: none; }
         .tab-section.active { display: block; }
+        
         .card { background: white; border-radius: 10px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
         table th { background: #f8fafc; padding: 10px 12px; border-bottom: 1px solid #e2e8f0; color: #475569; }
         table td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        
+        .clickable-customer-row { cursor: pointer; transition: background-color 0.2s; }
+        .clickable-customer-row:hover { background-color: #e0f2fe !important; }
 
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
         input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; }
-        .btn-primary { background: #ea580c; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .btn-print { background: #0284c7; color: white; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
+        .btn-primary { background: #2874f0; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-edit { background: #0284c7; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; margin-right: 4px; }
+        .btn-danger { background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
+        .btn-print { background: #0284c7; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
         .btn-print:hover { background: #0369a1; }
-        .btn-kitchen { background: #f97316; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
+
+        .status-pill { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+
+        .cat-checkbox-group { display: flex; gap: 15px; flex-wrap: wrap; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; }
+        .cat-checkbox-group label { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .cat-checkbox-group input { width: auto; }
 
         .preview-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
         .preview-box { width: 60px; height: 60px; border-radius: 6px; border: 1px solid #ddd; object-fit: cover; }
+        
+        .variant-row { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr auto; gap: 8px; align-items: center; margin-bottom: 8px; background: #fff; padding: 8px; border-radius: 6px; border: 1px solid #e2e8f0; }
 
-        .login-overlay { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 500; }
-        .login-card { background: white; border-radius: 12px; padding: 30px; width: 90%; max-width: 400px; text-align: center; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 500; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: white; padding: 25px; border-radius: 14px; width: 92%; max-width: 750px; box-shadow: 0 6px 30px rgba(0,0,0,0.25); position: relative; max-height: 85vh; overflow-y: auto; }
+        .close-modal-btn { position: absolute; right: 18px; top: 18px; cursor: pointer; font-size: 20px; font-weight: bold; width: 32px; height: 32px; border-radius: 50%; background: #f1f2f6; display: flex; align-items: center; justify-content: center; border: none; }
 
         @media print {
             body * { visibility: hidden; }
-            #printableInvoice, #printableInvoice * { visibility: visible; }
-            #printableInvoice { position: absolute; left: 0; top: 0; width: 80mm; font-family: monospace; color: black; padding: 5px; }
+            #adminPrintableBill, #adminPrintableBill * { visibility: visible; }
+            #adminPrintableBill { position: absolute; left: 0; top: 0; width: 80mm; font-family: monospace; color: black; padding: 5px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="login-overlay" id="loginOverlay">
-        <div class="login-card">
-            <h2 style="color: #ea580c;">🍕 Kitchen Partner</h2>
-            <p style="font-size: 12px; color: #64748b; margin-bottom: 15px;">Admin dwara diya gaya Username & Password dalein:</p>
-            <form id="restaurantLoginForm">
-                <input type="text" id="logUsername" placeholder="Username" required style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="password" id="logPassword" placeholder="Password" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; margin-top:10px;" required>
-                <button type="submit" class="btn-primary" style="width:100%; margin-top:15px; padding:12px;">Login</button>
-            </form>
-        </div>
-    </div>
-
     <aside>
-        <div class="logo">🍳 <span id="sidebarShopName">Kitchen</span></div>
+        <div class="logo">⚡ ksindo Master</div>
         <nav>
-            <a onclick="showTab('tab-live', this)" class="active">🔥 Live Kitchen Queue</a>
-            <a onclick="showTab('tab-hisab', this)">💰 Today Collection (No History)</a>
-            <a onclick="showTab('tab-profile-photo', this)">🖼️ Restaurant Photo</a>
-            <a onclick="showTab('tab-add-product', this)">➕ Add Food Item</a>
-            <a onclick="showTab('tab-menu', this)">📋 My Food Menu</a>
+            <a onclick="showTab('tab-orders', this)" class="active">
+                <span>📦 General Live</span>
+                <span class="nav-count" id="badgeGeneralOrders" style="display:none;">0</span>
+            </a>
+            <a onclick="showTab('tab-food', this)">
+                <span>🍕 Food Live</span>
+                <span class="nav-count" id="badgeFoodOrders" style="background:#ea580c; display:none;">0</span>
+            </a>
+            <a onclick="showTab('tab-hisab', this)">💰 Payment & Boys</a>
+            <a onclick="showTab('tab-shops', this)">🏪 Manage Shops</a>
+            <a onclick="showTab('tab-delivered', this)">📜 Delivered History</a>
+            <a onclick="showTab('tab-products', this)">🛍️ Products (Variants & Photos)</a>
+            <a onclick="showTab('tab-users', this)">👥 Customers</a>
         </nav>
-        <div style="padding:15px;">
-            <button onclick="logoutShop()" style="background:#431407; color:#fca5a5; border:none; width:100%; padding:8px; border-radius:6px; font-weight:bold; cursor:pointer;">🚪 Logout</button>
-        </div>
     </aside>
 
     <main>
         <header>
-            <h2 id="topBarShopTitle">Restaurant Panel</h2>
-            <span id="liveClock" style="font-size: 13px; font-weight: 600; color: #64748b;">Clock...</span>
+            <h2>Admin Master Dashboard</h2>
+            <span id="liveClock" style="font-size: 13px; font-weight: 600; color: #64748b;">Loading...</span>
         </header>
 
         <div class="content-body">
             <div class="stats-grid">
-                <div class="stat-card"><h3>Today Collection</h3><div class="val" id="statTodayCollection" style="color:#16a34a;">₹0</div></div>
-                <div class="stat-card"><h3>Delivered Today</h3><div class="val" id="statDeliveredToday" style="color:#2563eb;">0</div></div>
-                <div class="stat-card"><h3>Cancelled Today</h3><div class="val" id="statCancelledToday" style="color:#dc2626;">0</div></div>
-                <div class="stat-card"><h3>Today UPI</h3><div class="val" id="statTodayUpi" style="color:#7c3aed;">₹0</div></div>
-                <div class="stat-card"><h3>Today Cash</h3><div class="val" id="statTodayCash" style="color:#d97706;">₹0</div></div>
+                <div class="stat-card"><h3>Total Revenue</h3><div class="val" id="statRevenue" style="color:#16a34a;">₹0</div></div>
+                <div class="stat-card"><h3>Cash (COD)</h3><div class="val" id="statTotalCash" style="color:#d97706;">₹0</div></div>
+                <div class="stat-card"><h3>Live Food</h3><div class="val" id="statFood" style="color:#ea580c;">0</div></div>
+                <div class="stat-card"><h3>Live General</h3><div class="val" id="statGeneral" style="color:#2874f0;">0</div></div>
             </div>
 
-            <!-- Tab 1: Live Kitchen Queue -->
-            <section id="tab-live" class="tab-section active">
+            <!-- TAB 1: General Live -->
+            <section id="tab-orders" class="tab-section active">
                 <div class="card">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                        <h2>🔥 Live Active Orders</h2>
-                        <small style="color:#ea580c; font-weight:bold;">💡 Bill Print karte hi Customer ko "Order Confirmed" notify hoga</small>
-                    </div>
+                    <h2>📦 General Live Orders Queue</h2>
                     <table>
                         <thead>
-                            <tr>
-                                <th>Time</th>
-                                <th>Customer Info</th>
-                                <th>Dishes</th>
-                                <th>Total</th>
-                                <th>Status</th>
-                                <th>Receipt</th>
-                                <th>Assign Delivery Boy</th>
-                            </tr>
+                            <tr><th>Time</th><th>Customer</th><th>Address</th><th>Items</th><th>Total</th><th>OTP</th><th>Status</th><th>Receipt</th><th>Assign Boy</th><th>Action</th></tr>
                         </thead>
-                        <tbody id="liveOrdersTableBody"></tbody>
+                        <tbody id="generalOrdersTableBody"></tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- Tab 2: Today Hisab Only -->
+            <!-- TAB 2: Food Live -->
+            <section id="tab-food" class="tab-section">
+                <div class="card" style="border-left:5px solid #ea580c;">
+                    <h2>🍕 Live Food Orders (Auto Assigned)</h2>
+                    <table>
+                        <thead>
+                            <tr><th>Time</th><th>Food Items</th><th>Customer</th><th>Total</th><th>OTP</th><th>Status</th><th>Kitchen Shop</th><th>Receipt</th><th>Assign Boy</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="foodOrdersTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 3: Delivery Boys Audit -->
             <section id="tab-hisab" class="tab-section">
                 <div class="card">
-                    <h2>💰 Today Order Hisab & Cash / UPI Breakdown</h2>
+                    <h2>🚴 Delivery Boy Performance & Cash Collection Audit</h2>
                     <table>
-                        <thead><tr><th>Time</th><th>Customer</th><th>Dishes</th><th>Payment Mode</th><th>Amount (₹)</th><th>Status</th></tr></thead>
-                        <tbody id="todayHisabTableBody"></tbody>
+                        <thead>
+                            <tr><th>Delivery Boy Phone</th><th>Delivered Count</th><th>Cash Collected</th><th>Online Paid</th><th>Total Handled</th></tr>
+                        </thead>
+                        <tbody id="deliveryBoyAuditBody"></tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- Tab 3: Update Restaurant Profile/Banner Photo -->
-            <section id="tab-profile-photo" class="tab-section">
-                <div class="card" style="max-width: 600px;">
-                    <h2>🖼️ Restaurant Profile Photo Update Karein</h2>
-                    <p style="font-size:12px; color:#64748b; margin:6px 0 15px;">Yeh photo customer ko store ke restaurant list page par dikhegi.</p>
-                    
-                    <div style="text-align:center; margin-bottom:15px;">
-                        <img id="currentShopPhotoPreview" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500" alt="Restaurant Banner" style="width:100%; max-height:220px; object-fit:cover; border-radius:10px; border:2px solid #fed7aa;">
-                    </div>
-
-                    <form id="updateShopPhotoForm">
-                        <label style="font-size:12px; font-weight:bold;">Option 1: Image URL Link Dalein:</label>
-                        <input type="url" id="shopPhotoUrlInput" placeholder="https://..." style="margin:6px 0 12px;">
-
-                        <label style="font-size:12px; font-weight:bold;">Option 2: Ya Gallery Se Photo Upload Karein:</label>
-                        <input type="file" id="shopPhotoFileInput" accept="image/*" style="margin:6px 0 15px;" onchange="previewShopBannerFile(this)">
-
-                        <button type="submit" class="btn-primary" style="width:100%; padding:12px;">Save & Update Photo</button>
+            <!-- TAB 4: Manage Shops -->
+            <section id="tab-shops" class="tab-section">
+                <div class="card">
+                    <h2>+ Nayi Shop / Restaurant Add Karein</h2>
+                    <form id="addShopForm">
+                        <div class="form-grid">
+                            <input type="text" id="shopNameInput" placeholder="Shop Name" required>
+                            <input type="text" id="ownerNameInput" placeholder="Owner Name" required>
+                            <input type="tel" id="shopPhoneInput" placeholder="Mobile Number" maxlength="10" required>
+                            <input type="text" id="shopPincodeInput" placeholder="Pincode (6-digit)" maxlength="6" required>
+                            <input type="text" id="shopAddressInput" placeholder="Shop Address" required>
+                            <input type="text" id="shopUserInput" placeholder="Username" required>
+                            <input type="text" id="shopPassInput" placeholder="Password" required>
+                        </div>
+                        <button type="submit" class="btn-primary" style="margin-top:12px;">Shop Account Banayein</button>
                     </form>
+                </div>
+                <div class="card">
+                    <h2>Registered Shops</h2>
+                    <table>
+                        <thead><tr><th>Shop Name</th><th>Owner</th><th>Phone</th><th>Pincode</th><th>Username</th><th>Password</th><th>Action</th></tr></thead>
+                        <tbody id="shopsTableBody"></tbody>
+                    </table>
                 </div>
             </section>
 
-            <!-- Tab 4: Add Food Item with Auto-Discount -->
-            <section id="tab-add-product" class="tab-section">
+            <!-- TAB 5: Delivered History -->
+            <section id="tab-delivered" class="tab-section">
                 <div class="card">
-                    <h2>➕ Nayi Dish Add Karein (Auto-Discount + 1-6 Photos)</h2>
-                    <form id="addFoodItemForm">
+                    <h2>📜 Delivered & Cancelled Orders (Auto-delete in 24h)</h2>
+                    <table>
+                        <thead><tr><th>Time</th><th>Customer</th><th>Mode</th><th>Amount</th><th>Boy</th><th>Status</th></tr></thead>
+                        <tbody id="deliveredTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 6: Products Management -->
+            <section id="tab-products" class="tab-section">
+                <div class="card">
+                    <h2 id="productFormHeader">+ Naya Product Add Karein (Individual Size MRP, Selling Price & Auto-Discount)</h2>
+                    <form id="addProductForm">
+                        <input type="hidden" id="editProductId" value="">
                         <div class="form-grid">
-                            <input type="text" id="foodTitle" placeholder="Food Dish Name" required>
-                            <input type="number" id="foodPrice" placeholder="Selling Price (₹)" required>
-                            <input type="number" id="foodOriginalPrice" placeholder="Original MRP (Optional)">
-                            <input type="text" id="foodDiscount" placeholder="Discount (Auto Calculated)" readonly style="background:#f1f5f9; font-weight:bold; color:#16a34a;">
-                            <select id="foodSubCategory" required>
-                                <option value="fast-food">Fast Food</option>
-                                <option value="daily-need">Daily Need / Milk</option>
-                                <option value="main-course">Main Course</option>
-                                <option value="beverages">Beverages & Shakes</option>
-                            </select>
-                            <input type="url" id="foodImageLink" placeholder="Option 1: Image Link">
+                            <input type="text" id="prodName" placeholder="Product Title / Name" required>
+                            
                             <div>
-                                <label style="font-size:12px; font-weight:bold;">Option 2: Upload Photos (1 to 6):</label>
-                                <input type="file" id="foodFilePhotos" accept="image/*" multiple onchange="previewFoodFiles(this)">
+                                <select id="prodSubCategory">
+                                    <option value="none">Sub-Category: Normal / General</option>
+                                    <option value="lingerie">Fashion: Lingerie / Innerwear</option>
+                                    <option value="women">Fashion: Women Dresses</option>
+                                    <option value="men">Fashion: Men Wear</option>
+                                    <option value="cosmetics">Beauty: Cosmetics & Makeup</option>
+                                    <option value="skincare">Beauty: Skin & Hair Care</option>
+                                    <option value="daily-need">Grocery: Daily Needs / Packets</option>
+                                    <option value="gift-combo">Gift: Hamper / Combo Box</option>
+                                </select>
+                            </div>
+
+                            <input type="url" id="prodImageLink" placeholder="Option 1: Image URL Link">
+                            <div>
+                                <input type="file" id="prodFilePhotos" accept="image/*" multiple onchange="previewSelectedFiles(this)">
                             </div>
                         </div>
-                        <div class="preview-grid" id="foodPhotoPreview"></div>
-                        <textarea id="foodDesc" placeholder="Dish Description..." style="width:100%; margin-top:10px; height:50px;"></textarea>
-                        <button type="submit" class="btn-primary" style="margin-top:12px;">Publish Dish</button>
+
+                        <!-- Multi-Category Select Checkboxes -->
+                        <div style="margin-top:14px;">
+                            <label style="font-size:12px; font-weight:bold; display:block; margin-bottom:6px;">Categories (Multi-Select Supported):</label>
+                            <div class="cat-checkbox-group">
+                                <label><input type="checkbox" name="productCats" value="fashion"> 👗 Fashion</label>
+                                <label><input type="checkbox" name="productCats" value="beauty"> 💄 Beauty</label>
+                                <label><input type="checkbox" name="productCats" value="grocery"> 🛒 Grocery</label>
+                                <label><input type="checkbox" name="productCats" value="gift"> 🎁 Gift</label>
+                                <label><input type="checkbox" name="productCats" value="food"> 🍔 Food</label>
+                            </div>
+                        </div>
+
+                        <div class="preview-grid" id="photoPreviewContainer"></div>
+
+                        <!-- Dynamic Variants Builder -->
+                        <div style="margin-top:16px; padding:15px; background:#f8fafc; border:1px dashed #2874f0; border-radius:8px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                <div>
+                                    <strong style="font-size:13px; color:#0f172a;">📏 Size / Weight Variants (Har Size Ka Alag MRP, Selling Price & Auto-Discount):</strong>
+                                    <p style="font-size:11px; color:#64748b; margin-top:2px;">Example: Size: <code>75cm</code> | Selling Price: <code>₹199</code> | MRP: <code>₹228</code> -> Discount auto-calculate ho jayega.</p>
+                                </div>
+                                <button type="button" onclick="addVariantRow()" style="background:#16a34a; color:white; border:none; padding:7px 14px; border-radius:4px; font-weight:bold; font-size:12px; cursor:pointer;">+ Add Size Variant</button>
+                            </div>
+                            <div id="variantsContainer"></div>
+                        </div>
+
+                        <textarea id="prodDesc" placeholder="Product Description..." style="margin-top:12px; height:60px;"></textarea>
+                        <div style="display:flex; gap:10px; margin-top:12px;">
+                            <button type="submit" class="btn-primary" id="productSubmitBtn" style="padding:10px 20px;">Publish Product</button>
+                            <button type="button" class="btn-danger" id="cancelEditBtn" onclick="resetProductForm()" style="display:none; padding:10px 18px;">Cancel Edit</button>
+                        </div>
                     </form>
+                </div>
+
+                <div class="card">
+                    <h2>Store Catalog</h2>
+                    <table>
+                        <thead><tr><th>Image</th><th>Name</th><th>Categories</th><th>Price</th><th>Variants</th><th>Action</th></tr></thead>
+                        <tbody id="productsTableBody"></tbody>
+                    </table>
                 </div>
             </section>
 
-            <!-- Tab 5: Food Menu -->
-            <section id="tab-menu" class="tab-section">
+            <!-- TAB 7: Customers List -->
+            <section id="tab-users" class="tab-section">
                 <div class="card">
-                    <h2>📋 Aapki Shop Ka Menu</h2>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <h2>👥 Customers</h2>
+                        <small style="color:#2874f0; font-weight:700;">👉 Customer row par click karein order history dekhne ke liye</small>
+                    </div>
                     <table>
-                        <thead><tr><th>Photos</th><th>Title</th><th>Category</th><th>Price (MRP)</th><th>Discount</th><th>Action</th></tr></thead>
-                        <tbody id="menuTableBody"></tbody>
+                        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Address</th><th>Orders</th><th>Action</th></tr></thead>
+                        <tbody id="usersTableBody"></tbody>
                     </table>
                 </div>
             </section>
         </div>
     </main>
 
-    <div id="printableInvoice" style="display:none;"></div>
+    <div id="adminPrintableBill" style="display:none;"></div>
+
+    <div class="modal-overlay" id="customerAuditModal">
+        <div class="modal-box">
+            <button class="close-modal-btn" onclick="closeCustomerAudit()">&times;</button>
+            <h2 id="modalCustName">Customer History</h2>
+            <p id="modalCustEmail" style="font-size:12px; color:#64748b; margin-bottom:15px;"></p>
+            <div id="modalOrdersContainer">Loading...</div>
+        </div>
+    </div>
 
     <script>
-        // Banner File Preview Handler
-        let selectedShopBannerBase64 = null;
-        function previewShopBannerFile(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    selectedShopBannerBase64 = e.target.result;
-                    document.getElementById('currentShopPhotoPreview').src = e.target.result;
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
+        function calculateRowDiscount(row) {
+            const priceInput = row.querySelector('.v-price');
+            const origPriceInput = row.querySelector('.v-orig-price');
+            const discountPill = row.querySelector('.v-discount-pill');
 
-        // Auto Calculate Discount
-        const foodPriceInput = document.getElementById('foodPrice');
-        const foodOrigPriceInput = document.getElementById('foodOriginalPrice');
-        const foodDiscountInput = document.getElementById('foodDiscount');
+            const price = parseFloat(priceInput.value);
+            const orig = parseFloat(origPriceInput.value);
 
-        function autoCalculateFoodDiscount() {
-            const sellPrice = parseFloat(foodPriceInput.value);
-            const origPrice = parseFloat(foodOrigPriceInput.value);
-
-            if (!isNaN(origPrice) && !isNaN(sellPrice) && origPrice > 0 && origPrice > sellPrice) {
-                const discountPercent = Math.round(((origPrice - sellPrice) / origPrice) * 100);
-                foodDiscountInput.value = `${discountPercent}% OFF`;
+            if (!isNaN(price) && !isNaN(orig) && orig > price && price > 0) {
+                const perc = Math.round(((orig - price) / orig) * 100);
+                discountPill.value = perc + "% OFF";
+                discountPill.style.color = "#16a34a";
             } else {
-                foodDiscountInput.value = '';
+                discountPill.value = '';
             }
         }
 
-        foodPriceInput.addEventListener('input', autoCalculateFoodDiscount);
-        foodOrigPriceInput.addEventListener('input', autoCalculateFoodDiscount);
+        window.addVariantRow = function(valName, valPrice, valOrigPrice, valDisc) {
+            valName = valName || '';
+            valPrice = valPrice || '';
+            valOrigPrice = valOrigPrice || '';
+            valDisc = valDisc || '';
+            const container = document.getElementById('variantsContainer');
+            const row = document.createElement('div');
+            row.className = 'variant-row';
+            row.innerHTML = 
+                '<input type="text" placeholder="Size (e.g. 75cm, 1kg)" value="' + valName + '" class="v-name" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;" required>' +
+                '<input type="number" placeholder="Selling Price (₹)" value="' + valPrice + '" class="v-price" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;" required>' +
+                '<input type="number" placeholder="Original MRP (₹)" value="' + valOrigPrice + '" class="v-orig-price" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;">' +
+                '<input type="text" placeholder="Discount" value="' + valDisc + '" class="v-discount-pill" readonly style="padding:7px 10px; border:1px solid #bbf7d0; background:#f0fdf4; border-radius:4px; font-size:12px; font-weight:bold; color:#16a34a;">' +
+                '<button type="button" onclick="this.parentElement.remove()" style="background:#ef4444; color:white; border:none; padding:7px 12px; border-radius:4px; cursor:pointer; font-weight:bold;">✕</button>';
 
-        // Preview Food Photos Upload
-        let foodPhotosArray = [];
-        function previewFoodFiles(input) {
-            const container = document.getElementById('foodPhotoPreview');
+            const priceInp = row.querySelector('.v-price');
+            const origInp = row.querySelector('.v-orig-price');
+
+            priceInp.addEventListener('input', function() { calculateRowDiscount(row); });
+            origInp.addEventListener('input', function() { calculateRowDiscount(row); });
+
+            container.appendChild(row);
+            if (valPrice && valOrigPrice) calculateRowDiscount(row);
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('variantsContainer').children.length === 0) {
+                addVariantRow();
+            }
+        });
+
+        let base64PhotosArray = [];
+        function previewSelectedFiles(input) {
+            const container = document.getElementById('photoPreviewContainer');
             container.innerHTML = '';
-            foodPhotosArray = [];
+            base64PhotosArray = [];
 
             if (input.files.length > 6) {
-                alert("Maximum 6 photos allowed!");
+                alert("Maximum 6 photos allowed hain!");
                 input.value = '';
                 return;
             }
@@ -244,7 +339,7 @@
             Array.from(input.files).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    foodPhotosArray.push(e.target.result);
+                    base64PhotosArray.push(e.target.result);
                     const img = document.createElement('img');
                     img.src = e.target.result;
                     img.className = 'preview-box';
@@ -271,12 +366,13 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let currentShop = JSON.parse(localStorage.getItem('rest_shop_session')) || null;
+        const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
         let isFirstLoad = true;
         let knownOrders = new Set();
         let ordersDataCache = {};
+        let productsDataCache = {};
 
-        function playNewOrderRingtone() {
+        function playBellAlarm() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const now = ctx.currentTime;
@@ -306,234 +402,178 @@
             document.getElementById('liveClock').innerText = new Date().toLocaleString('en-IN');
         }, 1000);
 
-        if (currentShop) initApp();
+        onSnapshot(collection(db, "orders"), async (snapshot) => {
+            let totalRevenue = 0, totalCash = 0;
+            let foodCount = 0, generalCount = 0;
+            let boyStats = {};
+            const now = Date.now();
 
-        document.getElementById('restaurantLoginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const u = document.getElementById('logUsername').value.trim().toLowerCase();
-            const p = document.getElementById('logPassword').value.trim();
+            const generalTable = document.getElementById('generalOrdersTableBody');
+            const foodTable = document.getElementById('foodOrdersTableBody');
+            const historyTable = document.getElementById('deliveredTableBody');
+            const auditTable = document.getElementById('deliveryBoyAuditBody');
 
-            const q = query(collection(db, "shops"), where("username", "==", u), where("password", "==", p));
-            const snap = await getDocs(q);
-            if (snap.empty) return alert("❌ Galat credentials!");
+            generalTable.innerHTML = '';
+            foodTable.innerHTML = '';
+            historyTable.innerHTML = '';
+            auditTable.innerHTML = '';
 
-            let sData = null;
-            snap.forEach(d => { sData = { id: d.id, ...d.data() }; });
-            currentShop = sData;
-            localStorage.setItem('rest_shop_session', JSON.stringify(sData));
-            initApp();
-        });
+            for (const docSnap of snapshot.docs) {
+                const order = { id: docSnap.id, ...docSnap.data() };
+                ordersDataCache[order.id] = order;
 
-        window.logoutShop = () => { localStorage.removeItem('rest_shop_session'); location.reload(); };
-
-        function isToday(dateObj) {
-            if (!dateObj) return false;
-            const today = new Date();
-            return dateObj.getDate() === today.getDate() && dateObj.getMonth() === today.getMonth() && dateObj.getFullYear() === today.getFullYear();
-        }
-
-        function initApp() {
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('sidebarShopName').innerText = currentShop.shopName;
-            document.getElementById('topBarShopTitle').innerText = `🏪 ${currentShop.shopName} (PIN: ${currentShop.pincode || 'Local'})`;
-
-            if (currentShop.imageUrl) {
-                document.getElementById('currentShopPhotoPreview').src = currentShop.imageUrl;
-            }
-
-            // Realtime Shop Profile Sync
-            onSnapshot(doc(db, "shops", currentShop.id), (docSnap) => {
-                if (docSnap.exists()) {
-                    currentShop = { id: docSnap.id, ...docSnap.data() };
-                    localStorage.setItem('rest_shop_session', JSON.stringify(currentShop));
-                    if (currentShop.imageUrl) {
-                        document.getElementById('currentShopPhotoPreview').src = currentShop.imageUrl;
-                    }
+                if (!isFirstLoad && !knownOrders.has(docSnap.id)) {
+                    playBellAlarm();
                 }
-            });
+                knownOrders.add(docSnap.id);
 
-            const qOrders = query(collection(db, "orders"), where("assignedShopId", "==", currentShop.id));
-            
-            onSnapshot(qOrders, (snapshot) => {
-                const liveTable = document.getElementById('liveOrdersTableBody');
-                const hisabTable = document.getElementById('todayHisabTableBody');
-                liveTable.innerHTML = '';
-                hisabTable.innerHTML = '';
+                const st = (order.status || 'Placed').toLowerCase();
+                const amt = Number(order.totalAmount || 0);
 
-                let todayDelivered = 0, todayCancelled = 0, todayCollection = 0, todayUpi = 0, todayCash = 0;
-
-                snapshot.forEach(docSnap => {
-                    const order = { id: docSnap.id, ...docSnap.data() };
-                    ordersDataCache[order.id] = order;
-
-                    if (!isFirstLoad && !knownOrders.has(docSnap.id)) {
-                        playNewOrderRingtone();
+                if (st === 'delivered' || st === 'cancelled') {
+                    let closedTime = order.closedAt ? new Date(order.closedAt).getTime() : (order.deliveredAt ? new Date(order.deliveredAt).getTime() : now);
+                    if (now - closedTime >= TWENTY_FOUR_HOURS_MS) {
+                        try { await deleteDoc(doc(db, "orders", order.id)); } catch (err) {}
+                        continue;
                     }
-                    knownOrders.add(docSnap.id);
-
-                    const st = (order.status || 'Placed').toLowerCase();
-                    const rawDate = order.orderDate?.seconds ? new Date(order.orderDate.seconds * 1000) : new Date(order.orderDate || Date.now());
-                    const isOrderToday = isToday(rawDate);
-
-                    const itemsHtml = (order.items || []).map(i => `• ${i.name} (₹${i.price})`).join('<br>');
-
-                    if (st !== 'delivered' && st !== 'cancelled') {
-                        liveTable.innerHTML += `
-                            <tr>
-                                <td><small>${order.orderDateFormatted || 'Just now'}</small></td>
-                                <td><strong>${order.customerName}</strong><br><small>📞 ${order.customerPhone}</small><br><small>📍 ${order.customerAddress}</small></td>
-                                <td>${itemsHtml}</td>
-                                <td><strong>₹${order.totalAmount}</strong><br><small>${order.paymentMethod}</small></td>
-                                <td>
-                                    <span style="background:${st==='confirmed'?'#dbeafe':'#fed7aa'}; color:${st==='confirmed'?'#1d4ed8':'#c2410c'}; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:bold;">${order.status}</span><br>
-                                    <button class="btn-kitchen" onclick="setOrderStatus('${order.id}', 'Preparing')" style="margin-top:4px;">🍳 Preparing</button>
-                                    <button class="btn-kitchen" style="background:#ca8a04; margin-top:4px;" onclick="setOrderStatus('${order.id}', 'Food Ready')">🥡 Ready</button>
-                                </td>
-                                <td>
-                                    <button class="btn-print" onclick="printOrderInvoice('${order.id}')">🖨️ Print Bill</button>
-                                </td>
-                                <td>
-                                    <input type="tel" id="boyPhone_${order.id}" placeholder="Boy Phone" value="${order.assignedBoyPhone || ''}" style="width:105px; font-size:11px; padding:3px;">
-                                    <button onclick="assignBoy('${order.id}')" class="btn-primary" style="padding:3px 6px; font-size:11px;">Assign</button>
-                                </td>
-                            </tr>
-                        `;
-                    }
-
-                    if (isOrderToday) {
-                        const amt = Number(order.totalAmount || 0);
-                        const payMethod = (order.paymentMethod || 'COD').toUpperCase();
-
-                        if (st === 'delivered') {
-                            todayDelivered++;
-                            todayCollection += amt;
-                            if (payMethod.includes('UPI')) todayUpi += amt; else todayCash += amt;
-                            hisabTable.innerHTML += `<tr><td><small>${order.orderDateFormatted||'Today'}</small></td><td>${order.customerName}</td><td>${itemsHtml}</td><td>${payMethod}</td><td>₹${amt}</td><td><span style="color:green; font-weight:bold;">Delivered</span></td></tr>`;
-                        } else if (st === 'cancelled') {
-                            todayCancelled++;
-                            hisabTable.innerHTML += `<tr><td><small>${order.orderDateFormatted||'Today'}</small></td><td>${order.customerName}</td><td>${itemsHtml}</td><td>${payMethod}</td><td>₹${amt}</td><td><span style="color:red; font-weight:bold;">Cancelled</span></td></tr>`;
+                    if (st === 'delivered') {
+                        totalRevenue += amt;
+                        totalCash += amt;
+                        if (order.assignedBoyPhone) {
+                            const b = order.assignedBoyPhone;
+                            if (!boyStats[b]) boyStats[b] = { count: 0, cash: 0 };
+                            boyStats[b].count++;
+                            boyStats[b].cash += amt;
                         }
                     }
-                });
 
-                isFirstLoad = false;
+                    historyTable.innerHTML += 
+                        '<tr>' +
+                            '<td><small>' + (order.orderDateFormatted || 'Done') + '</small></td>' +
+                            '<td>' + (order.customerName || '') + '</td>' +
+                            '<td>' + (order.paymentMethod || 'COD') + '</td>' +
+                            '<td>₹' + order.totalAmount + '</td>' +
+                            '<td>' + (order.assignedBoyPhone || '-') + '</td>' +
+                            '<td><span class="status-pill">' + order.status + '</span></td>' +
+                        '</tr>';
+                } else {
+                    const hasFood = (order.items || []).some(i => (i.category || '').toLowerCase() === 'food');
+                    const itemsText = (order.items || []).map(i => i.name + ' (x' + (i.qty || 1) + ')').join(', ');
+                    const statusColor = (st === 'confirmed') ? '#dbeafe' : '#fed7aa';
+                    const textColor = (st === 'confirmed') ? '#1d4ed8' : '#c2410c';
 
-                document.getElementById('statTodayCollection').innerText = `₹${todayCollection}`;
-                document.getElementById('statDeliveredToday').innerText = todayDelivered;
-                document.getElementById('statCancelledToday').innerText = todayCancelled;
-                document.getElementById('statTodayUpi').innerText = `₹${todayUpi}`;
-                document.getElementById('statTodayCash').innerText = `₹${todayCash}`;
-            });
-
-            // Menu Realtime
-            const qMenu = query(collection(db, "products"), where("shopId", "==", currentShop.id));
-            onSnapshot(qMenu, (snapshot) => {
-                const tbody = document.getElementById('menuTableBody');
-                tbody.innerHTML = '';
-                snapshot.forEach(docSnap => {
-                    const p = docSnap.data();
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><img src="${p.imageUrl || ''}" style="width:40px; height:40px; border-radius:4px; object-fit:cover;"></td>
-                            <td><strong>${p.name}</strong></td>
-                            <td>${p.subCategory}</td>
-                            <td>₹${p.price} ${p.originalPrice ? `<span style="text-decoration:line-through; color:#888; font-size:11px;">(₹${p.originalPrice})</span>` : ''}</td>
-                            <td><strong style="color:#16a34a;">${p.discount || '-'}</strong></td>
-                            <td><button onclick="delDish('${docSnap.id}')" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Delete</button></td>
-                        </tr>
-                    `;
-                });
-            });
-        }
-
-        // Restaurant Profile/Banner Photo Update Event
-        document.getElementById('updateShopPhotoForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!currentShop) return;
-
-            const urlInput = document.getElementById('shopPhotoUrlInput').value.trim();
-            let finalPhoto = selectedShopBannerBase64 || urlInput;
-
-            if (!finalPhoto) {
-                return alert("Kripya photo upload karein ya image URL enter karein!");
+                    if (hasFood) {
+                        foodCount++;
+                        foodTable.innerHTML += 
+                            '<tr>' +
+                                '<td><small>' + (order.orderDateFormatted || 'Just now') + '</small></td>' +
+                                '<td>' + itemsText + '</td>' +
+                                '<td><strong>' + (order.customerName || '') + '</strong><br><small>📞 ' + (order.customerPhone || '') + '</small></td>' +
+                                '<td>₹' + order.totalAmount + '</td>' +
+                                '<td><strong>' + (order.deliveryOtp || 'N/A') + '</strong></td>' +
+                                '<td><span style="background:' + statusColor + '; color:' + textColor + '; padding:3px 6px; border-radius:10px; font-weight:bold; font-size:11px;">' + order.status + '</span></td>' +
+                                '<td><strong style="color:#ea580c;">' + (order.assignedShopName || 'Kitchen') + '</strong></td>' +
+                                '<td><button class="btn-print" onclick="printAdminBill(\'' + order.id + '\')">🖨️ Bill</button></td>' +
+                                '<td>' +
+                                    '<input type="tel" id="boy_' + order.id + '" placeholder="Boy Phone" value="' + (order.assignedBoyPhone || '') + '" style="width:100px; font-size:11px; padding:3px;"> ' +
+                                    '<button onclick="assignBoy(\'' + order.id + '\')" class="btn-primary" style="padding:3px 6px;">Assign</button>' +
+                                '</td>' +
+                                '<td><button onclick="cancelOrder(\'' + order.id + '\')" class="btn-danger">Cancel</button></td>' +
+                            '</tr>';
+                    } else {
+                        generalCount++;
+                        generalTable.innerHTML += 
+                            '<tr>' +
+                                '<td><small>' + (order.orderDateFormatted || 'Just now') + '</small></td>' +
+                                '<td><strong>' + (order.customerName || '') + '</strong><br><small>📞 ' + (order.customerPhone || '') + '</small></td>' +
+                                '<td>' + (order.customerAddress || '') + '</td>' +
+                                '<td>' + itemsText + '</td>' +
+                                '<td>₹' + order.totalAmount + '</td>' +
+                                '<td><strong>' + (order.deliveryOtp || 'N/A') + '</strong></td>' +
+                                '<td><span style="background:' + statusColor + '; color:' + textColor + '; padding:3px 6px; border-radius:10px; font-weight:bold; font-size:11px;">' + order.status + '</span></td>' +
+                                '<td><button class="btn-print" onclick="printAdminBill(\'' + order.id + '\')">🖨️ Bill</button></td>' +
+                                '<td>' +
+                                    '<input type="tel" id="boy_' + order.id + '" placeholder="Boy Phone" value="' + (order.assignedBoyPhone || '') + '" style="width:100px; font-size:11px; padding:3px;"> ' +
+                                    '<button onclick="assignBoy(\'' + order.id + '\')" class="btn-primary" style="padding:3px 6px;">Assign</button>' +
+                                '</td>' +
+                                '<td><button onclick="cancelOrder(\'' + order.id + '\')" class="btn-danger">Cancel</button></td>' +
+                            '</tr>';
+                    }
+                }
             }
 
-            try {
-                await updateDoc(doc(db, "shops", currentShop.id), {
-                    imageUrl: finalPhoto,
-                    updatedAt: serverTimestamp()
-                });
-                currentShop.imageUrl = finalPhoto;
-                localStorage.setItem('rest_shop_session', JSON.stringify(currentShop));
-                alert("✅ Restaurant profile photo update ho gayi! Ab yeh customer store par dikhegi.");
-            } catch(err) {
-                alert("Error: " + err.message);
-            }
+            isFirstLoad = false;
+
+            Object.keys(boyStats).forEach(phone => {
+                const b = boyStats[phone];
+                auditTable.innerHTML += 
+                    '<tr>' +
+                        '<td><strong>📞 ' + phone + '</strong></td>' +
+                        '<td>' + b.count + ' Orders</td>' +
+                        '<td><strong style="color:#d97706;">₹' + b.cash + ' (Cash)</strong></td>' +
+                        '<td>₹0</td>' +
+                        '<td>₹' + b.cash + '</td>' +
+                    '</tr>';
+            });
+
+            document.getElementById('statRevenue').innerText = '₹' + totalRevenue;
+            document.getElementById('statTotalCash').innerText = '₹' + totalCash;
+            document.getElementById('statFood').innerText = foodCount;
+            document.getElementById('statGeneral').innerText = generalCount;
         });
 
-        window.setOrderStatus = async (id, st) => await updateDoc(doc(db, "orders", id), { status: st });
-        window.assignBoy = async (id) => {
-            const phone = document.getElementById(`boyPhone_${id}`).value.trim();
-            if (phone.length !== 10) return alert("10-digit phone number dalein!");
-            await updateDoc(doc(db, "orders", id), { assignedBoyPhone: phone, status: "Assigned" });
-            alert("Delivery boy assign ho gaya!");
-        };
-
-        // 1-Click Thermal Bill Print (Delivery Charge Itemized, OTP Excluded)
-        window.printOrderInvoice = async function(orderId) {
+        // 1-Click Bill Print (Header updated to KSINDO)
+        window.printAdminBill = async function(orderId) {
             const order = ordersDataCache[orderId];
             if (!order) return alert("Order data nahi mila!");
 
-            const invoiceArea = document.getElementById('printableInvoice');
+            const invoiceArea = document.getElementById('adminPrintableBill');
             invoiceArea.style.display = 'block';
 
-            let itemsRow = (order.items || []).map(i => `
-                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px;">
-                    <span>${i.name} (x1)</span>
-                    <span>₹${i.price}</span>
-                </div>
-            `).join('');
+            let itemsRow = (order.items || []).map(i => 
+                '<div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px;">' +
+                    '<span>' + i.name + ' (x' + (i.qty || 1) + ')</span>' +
+                    '<span>₹' + ((i.price) * (i.qty || 1)) + '</span>' +
+                '</div>'
+            ).join('');
 
             const deliveryCharge = Number(order.deliveryCharge !== undefined ? order.deliveryCharge : (Number(order.totalAmount) < 100 ? 20 : 0));
             const subtotal = order.subtotal !== undefined ? order.subtotal : (Number(order.totalAmount) - deliveryCharge);
 
-            invoiceArea.innerHTML = `
-                <div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">
-                    <h3 style="margin:0; font-size:16px;">${currentShop.shopName || 'Jaynagar Store'}</h3>
-                    <p style="margin:0; font-size:10px;">Local Delivery & Food Kitchen</p>
-                    <p style="margin:0; font-size:10px;">${order.orderDateFormatted || new Date().toLocaleString()}</p>
-                </div>
-                <div style="font-size:11px; margin-bottom:5px; border-bottom:1px dashed #000; padding-bottom:5px;">
-                    <strong>Customer:</strong> ${order.customerName}<br>
-                    <strong>Phone:</strong> ${order.customerPhone}<br>
-                    <strong>Address:</strong> ${order.customerAddress} (PIN: ${order.customerPincode})
-                </div>
-                <div style="margin-bottom:5px; border-bottom:1px dashed #000; padding-bottom:5px;">
-                    <div style="font-weight:bold; font-size:11px; margin-bottom:3px;">DISHES:</div>
-                    ${itemsRow}
-                </div>
-
-                <div style="font-size:12px; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
-                        <span>Food Subtotal:</span>
-                        <span>₹${subtotal}</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-weight:bold;">
-                        <span>Delivery Charge:</span>
-                        <span>${deliveryCharge > 0 ? `+ ₹${deliveryCharge}` : 'FREE (₹0)'}</span>
-                    </div>
-                </div>
-
-                <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px; margin-bottom:5px;">
-                    <span>FINAL TOTAL:</span>
-                    <span>₹${order.totalAmount}</span>
-                </div>
-                <div style="text-align:center; font-size:10px; border-top:1px dashed #000; padding-top:5px; margin-top:5px;">
-                    Payment Mode: ${order.paymentMethod || 'COD'}<br>
-                    <em>Customer OTP will be verified at doorstep</em><br>
-                    *** Swadist Bhojan, Shubh Aagman ***
-                </div>
-            `;
+            invoiceArea.innerHTML = 
+                '<div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">' +
+                    '<h3 style="margin:0; font-size:16px;">KSINDO</h3>' +
+                    '<p style="margin:0; font-size:10px;">Official Invoice Receipt</p>' +
+                    '<p style="margin:0; font-size:10px;">' + (order.orderDateFormatted || new Date().toLocaleString()) + '</p>' +
+                '</div>' +
+                '<div style="font-size:11px; margin-bottom:5px; border-bottom:1px dashed #000; padding-bottom:5px;">' +
+                    '<strong>Customer:</strong> ' + (order.customerName || '') + '<br>' +
+                    '<strong>Phone:</strong> ' + (order.customerPhone || '') + '<br>' +
+                    '<strong>Address:</strong> ' + (order.customerAddress || '') + ' (PIN: ' + (order.customerPincode || '') + ')' +
+                '</div>' +
+                '<div style="margin-bottom:5px; border-bottom:1px dashed #000; padding-bottom:5px;">' +
+                    '<div style="font-weight:bold; font-size:11px; margin-bottom:3px;">ITEMS:</div>' +
+                    itemsRow +
+                '</div>' +
+                '<div style="font-size:12px; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">' +
+                    '<div style="display:flex; justify-content:space-between; margin-bottom:2px;">' +
+                        '<span>Item Subtotal:</span>' +
+                        '<span>₹' + subtotal + '</span>' +
+                    '</div>' +
+                    '<div style="display:flex; justify-content:space-between; font-weight:bold;">' +
+                        '<span>Delivery Charge:</span>' +
+                        '<span>' + (deliveryCharge > 0 ? ('+ ₹' + deliveryCharge) : 'FREE (₹0)') + '</span>' +
+                    '</div>' +
+                '</div>' +
+                '<div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px; margin-bottom:5px;">' +
+                    '<span>FINAL PAYABLE:</span>' +
+                    '<span>₹' + order.totalAmount + '</span>' +
+                '</div>' +
+                '<div style="text-align:center; font-size:10px; border-top:1px dashed #000; padding-top:5px; margin-top:5px;">' +
+                    'Payment: ' + (order.paymentMethod || 'COD') + '<br>' +
+                    'Helpline: 8252731656 , 06246451082<br>' +
+                    '<em>Doorstep OTP verification compulsory</em>' +
+                '</div>';
 
             window.print();
             invoiceArea.style.display = 'none';
@@ -548,40 +588,271 @@
             } catch(e) {}
         };
 
-        // Add Dish Form
-        document.getElementById('addFoodItemForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('foodTitle').value.trim();
-            const price = Number(document.getElementById('foodPrice').value);
-            const originalPrice = Number(document.getElementById('foodOriginalPrice').value) || '';
-            const discount = document.getElementById('foodDiscount').value.trim();
-            const subCategory = document.getElementById('foodSubCategory').value;
-            const desc = document.getElementById('foodDesc').value.trim();
-            const link = document.getElementById('foodImageLink').value.trim();
+        window.assignBoy = async (id) => {
+            const phone = document.getElementById('boy_' + id).value.trim();
+            if (phone.length !== 10) return alert("10-digit phone number dalein!");
+            await updateDoc(doc(db, "orders", id), { assignedBoyPhone: phone, status: "Assigned" });
+            alert("Delivery boy assigned!");
+        };
 
-            let photos = [];
-            if (foodPhotosArray.length > 0) photos = foodPhotosArray;
-            else if (link) photos = [link];
-            else return alert("Photo link dalein ya 1-6 photos upload karein!");
+        window.cancelOrder = async (id) => {
+            if (confirm("Cancel order?")) {
+                await updateDoc(doc(db, "orders", id), { status: "Cancelled", closedAt: new Date().toISOString() });
+            }
+        };
+
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const u = docSnap.data();
+                const tr = document.createElement('tr');
+                tr.className = 'clickable-customer-row';
+                tr.innerHTML = 
+                    '<td><strong>' + (u.fullName || 'User') + '</strong></td>' +
+                    '<td>' + (u.userEmail || u.email || '') + '</td>' +
+                    '<td>' + (u.phone || '-') + '</td>' +
+                    '<td>' + (u.address || '-') + '</td>' +
+                    '<td>' + (u.totalOrdersCount || 0) + '</td>' +
+                    '<td><button class="btn-primary" style="padding:3px 8px; font-size:11px;">View</button></td>';
+                tr.addEventListener('click', () => viewCustomerAudit(u.userEmail || u.email, u.fullName));
+                tbody.appendChild(tr);
+            });
+        });
+
+        window.viewCustomerAudit = async function(email, name) {
+            const modal = document.getElementById('customerAuditModal');
+            document.getElementById('modalCustName').innerText = 'History: ' + (name || 'Customer');
+            document.getElementById('modalCustEmail').innerText = 'Email: ' + (email || '');
+            const container = document.getElementById('modalOrdersContainer');
+            container.innerHTML = 'Searching orders...';
+            modal.classList.add('active');
 
             try {
-                await addDoc(collection(db, "products"), {
-                    name, price, originalPrice, discount, category: "food", subCategory, description: desc,
-                    shopName: currentShop.shopName,
-                    shopId: currentShop.id,
-                    imageUrl: photos[0],
-                    images: photos,
+                const q = query(collection(db, "orders"), where("userEmail", "==", email));
+                const snap = await getDocs(q);
+                if (snap.empty) { container.innerHTML = 'Koi order record nahi mila.'; return; }
+                container.innerHTML = '';
+                snap.forEach(d => {
+                    const o = d.data();
+                    const itemNames = (o.items || []).map(i => i.name + ' (x' + (i.qty || 1) + ')').join(', ');
+                    container.innerHTML += 
+                        '<div style="background:#f8fafc; border:1px solid #ddd; padding:10px; border-radius:8px; margin-bottom:8px;">' +
+                            '<strong>Date:</strong> ' + (o.orderDateFormatted || 'N/A') + ' | <strong>Status:</strong> ' + o.status + '<br>' +
+                            '<strong>Amount:</strong> ₹' + o.totalAmount + ' | <strong>OTP:</strong> ' + (o.deliveryOtp || 'N/A') + '<br>' +
+                            '<strong>Items:</strong> ' + itemNames +
+                        '</div>';
+                });
+            } catch(e) { container.innerHTML = 'Error: ' + e.message; }
+        };
+
+        window.closeCustomerAudit = () => document.getElementById('customerAuditModal').classList.remove('active');
+
+        document.getElementById('addShopForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const shopName = document.getElementById('shopNameInput').value.trim();
+            const ownerName = document.getElementById('ownerNameInput').value.trim();
+            const phone = document.getElementById('shopPhoneInput').value.trim();
+            const pincode = document.getElementById('shopPincodeInput').value.trim();
+            const address = document.getElementById('shopAddressInput').value.trim();
+            const username = document.getElementById('shopUserInput').value.trim().toLowerCase();
+            const password = document.getElementById('shopPassInput').value.trim();
+
+            try {
+                await addDoc(collection(db, "shops"), {
+                    shopName, ownerName, phone, pincode, address, username, password,
                     createdAt: serverTimestamp()
                 });
-                alert("✅ Dish menu me add ho gayi!");
-                document.getElementById('addFoodItemForm').reset();
-                document.getElementById('foodPhotoPreview').innerHTML = '';
-                foodPhotosArray = [];
-                showTab('tab-menu', document.querySelectorAll('aside nav a')[4]);
+                alert('✅ Shop Registered! User: ' + username);
+                document.getElementById('addShopForm').reset();
             } catch(err) { alert("Error: " + err.message); }
         });
 
-        window.delDish = async (id) => { if (confirm("Delete dish?")) await deleteDoc(doc(db, "products", id)); };
+        onSnapshot(collection(db, "shops"), (snapshot) => {
+            const tbody = document.getElementById('shopsTableBody');
+            tbody.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const s = docSnap.data();
+                tbody.innerHTML += 
+                    '<tr>' +
+                        '<td><strong>' + s.shopName + '</strong></td>' +
+                        '<td>' + s.ownerName + '</td>' +
+                        '<td>' + s.phone + '</td>' +
+                        '<td>' + (s.pincode || '-') + '</td>' +
+                        '<td><code>' + s.username + '</code></td>' +
+                        '<td><code>' + s.password + '</code></td>' +
+                        '<td><button class="btn-danger" onclick="deleteShop(\'' + docSnap.id + '\')">Delete</button></td>' +
+                    '</tr>';
+            });
+        });
+        window.deleteShop = async (id) => { if (confirm("Delete shop?")) await deleteDoc(doc(db, "shops", id)); };
+
+        // PRODUCT EDIT SYSTEM
+        window.editProduct = function(productId) {
+            const p = productsDataCache[productId];
+            if (!p) return alert("Product data load nahi ho paya!");
+
+            document.getElementById('editProductId').value = productId;
+            document.getElementById('prodName').value = p.name || '';
+            document.getElementById('prodSubCategory').value = p.subCategory || 'none';
+            document.getElementById('prodImageLink').value = p.imageUrl || '';
+            document.getElementById('prodDesc').value = p.description || '';
+
+            const selectedCats = p.categories || [p.category];
+            document.querySelectorAll('input[name="productCats"]').forEach(cb => {
+                cb.checked = selectedCats.includes(cb.value);
+            });
+
+            const container = document.getElementById('variantsContainer');
+            container.innerHTML = '';
+            if (p.sizes && p.sizes.length > 0) {
+                p.sizes.forEach(v => {
+                    addVariantRow(v.size, v.price, v.originalPrice, v.discount || '');
+                });
+            } else {
+                addVariantRow('Default', p.price, p.originalPrice, p.discount || '');
+            }
+
+            document.getElementById('productFormHeader').innerText = '✏️ Edit Product: ' + p.name;
+            document.getElementById('productSubmitBtn').innerText = 'Update Product';
+            document.getElementById('cancelEditBtn').style.display = 'inline-block';
+
+            window.scrollTo({ top: document.getElementById('tab-products').offsetTop, behavior: 'smooth' });
+        };
+
+        window.resetProductForm = function() {
+            document.getElementById('addProductForm').reset();
+            document.getElementById('editProductId').value = '';
+            document.getElementById('productFormHeader').innerText = '+ Naya Product Add Karein (Individual Size MRP, Selling Price & Auto-Discount)';
+            document.getElementById('productSubmitBtn').innerText = 'Publish Product';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+            document.getElementById('photoPreviewContainer').innerHTML = '';
+            document.getElementById('variantsContainer').innerHTML = '';
+            base64PhotosArray = [];
+            addVariantRow();
+        };
+
+        // Publish OR Update Product
+        document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('editProductId').value;
+            const name = document.getElementById('prodName').value.trim();
+            const subCategory = document.getElementById('prodSubCategory').value;
+            const desc = document.getElementById('prodDesc').value.trim();
+            const imgLink = document.getElementById('prodImageLink').value.trim();
+
+            const selectedCats = Array.from(document.querySelectorAll('input[name="productCats"]:checked')).map(cb => cb.value);
+            if (selectedCats.length === 0) return alert("Kam se kam ek Category select karein!");
+
+            const vNames = document.querySelectorAll('.v-name');
+            const vPrices = document.querySelectorAll('.v-price');
+            const vOrigPrices = document.querySelectorAll('.v-orig-price');
+            let variantsList = [];
+
+            vNames.forEach((nEl, idx) => {
+                const vName = nEl.value.trim();
+                const vPrice = Number(vPrices[idx].value);
+                const vOrig = Number(vOrigPrices[idx].value) || '';
+                
+                if (vName && !isNaN(vPrice) && vPrice > 0) {
+                    let vDisc = '';
+                    if (vOrig && vOrig > vPrice) {
+                        vDisc = Math.round(((vOrig - vPrice) / vOrig) * 100) + '% OFF';
+                    }
+                    variantsList.push({ 
+                        size: vName, 
+                        price: vPrice, 
+                        originalPrice: vOrig,
+                        discount: vDisc
+                    });
+                }
+            });
+
+            if (variantsList.length === 0) {
+                return alert("Kam se kam 1 Size/Variant (Size Name aur Selling Price) add karein!");
+            }
+
+            const defaultBasePrice = variantsList[0].price;
+            const defaultOriginalPrice = variantsList[0].originalPrice || '';
+            const defaultDiscount = variantsList[0].discount || '';
+
+            let photos = [];
+            if (base64PhotosArray.length > 0) {
+                photos = base64PhotosArray;
+            } else if (imgLink) {
+                photos = [imgLink];
+            } else if (editId && productsDataCache[editId]) {
+                photos = productsDataCache[editId].images || [productsDataCache[editId].imageUrl];
+            } else {
+                return alert("Photo link dalein ya 1-6 photos upload karein!");
+            }
+
+            try {
+                const productData = {
+                    name,
+                    price: defaultBasePrice,
+                    originalPrice: defaultOriginalPrice,
+                    discount: defaultDiscount,
+                    categories: selectedCats,
+                    category: selectedCats[0],
+                    subCategory,
+                    description: desc,
+                    imageUrl: photos[0],
+                    images: photos,
+                    hasVariants: true,
+                    sizes: variantsList
+                };
+
+                if (editId) {
+                    await updateDoc(doc(db, "products", editId), {
+                        ...productData,
+                        updatedAt: serverTimestamp()
+                    });
+                    alert("✅ Product successfully update ho gaya!");
+                } else {
+                    await addDoc(collection(db, "products"), {
+                        ...productData,
+                        createdAt: serverTimestamp()
+                    });
+                    alert("✅ Product publish ho gaya!");
+                }
+
+                resetProductForm();
+            } catch(err) { alert("Error: " + err.message); }
+        });
+
+        onSnapshot(collection(db, "products"), (snapshot) => {
+            const tbody = document.getElementById('productsTableBody');
+            tbody.innerHTML = '';
+            productsDataCache = {};
+
+            snapshot.forEach(docSnap => {
+                const p = { id: docSnap.id, ...docSnap.data() };
+                productsDataCache[p.id] = p;
+
+                const cats = p.categories ? p.categories.join(', ') : p.category;
+                const vCount = (p.sizes && p.sizes.length > 0) ? (p.sizes.length + ' Sizes') : 'Single';
+                const origMarkup = p.originalPrice ? ('<span style="text-decoration:line-through; color:#888; font-size:11px;">(₹' + p.originalPrice + ')</span>') : '';
+                const imgUrl = p.imageUrl || (p.images ? p.images[0] : '');
+
+                tbody.innerHTML += 
+                    '<tr>' +
+                        '<td><img src="' + imgUrl + '" style="width:35px; height:35px; border-radius:4px; object-fit:cover;"></td>' +
+                        '<td><strong>' + p.name + '</strong></td>' +
+                        '<td><span style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:6px; font-weight:bold; font-size:11px;">' + cats + '</span></td>' +
+                        '<td>₹' + p.price + ' ' + origMarkup + '</td>' +
+                        '<td><span style="background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:10px; font-weight:bold; font-size:11px;">' + vCount + '</span></td>' +
+                        '<td>' +
+                            '<button onclick="editProduct(\'' + p.id + '\')" class="btn-edit">✏️ Edit</button>' +
+                            '<button onclick="delProd(\'' + p.id + '\')" class="btn-danger">Delete</button>' +
+                        '</td>' +
+                    '</tr>';
+            });
+        });
+
+        window.delProd = async (id) => { 
+            if (confirm("Delete product?")) await deleteDoc(doc(db, "products", id)); 
+        };
     </script>
 </body>
 </html>
