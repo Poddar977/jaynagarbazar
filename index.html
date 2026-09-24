@@ -42,7 +42,26 @@
         .search-container input { width: 100%; padding: 10px 18px; border: none; outline: none; border-radius: 25px 0 0 25px; font-size: 14px; }
         .search-btn-round { background: white; border: none; border-radius: 0 25px 25px 0; padding: 0 14px; cursor: pointer; color: #16a34a; font-size: 15px; }
 
-        .nav-actions { display: flex; gap: 12px; align-items: center; position: relative; }
+        .nav-actions { display: flex; gap: 10px; align-items: center; position: relative; }
+        
+        /* Reference Style Login Button */
+        .btn-header-login {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.15s;
+        }
+        .btn-header-login:hover { background: #1e40af; transform: translateY(-1px); }
+
         .nav-round-btn { background-color: #fff; color: #0f172a; border: none; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; position: relative; font-weight: bold; }
         .cart-badge { background-color: #ca8a04; color: white; padding: 2px 6px; border-radius: 12px; font-size: 11px; position: absolute; top: -4px; right: -4px; font-weight: bold; }
 
@@ -77,7 +96,7 @@
         }
         @keyframes fastMarquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        /* MODE SWITCHER: Placed on TOP */
+        /* Mode Switcher: Top of Icons */
         .mode-switcher-container { 
             display: flex; 
             justify-content: center; 
@@ -272,7 +291,13 @@
             <button class="search-btn-round" onclick="handleSearch()">🔍</button>
         </div>
         <div class="nav-actions">
-            <button class="nav-round-btn" id="userAvatarBtn" onclick="handleUserIconClick()">👤</button>
+            <!-- Dedicated Login Button (Shown when not logged in) -->
+            <button class="btn-header-login" id="headerLoginBtn" onclick="openAuthModal()">
+                🔑 Login
+            </button>
+
+            <!-- User Profile Icon (Shown when logged in) -->
+            <button class="nav-round-btn" id="userAvatarBtn" style="display:none;" onclick="handleUserIconClick()">👤</button>
             <div class="user-menu-dropdown" id="userMenuDropdown">
                 <div style="background:#0f172a; color:white; padding:12px; text-align:center;">
                     <h4 id="userMenuName">Welcome, Guest</h4>
@@ -286,6 +311,8 @@
                     <li onclick="handleLogout()" style="color:#ef4444;">🚪 Logout</li>
                 </ul>
             </div>
+
+            <!-- Cart Button -->
             <button class="nav-round-btn" onclick="toggleCart()">
                 🛒 <span class="cart-badge" id="cart-count">0</span>
             </button>
@@ -377,7 +404,7 @@
         </section>
     </div>
 
-    <!-- Login Modal -->
+    <!-- Login & Register Modal -->
     <div class="modal-overlay" id="auth-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="closeAuthModal()">&times;</span>
@@ -390,7 +417,7 @@
                     <textarea id="regAddress" placeholder="Full Delivery Address" style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;"></textarea>
                 </div>
                 <input type="email" id="authEmail" placeholder="Email Address" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
-                <input type="password" id="authPassword" placeholder="Password" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
+                <input type="password" id="authPassword" placeholder="Password (Min 6 Characters)" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
                 <button type="submit" class="btn-submit" id="authSubmitBtn">Login</button>
             </form>
             <p style="text-align:center; margin-top:15px; font-size:13px;">
@@ -600,17 +627,37 @@
             if (currentMode === 'food') renderRestaurants();
         });
 
+        // Auth State Handler: Toggles Login Button vs User Profile Icon
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
-            if (user && !currentUserProfile) {
-                try {
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
-                    if (userDoc.exists()) {
-                        currentUserProfile = userDoc.data();
-                        localStorage.setItem('user_profile', JSON.stringify(currentUserProfile));
-                        document.getElementById('userMenuName').innerText = currentUserProfile.fullName || "Customer";
-                    }
-                } catch(e) {}
+            const loginBtn = document.getElementById('headerLoginBtn');
+            const avatarBtn = document.getElementById('userAvatarBtn');
+
+            if (user) {
+                if (loginBtn) loginBtn.style.display = 'none';
+                if (avatarBtn) {
+                    avatarBtn.style.display = 'flex';
+                    avatarBtn.innerText = (user.email || 'U').charAt(0).toUpperCase();
+                }
+
+                if (!currentUserProfile) {
+                    try {
+                        const userDoc = await getDoc(doc(db, "users", user.uid));
+                        if (userDoc.exists()) {
+                            currentUserProfile = userDoc.data();
+                            localStorage.setItem('user_profile', JSON.stringify(currentUserProfile));
+                            document.getElementById('userMenuName').innerText = currentUserProfile.fullName || "Customer";
+                            document.getElementById('userMenuEmail').innerText = user.email;
+                            if (avatarBtn && currentUserProfile.fullName) {
+                                avatarBtn.innerText = currentUserProfile.fullName.charAt(0).toUpperCase();
+                            }
+                        }
+                    } catch(e) {}
+                }
+            } else {
+                if (loginBtn) loginBtn.style.display = 'flex';
+                if (avatarBtn) avatarBtn.style.display = 'none';
+                document.getElementById('userMenuDropdown').classList.remove('show');
             }
         });
 
@@ -1024,7 +1071,7 @@
 
                     html += '<div class="product-card">' +
                         '<img src="' + img + '" class="card-main-img" loading="lazy" alt="' + p.name + '" onclick="openProductDetail(\'' + p.id + '\')">' +
-                        '<div class="product-title" onclick="openProductDetail(\'' + p.id + '\')">${p.name}</div>' +
+                        '<div class="product-title" onclick="openProductDetail(\'' + p.id + '\')">' + p.name + '</div>' +
                         '<div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">' +
                             '<span style="font-size:18px; font-weight:900; color:#15803d;">₹' + p.price + '</span>' +
                             origMarkup +
