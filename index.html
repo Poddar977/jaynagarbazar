@@ -70,7 +70,6 @@
         .user-menu-list li { padding: 10px 16px; font-size: 13px; font-weight: 600; color: #444; cursor: pointer; }
         .user-menu-list li:hover { background-color: #f1f5f9; color: #16a34a; }
 
-        /* Support Ticker */
         .sub-header-clock-bar { 
             background: linear-gradient(90deg, #15803d, #ca8a04, #15803d); 
             background-size: 200% 200%; 
@@ -95,7 +94,6 @@
         }
         @keyframes fastMarquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        /* Mode Switcher */
         .mode-switcher-container { 
             display: flex; 
             justify-content: center; 
@@ -123,7 +121,6 @@
         .mode-btn.active { border-color: #16a34a; background: #16a34a; color: white; }
         .mode-btn.food-mode.active { border-color: #ea580c; background: #ea580c; color: white; }
 
-        /* Category Icon Strip */
         .clean-icon-bar {
             background: #ffffff; 
             padding: 12px 3%; 
@@ -143,12 +140,10 @@
         .icon-title { font-size: 11px; font-weight: 700; }
         .icon-item.active .icon-title { color: #16a34a; border-bottom: 2px solid #16a34a; padding-bottom: 2px; }
 
-        /* Fashion Sub-Categories */
         .sub-cat-bar { display: none; background: #fefce8; padding: 8px 5%; gap: 8px; overflow-x: auto; border-bottom: 1px dashed #ca8a04; }
         .sub-cat-btn { background: white; border: 1px solid #fde047; color: #854d0e; padding: 5px 14px; border-radius: 15px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .sub-cat-btn.active { background: #ca8a04; color: white; }
 
-        /* Multi-Ads Horizontal Row */
         .ads-scroll-section { padding: 15px 4% 5px; overflow: hidden; }
         .ads-scroll-track { display: flex; gap: 15px; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; padding-bottom: 5px; }
         .ads-scroll-track::-webkit-scrollbar { display: none; }
@@ -159,7 +154,6 @@
 
         .container { max-width: 1200px; margin: 0 auto; padding: 15px 15px 40px; }
 
-        /* Product Cards */
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
         .product-card { 
             background-color: #fffdf0; 
@@ -182,7 +176,6 @@
 
         .discount-tag { color: #15803d; font-weight: 800; font-size: 12px; margin-left: 6px; background: #bbf7d0; padding: 2px 6px; border-radius: 4px; border: 1px solid #86efac; display: inline-block; }
 
-        /* Fast Food */
         .restaurant-filter-box { background: white; padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; border-left: 5px solid #ea580c; gap: 10px; }
         .restaurant-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; margin-bottom: 30px; }
         .restaurant-card { background: white; border-radius: 14px; overflow: hidden; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s; }
@@ -190,7 +183,7 @@
         .restaurant-img { width: 100%; height: 140px; object-fit: cover; background: #e2e8f0; }
         .restaurant-info { padding: 12px 15px; }
 
-        /* Tracker Steps */
+        /* TRACKER PROGRESS BAR STYLES */
         .tracker-steps { display: flex; justify-content: space-between; position: relative; margin: 15px 0 10px; }
         .tracker-steps::before { content: ''; position: absolute; top: 12px; left: 15px; right: 15px; height: 3px; background: #e2e8f0; z-index: 1; }
         .step-point { position: relative; z-index: 2; text-align: center; display: flex; flex-direction: column; align-items: center; }
@@ -201,7 +194,6 @@
         .step-point.active .step-label { color: #16a34a; font-weight: bold; }
         .step-point.completed .step-label { color: #15803d; }
 
-        /* Modals & Cart Drawer */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 300; }
         .modal-overlay.active { display: flex; }
         .modal-box { background: white; padding: 25px; border-radius: 16px; width: 92%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; }
@@ -232,12 +224,10 @@
             <button class="search-btn-round" onclick="handleSearch()">🔍</button>
         </div>
         <div class="nav-actions">
-            <!-- Dedicated Login Button -->
             <button class="btn-header-login" id="headerLoginBtn" onclick="openAuthModal()">
                 🔑 Login
             </button>
 
-            <!-- User Profile Icon (Active when logged in) -->
             <button class="nav-round-btn" id="userAvatarBtn" style="display:none;" onclick="handleUserIconClick()">👤</button>
             <div class="user-menu-dropdown" id="userMenuDropdown">
                 <div style="background:#0f172a; color:white; padding:12px; text-align:center;">
@@ -254,14 +244,12 @@
                 </ul>
             </div>
 
-            <!-- Cart Button -->
             <button class="nav-round-btn" onclick="toggleCart()">
                 🛒 <span class="cart-badge" id="cart-count">0</span>
             </button>
         </div>
     </header>
 
-    <!-- Support Ticker with Live Date, Time & Touch/Hover Pause -->
     <div class="sub-header-clock-bar" id="supportTickerBar">
         <div class="marquee-track" id="marqueeTrack">
             <span id="liveClockDate">📅 Date</span> &nbsp;|&nbsp; 
@@ -272,13 +260,11 @@
         </div>
     </div>
 
-    <!-- 1. Mode Switcher (Top of Categories) -->
     <div class="mode-switcher-container">
         <button class="mode-btn active" id="btnModeGeneral" onclick="switchAppMode('general')">🛍️ All Products Market</button>
         <button class="mode-btn food-mode" id="btnModeFood" onclick="switchAppMode('food')">🍔 Fast Food & Restaurants</button>
     </div>
 
-    <!-- 2. Clean Category Icon Strip -->
     <div class="clean-icon-bar" id="categoryIconStrip">
         <div class="icon-item active" onclick="filterCategory('all', this)"><div class="icon-symbol">🛍️</div><span class="icon-title">For You</span></div>
         <div class="icon-item" onclick="filterCategory('fashion', this)"><div class="icon-symbol">👕</div><span class="icon-title">Fashion</span></div>
@@ -290,7 +276,6 @@
         <div class="icon-item" onclick="filterCategory('home', this)"><div class="icon-symbol">🏠</div><span class="icon-title">Home</span></div>
     </div>
 
-    <!-- Fashion Sub-Categories Strip -->
     <div class="sub-cat-bar" id="fashionSubCatBar">
         <button class="sub-cat-btn active" onclick="filterSubCat('all', this)">All Fashion</button>
         <button class="sub-cat-btn" onclick="filterSubCat('lingerie', this)">👙 Lingerie & Innerwear</button>
@@ -298,7 +283,6 @@
         <button class="sub-cat-btn" onclick="filterSubCat('men', this)">👕 Men Wear</button>
     </div>
 
-    <!-- 3. Multi-Ads Horizontal Row -->
     <div class="ads-scroll-section">
         <div class="ads-scroll-track" id="multiAdsTrack">
             <div class="ad-card"><img src="https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600" alt="Special Deals"><span class="ad-tag-pill">AD</span></div>
@@ -308,7 +292,6 @@
     </div>
 
     <div class="container">
-        <!-- GENERAL MARKET VIEW -->
         <section id="sectionGeneralStore">
             <div id="sundayRecommendationFeed"></div>
             <h2 style="font-size:18px; margin-bottom:15px; color:#15803d; font-weight:800;" id="marketViewTitle">Featured Products</h2>
@@ -316,7 +299,6 @@
             <div id="weekdayBottomFeed"></div>
         </section>
 
-        <!-- FAST FOOD MODE VIEW -->
         <section id="sectionFoodStore" style="display:none;">
             <div class="restaurant-filter-box">
                 <div>
@@ -346,13 +328,12 @@
         </section>
     </div>
 
-    <!-- Login & Register Modal (Ticked Terms Supported on Both) -->
+    <!-- Login & Register Modal -->
     <div class="modal-overlay" id="auth-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="closeAuthModal()">&times;</span>
             <h2 id="authModalTitle" style="color:#0f172a;">Customer Login</h2>
             <form id="authForm">
-                <!-- Registration Fields -->
                 <div id="signupFields" style="display:none;">
                     <input type="text" id="regName" placeholder="Full Name" style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
                     <input type="tel" id="regPhone" placeholder="Mobile Number (10 Digit)" maxlength="10" style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
@@ -360,11 +341,9 @@
                     <textarea id="regAddress" placeholder="Full Delivery Address" style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;"></textarea>
                 </div>
 
-                <!-- Credential Fields -->
                 <input type="email" id="authEmail" placeholder="Email Address" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
                 <input type="password" id="authPassword" placeholder="Password (Min 6 Characters)" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
 
-                <!-- Compulsory Terms & Conditions Checkbox (Visible on BOTH Login & Signup) -->
                 <div style="display:flex; align-items:flex-start; gap:8px; margin-top:14px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
                     <input type="checkbox" id="termsAgreementCheckbox" style="margin-top:3px; cursor:pointer;" required>
                     <label for="termsAgreementCheckbox" style="font-size:12px; color:#475569; cursor:pointer;">
@@ -381,7 +360,7 @@
         </div>
     </div>
 
-    <!-- Terms & Conditions Modal -->
+    <!-- Terms Modal -->
     <div class="modal-overlay" id="terms-overlay">
         <div class="modal-box" style="max-width:700px;">
             <span class="close-modal" onclick="closeTermsModal()">&times;</span>
@@ -399,7 +378,7 @@
         </div>
     </div>
 
-    <!-- Delivery Tracking Modal -->
+    <!-- Live Delivery Tracking Modal with Images -->
     <div class="modal-overlay" id="orders-modal-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="closeOrdersModal()">&times;</span>
@@ -459,6 +438,27 @@
     </div>
 
     <script>
+        // Global Tracker Helper (Fixed)
+        window.getDeliveryTrackerBar = function(status) {
+            var st = (status || 'Placed').toLowerCase();
+            var p1 = 'completed', p2 = '', p3 = '', p4 = '';
+
+            if (st === 'confirmed' || st === 'preparing') {
+                p1 = 'completed'; p2 = 'active';
+            } else if (st === 'assigned' || st === 'food ready' || st === 'out for delivery') {
+                p1 = 'completed'; p2 = 'completed'; p3 = 'active';
+            } else if (st === 'delivered') {
+                p1 = 'completed'; p2 = 'completed'; p3 = 'completed'; p4 = 'completed';
+            }
+
+            return '<div class="tracker-steps">' +
+                '<div class="step-point ' + p1 + '"><div class="step-dot">✓</div><span class="step-label">Placed</span></div>' +
+                '<div class="step-point ' + p2 + '"><div class="step-dot">' + (p2 === 'active' ? '●' : '2') + '</div><span class="step-label">Confirmed</span></div>' +
+                '<div class="step-point ' + p3 + '"><div class="step-dot">' + (p3 === 'active' ? '●' : '3') + '</div><span class="step-label">Out for Delivery</span></div>' +
+                '<div class="step-point ' + p4 + '"><div class="step-dot">' + (p4 === 'completed' ? '✓' : '4') + '</div><span class="step-label">Delivered</span></div>' +
+            '</div>';
+        };
+
         function updateLiveClock() {
             var now = new Date();
             var d = document.getElementById('liveClockDate');
@@ -539,6 +539,14 @@
         if (allProducts.length > 0) renderFilteredProducts();
         if (allShops.length > 0) renderRestaurants();
 
+        // Check if coming from product.html directly to checkout
+        if (localStorage.getItem('open_checkout_direct') === 'true') {
+            localStorage.removeItem('open_checkout_direct');
+            cart = JSON.parse(localStorage.getItem('store_cart')) || [];
+            updateCartUI();
+            setTimeout(() => { openCheckoutModal(); }, 200);
+        }
+
         function getDiscountMarkup(p) {
             let disc = p.discount;
             let orig = p.originalPrice;
@@ -562,7 +570,6 @@
             return '';
         }
 
-        // Realtime Multi-Ads from Firestore
         onSnapshot(collection(db, "ads"), (snap) => {
             if (!snap.empty) {
                 const track = document.getElementById('multiAdsTrack');
@@ -580,7 +587,6 @@
             }
         });
 
-        // Realtime Products Sync
         onSnapshot(collection(db, "products"), (snapshot) => {
             const fresh = [];
             snapshot.forEach(d => fresh.push({ id: d.id, ...d.data() }));
@@ -590,7 +596,6 @@
             else if (selectedShopForMenu) openRestaurantMenu(selectedShopForMenu);
         });
 
-        // Realtime Shops Sync
         onSnapshot(collection(db, "shops"), (snapshot) => {
             const freshShops = [];
             snapshot.forEach(d => freshShops.push({ id: d.id, ...d.data() }));
@@ -599,7 +604,6 @@
             if (currentMode === 'food') renderRestaurants();
         });
 
-        // Auth State Handler: Toggles Login Button vs User Profile Icon
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             const loginBtn = document.getElementById('headerLoginBtn');
@@ -633,7 +637,6 @@
             }
         });
 
-        // Toggle Login vs Signup Mode
         window.toggleAuthMode = () => {
             isSignupMode = !isSignupMode;
             const sFields = document.getElementById('signupFields');
@@ -665,12 +668,11 @@
             }
         };
 
-        // Complete & Fixed Login / Signup Event
         document.getElementById('authForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const termsAccepted = document.getElementById('termsAgreementCheckbox').checked;
             if (!termsAccepted) {
-                return alert("⚠️ Login / Register karne ke liye Terms & Conditions par tick lagana anivarya hai!");
+                return alert("⚠️ Terms & Conditions par tick lagana anivarya hai!");
             }
 
             const email = document.getElementById('authEmail').value.trim();
@@ -684,7 +686,7 @@
                     const address = document.getElementById('regAddress').value.trim();
 
                     if (!name || !phone || !pincode || !address) {
-                        return alert("Kripya sabhi details (Name, Phone, Pincode, Address) bharein!");
+                        return alert("Kripya sabhi details bharein!");
                     }
 
                     const cred = await createUserWithEmailAndPassword(auth, email, pass);
@@ -1138,6 +1140,7 @@
             }
         };
 
+        // TRACKING MODAL FUNCTION (FIXED & SAFE)
         window.openOrdersTab = async function(type) {
             document.getElementById('userMenuDropdown').classList.remove('show');
             const email = currentUser?.email || currentUserProfile?.userEmail;
@@ -1152,7 +1155,7 @@
             try {
                 const q = query(collection(db, "orders"), where("userEmail", "==", email));
                 const snap = await getDocs(q);
-                if (snap.empty) { container.innerHTML = '<p style="text-align:center; padding:20px;">Koi order nahi mila.</p>'; return; }
+                if (snap.empty) { container.innerHTML = '<p style="text-align:center; padding:20px;">Koi order record nahi mila.</p>'; return; }
 
                 let list = [];
                 snap.forEach(d => list.push({ id: d.id, ...d.data() }));
@@ -1187,7 +1190,9 @@
 
                     const isFood = (o.items || []).some(i => (i.category || '').toLowerCase() === 'food');
                     const deliveryFee = o.deliveryCharge !== undefined ? Number(o.deliveryCharge) : (Number(o.totalAmount) < 100 ? 20 : 0);
-                    const trackerBarHtml = (type === 'current') ? getDeliveryTrackerBar(o.status) : '';
+                    
+                    // Call global safe tracker bar function
+                    const trackerBarHtml = (type === 'current') ? window.getDeliveryTrackerBar(o.status) : '';
 
                     container.innerHTML += '<div style="background:#f8fafc; border:1.5px solid ' + (isFood ? '#fdba74' : '#e2e8f0') + '; border-radius:14px; padding:16px; margin-bottom:15px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">' +
                         '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; border-bottom:1px dashed #cbd5e1; padding-bottom:8px;">' +
