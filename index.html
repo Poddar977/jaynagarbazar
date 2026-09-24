@@ -31,11 +31,11 @@
             cursor: pointer; 
             letter-spacing: 0.5px;
             text-transform: uppercase;
-            background: linear-gradient(90deg, #ff007f, #a855f7, #06b6d4, #facc15);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: #ff007f;
+            background: linear-gradient(90deg, #ff007f, #a855f7, #06b6d4, #facc15); 
+            -webkit-background-clip: text; 
+            background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            color: #ff007f; 
         }
 
         .search-container { display: flex; flex: 1; max-width: 550px; }
@@ -44,7 +44,6 @@
 
         .nav-actions { display: flex; gap: 10px; align-items: center; position: relative; }
         
-        /* Reference Style Login Button */
         .btn-header-login {
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: white;
@@ -74,7 +73,7 @@
         /* Support Ticker */
         .sub-header-clock-bar { 
             background: linear-gradient(90deg, #15803d, #ca8a04, #15803d); 
-            background-size: 200% 200%;
+            background-size: 200% 200%; 
             color: #ffffff; 
             padding: 7px 0; 
             font-size: 13px; 
@@ -96,7 +95,7 @@
         }
         @keyframes fastMarquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        /* Mode Switcher: Top of Icons */
+        /* Mode Switcher */
         .mode-switcher-container { 
             display: flex; 
             justify-content: center; 
@@ -124,88 +123,39 @@
         .mode-btn.active { border-color: #16a34a; background: #16a34a; color: white; }
         .mode-btn.food-mode.active { border-color: #ea580c; background: #ea580c; color: white; }
 
-        /* Top Clean Icon Strip */
+        /* Category Icon Strip */
         .clean-icon-bar {
-            background: #ffffff;
-            padding: 12px 3%;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 24px;
-            overflow-x: auto;
-            white-space: nowrap;
-            border-bottom: 1px solid #e2e8f0;
-            scrollbar-width: none;
+            background: #ffffff; 
+            padding: 12px 3%; 
+            display: flex; 
+            justify-content: flex-start; 
+            align-items: center; 
+            gap: 24px; 
+            overflow-x: auto; 
+            white-space: nowrap; 
+            border-bottom: 1px solid #e2e8f0; 
+            scrollbar-width: none; 
         }
         .clean-icon-bar::-webkit-scrollbar { display: none; }
-        .icon-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            gap: 5px;
-            min-width: 60px;
-            color: #475569;
-        }
-        .icon-symbol {
-            font-size: 22px;
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: #f8fafc;
-            border: 1.5px solid #e2e8f0;
-        }
-        .icon-item.active .icon-symbol {
-            background: #dcfce7;
-            border-color: #16a34a;
-            color: #16a34a;
-        }
+        .icon-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; gap: 5px; min-width: 60px; color: #475569; }
+        .icon-symbol { font-size: 22px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #f8fafc; border: 1.5px solid #e2e8f0; }
+        .icon-item.active .icon-symbol { background: #dcfce7; border-color: #16a34a; color: #16a34a; }
         .icon-title { font-size: 11px; font-weight: 700; }
         .icon-item.active .icon-title { color: #16a34a; border-bottom: 2px solid #16a34a; padding-bottom: 2px; }
 
-        /* Fashion Sub-Categories Strip */
+        /* Fashion Sub-Categories */
         .sub-cat-bar { display: none; background: #fefce8; padding: 8px 5%; gap: 8px; overflow-x: auto; border-bottom: 1px dashed #ca8a04; }
         .sub-cat-btn { background: white; border: 1px solid #fde047; color: #854d0e; padding: 5px 14px; border-radius: 15px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .sub-cat-btn.active { background: #ca8a04; color: white; }
 
         /* Multi-Ads Horizontal Row */
         .ads-scroll-section { padding: 15px 4% 5px; overflow: hidden; }
-        .ads-scroll-track {
-            display: flex;
-            gap: 15px;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            scrollbar-width: none;
-            padding-bottom: 5px;
-        }
+        .ads-scroll-track { display: flex; gap: 15px; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; padding-bottom: 5px; }
         .ads-scroll-track::-webkit-scrollbar { display: none; }
-        .ad-card {
-            flex: 0 0 calc(33.333% - 10px);
-            min-width: 290px;
-            height: 155px;
-            border-radius: 12px;
-            overflow: hidden;
-            position: relative;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            background: #000;
-        }
+        .ad-card { flex: 0 0 calc(33.333% - 10px); min-width: 290px; height: 155px; border-radius: 12px; overflow: hidden; position: relative; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #000; }
         @media (max-width: 768px) { .ad-card { flex: 0 0 85%; } }
         .ad-card img, .ad-card video { width: 100%; height: 100%; object-fit: cover; }
-        .ad-tag-pill {
-            position: absolute;
-            bottom: 8px;
-            right: 10px;
-            background: rgba(0,0,0,0.65);
-            color: white;
-            font-size: 9px;
-            font-weight: bold;
-            padding: 2px 6px;
-            border-radius: 3px;
-        }
+        .ad-tag-pill { position: absolute; bottom: 8px; right: 10px; background: rgba(0,0,0,0.65); color: white; font-size: 9px; font-weight: bold; padding: 2px 6px; border-radius: 3px; }
 
         .container { max-width: 1200px; margin: 0 auto; padding: 15px 15px 40px; }
 
@@ -222,7 +172,7 @@
             border: 2px solid #facc15; 
             contain: content; 
             box-shadow: 0 4px 10px rgba(202, 138, 4, 0.08); 
-            transition: transform 0.2s;
+            transition: transform 0.2s; 
         }
         .product-card:hover { transform: translateY(-3px); }
         .card-main-img { width: 100%; height: 160px; object-fit: contain; margin-bottom: 8px; border-radius: 8px; cursor: pointer; background: #ffffff; border: 1px solid #fef08a; }
@@ -230,20 +180,9 @@
         .add-btn-round { background: linear-gradient(135deg, #eab308, #ca8a04); color: white; border: none; padding: 8px 10px; border-radius: 20px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
         .buy-now-round { background: linear-gradient(135deg, #22c55e, #15803d); color: white; border: none; padding: 8px 10px; border-radius: 20px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
 
-        /* LIVE GREEN DISCOUNT PILL */
-        .discount-tag { 
-            color: #15803d; 
-            font-weight: 800; 
-            font-size: 12px; 
-            margin-left: 6px; 
-            background: #bbf7d0; 
-            padding: 2px 6px; 
-            border-radius: 4px; 
-            border: 1px solid #86efac; 
-            display: inline-block;
-        }
+        .discount-tag { color: #15803d; font-weight: 800; font-size: 12px; margin-left: 6px; background: #bbf7d0; padding: 2px 6px; border-radius: 4px; border: 1px solid #86efac; display: inline-block; }
 
-        /* Fast Food Styling */
+        /* Fast Food */
         .restaurant-filter-box { background: white; padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; border-left: 5px solid #ea580c; gap: 10px; }
         .restaurant-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; margin-bottom: 30px; }
         .restaurant-card { background: white; border-radius: 14px; overflow: hidden; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s; }
@@ -267,7 +206,7 @@
         .modal-overlay.active { display: flex; }
         .modal-box { background: white; padding: 25px; border-radius: 16px; width: 92%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; }
         .close-modal { position: absolute; right: 15px; top: 15px; cursor: pointer; font-size: 22px; font-weight: bold; width: 30px; height: 30px; border-radius: 50%; background: #f1f2f6; display: flex; align-items: center; justify-content: center; }
-        .btn-submit { background: #16a34a; color: white; border: none; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; padding: 12px; border-radius: 25px; }
+        .btn-submit { background: #16a34a; color: white; border: none; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; padding: 12px; border-radius: 25px; font-size: 14px; }
 
         .cart-modal { position: fixed; top: 0; right: -420px; width: 360px; height: 100%; background-color: white; box-shadow: -2px 0 10px rgba(0,0,0,0.2); transition: right 0.25s ease; z-index: 200; display: flex; flex-direction: column; }
         .cart-modal.open { right: 0; }
@@ -280,6 +219,8 @@
         .qty-val { min-width: 28px; text-align: center; font-size: 12px; font-weight: bold; }
         .cart-footer { padding: 15px; border-top: 1px solid #eee; background: #fffdf0; }
         .active-shop-pill { background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .terms-container { font-size: 12px; line-height: 1.6; color: #475569; max-height: 60vh; overflow-y: auto; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -291,12 +232,12 @@
             <button class="search-btn-round" onclick="handleSearch()">🔍</button>
         </div>
         <div class="nav-actions">
-            <!-- Dedicated Login Button (Shown when not logged in) -->
+            <!-- Dedicated Login Button -->
             <button class="btn-header-login" id="headerLoginBtn" onclick="openAuthModal()">
                 🔑 Login
             </button>
 
-            <!-- User Profile Icon (Shown when logged in) -->
+            <!-- User Profile Icon (Active when logged in) -->
             <button class="nav-round-btn" id="userAvatarBtn" style="display:none;" onclick="handleUserIconClick()">👤</button>
             <div class="user-menu-dropdown" id="userMenuDropdown">
                 <div style="background:#0f172a; color:white; padding:12px; text-align:center;">
@@ -307,6 +248,7 @@
                     <li onclick="openOrdersTab('current')">🚚 Track Current Orders</li>
                     <li onclick="openOrdersTab('previous')">📜 Delivered Orders History</li>
                     <li onclick="openProfileModal()">✏️ Update Profile</li>
+                    <li onclick="openTermsModal()">📄 Terms & Conditions</li>
                     <li onclick="window.open('https://poddar977.github.io/jaynagarbazar/restaurent.html', '_blank')" style="color:#ea580c; font-weight:bold;">🏪 Partner Login</li>
                     <li onclick="handleLogout()" style="color:#ef4444;">🚪 Logout</li>
                 </ul>
@@ -330,13 +272,13 @@
         </div>
     </div>
 
-    <!-- 1. MODE SWITCHER: Placed at the TOP of Categories and Ads -->
+    <!-- 1. Mode Switcher (Top of Categories) -->
     <div class="mode-switcher-container">
         <button class="mode-btn active" id="btnModeGeneral" onclick="switchAppMode('general')">🛍️ All Products Market</button>
         <button class="mode-btn food-mode" id="btnModeFood" onclick="switchAppMode('food')">🍔 Fast Food & Restaurants</button>
     </div>
 
-    <!-- 2. Clean Category Icon Strip (Directly Below Switcher) -->
+    <!-- 2. Clean Category Icon Strip -->
     <div class="clean-icon-bar" id="categoryIconStrip">
         <div class="icon-item active" onclick="filterCategory('all', this)"><div class="icon-symbol">🛍️</div><span class="icon-title">For You</span></div>
         <div class="icon-item" onclick="filterCategory('fashion', this)"><div class="icon-symbol">👕</div><span class="icon-title">Fashion</span></div>
@@ -356,7 +298,7 @@
         <button class="sub-cat-btn" onclick="filterSubCat('men', this)">👕 Men Wear</button>
     </div>
 
-    <!-- 3. Multi-Ads Horizontal Row (Auto & User Scroll) -->
+    <!-- 3. Multi-Ads Horizontal Row -->
     <div class="ads-scroll-section">
         <div class="ads-scroll-track" id="multiAdsTrack">
             <div class="ad-card"><img src="https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600" alt="Special Deals"><span class="ad-tag-pill">AD</span></div>
@@ -404,26 +346,56 @@
         </section>
     </div>
 
-    <!-- Login & Register Modal -->
+    <!-- Login & Register Modal (Ticked Terms Supported on Both) -->
     <div class="modal-overlay" id="auth-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="closeAuthModal()">&times;</span>
-            <h2 id="authModalTitle">Customer Login</h2>
+            <h2 id="authModalTitle" style="color:#0f172a;">Customer Login</h2>
             <form id="authForm">
+                <!-- Registration Fields -->
                 <div id="signupFields" style="display:none;">
                     <input type="text" id="regName" placeholder="Full Name" style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
                     <input type="tel" id="regPhone" placeholder="Mobile Number (10 Digit)" maxlength="10" style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
                     <input type="text" id="regPincode" placeholder="Pincode (e.g. 847226)" maxlength="6" style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
                     <textarea id="regAddress" placeholder="Full Delivery Address" style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;"></textarea>
                 </div>
+
+                <!-- Credential Fields -->
                 <input type="email" id="authEmail" placeholder="Email Address" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
                 <input type="password" id="authPassword" placeholder="Password (Min 6 Characters)" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
+
+                <!-- Compulsory Terms & Conditions Checkbox (Visible on BOTH Login & Signup) -->
+                <div style="display:flex; align-items:flex-start; gap:8px; margin-top:14px; text-align:left; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
+                    <input type="checkbox" id="termsAgreementCheckbox" style="margin-top:3px; cursor:pointer;" required>
+                    <label for="termsAgreementCheckbox" style="font-size:12px; color:#475569; cursor:pointer;">
+                        Main ksindo ke <a href="javascript:void(0)" onclick="openTermsModal()" style="color:#16a34a; font-weight:bold; text-decoration:underline;">Terms & Conditions</a> se sehmat hoon (Compulsory).
+                    </label>
+                </div>
+
                 <button type="submit" class="btn-submit" id="authSubmitBtn">Login</button>
             </form>
             <p style="text-align:center; margin-top:15px; font-size:13px;">
                 <span id="authToggleText">Naye customer hain? </span>
                 <a href="javascript:void(0)" onclick="toggleAuthMode()" id="authToggleLink" style="color:#16a34a; font-weight:bold;">Naya Account Banayein</a>
             </p>
+        </div>
+    </div>
+
+    <!-- Terms & Conditions Modal -->
+    <div class="modal-overlay" id="terms-overlay">
+        <div class="modal-box" style="max-width:700px;">
+            <span class="close-modal" onclick="closeTermsModal()">&times;</span>
+            <h2 style="color:#0f172a;">ksindo - Terms & Conditions</h2>
+            <div class="terms-container">
+                <p><strong>ksindo</strong> is an online e-commerce and local delivery platform.</p>
+                <h3>1. STRICT NO CANCELLATION</h3>
+                <p>Once placed, orders cannot be cancelled by customer.</p>
+                <h3>2. DELIVERY CHARGES</h3>
+                <p>Below ₹100: ₹20. ₹100 or above: FREE Delivery.</p>
+                <h3>3. DOORSTEP OTP</h3>
+                <p>Delivery boy ke parcel lane par doorstep verification ke liye OTP batana anivarya hai.</p>
+            </div>
+            <button class="btn-submit" onclick="closeTermsModal()" style="margin-top:12px;">I Agree</button>
         </div>
     </div>
 
@@ -503,7 +475,6 @@
             ticker.addEventListener('touchend', function() { ticker.classList.remove('touch-paused'); }, { passive: true });
         }
 
-        // Multi-Ads Auto Scroll Controller
         var adsTrack = document.getElementById('multiAdsTrack');
         var adsAutoScrollTimer = null;
         function startAdsAutoScroll() {
@@ -529,6 +500,8 @@
         window.openProductDetail = function(id) {
             window.location.href = "product.html?id=" + encodeURIComponent(id);
         };
+        window.openTermsModal = function() { document.getElementById('terms-overlay').classList.add('active'); };
+        window.closeTermsModal = function() { document.getElementById('terms-overlay').classList.remove('active'); };
     </script>
 
     <script type="module">
@@ -566,7 +539,6 @@
         if (allProducts.length > 0) renderFilteredProducts();
         if (allShops.length > 0) renderRestaurants();
 
-        // 1. LIVE DISCOUNT BADGE MARKUP GENERATOR
         function getDiscountMarkup(p) {
             let disc = p.discount;
             let orig = p.originalPrice;
@@ -590,7 +562,7 @@
             return '';
         }
 
-        // 2. Realtime Multi-Ads from Firestore
+        // Realtime Multi-Ads from Firestore
         onSnapshot(collection(db, "ads"), (snap) => {
             if (!snap.empty) {
                 const track = document.getElementById('multiAdsTrack');
@@ -608,7 +580,7 @@
             }
         });
 
-        // 3. Realtime Products Sync
+        // Realtime Products Sync
         onSnapshot(collection(db, "products"), (snapshot) => {
             const fresh = [];
             snapshot.forEach(d => fresh.push({ id: d.id, ...d.data() }));
@@ -618,7 +590,7 @@
             else if (selectedShopForMenu) openRestaurantMenu(selectedShopForMenu);
         });
 
-        // 4. Realtime Shops Sync
+        // Realtime Shops Sync
         onSnapshot(collection(db, "shops"), (snapshot) => {
             const freshShops = [];
             snapshot.forEach(d => freshShops.push({ id: d.id, ...d.data() }));
@@ -658,6 +630,85 @@
                 if (loginBtn) loginBtn.style.display = 'flex';
                 if (avatarBtn) avatarBtn.style.display = 'none';
                 document.getElementById('userMenuDropdown').classList.remove('show');
+            }
+        });
+
+        // Toggle Login vs Signup Mode
+        window.toggleAuthMode = () => {
+            isSignupMode = !isSignupMode;
+            const sFields = document.getElementById('signupFields');
+            const titleEl = document.getElementById('authModalTitle');
+            const submitBtn = document.getElementById('authSubmitBtn');
+            const toggleText = document.getElementById('authToggleText');
+            const toggleLink = document.getElementById('authToggleLink');
+
+            if (isSignupMode) {
+                sFields.style.display = 'block';
+                document.getElementById('regName').required = true;
+                document.getElementById('regPhone').required = true;
+                document.getElementById('regPincode').required = true;
+                document.getElementById('regAddress').required = true;
+                titleEl.innerText = "Create ksindo Account";
+                submitBtn.innerText = "Sign Up";
+                toggleText.innerText = "Already registered? ";
+                toggleLink.innerText = "Login here";
+            } else {
+                sFields.style.display = 'none';
+                document.getElementById('regName').required = false;
+                document.getElementById('regPhone').required = false;
+                document.getElementById('regPincode').required = false;
+                document.getElementById('regAddress').required = false;
+                titleEl.innerText = "Customer Login";
+                submitBtn.innerText = "Login";
+                toggleText.innerText = "Naye customer hain? ";
+                toggleLink.innerText = "Naya Account Banayein";
+            }
+        };
+
+        // Complete & Fixed Login / Signup Event
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const termsAccepted = document.getElementById('termsAgreementCheckbox').checked;
+            if (!termsAccepted) {
+                return alert("⚠️ Login / Register karne ke liye Terms & Conditions par tick lagana anivarya hai!");
+            }
+
+            const email = document.getElementById('authEmail').value.trim();
+            const pass = document.getElementById('authPassword').value;
+
+            try {
+                if (isSignupMode) {
+                    const name = document.getElementById('regName').value.trim();
+                    const phone = document.getElementById('regPhone').value.trim();
+                    const pincode = document.getElementById('regPincode').value.trim();
+                    const address = document.getElementById('regAddress').value.trim();
+
+                    if (!name || !phone || !pincode || !address) {
+                        return alert("Kripya sabhi details (Name, Phone, Pincode, Address) bharein!");
+                    }
+
+                    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+                    const pData = { 
+                        uid: cred.user.uid, 
+                        userEmail: email, 
+                        fullName: name, 
+                        phone: phone, 
+                        pincode: pincode, 
+                        address: address, 
+                        createdAt: serverTimestamp() 
+                    };
+
+                    await setDoc(doc(db, "users", cred.user.uid), pData);
+                    currentUserProfile = pData;
+                    localStorage.setItem('user_profile', JSON.stringify(pData));
+                    alert("🎉 Aapka ksindo account safalta-poorvak ban gaya!");
+                } else {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                    alert("✅ Login safal hua!");
+                }
+                closeAuthModal();
+            } catch(err) { 
+                alert("Authentication Error: " + err.message); 
             }
         });
 
@@ -710,7 +761,6 @@
             renderFilteredProducts();
         };
 
-        // ACCURATE PRODUCT CARD RENDERING WITH STRIKETHROUGH ORIGINAL PRICE AND DISCOUNT BADGE
         function renderFilteredProducts() {
             let list = allProducts.filter(p => (p.category || '').toLowerCase() !== 'food' && (!p.categories || !p.categories.includes('food')));
 
@@ -738,7 +788,6 @@
                 const p = list[i];
                 const img = (p.images && p.images.length > 0) ? p.images[0] : (p.imageUrl || 'https://via.placeholder.com/200');
                 
-                // Discount tag & Original Strikethrough Price Calculation
                 const discBadge = getDiscountMarkup(p);
                 const origVal = p.originalPrice || (p.sizes && p.sizes[0]?.originalPrice) || '';
                 const origMarkup = (origVal && Number(origVal) > Number(p.price)) ? '<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:6px;">₹' + origVal + '</span>' : '';
