@@ -4,14 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="72NquAkB-h-rhGmC663QSuZ3Y40bASxjPp0xk2tme2w" />
-    <title>ksindo</title>
+    <title>ksindo - Everything. One Place.</title>
     <link rel="preconnect" href="https://firestore.googleapis.com">
     <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background-color: #f8fafc; color: #333; }
-        
-        header { background-color: #0f172a; color: white; padding: 12px 5%; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        body { background-color: #f1f2f6; color: #1e293b; overflow-x: hidden; }
+
+        header { 
+            background-color: #0f172a; 
+            color: white; 
+            padding: 10px 4%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            gap: 15px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2); 
+        }
         .logo { 
             font-size: 24px; 
             font-weight: 900; 
@@ -25,48 +37,164 @@
             -webkit-text-fill-color: transparent;
             color: #ff007f;
         }
-        .sub-header-clock-bar { background: linear-gradient(90deg, #15803d, #ca8a04, #15803d); color: #ffffff; text-align: center; padding: 6px 10px; font-size: 13px; font-weight: 600; display: flex; justify-content: center; align-items: center; gap: 15px; }
 
-        .mode-switcher-container { display: flex; justify-content: center; background: #ffffff; padding: 10px 5%; gap: 15px; border-bottom: 2px solid #e2e8f0; }
-        .mode-btn { flex: 1; max-width: 320px; padding: 12px 20px; border-radius: 30px; border: 2px solid #e2e8f0; background: #f8fafc; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
-        .mode-btn.active { border-color: #16a34a; background: #16a34a; color: white; }
-        .mode-btn.food-mode.active { border-color: #ea580c; background: #ea580c; color: white; }
-
-        .category-nav-bar { background-color: #ffffff; padding: 10px 5%; display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid #e2e8f0; }
-        .category-btn { background-color: #fef9c3; color: #854d0e; border: 1px solid #fef08a; padding: 7px 18px; border-radius: 25px; font-size: 13px; font-weight: 600; cursor: pointer; }
-        .category-btn.active { background-color: #16a34a; color: white; border-color: #16a34a; }
-
-        .sub-cat-bar { display: none; background: #fefce8; padding: 8px 5%; gap: 8px; overflow-x: auto; border-bottom: 1px dashed #ca8a04; }
-        .sub-cat-btn { background: white; border: 1px solid #fde047; color: #854d0e; padding: 5px 14px; border-radius: 15px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .sub-cat-btn.active { background: #ca8a04; color: white; }
-
-        .search-container { display: flex; width: 32%; }
+        .search-container { display: flex; flex: 1; max-width: 550px; }
         .search-container input { width: 100%; padding: 10px 18px; border: none; outline: none; border-radius: 25px 0 0 25px; font-size: 14px; }
-        .search-btn-round { background: white; border: none; border-radius: 0 25px 25px 0; padding: 0 14px; cursor: pointer; color: #16a34a; font-weight: bold; }
+        .search-btn-round { background: white; border: none; border-radius: 0 25px 25px 0; padding: 0 14px; cursor: pointer; color: #16a34a; font-size: 15px; }
 
         .nav-actions { display: flex; gap: 12px; align-items: center; position: relative; }
-        .nav-round-btn { background-color: #fff; color: #0f172a; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 17px; position: relative; font-weight: bold; }
+        .nav-round-btn { background-color: #fff; color: #0f172a; border: none; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; position: relative; font-weight: bold; }
         .cart-badge { background-color: #ca8a04; color: white; padding: 2px 6px; border-radius: 12px; font-size: 11px; position: absolute; top: -4px; right: -4px; font-weight: bold; }
 
-        .user-menu-dropdown { display: none; position: absolute; top: 48px; right: 0; background: white; min-width: 250px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.2); z-index: 250; overflow: hidden; border: 1px solid #eaeaea; }
+        .user-menu-dropdown { display: none; position: absolute; top: 48px; right: 0; background: white; min-width: 250px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); z-index: 250; overflow: hidden; border: 1px solid #eaeaea; }
         .user-menu-dropdown.show { display: block; }
         .user-menu-list { list-style: none; padding: 6px 0; }
         .user-menu-list li { padding: 10px 16px; font-size: 13px; font-weight: 600; color: #444; cursor: pointer; }
         .user-menu-list li:hover { background-color: #f1f5f9; color: #16a34a; }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px 15px 40px; }
+        /* Support Ticker */
+        .sub-header-clock-bar { 
+            background: linear-gradient(90deg, #15803d, #ca8a04, #15803d); 
+            background-size: 200% 200%;
+            color: #ffffff; 
+            padding: 7px 0; 
+            font-size: 13px; 
+            font-weight: 700; 
+            overflow: hidden; 
+            white-space: nowrap; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        }
+        .marquee-track { 
+            display: inline-block; 
+            white-space: nowrap; 
+            animation: fastMarquee 22s linear infinite; 
+            cursor: pointer; 
+        }
+        .sub-header-clock-bar:hover .marquee-track, 
+        .sub-header-clock-bar:active .marquee-track,
+        .sub-header-clock-bar.touch-paused .marquee-track { 
+            animation-play-state: paused !important; 
+        }
+        @keyframes fastMarquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        .restaurant-filter-box { background: white; padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; border-left: 5px solid #ea580c; gap: 10px; }
-        .restaurant-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; margin-bottom: 30px; }
-        .restaurant-card { background: white; border-radius: 14px; overflow: hidden; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s; }
-        .restaurant-card:hover { transform: translateY(-4px); border-color: #ea580c; box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
-        .restaurant-img { width: 100%; height: 140px; object-fit: cover; background: #e2e8f0; }
-        .restaurant-info { padding: 12px 15px; }
+        /* MODE SWITCHER: Placed on TOP */
+        .mode-switcher-container { 
+            display: flex; 
+            justify-content: center; 
+            background: #ffffff; 
+            padding: 10px 5%; 
+            gap: 15px; 
+            border-bottom: 2px solid #e2e8f0; 
+        }
+        .mode-btn { 
+            flex: 1; 
+            max-width: 320px; 
+            padding: 12px 20px; 
+            border-radius: 30px; 
+            border: 2px solid #e2e8f0; 
+            background: #f8fafc; 
+            font-size: 14px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            transition: 0.2s; 
+        }
+        .mode-btn.active { border-color: #16a34a; background: #16a34a; color: white; }
+        .mode-btn.food-mode.active { border-color: #ea580c; background: #ea580c; color: white; }
 
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
+        /* Top Clean Icon Strip */
+        .clean-icon-bar {
+            background: #ffffff;
+            padding: 12px 3%;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 24px;
+            overflow-x: auto;
+            white-space: nowrap;
+            border-bottom: 1px solid #e2e8f0;
+            scrollbar-width: none;
+        }
+        .clean-icon-bar::-webkit-scrollbar { display: none; }
+        .icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            gap: 5px;
+            min-width: 60px;
+            color: #475569;
+        }
+        .icon-symbol {
+            font-size: 22px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+        }
+        .icon-item.active .icon-symbol {
+            background: #dcfce7;
+            border-color: #16a34a;
+            color: #16a34a;
+        }
+        .icon-title { font-size: 11px; font-weight: 700; }
+        .icon-item.active .icon-title { color: #16a34a; border-bottom: 2px solid #16a34a; padding-bottom: 2px; }
+
+        /* Fashion Sub-Categories Strip */
+        .sub-cat-bar { display: none; background: #fefce8; padding: 8px 5%; gap: 8px; overflow-x: auto; border-bottom: 1px dashed #ca8a04; }
+        .sub-cat-btn { background: white; border: 1px solid #fde047; color: #854d0e; padding: 5px 14px; border-radius: 15px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .sub-cat-btn.active { background: #ca8a04; color: white; }
+
+        /* Multi-Ads Horizontal Row */
+        .ads-scroll-section { padding: 15px 4% 5px; overflow: hidden; }
+        .ads-scroll-track {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            padding-bottom: 5px;
+        }
+        .ads-scroll-track::-webkit-scrollbar { display: none; }
+        .ad-card {
+            flex: 0 0 calc(33.333% - 10px);
+            min-width: 290px;
+            height: 155px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            background: #000;
+        }
+        @media (max-width: 768px) { .ad-card { flex: 0 0 85%; } }
+        .ad-card img, .ad-card video { width: 100%; height: 100%; object-fit: cover; }
+        .ad-tag-pill {
+            position: absolute;
+            bottom: 8px;
+            right: 10px;
+            background: rgba(0,0,0,0.65);
+            color: white;
+            font-size: 9px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 15px 15px 40px; }
+
+        /* Product Cards */
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
         .product-card { 
             background-color: #fffdf0; 
-            border-radius: 12px; 
+            border-radius: 14px; 
             padding: 15px; 
             text-align: center; 
             display: flex; 
@@ -78,36 +206,33 @@
             transition: transform 0.2s;
         }
         .product-card:hover { transform: translateY(-3px); }
-        
         .card-main-img { width: 100%; height: 160px; object-fit: contain; margin-bottom: 8px; border-radius: 8px; cursor: pointer; background: #ffffff; border: 1px solid #fef08a; }
-        .product-title { font-size: 14px; font-weight: 700; height: 38px; overflow: hidden; color: #166534; margin-bottom: 6px; cursor: pointer; }
+        .product-title { font-size: 14px; font-weight: 700; height: 38px; overflow: hidden; color: #166534; margin-bottom: 6px; cursor: pointer; text-decoration: none; line-height: 1.35; }
         .add-btn-round { background: linear-gradient(135deg, #eab308, #ca8a04); color: white; border: none; padding: 8px 10px; border-radius: 20px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
         .buy-now-round { background: linear-gradient(135deg, #22c55e, #15803d); color: white; border: none; padding: 8px 10px; border-radius: 20px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
 
-        .discount-tag { color: #15803d; font-weight: bold; font-size: 12px; margin-left: 6px; background: #bbf7d0; padding: 2px 6px; border-radius: 4px; border: 1px solid #86efac; }
+        /* LIVE GREEN DISCOUNT PILL */
+        .discount-tag { 
+            color: #15803d; 
+            font-weight: 800; 
+            font-size: 12px; 
+            margin-left: 6px; 
+            background: #bbf7d0; 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            border: 1px solid #86efac; 
+            display: inline-block;
+        }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 300; }
-        .modal-overlay.active { display: flex; }
-        .modal-box { background: white; padding: 25px; border-radius: 16px; width: 92%; max-width: 620px; max-height: 90vh; overflow-y: auto; position: relative; }
-        .close-modal { position: absolute; right: 15px; top: 15px; cursor: pointer; font-size: 22px; font-weight: bold; width: 30px; height: 30px; border-radius: 50%; background: #f1f2f6; display: flex; align-items: center; justify-content: center; }
-        .btn-submit { background: #16a34a; color: white; border: none; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; padding: 12px; border-radius: 25px; }
+        /* Fast Food Styling */
+        .restaurant-filter-box { background: white; padding: 15px 20px; border-radius: 12px; margin-bottom: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; border-left: 5px solid #ea580c; gap: 10px; }
+        .restaurant-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; margin-bottom: 30px; }
+        .restaurant-card { background: white; border-radius: 14px; overflow: hidden; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s; }
+        .restaurant-card:hover { transform: translateY(-4px); border-color: #ea580c; box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+        .restaurant-img { width: 100%; height: 140px; object-fit: cover; background: #e2e8f0; }
+        .restaurant-info { padding: 12px 15px; }
 
-        .cart-modal { position: fixed; top: 0; right: -420px; width: 360px; height: 100%; background-color: white; box-shadow: -2px 0 10px rgba(0,0,0,0.2); transition: right 0.25s ease; z-index: 200; display: flex; flex-direction: column; }
-        .cart-modal.open { right: 0; }
-        .cart-header { background-color: #0f172a; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .cart-items { flex: 1; overflow-y: auto; padding: 15px; }
-        .cart-item { display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #eee; padding: 12px 0; }
-        .cart-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
-        
-        .qty-controls { display: inline-flex; align-items: center; border: 1px solid #facc15; border-radius: 20px; background: #fefce8; overflow: hidden; margin-top: 5px; }
-        .qty-btn { background: #fef08a; border: none; width: 26px; height: 26px; cursor: pointer; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; color: #854d0e; }
-        .qty-val { min-width: 28px; text-align: center; font-size: 12px; font-weight: bold; }
-        .cart-footer { padding: 15px; border-top: 1px solid #eee; background: #fffdf0; }
-
-        .terms-container { font-size: 12px; line-height: 1.6; color: #475569; max-height: 60vh; overflow-y: auto; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; margin-top: 10px; }
-        .terms-container h3 { color: #0f172a; margin-top: 10px; font-size: 13px; }
-        .active-shop-pill { background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-
+        /* Tracker Steps */
         .tracker-steps { display: flex; justify-content: space-between; position: relative; margin: 15px 0 10px; }
         .tracker-steps::before { content: ''; position: absolute; top: 12px; left: 15px; right: 15px; height: 3px; background: #e2e8f0; z-index: 1; }
         .step-point { position: relative; z-index: 2; text-align: center; display: flex; flex-direction: column; align-items: center; }
@@ -117,6 +242,25 @@
         .step-label { font-size: 10px; color: #64748b; font-weight: 600; }
         .step-point.active .step-label { color: #16a34a; font-weight: bold; }
         .step-point.completed .step-label { color: #15803d; }
+
+        /* Modals & Cart Drawer */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 300; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: white; padding: 25px; border-radius: 16px; width: 92%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; }
+        .close-modal { position: absolute; right: 15px; top: 15px; cursor: pointer; font-size: 22px; font-weight: bold; width: 30px; height: 30px; border-radius: 50%; background: #f1f2f6; display: flex; align-items: center; justify-content: center; }
+        .btn-submit { background: #16a34a; color: white; border: none; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; padding: 12px; border-radius: 25px; }
+
+        .cart-modal { position: fixed; top: 0; right: -420px; width: 360px; height: 100%; background-color: white; box-shadow: -2px 0 10px rgba(0,0,0,0.2); transition: right 0.25s ease; z-index: 200; display: flex; flex-direction: column; }
+        .cart-modal.open { right: 0; }
+        .cart-header { background-color: #0f172a; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .cart-items { flex: 1; overflow-y: auto; padding: 15px; }
+        .cart-item { display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #eee; padding: 12px 0; }
+        .cart-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
+        .qty-controls { display: inline-flex; align-items: center; border: 1px solid #facc15; border-radius: 20px; background: #fefce8; overflow: hidden; margin-top: 5px; }
+        .qty-btn { background: #fef08a; border: none; width: 26px; height: 26px; cursor: pointer; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; color: #854d0e; }
+        .qty-val { min-width: 28px; text-align: center; font-size: 12px; font-weight: bold; }
+        .cart-footer { padding: 15px; border-top: 1px solid #eee; background: #fffdf0; }
+        .active-shop-pill { background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
@@ -124,7 +268,7 @@
     <header>
         <div class="logo" onclick="switchAppMode('general')">ksindo</div>
         <div class="search-container">
-            <input type="text" id="search-input" placeholder="Search item, dish or category..." onkeyup="handleSearch()">
+            <input type="text" id="search-input" placeholder="Search products, dishes, brands..." onkeyup="handleSearch()">
             <button class="search-btn-round" onclick="handleSearch()">🔍</button>
         </div>
         <div class="nav-actions">
@@ -135,13 +279,10 @@
                     <small id="userMenuEmail"></small>
                 </div>
                 <ul class="user-menu-list">
-                    <li onclick="openOrdersTab('current')">🚚 Track Current Orders & Status</li>
+                    <li onclick="openOrdersTab('current')">🚚 Track Current Orders</li>
                     <li onclick="openOrdersTab('previous')">📜 Delivered Orders History</li>
                     <li onclick="openProfileModal()">✏️ Update Profile</li>
-                    <li onclick="openTermsModal()">📄 Terms & Conditions</li>
-                    <li onclick="window.open('https://poddar977.github.io/jaynagarbazar/restaurent.html', '_blank')" style="color:#ea580c; font-weight:bold; border-top:1px dashed #cbd5e1;">
-                        🏪 Seller
-                    </li>
+                    <li onclick="window.open('https://poddar977.github.io/jaynagarbazar/restaurent.html', '_blank')" style="color:#ea580c; font-weight:bold;">🏪 Partner Login</li>
                     <li onclick="handleLogout()" style="color:#ef4444;">🚪 Logout</li>
                 </ul>
             </div>
@@ -151,28 +292,36 @@
         </div>
     </header>
 
-    <div class="sub-header-clock-bar">
-        <span id="liveClockDate">📅 Date: Loading...</span>
-        <span>|</span>
-        <span id="liveClockTime">⏰ Time: Loading...</span>
+    <!-- Support Ticker with Live Date, Time & Touch/Hover Pause -->
+    <div class="sub-header-clock-bar" id="supportTickerBar">
+        <div class="marquee-track" id="marqueeTrack">
+            <span id="liveClockDate">📅 Date</span> &nbsp;|&nbsp; 
+            <span id="liveClockTime">⏰ Time</span> &nbsp;&nbsp;&nbsp;&nbsp;
+            <span>📞 <strong>Customer Support Helpline:</strong> 8252731656 , 06246451082 (24x7 Order & Delivery Support)</span> &nbsp;&nbsp;&nbsp;&nbsp;
+            <span>⚡ Welcome to <strong>ksindo Super App</strong> - Fast Doorstep Delivery!</span> &nbsp;&nbsp;&nbsp;&nbsp;
+            <span>📞 <strong>Call Us:</strong> 8252731656 , 06246451082</span>
+        </div>
     </div>
 
-    <!-- Mode Switcher -->
+    <!-- 1. MODE SWITCHER: Placed at the TOP of Categories and Ads -->
     <div class="mode-switcher-container">
         <button class="mode-btn active" id="btnModeGeneral" onclick="switchAppMode('general')">🛍️ All Products Market</button>
         <button class="mode-btn food-mode" id="btnModeFood" onclick="switchAppMode('food')">🍔 Fast Food & Restaurants</button>
     </div>
 
-    <!-- Categories Bar -->
-    <div class="category-nav-bar" id="generalCatNav">
-        <button class="category-btn active" onclick="filterCategory('all', this)">🛍️ All Market Items</button>
-        <button class="category-btn" onclick="filterCategory('fashion', this)">👗 Fashion</button>
-        <button class="category-btn" onclick="filterCategory('beauty', this)">💄 Beauty</button>
-        <button class="category-btn" onclick="filterCategory('grocery', this)">🛒 Grocery</button>
-        <button class="category-btn" onclick="filterCategory('gift', this)">🎁 Gifts</button>
+    <!-- 2. Clean Category Icon Strip (Directly Below Switcher) -->
+    <div class="clean-icon-bar" id="categoryIconStrip">
+        <div class="icon-item active" onclick="filterCategory('all', this)"><div class="icon-symbol">🛍️</div><span class="icon-title">For You</span></div>
+        <div class="icon-item" onclick="filterCategory('fashion', this)"><div class="icon-symbol">👕</div><span class="icon-title">Fashion</span></div>
+        <div class="icon-item" onclick="filterCategory('beauty', this)"><div class="icon-symbol">💄</div><span class="icon-title">Beauty</span></div>
+        <div class="icon-item" onclick="filterCategory('grocery', this)"><div class="icon-symbol">🛒</div><span class="icon-title">Grocery</span></div>
+        <div class="icon-item" onclick="filterCategory('gift', this)"><div class="icon-symbol">🎁</div><span class="icon-title">Gifts</span></div>
+        <div class="icon-item" onclick="filterCategory('mobiles', this)"><div class="icon-symbol">📱</div><span class="icon-title">Mobiles</span></div>
+        <div class="icon-item" onclick="filterCategory('electronics', this)"><div class="icon-symbol">💻</div><span class="icon-title">Electronics</span></div>
+        <div class="icon-item" onclick="filterCategory('home', this)"><div class="icon-symbol">🏠</div><span class="icon-title">Home</span></div>
     </div>
 
-    <!-- Fashion Sub-Categories Bar -->
+    <!-- Fashion Sub-Categories Strip -->
     <div class="sub-cat-bar" id="fashionSubCatBar">
         <button class="sub-cat-btn active" onclick="filterSubCat('all', this)">All Fashion</button>
         <button class="sub-cat-btn" onclick="filterSubCat('lingerie', this)">👙 Lingerie & Innerwear</button>
@@ -180,16 +329,21 @@
         <button class="sub-cat-btn" onclick="filterSubCat('men', this)">👕 Men Wear</button>
     </div>
 
+    <!-- 3. Multi-Ads Horizontal Row (Auto & User Scroll) -->
+    <div class="ads-scroll-section">
+        <div class="ads-scroll-track" id="multiAdsTrack">
+            <div class="ad-card"><img src="https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600" alt="Special Deals"><span class="ad-tag-pill">AD</span></div>
+            <div class="ad-card"><img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600" alt="Super Sale"><span class="ad-tag-pill">AD</span></div>
+            <div class="ad-card"><img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600" alt="Tech Deals"><span class="ad-tag-pill">AD</span></div>
+        </div>
+    </div>
+
     <div class="container">
         <!-- GENERAL MARKET VIEW -->
         <section id="sectionGeneralStore">
-            <!-- Sunday Personalized Feed Placeholder -->
             <div id="sundayRecommendationFeed"></div>
-
             <h2 style="font-size:18px; margin-bottom:15px; color:#15803d; font-weight:800;" id="marketViewTitle">Featured Products</h2>
-            <div class="product-grid" id="generalProductGrid"></div>
-
-            <!-- Monday to Saturday Bottom Feed Placeholder -->
+            <div class="product-grid" id="generalProductGrid">Loading products...</div>
             <div id="weekdayBottomFeed"></div>
         </section>
 
@@ -223,28 +377,20 @@
         </section>
     </div>
 
-    <!-- Modals -->
+    <!-- Login Modal -->
     <div class="modal-overlay" id="auth-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="closeAuthModal()">&times;</span>
-            <h2 id="authModalTitle">ksindo Customer Login</h2>
+            <h2 id="authModalTitle">Customer Login</h2>
             <form id="authForm">
                 <div id="signupFields" style="display:none;">
                     <input type="text" id="regName" placeholder="Full Name" style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
                     <input type="tel" id="regPhone" placeholder="Mobile Number (10 Digit)" maxlength="10" style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
                     <input type="text" id="regPincode" placeholder="Pincode (e.g. 847226)" maxlength="6" style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
                     <textarea id="regAddress" placeholder="Full Delivery Address" style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;"></textarea>
-                    
-                    <div style="display:flex; align-items:flex-start; gap:8px; margin-top:12px; text-align:left;">
-                        <input type="checkbox" id="termsAgreementCheckbox" style="margin-top:3px; cursor:pointer;" required>
-                        <label for="termsAgreementCheckbox" style="font-size:12px; color:#475569; cursor:pointer;">
-                            Main ksindo ke <a href="javascript:void(0)" onclick="openTermsModal()" style="color:#16a34a; font-weight:bold; text-decoration:underline;">Terms & Conditions</a> se sehmat hoon (Compulsory).
-                        </label>
-                    </div>
                 </div>
-
                 <input type="email" id="authEmail" placeholder="Email Address" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
-                <input type="password" id="authPassword" placeholder="Password (Min 6 Characters)" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
+                <input type="password" id="authPassword" placeholder="Password" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
                 <button type="submit" class="btn-submit" id="authSubmitBtn">Login</button>
             </form>
             <p style="text-align:center; margin-top:15px; font-size:13px;">
@@ -254,24 +400,9 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="terms-overlay">
-        <div class="modal-box" style="max-width:700px;">
-            <span class="close-modal" onclick="closeTermsModal()">&times;</span>
-            <h2 style="color:#0f172a;">ksindo - Terms & Conditions</h2>
-            <div class="terms-container">
-                <p><strong>ksindo</strong> is an online e-commerce and local delivery platform.</p>
-                <h3>1. STRICT NO CANCELLATION</h3>
-                <p>Once placed, orders cannot be cancelled by customer.</p>
-                <h3>2. DELIVERY CHARGES</h3>
-                <p>Below ₹100: ₹20. ₹100 or above: FREE Delivery.</p>
-            </div>
-            <button class="btn-submit" onclick="closeTermsModal()" style="margin-top:12px;">I Agree</button>
-        </div>
-    </div>
-
-    <!-- Delivery Tracking Modal with Product Images & Status Timeline -->
+    <!-- Delivery Tracking Modal -->
     <div class="modal-overlay" id="orders-modal-overlay">
-        <div class="modal-box" style="max-width: 650px;">
+        <div class="modal-box">
             <span class="close-modal" onclick="closeOrdersModal()">&times;</span>
             <h2 id="ordersModalTitle">🚚 Live Delivery Tracking & Status</h2>
             <div id="ordersListContainer" style="margin-top:15px;">Loading...</div>
@@ -292,21 +423,23 @@
         </div>
     </div>
 
+    <!-- Cart Drawer -->
     <div class="cart-modal" id="cart-modal">
         <div class="cart-header" id="cartHeaderEl">
             <h3>ksindo Shopping Cart</h3>
             <span class="close-modal" style="position:static;" onclick="toggleCart()">&times;</span>
         </div>
         <div style="padding: 10px 15px 0;" id="cartNoticeBox"></div>
-        <div class="cart-items" id="cart-items"><p>Cart khali hai.</p></div>
+        <div class="cart-items" id="cart-items"><p style="text-align:center; padding:20px;">Cart khali hai.</p></div>
         <div class="cart-footer">
             <div style="font-size:13px; margin-bottom:5px;">Subtotal: ₹<span id="cart-subtotal">0</span></div>
             <div style="font-size:13px; margin-bottom:5px; color:#c2410c; font-weight:bold;">Delivery Charge: ₹<span id="delivery-charge">0</span></div>
             <h4>Total: ₹<span id="cart-total">0</span></h4>
-            <button class="btn-submit" onclick="openCheckoutModal()" style="background:#16a34a;">PLACE ORDER</button>
+            <button class="btn-submit" onclick="openCheckoutModal()">PLACE ORDER</button>
         </div>
     </div>
 
+    <!-- Checkout Modal -->
     <div class="modal-overlay" id="checkout-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
@@ -318,30 +451,57 @@
                 <textarea id="custAddress" placeholder="Delivery Address" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;"></textarea>
                 
                 <div style="margin-top:15px; padding:14px; background:#f0fdf4; border:1px dashed #16a34a; border-radius:8px; text-align:center;">
-                    <span style="font-size:18px;">💵 / 📲</span>
                     <h4 style="color:#16a34a; margin:4px 0;">Cash on Delivery / Doorstep UPI</h4>
-                    <p style="font-size:12px; color:#64748b;">Parcel lene par cash dein ya delivery boy ke QR par pay karein.</p>
+                    <p style="font-size:12px; color:#64748b;">Delivery partner ke doorstep aane par OTP screen par live show hoga.</p>
                 </div>
-                <button type="submit" class="btn-submit" style="background:#16a34a;">Confirm Order</button>
+                <button type="submit" class="btn-submit">Confirm Order</button>
             </form>
         </div>
     </div>
 
     <script>
         function updateLiveClock() {
-            const dateEl = document.getElementById('liveClockDate');
-            const timeEl = document.getElementById('liveClockTime');
-            if (!dateEl || !timeEl) return;
-            const now = new Date();
-            dateEl.innerText = `📅 Date: ${now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}`;
-            timeEl.innerText = `⏰ Time: ${now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}`;
+            var now = new Date();
+            var d = document.getElementById('liveClockDate');
+            var t = document.getElementById('liveClockTime');
+            if (d) d.innerText = "📅 Date: " + now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+            if (t) t.innerText = "⏰ Time: " + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
         }
         setInterval(updateLiveClock, 1000);
         updateLiveClock();
 
-        window.openProductDetail = (id) => window.open(`product.html?id=${id}`, '_blank');
-        window.openTermsModal = () => document.getElementById('terms-overlay').classList.add('active');
-        window.closeTermsModal = () => document.getElementById('terms-overlay').classList.remove('active');
+        var ticker = document.getElementById('supportTickerBar');
+        if (ticker) {
+            ticker.addEventListener('touchstart', function() { ticker.classList.add('touch-paused'); }, { passive: true });
+            ticker.addEventListener('touchend', function() { ticker.classList.remove('touch-paused'); }, { passive: true });
+        }
+
+        // Multi-Ads Auto Scroll Controller
+        var adsTrack = document.getElementById('multiAdsTrack');
+        var adsAutoScrollTimer = null;
+        function startAdsAutoScroll() {
+            if (!adsTrack) return;
+            adsAutoScrollTimer = setInterval(function() {
+                var maxScroll = adsTrack.scrollWidth - adsTrack.clientWidth;
+                if (adsTrack.scrollLeft >= maxScroll - 10) {
+                    adsTrack.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    adsTrack.scrollBy({ left: 300, behavior: 'smooth' });
+                }
+            }, 4000);
+        }
+        startAdsAutoScroll();
+
+        if (adsTrack) {
+            adsTrack.addEventListener('mouseenter', function() { clearInterval(adsAutoScrollTimer); });
+            adsTrack.addEventListener('mouseleave', startAdsAutoScroll);
+            adsTrack.addEventListener('touchstart', function() { clearInterval(adsAutoScrollTimer); }, { passive: true });
+            adsTrack.addEventListener('touchend', startAdsAutoScroll, { passive: true });
+        }
+
+        window.openProductDetail = function(id) {
+            window.location.href = "product.html?id=" + encodeURIComponent(id);
+        };
     </script>
 
     <script type="module">
@@ -376,308 +536,52 @@
         let selectedShopForMenu = null;
 
         updateCartUI();
-
         if (allProducts.length > 0) renderFilteredProducts();
         if (allShops.length > 0) renderRestaurants();
 
+        // 1. LIVE DISCOUNT BADGE MARKUP GENERATOR
         function getDiscountMarkup(p) {
             let disc = p.discount;
-            if (!disc && p.originalPrice && Number(p.originalPrice) > Number(p.price)) {
-                const perc = Math.round(((Number(p.originalPrice) - Number(p.price)) / Number(p.originalPrice)) * 100);
-                if (perc > 0) disc = `${perc}% OFF`;
+            let orig = p.originalPrice;
+
+            if (!orig && p.sizes && p.sizes.length > 0 && p.sizes[0].originalPrice) {
+                orig = p.sizes[0].originalPrice;
+                disc = p.sizes[0].discount || disc;
             }
-            return disc ? `<span class="discount-tag">${disc}</span>` : '';
+
+            const curPrice = Number(p.price);
+            const originalNum = Number(orig);
+
+            if (!disc && originalNum && originalNum > curPrice && curPrice > 0) {
+                const perc = Math.round(((originalNum - curPrice) / originalNum) * 100);
+                if (perc > 0) disc = perc + "% OFF";
+            }
+
+            if (disc) {
+                return '<span class="discount-tag">' + disc + '</span>';
+            }
+            return '';
         }
 
-        window.switchAppMode = function(mode) {
-            currentMode = mode;
-            const btnGen = document.getElementById('btnModeGeneral');
-            const btnFood = document.getElementById('btnModeFood');
-            const secGen = document.getElementById('sectionGeneralStore');
-            const secFood = document.getElementById('sectionFoodStore');
-            const genNav = document.getElementById('generalCatNav');
-            const subBar = document.getElementById('fashionSubCatBar');
-
-            if (mode === 'general') {
-                btnGen.classList.add('active');
-                btnFood.classList.remove('active');
-                secGen.style.display = 'block';
-                secFood.style.display = 'none';
-                genNav.style.display = 'flex';
-                if (activeCategory === 'fashion') subBar.style.display = 'flex';
-                renderFilteredProducts();
-            } else {
-                btnFood.classList.add('active');
-                btnGen.classList.remove('active');
-                secGen.style.display = 'none';
-                secFood.style.display = 'block';
-                genNav.style.display = 'none';
-                subBar.style.display = 'none';
-                backToRestaurantList();
-                renderRestaurants();
-            }
-        };
-
-        if (localStorage.getItem('open_checkout_direct') === 'true') {
-            localStorage.removeItem('open_checkout_direct');
-            setTimeout(() => { openCheckoutModal(); }, 100);
-        }
-
-        if (currentUserProfile) {
-            const userAvatarBtn = document.getElementById('userAvatarBtn');
-            userAvatarBtn.innerText = (currentUserProfile.fullName || 'U').charAt(0).toUpperCase();
-            document.getElementById('userMenuName').innerText = currentUserProfile.fullName || "Customer";
-            document.getElementById('userMenuEmail').innerText = currentUserProfile.userEmail || "";
-            if (currentUserProfile.pincode) {
-                document.getElementById('foodPincodeFilter').value = currentUserProfile.pincode;
-            }
-        }
-
-        onAuthStateChanged(auth, async (user) => {
-            currentUser = user;
-            if (user) {
-                if (!currentUserProfile) {
-                    try {
-                        const userDoc = await getDoc(doc(db, "users", user.uid));
-                        if (userDoc.exists()) {
-                            currentUserProfile = userDoc.data();
-                            localStorage.setItem('user_profile', JSON.stringify(currentUserProfile));
-                            document.getElementById('userAvatarBtn').innerText = (currentUserProfile.fullName || user.email).charAt(0).toUpperCase();
-                            document.getElementById('userMenuName').innerText = currentUserProfile.fullName;
-                            document.getElementById('userMenuEmail').innerText = user.email;
-                        }
-                    } catch(e) {}
-                }
-            }
-        });
-
-        window.handleUserIconClick = () => {
-            if (!currentUser && !currentUserProfile) openAuthModal();
-            else document.getElementById('userMenuDropdown').classList.toggle('show');
-        };
-
-        document.addEventListener('click', (e) => {
-            const dropdown = document.getElementById('userMenuDropdown');
-            const avatarBtn = document.getElementById('userAvatarBtn');
-            if (dropdown && avatarBtn && !avatarBtn.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.classList.remove('show');
-            }
-        });
-
-        window.openAuthModal = () => document.getElementById('auth-overlay').classList.add('active');
-        window.closeAuthModal = () => document.getElementById('auth-overlay').classList.remove('active');
-
-        window.toggleAuthMode = () => {
-            isSignupMode = !isSignupMode;
-            document.getElementById('signupFields').style.display = isSignupMode ? 'block' : 'none';
-            document.getElementById('authModalTitle').innerText = isSignupMode ? "Create Account" : "Customer Login";
-            document.getElementById('authSubmitBtn').innerText = isSignupMode ? "Sign Up" : "Login";
-            document.getElementById('authToggleText').innerText = isSignupMode ? "Already registered? " : "Naye customer hain? ";
-            document.getElementById('authToggleLink').innerText = isSignupMode ? "Login here" : "Naya Account Banayein";
-        };
-
-        document.getElementById('authForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('authEmail').value.trim();
-            const pass = document.getElementById('authPassword').value;
-
-            try {
-                if (isSignupMode) {
-                    const termsAccepted = document.getElementById('termsAgreementCheckbox').checked;
-                    if (!termsAccepted) return alert("⚠️ Terms accept karein!");
-
-                    const name = document.getElementById('regName').value.trim();
-                    const phone = document.getElementById('regPhone').value.trim();
-                    const pincode = document.getElementById('regPincode').value.trim();
-                    const address = document.getElementById('regAddress').value.trim();
-
-                    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-                    const pData = { uid: cred.user.uid, userEmail: email, fullName: name, phone, pincode, address, createdAt: new Date().toISOString() };
-                    await setDoc(doc(db, "users", cred.user.uid), pData);
-                    currentUserProfile = pData;
-                    localStorage.setItem('user_profile', JSON.stringify(pData));
-                    alert("✅ Account ban gaya!");
-                } else {
-                    await signInWithEmailAndPassword(auth, email, pass);
-                    alert("✅ Login successful!");
-                }
-                closeAuthModal();
-            } catch(err) { alert("Auth error: " + err.message); }
-        });
-
-        window.handleLogout = () => {
-            if (confirm("Logout?")) {
-                localStorage.removeItem('user_profile');
-                signOut(auth).then(() => location.reload());
-            }
-        };
-
-        window.openProfileModal = function() {
-            document.getElementById('userMenuDropdown').classList.remove('show');
-            const prof = currentUserProfile || {};
-            if (!currentUser && !currentUserProfile) return alert("Pehle login karein!");
-            document.getElementById('profName').value = prof.fullName || '';
-            document.getElementById('profPhone').value = prof.phone || '';
-            document.getElementById('profAddress').value = prof.address || '';
-            document.getElementById('profPincode').value = prof.pincode || '';
-            document.getElementById('profile-overlay').classList.add('active');
-        };
-        window.closeProfileModal = () => document.getElementById('profile-overlay').classList.remove('active');
-
-        document.getElementById('profileUpdateForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('profName').value.trim();
-            const phone = document.getElementById('profPhone').value.trim();
-            const address = document.getElementById('profAddress').value.trim();
-            const pincode = document.getElementById('profPincode').value.trim();
-
-            try {
-                const uid = currentUser ? currentUser.uid : (currentUserProfile?.uid || 'guest');
-                const updated = { uid, userEmail: currentUser?.email || currentUserProfile?.userEmail || '', fullName: name, phone, address, pincode };
-                if (currentUser) {
-                    await setDoc(doc(db, "users", currentUser.uid), updated, { merge: true });
-                }
-                currentUserProfile = updated;
-                localStorage.setItem('user_profile', JSON.stringify(updated));
-                alert("✅ Profile updated!");
-                closeProfileModal();
-            } catch(err) { alert("Error: " + err.message); }
-        });
-
-        function getDeliveryTrackerBar(status) {
-            const st = (status || 'Placed').toLowerCase();
-            let p1 = 'completed', p2 = '', p3 = '', p4 = '';
-
-            if (st === 'confirmed' || st === 'preparing') {
-                p1 = 'completed'; p2 = 'active';
-            } else if (st === 'assigned' || st === 'food ready' || st === 'out for delivery') {
-                p1 = 'completed'; p2 = 'completed'; p3 = 'active';
-            } else if (st === 'delivered') {
-                p1 = 'completed'; p2 = 'completed'; p3 = 'completed'; p4 = 'completed';
-            }
-
-            return `
-                <div class="tracker-steps">
-                    <div class="step-point ${p1}">
-                        <div class="step-dot">✓</div>
-                        <span class="step-label">Placed</span>
-                    </div>
-                    <div class="step-point ${p2}">
-                        <div class="step-dot">${p2==='active'?'●':'2'}</div>
-                        <span class="step-label">Confirmed</span>
-                    </div>
-                    <div class="step-point ${p3}">
-                        <div class="step-dot">${p3==='active'?'●':'3'}</div>
-                        <span class="step-label">Out for Delivery</span>
-                    </div>
-                    <div class="step-point ${p4}">
-                        <div class="step-dot">${p4==='completed'?'✓':'4'}</div>
-                        <span class="step-label">Delivered</span>
-                    </div>
-                </div>
-            `;
-        }
-
-        window.openOrdersTab = async function(type) {
-            document.getElementById('userMenuDropdown').classList.remove('show');
-            const email = currentUser?.email || currentUserProfile?.userEmail;
-            if (!email) return alert("Pehle login karein!");
-
-            const modal = document.getElementById('orders-modal-overlay');
-            const container = document.getElementById('ordersListContainer');
-            document.getElementById('ordersModalTitle').innerText = (type === 'current') ? "🚚 Live Delivery Tracking & Status" : "📜 Delivered Orders History";
-            container.innerHTML = 'Orders load ho rahe hain...';
-            modal.classList.add('active');
-
-            try {
-                const q = query(collection(db, "orders"), where("userEmail", "==", email));
-                const snap = await getDocs(q);
-                if (snap.empty) { container.innerHTML = '<p style="text-align:center; padding:20px;">Koi order nahi mila.</p>'; return; }
-
-                let list = [];
-                snap.forEach(d => list.push({ id: d.id, ...d.data() }));
-                list.sort((a, b) => (b.orderDate?.seconds || 0) - (a.orderDate?.seconds || 0));
-
-                let filtered = list.filter(o => {
-                    const st = (o.status || '').toLowerCase();
-                    return (type === 'current') ? (st !== 'delivered' && st !== 'cancelled') : (st === 'delivered');
+        // 2. Realtime Multi-Ads from Firestore
+        onSnapshot(collection(db, "ads"), (snap) => {
+            if (!snap.empty) {
+                const track = document.getElementById('multiAdsTrack');
+                let html = '';
+                snap.forEach(d => {
+                    const ad = d.data();
+                    const targetAttr = ad.targetUrl ? 'onclick="window.location.href=\'' + ad.targetUrl + '\'"' : '';
+                    if (ad.type === 'video') {
+                        html += '<div class="ad-card" ' + targetAttr + '><video src="' + ad.mediaUrl + '" autoplay muted playsinline loop></video><span class="ad-tag-pill">AD</span></div>';
+                    } else {
+                        html += '<div class="ad-card" ' + targetAttr + '><img src="' + ad.mediaUrl + '" alt="Offer"><span class="ad-tag-pill">AD</span></div>';
+                    }
                 });
+                track.innerHTML = html;
+            }
+        });
 
-                if (filtered.length === 0) {
-                    container.innerHTML = `<p style="text-align:center; padding:20px;">Koi ${type === 'current' ? 'active live' : 'delivered'} order nahi hai.</p>`;
-                    return;
-                }
-
-                container.innerHTML = '';
-                filtered.forEach(o => {
-                    const itemsMarkup = (o.items || []).map(i => {
-                        const itemImg = (i.images && i.images.length > 0) ? i.images[0] : (i.imageUrl || 'https://via.placeholder.com/60');
-                        return `
-                            <div style="display:flex; align-items:center; gap:12px; background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:10px; margin-bottom:8px;">
-                                <img src="${itemImg}" style="width:58px; height:58px; object-fit:contain; border-radius:8px; background:#f8fafc; border:1px solid #cbd5e1;" loading="lazy">
-                                <div style="flex:1;">
-                                    <strong style="font-size:14px; color:#0f172a; display:block;">${i.name}</strong>
-                                    <div style="color:#64748b; font-size:12px; margin-top:3px;">
-                                        Qty: <strong>${i.qty || 1}</strong> | Rate: ₹${i.price}
-                                        ${i.selectedSize ? `<span style="background:#fce7f3; color:#be185d; padding:1px 6px; border-radius:4px; margin-left:6px; font-weight:bold;">Size: ${i.selectedSize}</span>` : ''}
-                                    </div>
-                                </div>
-                                <strong style="font-size:14px; color:#16a34a;">₹${Number(i.price) * (i.qty || 1)}</strong>
-                            </div>
-                        `;
-                    }).join('');
-
-                    const isFood = (o.items || []).some(i => (i.category || '').toLowerCase() === 'food');
-                    const deliveryFee = o.deliveryCharge !== undefined ? Number(o.deliveryCharge) : (Number(o.totalAmount) < 100 ? 20 : 0);
-                    const trackerBarHtml = (type === 'current') ? getDeliveryTrackerBar(o.status) : '';
-
-                    container.innerHTML += `
-                        <div style="background:#f8fafc; border:1.5px solid ${isFood ? '#fdba74' : '#e2e8f0'}; border-radius:14px; padding:16px; margin-bottom:15px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
-                            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; border-bottom:1px dashed #cbd5e1; padding-bottom:8px;">
-                                <div>
-                                    <strong style="font-size:13px; color:#0f172a;">📅 Order Time: ${o.orderDateFormatted || 'Just now'}</strong><br>
-                                    ${o.assignedShopName ? `<small style="color:#ea580c; font-weight:bold; font-size:12px;">🏪 Seller: ${o.assignedShopName}</small><br>` : ''}
-                                    <small style="color:#64748b; font-size:11px;">📍 Deliver To: ${o.customerAddress || 'Local'}</small>
-                                </div>
-                                <span style="background:${o.status === 'Delivered' ? '#dcfce7' : (o.status === 'Confirmed' ? '#dbeafe' : '#ffedd5')}; color:${o.status === 'Delivered' ? '#15803d' : (o.status === 'Confirmed' ? '#1d4ed8' : '#c2410c')}; padding:4px 12px; border-radius:14px; font-size:11px; font-weight:bold; text-transform:uppercase;">
-                                    ${o.status || 'Placed'}
-                                </span>
-                            </div>
-
-                            ${trackerBarHtml}
-
-                            <div style="margin: 12px 0 8px;">
-                                <div style="font-size:11px; font-weight:bold; color:#475569; margin-bottom:6px; text-transform:uppercase;">Ordered Products:</div>
-                                ${itemsMarkup}
-                            </div>
-
-                            <div style="font-size:12px; color:#64748b; display:flex; justify-content:space-between; margin-bottom:4px;">
-                                <span>Item Subtotal:</span>
-                                <span>₹${o.subtotal || (Number(o.totalAmount) - deliveryFee)}</span>
-                            </div>
-
-                            <div style="font-size:12px; color:#64748b; display:flex; justify-content:space-between; margin-bottom:6px;">
-                                <span>Delivery Charge:</span>
-                                <span style="font-weight:bold; color:${deliveryFee > 0 ? '#ea580c' : '#16a34a'};">${deliveryFee > 0 ? `+ ₹${deliveryFee}` : 'FREE (₹0)'}</span>
-                            </div>
-
-                            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #cbd5e1; padding-top:10px; margin-top:4px;">
-                                <div>
-                                    <strong style="font-size:15px; color:#0f172a;">Final Amount: ₹${o.totalAmount}</strong><br>
-                                    <small style="color:#64748b; font-size:11px;">Payment Mode: <strong>${o.paymentMethod || 'COD'}</strong></small>
-                                </div>
-                                <div style="font-size:13px; background:#f0fdf4; border:1.5px solid #86efac; color:#166534; padding:5px 12px; border-radius:8px; font-weight:bold; text-align:right;">
-                                    🔑 OTP: ${o.deliveryOtp || 'N/A'}<br>
-                                    <small style="font-size:9px; color:#15803d; font-weight:normal;">Share only at delivery</small>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch(e) { container.innerHTML = 'Error loading orders: ' + e.message; }
-        };
-        window.closeOrdersModal = () => document.getElementById('orders-modal-overlay').classList.remove('active');
-
+        // 3. Realtime Products Sync
         onSnapshot(collection(db, "products"), (snapshot) => {
             const fresh = [];
             snapshot.forEach(d => fresh.push({ id: d.id, ...d.data() }));
@@ -687,6 +591,7 @@
             else if (selectedShopForMenu) openRestaurantMenu(selectedShopForMenu);
         });
 
+        // 4. Realtime Shops Sync
         onSnapshot(collection(db, "shops"), (snapshot) => {
             const freshShops = [];
             snapshot.forEach(d => freshShops.push({ id: d.id, ...d.data() }));
@@ -695,9 +600,49 @@
             if (currentMode === 'food') renderRestaurants();
         });
 
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            if (user && !currentUserProfile) {
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        currentUserProfile = userDoc.data();
+                        localStorage.setItem('user_profile', JSON.stringify(currentUserProfile));
+                        document.getElementById('userMenuName').innerText = currentUserProfile.fullName || "Customer";
+                    }
+                } catch(e) {}
+            }
+        });
+
+        window.switchAppMode = function(mode) {
+            currentMode = mode;
+            const btnGen = document.getElementById('btnModeGeneral');
+            const btnFood = document.getElementById('btnModeFood');
+            const secGen = document.getElementById('sectionGeneralStore');
+            const secFood = document.getElementById('sectionFoodStore');
+            const subBar = document.getElementById('fashionSubCatBar');
+
+            if (mode === 'general') {
+                btnGen.classList.add('active');
+                btnFood.classList.remove('active');
+                secGen.style.display = 'block';
+                secFood.style.display = 'none';
+                if (activeCategory === 'fashion') subBar.style.display = 'flex';
+                renderFilteredProducts();
+            } else {
+                btnFood.classList.add('active');
+                btnGen.classList.remove('active');
+                secGen.style.display = 'none';
+                secFood.style.display = 'block';
+                subBar.style.display = 'none';
+                backToRestaurantList();
+                renderRestaurants();
+            }
+        };
+
         window.filterCategory = function(cat, el) {
-            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
+            document.querySelectorAll('.icon-item').forEach(b => b.classList.remove('active'));
+            if (el) el.classList.add('active');
             activeCategory = cat;
             activeSubCategory = 'all';
 
@@ -718,73 +663,7 @@
             renderFilteredProducts();
         };
 
-        function handleSmartRecommendationFeed() {
-            const sundayContainer = document.getElementById('sundayRecommendationFeed');
-            const weekdayContainer = document.getElementById('weekdayBottomFeed');
-            if (!sundayContainer || !weekdayContainer) return;
-
-            const today = new Date().getDay();
-            const history = JSON.parse(localStorage.getItem('user_category_history')) || {};
-
-            let favoriteCat = null;
-            let highestViews = 0;
-            for (const [cat, count] of Object.entries(history)) {
-                if (count >= 2 && count > highestViews) {
-                    highestViews = count;
-                    favoriteCat = cat;
-                }
-            }
-
-            if (!favoriteCat) {
-                sundayContainer.innerHTML = '';
-                weekdayContainer.innerHTML = '';
-                return;
-            }
-
-            const matchedProducts = allProducts.filter(p => {
-                if (p.categories && Array.isArray(p.categories)) return p.categories.includes(favoriteCat);
-                return (p.category || '').toLowerCase() === favoriteCat;
-            }).slice(0, 4);
-
-            if (matchedProducts.length === 0) return;
-
-            const feedCardsHtml = matchedProducts.map(p => {
-                const img = (p.images && p.images.length > 0) ? p.images[0] : (p.imageUrl || 'https://via.placeholder.com/200');
-                const discBadge = getDiscountMarkup(p);
-                return `
-                    <div class="product-card" onclick="openProductDetail('${p.id}')">
-                        <img src="${img}" class="card-main-img" loading="lazy">
-                        <div class="product-title">${p.name}</div>
-                        <div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">
-                            <span style="font-size:16px; font-weight:800; color:#15803d;">₹${p.price}</span>
-                            ${discBadge}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            if (today === 0) {
-                sundayContainer.innerHTML = `
-                    <div style="background:linear-gradient(135deg, #fefce8, #fef08a); border:2px solid #ca8a04; border-radius:14px; padding:15px; margin-bottom:25px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                            <h3 style="color:#854d0e; font-size:16px; font-weight:800;">✨ Sunday Picked For You (${favoriteCat.toUpperCase()})</h3>
-                            <span style="font-size:11px; background:#ca8a04; color:white; padding:3px 8px; border-radius:10px; font-weight:bold;">Special Recommendation</span>
-                        </div>
-                        <div class="product-grid">${feedCardsHtml}</div>
-                    </div>
-                `;
-                weekdayContainer.innerHTML = '';
-            } else {
-                sundayContainer.innerHTML = '';
-                weekdayContainer.innerHTML = `
-                    <div style="margin-top:35px; border-top:2px dashed #ca8a04; padding-top:20px;">
-                        <h3 style="font-size:15px; color:#15803d; font-weight:800; margin-bottom:12px;">Recommended Based on Your Interest</h3>
-                        <div class="product-grid">${feedCardsHtml}</div>
-                    </div>
-                `;
-            }
-        }
-
+        // ACCURATE PRODUCT CARD RENDERING WITH STRIKETHROUGH ORIGINAL PRICE AND DISCOUNT BADGE
         function renderFilteredProducts() {
             let list = allProducts.filter(p => (p.category || '').toLowerCase() !== 'food' && (!p.categories || !p.categories.includes('food')));
 
@@ -811,26 +690,27 @@
             for (let i = 0; i < list.length; i++) {
                 const p = list[i];
                 const img = (p.images && p.images.length > 0) ? p.images[0] : (p.imageUrl || 'https://via.placeholder.com/200');
+                
+                // Discount tag & Original Strikethrough Price Calculation
                 const discBadge = getDiscountMarkup(p);
+                const origVal = p.originalPrice || (p.sizes && p.sizes[0]?.originalPrice) || '';
+                const origMarkup = (origVal && Number(origVal) > Number(p.price)) ? '<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:6px;">₹' + origVal + '</span>' : '';
 
-                htmlBuffer += `
-                    <div class="product-card">
-                        <img src="${img}" class="card-main-img" loading="lazy" alt="${p.name}" onclick="openProductDetail('${p.id}')">
-                        <div class="product-title" onclick="openProductDetail('${p.id}')">${p.name}</div>
-                        <div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">
-                            <span style="font-size:18px; font-weight:900; color:#15803d;">₹${p.price}</span>
-                            ${p.originalPrice ? `<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:6px;">₹${p.originalPrice}</span>` : ''}
-                            ${discBadge}
-                        </div>
-                        <div style="display:flex; gap:6px;">
-                            <button class="add-btn-round" onclick="addToCart('${p.id}')">🛒 Add</button>
-                            <button class="buy-now-round" onclick="buyNow('${p.id}')">⚡ Buy</button>
-                        </div>
-                    </div>
-                `;
+                htmlBuffer += '<div class="product-card">' +
+                    '<img src="' + img + '" class="card-main-img" loading="lazy" alt="' + p.name + '" onclick="openProductDetail(\'' + p.id + '\')">' +
+                    '<div class="product-title" onclick="openProductDetail(\'' + p.id + '\')">' + p.name + '</div>' +
+                    '<div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">' +
+                        '<span style="font-size:18px; font-weight:900; color:#15803d;">₹' + p.price + '</span>' +
+                        origMarkup +
+                        discBadge +
+                    '</div>' +
+                    '<div style="display:flex; gap:6px;">' +
+                        '<button class="add-btn-round" onclick="addToCart(\'' + p.id + '\')">🛒 Add</button>' +
+                        '<button class="buy-now-round" onclick="buyNow(\'' + p.id + '\')">⚡ Buy</button>' +
+                    '</div>' +
+                '</div>';
             }
             grid.innerHTML = htmlBuffer;
-            handleSmartRecommendationFeed();
         }
 
         function renderRestaurants() {
@@ -844,7 +724,7 @@
             }
 
             if (list.length === 0) {
-                container.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:25px; color:#64748b;">Pincode "${pin}" me koi live restaurant nahi mila.</p>`;
+                container.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:25px; color:#64748b;">Pincode "' + pin + '" me koi live restaurant nahi mila.</p>';
                 return;
             }
 
@@ -854,19 +734,17 @@
                 const dishCount = allProducts.filter(p => (p.category || '').toLowerCase() === 'food' && (p.shopName === shop.shopName || p.shopId === shop.id)).length;
                 const shopBanner = shop.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500';
 
-                html += `
-                    <div class="restaurant-card" onclick="openRestaurantMenu('${shop.id}')">
-                        <img src="${shopBanner}" class="restaurant-img" loading="lazy" alt="${shop.shopName}">
-                        <div class="restaurant-info">
-                            <h3 style="font-size:16px; margin-bottom:3px;">${shop.shopName}</h3>
-                            <p style="font-size:12px; color:#64748b;">📍 ${shop.address || 'Market'} (PIN: ${shop.pincode || 'Local'})</p>
-                            <div style="display:flex; justify-content:space-between; margin-top:8px;">
-                                <span style="font-size:11px; background:#ffedd5; color:#c2410c; padding:2px 8px; border-radius:10px; font-weight:bold;">${dishCount} Dishes</span>
-                                <span style="color:#ea580c; font-weight:bold; font-size:12px;">View Menu →</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                html += '<div class="restaurant-card" onclick="openRestaurantMenu(\'' + shop.id + '\')">' +
+                    '<img src="' + shopBanner + '" class="restaurant-img" loading="lazy" alt="' + shop.shopName + '">' +
+                    '<div class="restaurant-info">' +
+                        '<h3 style="font-size:16px; margin-bottom:3px;">' + shop.shopName + '</h3>' +
+                        '<p style="font-size:12px; color:#64748b;">📍 ' + (shop.address || 'Market') + ' (PIN: ' + (shop.pincode || 'Local') + ')</p>' +
+                        '<div style="display:flex; justify-content:space-between; margin-top:8px;">' +
+                            '<span style="font-size:11px; background:#ffedd5; color:#c2410c; padding:2px 8px; border-radius:10px; font-weight:bold;">' + dishCount + ' Dishes</span>' +
+                            '<span style="color:#ea580c; font-weight:bold; font-size:12px;">View Menu →</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
             }
             container.innerHTML = html;
         }
@@ -879,8 +757,8 @@
 
             document.getElementById('restaurantDirectoryView').style.display = 'none';
             document.getElementById('restaurantMenuView').style.display = 'block';
-            document.getElementById('menuShopTitle').innerText = `🍴 ${shop.shopName} Menu`;
-            document.getElementById('menuShopPincode').innerText = `PIN: ${shop.pincode || 'Local'}`;
+            document.getElementById('menuShopTitle').innerText = '🍴 ' + shop.shopName + ' Menu';
+            document.getElementById('menuShopPincode').innerText = 'PIN: ' + (shop.pincode || 'Local');
 
             const grid = document.getElementById('foodDishesGrid');
             const shopDishes = allProducts.filter(p => (p.category || '').toLowerCase() === 'food' && (p.shopName === shop.shopName || p.shopId === shop.id));
@@ -895,22 +773,22 @@
                 const dish = shopDishes[i];
                 const img = (dish.images && dish.images.length > 0) ? dish.images[0] : (dish.imageUrl || 'https://via.placeholder.com/200');
                 const discBadge = getDiscountMarkup(dish);
+                const origVal = dish.originalPrice || '';
+                const origMarkup = (origVal && Number(origVal) > Number(dish.price)) ? '<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:6px;">₹' + origVal + '</span>' : '';
 
-                html += `
-                    <div class="product-card" style="border:1px solid #fed7aa; background:#fffaf0;">
-                        <img src="${img}" class="card-main-img" loading="lazy" alt="${dish.name}" onclick="openProductDetail('${dish.id}')">
-                        <div class="product-title" style="color:#ea580c;" onclick="openProductDetail('${dish.id}')">${dish.name}</div>
-                        <div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">
-                            <span style="font-size:16px; font-weight:800; color:#15803d;">₹${dish.price}</span>
-                            ${dish.originalPrice ? `<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:6px;">₹${dish.originalPrice}</span>` : ''}
-                            ${discBadge}
-                        </div>
-                        <div style="display:flex; gap:6px;">
-                            <button class="add-btn-round" style="background:#ea580c;" onclick="addFoodToCart('${dish.id}', '${shop.id}', '${shop.shopName}')">🛒 Add</button>
-                            <button class="buy-now-round" onclick="buyFoodNow('${dish.id}', '${shop.id}', '${shop.shopName}')">⚡ Order</button>
-                        </div>
-                    </div>
-                `;
+                html += '<div class="product-card" style="border:1px solid #fed7aa; background:#fffaf0;">' +
+                    '<img src="' + img + '" class="card-main-img" loading="lazy" alt="' + dish.name + '" onclick="openProductDetail(\'' + dish.id + '\')">' +
+                    '<div class="product-title" style="color:#ea580c;" onclick="openProductDetail(\'' + dish.id + '\')">' + dish.name + '</div>' +
+                    '<div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">' +
+                        '<span style="font-size:16px; font-weight:800; color:#15803d;">₹' + dish.price + '</span>' +
+                        origMarkup +
+                        discBadge +
+                    '</div>' +
+                    '<div style="display:flex; gap:6px;">' +
+                        '<button class="add-btn-round" style="background:#ea580c;" onclick="addFoodToCart(\'' + dish.id + '\', \'' + shop.id + '\', \'' + shop.shopName + '\')">🛒 Add</button>' +
+                        '<button class="buy-now-round" onclick="buyFoodNow(\'' + dish.id + '\', \'' + shop.id + '\', \'' + shop.shopName + '\')">⚡ Order</button>' +
+                    '</div>' +
+                '</div>';
             }
             grid.innerHTML = html;
         };
@@ -959,7 +837,7 @@
 
             const existingFood = cart.find(i => (i.category || '').toLowerCase() === 'food' && i.assignedShopId);
             if (existingFood && existingFood.assignedShopId !== shopId) {
-                if (!confirm(`Pehle se "${existingFood.assignedShopName}" ka order hai. Replace karein?`)) return;
+                if (!confirm('Pehle se "' + existingFood.assignedShopName + '" ka order hai. Replace karein?')) return;
                 cart = [];
             }
 
@@ -1003,12 +881,10 @@
 
             const foodItem = cart.find(i => (i.category || '').toLowerCase() === 'food' && i.assignedShopId);
             if (foodItem) {
-                noticeBox.innerHTML = `
-                    <div class="active-shop-pill">
-                        <span>🏪 Restaurant: <strong>${foodItem.assignedShopName || 'Kitchen'}</strong></span>
-                        <small style="color:#b45309; font-size:10px;">(Single Shop)</small>
-                    </div>
-                `;
+                noticeBox.innerHTML = '<div class="active-shop-pill">' +
+                    '<span>🏪 Restaurant: <strong>' + (foodItem.assignedShopName || 'Kitchen') + '</strong></span>' +
+                    '<small style="color:#b45309; font-size:10px;">(Single Shop)</small>' +
+                '</div>';
             } else {
                 noticeBox.innerHTML = '';
             }
@@ -1030,22 +906,20 @@
                 subtotal += itemTotal;
                 const displayImg = (item.images && item.images.length > 0) ? item.images[0] : (item.imageUrl || 'https://via.placeholder.com/50');
                 
-                container.innerHTML += `
-                    <div class="cart-item">
-                        <img src="${displayImg}" loading="lazy" alt="">
-                        <div style="flex:1;">
-                            <strong style="font-size:13px; color:#166534;">${item.name}</strong><br>
-                            <small style="color:#64748b;">₹${item.price}</small><br>
-                            <div class="qty-controls">
-                                <button type="button" class="qty-btn" onclick="changeCartQty(${i}, -1)">−</button>
-                                <span class="qty-val">${itemQty}</span>
-                                <button type="button" class="qty-btn" onclick="changeCartQty(${i}, 1)">+</button>
-                            </div>
-                            <span style="font-size:12px; font-weight:bold; margin-left:8px; color:#15803d;">= ₹${itemTotal}</span>
-                        </div>
-                        <button onclick="removeFromCart(${i})" style="background:none; border:none; color:red; font-size:16px; font-weight:bold; cursor:pointer;">✕</button>
-                    </div>
-                `;
+                container.innerHTML += '<div class="cart-item">' +
+                    '<img src="' + displayImg + '" loading="lazy" alt="">' +
+                    '<div style="flex:1;">' +
+                        '<strong style="font-size:13px; color:#166534;">' + item.name + '</strong><br>' +
+                        '<small style="color:#64748b;">₹' + item.price + '</small><br>' +
+                        '<div class="qty-controls">' +
+                            '<button type="button" class="qty-btn" onclick="changeCartQty(' + i + ', -1)">−</button>' +
+                            '<span class="qty-val">' + itemQty + '</span>' +
+                            '<button type="button" class="qty-btn" onclick="changeCartQty(' + i + ', 1)">+</button>' +
+                        '</div>' +
+                        '<span style="font-size:12px; font-weight:bold; margin-left:8px; color:#15803d;">= ₹' + itemTotal + '</span>' +
+                    '</div>' +
+                    '<button onclick="removeFromCart(' + i + ')" style="background:none; border:none; color:red; font-size:16px; font-weight:bold; cursor:pointer;">✕</button>' +
+                '</div>';
             }
 
             let del = (subtotal > 0 && subtotal < 100) ? 20 : 0;
@@ -1117,14 +991,14 @@
                     orderDateFormatted: formattedDate
                 });
 
-                alert(`🎉 Order Confirm ho gaya!\n\nOTP: ${deliveryOtp}\nPayment: COD / UPI`);
+                alert('🎉 Order Confirm ho gaya!\n\nOTP: ' + deliveryOtp + '\nPayment: COD / UPI');
                 cart = [];
                 saveCart();
                 closeCheckoutModal();
                 toggleCart();
 
-                const itemsText = cart.map(i => `- ${i.name} (x${i.qty||1})`).join('%0A');
-                window.open(`https://wa.me/${deliveryBoyWhatsAppNumber}?text=🚚 *Naya Order (ksindo)*%0AClient: ${encodeURIComponent(name)}%0APhone: ${phone}%0APIN: ${pincode}%0AItems: ${itemsText}%0ASubtotal: ₹${subtotalVal}%0ADelivery Charge: ₹${deliveryChargeVal}%0ATotal: ₹${totalAmount}%0AOTP: ${deliveryOtp}`, '_blank');
+                const itemsText = cart.map(i => '- ' + i.name + ' (x' + (i.qty || 1) + ')').join('%0A');
+                window.open('https://wa.me/' + deliveryBoyWhatsAppNumber + '?text=' + encodeURIComponent('🚚 *Naya Order (ksindo)*\nClient: ' + name + '\nPhone: ' + phone + '\nPIN: ' + pincode + '\nTotal: ₹' + totalAmount + '\nOTP: ' + deliveryOtp), '_blank');
             } catch(err) { alert("Error: " + err.message); }
         });
 
@@ -1145,27 +1019,135 @@
                 list.forEach((p) => {
                     const img = (p.images && p.images.length > 0) ? p.images[0] : (p.imageUrl || 'https://via.placeholder.com/200');
                     const discBadge = getDiscountMarkup(p);
-                    html += `
-                        <div class="product-card">
-                            <img src="${img}" class="card-main-img" loading="lazy" alt="${p.name}" onclick="openProductDetail('${p.id}')">
-                            <div class="product-title" onclick="openProductDetail('${p.id}')">${p.name}</div>
-                            <div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">
-                                <span style="font-size:18px; font-weight:900; color:#15803d;">₹${p.price}</span>
-                                ${p.originalPrice ? `<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:6px;">₹${p.originalPrice}</span>` : ''}
-                                ${discBadge}
-                            </div>
-                            <div style="display:flex; gap:6px;">
-                                <button class="add-btn-round" onclick="addToCart('${p.id}')">🛒 Add</button>
-                                <button class="buy-now-round" onclick="buyNow('${p.id}')">⚡ Buy</button>
-                            </div>
-                        </div>
-                    `;
+                    const origVal = p.originalPrice || '';
+                    const origMarkup = (origVal && Number(origVal) > Number(p.price)) ? '<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:6px;">₹' + origVal + '</span>' : '';
+
+                    html += '<div class="product-card">' +
+                        '<img src="' + img + '" class="card-main-img" loading="lazy" alt="' + p.name + '" onclick="openProductDetail(\'' + p.id + '\')">' +
+                        '<div class="product-title" onclick="openProductDetail(\'' + p.id + '\')">${p.name}</div>' +
+                        '<div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">' +
+                            '<span style="font-size:18px; font-weight:900; color:#15803d;">₹' + p.price + '</span>' +
+                            origMarkup +
+                            discBadge +
+                        '</div>' +
+                        '<div style="display:flex; gap:6px;">' +
+                            '<button class="add-btn-round" onclick="addToCart(\'' + p.id + '\')">🛒 Add</button>' +
+                            '<button class="buy-now-round" onclick="buyNow(\'' + p.id + '\')">⚡ Buy</button>' +
+                        '</div>' +
+                    '</div>';
                 });
                 grid.innerHTML = html;
             } else {
                 renderRestaurants();
             }
         };
+
+        window.openOrdersTab = async function(type) {
+            document.getElementById('userMenuDropdown').classList.remove('show');
+            const email = currentUser?.email || currentUserProfile?.userEmail;
+            if (!email) return alert("Pehle login karein!");
+
+            const modal = document.getElementById('orders-modal-overlay');
+            const container = document.getElementById('ordersListContainer');
+            document.getElementById('ordersModalTitle').innerText = (type === 'current') ? "🚚 Live Delivery Tracking & Status" : "📜 Delivered Orders History";
+            container.innerHTML = 'Orders load ho rahe hain...';
+            modal.classList.add('active');
+
+            try {
+                const q = query(collection(db, "orders"), where("userEmail", "==", email));
+                const snap = await getDocs(q);
+                if (snap.empty) { container.innerHTML = '<p style="text-align:center; padding:20px;">Koi order nahi mila.</p>'; return; }
+
+                let list = [];
+                snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+                list.sort((a, b) => (b.orderDate?.seconds || 0) - (a.orderDate?.seconds || 0));
+
+                let filtered = list.filter(o => {
+                    const st = (o.status || '').toLowerCase();
+                    return (type === 'current') ? (st !== 'delivered' && st !== 'cancelled') : (st === 'delivered');
+                });
+
+                if (filtered.length === 0) {
+                    container.innerHTML = '<p style="text-align:center; padding:20px;">Koi ' + (type === 'current' ? 'active live' : 'delivered') + ' order nahi hai.</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                filtered.forEach(o => {
+                    const itemsMarkup = (o.items || []).map(i => {
+                        const itemImg = (i.images && i.images.length > 0) ? i.images[0] : (i.imageUrl || 'https://via.placeholder.com/60');
+                        return '<div style="display:flex; align-items:center; gap:12px; background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:10px; margin-bottom:8px;">' +
+                            '<img src="' + itemImg + '" style="width:58px; height:58px; object-fit:contain; border-radius:8px; background:#f8fafc; border:1px solid #cbd5e1;" loading="lazy">' +
+                            '<div style="flex:1;">' +
+                                '<strong style="font-size:14px; color:#0f172a; display:block;">' + i.name + '</strong>' +
+                                '<div style="color:#64748b; font-size:12px; margin-top:3px;">' +
+                                    'Qty: <strong>' + (i.qty || 1) + '</strong> | Rate: ₹' + i.price +
+                                    (i.selectedSize ? '<span style="background:#fce7f3; color:#be185d; padding:1px 6px; border-radius:4px; margin-left:6px; font-weight:bold;">Size: ' + i.selectedSize + '</span>' : '') +
+                                '</div>' +
+                            '</div>' +
+                            '<strong style="font-size:14px; color:#16a34a;">₹' + (Number(i.price) * (i.qty || 1)) + '</strong>' +
+                        '</div>';
+                    }).join('');
+
+                    const isFood = (o.items || []).some(i => (i.category || '').toLowerCase() === 'food');
+                    const deliveryFee = o.deliveryCharge !== undefined ? Number(o.deliveryCharge) : (Number(o.totalAmount) < 100 ? 20 : 0);
+                    const trackerBarHtml = (type === 'current') ? getDeliveryTrackerBar(o.status) : '';
+
+                    container.innerHTML += '<div style="background:#f8fafc; border:1.5px solid ' + (isFood ? '#fdba74' : '#e2e8f0') + '; border-radius:14px; padding:16px; margin-bottom:15px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">' +
+                        '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; border-bottom:1px dashed #cbd5e1; padding-bottom:8px;">' +
+                            '<div>' +
+                                '<strong style="font-size:13px; color:#0f172a;">📅 Order Time: ' + (o.orderDateFormatted || 'Just now') + '</strong><br>' +
+                                (o.assignedShopName ? '<small style="color:#ea580c; font-weight:bold; font-size:12px;">🏪 Seller: ' + o.assignedShopName + '</small><br>' : '') +
+                                '<small style="color:#64748b; font-size:11px;">📍 Deliver To: ' + (o.customerAddress || 'Local') + '</small>' +
+                            '</div>' +
+                            '<span style="background:' + (o.status === 'Delivered' ? '#dcfce7' : (o.status === 'Confirmed' ? '#dbeafe' : '#ffedd5')) + '; color:' + (o.status === 'Delivered' ? '#15803d' : (o.status === 'Confirmed' ? '#1d4ed8' : '#c2410c')) + '; padding:4px 12px; border-radius:14px; font-size:11px; font-weight:bold; text-transform:uppercase;">' +
+                                (o.status || 'Placed') +
+                            '</span>' +
+                        '</div>' +
+                        trackerBarHtml +
+                        '<div style="margin: 12px 0 8px;">' +
+                            '<div style="font-size:11px; font-weight:bold; color:#475569; margin-bottom:6px; text-transform:uppercase;">Ordered Products:</div>' +
+                            itemsMarkup +
+                        '</div>' +
+                        '<div style="font-size:12px; color:#64748b; display:flex; justify-content:space-between; margin-bottom:4px;">' +
+                            '<span>Item Subtotal:</span>' +
+                            '<span>₹' + (o.subtotal || (Number(o.totalAmount) - deliveryFee)) + '</span>' +
+                        '</div>' +
+                        '<div style="font-size:12px; color:#64748b; display:flex; justify-content:space-between; margin-bottom:6px;">' +
+                            '<span>Delivery Charge:</span>' +
+                            '<span style="font-weight:bold; color:' + (deliveryFee > 0 ? '#ea580c' : '#16a34a') + ';">' + (deliveryFee > 0 ? ('+ ₹' + deliveryFee) : 'FREE (₹0)') + '</span>' +
+                        '</div>' +
+                        '<div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #cbd5e1; padding-top:10px; margin-top:4px;">' +
+                            '<div>' +
+                                '<strong style="font-size:15px; color:#0f172a;">Final Amount: ₹' + o.totalAmount + '</strong><br>' +
+                                '<small style="color:#64748b; font-size:11px;">Payment Mode: <strong>' + (o.paymentMethod || 'COD') + '</strong></small>' +
+                            '</div>' +
+                            '<div style="font-size:13px; background:#f0fdf4; border:1.5px solid #86efac; color:#166534; padding:5px 12px; border-radius:8px; font-weight:bold; text-align:right;">' +
+                                '🔑 OTP: ' + (o.deliveryOtp || 'N/A') + '<br>' +
+                                '<small style="font-size:9px; color:#15803d; font-weight:normal;">Share only at delivery</small>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+                });
+            } catch(e) { container.innerHTML = 'Error loading orders: ' + e.message; }
+        };
+
+        window.closeOrdersModal = () => document.getElementById('orders-modal-overlay').classList.remove('active');
+        window.handleUserIconClick = () => document.getElementById('userMenuDropdown').classList.toggle('show');
+        window.handleLogout = () => { if(confirm("Logout?")) signOut(auth).then(() => location.reload()); };
+        window.openAuthModal = () => document.getElementById('auth-overlay').classList.add('active');
+        window.closeAuthModal = () => document.getElementById('auth-overlay').classList.remove('active');
+        window.openProfileModal = function() {
+            document.getElementById('userMenuDropdown').classList.remove('show');
+            const prof = currentUserProfile || {};
+            if (!currentUser && !currentUserProfile) return alert("Pehle login karein!");
+            document.getElementById('profName').value = prof.fullName || '';
+            document.getElementById('profPhone').value = prof.phone || '';
+            document.getElementById('profAddress').value = prof.address || '';
+            document.getElementById('profPincode').value = prof.pincode || '';
+            document.getElementById('profile-overlay').classList.add('active');
+        };
+        window.closeProfileModal = () => document.getElementById('profile-overlay').classList.remove('active');
     </script>
 </body>
 </html>
