@@ -34,7 +34,6 @@
         input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; }
         .btn-primary { background: #ea580c; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-print { background: #0284c7; color: white; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
-        .btn-print:hover { background: #0369a1; }
         .btn-kitchen { background: #f97316; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
 
         .preview-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
@@ -68,7 +67,7 @@
         <div class="logo">🍳 <span id="sidebarShopName">Kitchen</span></div>
         <nav>
             <a onclick="showTab('tab-live', this)" class="active">🔥 Live Kitchen Queue</a>
-            <a onclick="showTab('tab-hisab', this)">💰 Today Collection (No History)</a>
+            <a onclick="showTab('tab-hisab', this)">💰 Today & Monthly Hisab</a>
             <a onclick="showTab('tab-profile-photo', this)">🖼️ Restaurant Photo</a>
             <a onclick="showTab('tab-add-product', this)">➕ Add Food Item</a>
             <a onclick="showTab('tab-menu', this)">📋 My Food Menu</a>
@@ -81,16 +80,16 @@
     <main>
         <header>
             <h2 id="topBarShopTitle">ksindo Restaurant Panel</h2>
-            <span id="liveClock" style="font-size: 13px; font-weight: 600; color: #64748b;">Clock...</span>
+            <span id="liveClock" style="font-size: 13px; font-weight: 600; color: #64748b;">Loading...</span>
         </header>
 
         <div class="content-body">
             <div class="stats-grid">
                 <div class="stat-card"><h3>Today Collection</h3><div class="val" id="statTodayCollection" style="color:#16a34a;">₹0</div></div>
-                <div class="stat-card"><h3>Delivered Today</h3><div class="val" id="statDeliveredToday" style="color:#2563eb;">0</div></div>
-                <div class="stat-card"><h3>Cancelled Today</h3><div class="val" id="statCancelledToday" style="color:#dc2626;">0</div></div>
-                <div class="stat-card"><h3>Today UPI</h3><div class="val" id="statTodayUpi" style="color:#7c3aed;">₹0</div></div>
-                <div class="stat-card"><h3>Today Cash</h3><div class="val" id="statTodayCash" style="color:#d97706;">₹0</div></div>
+                <div class="stat-card"><h3>Monthly Collection</h3><div class="val" id="statMonthCollection" style="color:#0284c7;">₹0</div></div>
+                <div class="stat-card"><h3>Monthly Delivered</h3><div class="val" id="statMonthDelivered" style="color:#2563eb;">0</div></div>
+                <div class="stat-card"><h3>Month UPI</h3><div class="val" id="statMonthUpi" style="color:#7c3aed;">₹0</div></div>
+                <div class="stat-card"><h3>Month Cash</h3><div class="val" id="statMonthCash" style="color:#d97706;">₹0</div></div>
             </div>
 
             <!-- Tab 1: Live Kitchen Queue -->
@@ -98,7 +97,7 @@
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                         <h2>🔥 Live Active Orders</h2>
-                        <small style="color:#ea580c; font-weight:bold;">💡 Bill Print karte hi Customer ko "Order Confirmed" notify hoga</small>
+                        <small style="color:#ea580c; font-weight:bold;">💡 Bill Print karte hi Customer ko "Order Confirmed" update hoga</small>
                     </div>
                     <table>
                         <thead>
@@ -117,10 +116,18 @@
                 </div>
             </section>
 
-            <!-- Tab 2: Today Hisab Only -->
+            <!-- Tab 2: Today & Monthly Hisab -->
             <section id="tab-hisab" class="tab-section">
                 <div class="card">
-                    <h2>💰 Today Order Hisab & Cash / UPI Breakdown</h2>
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+                        <div>
+                            <h2>💰 Monthly Statement & Order Hisab</h2>
+                            <p style="font-size:12px; color:#64748b; margin-top:2px;">Month: <strong id="currentMonthNameText">-</strong></p>
+                        </div>
+                        <button class="btn-primary" onclick="printMonthlyStatementAndClearOld()" style="background:#16a34a;">
+                            🖨️ Print Monthly Statement & Clear Old Records
+                        </button>
+                    </div>
                     <table>
                         <thead><tr><th>Time</th><th>Customer</th><th>Dishes</th><th>Payment Mode</th><th>Amount (₹)</th><th>Status</th></tr></thead>
                         <tbody id="todayHisabTableBody"></tbody>
@@ -128,32 +135,27 @@
                 </div>
             </section>
 
-            <!-- Tab 3: Update Restaurant Profile/Banner Photo -->
+            <!-- Tab 3: Update Restaurant Profile Photo -->
             <section id="tab-profile-photo" class="tab-section">
                 <div class="card" style="max-width: 600px;">
                     <h2>🖼️ Restaurant Profile Photo Update Karein</h2>
-                    <p style="font-size:12px; color:#64748b; margin:6px 0 15px;">Yeh photo customer ko store ke restaurant list page par dikhegi.</p>
-                    
-                    <div style="text-align:center; margin-bottom:15px;">
+                    <div style="text-align:center; margin:15px 0;">
                         <img id="currentShopPhotoPreview" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500" alt="Restaurant Banner" style="width:100%; max-height:220px; object-fit:cover; border-radius:10px; border:2px solid #fed7aa;">
                     </div>
-
                     <form id="updateShopPhotoForm">
-                        <label style="font-size:12px; font-weight:bold;">Option 1: Image URL Link Dalein:</label>
+                        <label style="font-size:12px; font-weight:bold;">Option 1: Image URL Link:</label>
                         <input type="url" id="shopPhotoUrlInput" placeholder="https://..." style="margin:6px 0 12px;">
-
-                        <label style="font-size:12px; font-weight:bold;">Option 2: Ya Gallery Se Photo Upload Karein:</label>
+                        <label style="font-size:12px; font-weight:bold;">Option 2: Direct File Upload:</label>
                         <input type="file" id="shopPhotoFileInput" accept="image/*" style="margin:6px 0 15px;" onchange="previewShopBannerFile(this)">
-
                         <button type="submit" class="btn-primary" style="width:100%; padding:12px;">Save & Update Photo</button>
                     </form>
                 </div>
             </section>
 
-            <!-- Tab 4: Add Food Item with Auto-Discount -->
+            <!-- Tab 4: Add Food Item -->
             <section id="tab-add-product" class="tab-section">
                 <div class="card">
-                    <h2>➕ Nayi Dish Add Karein (Auto-Discount + 1-6 Photos)</h2>
+                    <h2>➕ Nayi Dish Add Karein (Auto-Discount + Photos)</h2>
                     <form id="addFoodItemForm">
                         <div class="form-grid">
                             <input type="text" id="foodTitle" placeholder="Food Dish Name" required>
@@ -214,7 +216,6 @@
         function autoCalculateFoodDiscount() {
             const sellPrice = parseFloat(foodPriceInput.value);
             const origPrice = parseFloat(foodOrigPriceInput.value);
-
             if (!isNaN(origPrice) && !isNaN(sellPrice) && origPrice > 0 && origPrice > sellPrice) {
                 const discountPercent = Math.round(((origPrice - sellPrice) / origPrice) * 100);
                 foodDiscountInput.value = discountPercent + "% OFF";
@@ -231,13 +232,11 @@
             const container = document.getElementById('foodPhotoPreview');
             container.innerHTML = '';
             foodPhotosArray = [];
-
             if (input.files.length > 6) {
                 alert("Maximum 6 photos allowed!");
                 input.value = '';
                 return;
             }
-
             Array.from(input.files).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -272,6 +271,7 @@
         let isFirstLoad = true;
         let knownOrders = new Set();
         let ordersDataCache = {};
+        let monthlyDeliveredCache = [];
 
         function playNewOrderRingtone() {
             try {
@@ -300,7 +300,8 @@
         };
 
         setInterval(() => {
-            document.getElementById('liveClock').innerText = new Date().toLocaleString('en-IN');
+            const clockEl = document.getElementById('liveClock');
+            if (clockEl) clockEl.innerText = new Date().toLocaleString('en-IN');
         }, 1000);
 
         if (currentShop) initApp();
@@ -310,56 +311,70 @@
             const u = document.getElementById('logUsername').value.trim().toLowerCase();
             const p = document.getElementById('logPassword').value.trim();
 
-            const q = query(collection(db, "shops"), where("username", "==", u), where("password", "==", p));
-            const snap = await getDocs(q);
-            if (snap.empty) return alert("❌ Galat credentials!");
+            try {
+                const q = query(collection(db, "shops"), where("username", "==", u), where("password", "==", p));
+                const snap = await getDocs(q);
+                if (snap.empty) return alert("Galat username ya password!");
 
-            let sData = null;
-            snap.forEach(d => { sData = { id: d.id, ...d.data() }; });
-            currentShop = sData;
-            localStorage.setItem('rest_shop_session', JSON.stringify(sData));
-            initApp();
+                let sData = null;
+                snap.forEach(d => { sData = { id: d.id, ...d.data() }; });
+                currentShop = sData;
+                localStorage.setItem('rest_shop_session', JSON.stringify(sData));
+                initApp();
+            } catch(err) {
+                alert("Login Error: " + err.message);
+            }
         });
 
         window.logoutShop = () => { localStorage.removeItem('rest_shop_session'); location.reload(); };
 
-        function isToday(dateObj) {
-            if (!dateObj) return false;
-            const today = new Date();
-            return dateObj.getDate() === today.getDate() && dateObj.getMonth() === today.getMonth() && dateObj.getFullYear() === today.getFullYear();
+        function parseOrderDate(order) {
+            if (order.orderDate?.seconds) return new Date(order.orderDate.seconds * 1000);
+            if (order.createdAt?.seconds) return new Date(order.createdAt.seconds * 1000);
+            if (order.orderDate) {
+                const d = new Date(order.orderDate);
+                if (!isNaN(d.getTime())) return d;
+            }
+            return new Date();
         }
 
         function initApp() {
             document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('sidebarShopName').innerText = currentShop.shopName;
-            document.getElementById('topBarShopTitle').innerText = "🏪 " + currentShop.shopName + " (PIN: " + (currentShop.pincode || 'Local') + ")";
+            document.getElementById('sidebarShopName').innerText = currentShop.shopName || "Kitchen";
+            document.getElementById('topBarShopTitle').innerText = "🏪 " + (currentShop.shopName || "Kitchen") + " (PIN: " + (currentShop.pincode || 'Local') + ")";
+
+            const now = new Date();
+            const nowMonthName = now.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+            const mTextEl = document.getElementById('currentMonthNameText');
+            if (mTextEl) mTextEl.innerText = nowMonthName;
 
             if (currentShop.imageUrl) {
                 document.getElementById('currentShopPhotoPreview').src = currentShop.imageUrl;
             }
 
-            onSnapshot(doc(db, "shops", currentShop.id), (docSnap) => {
-                if (docSnap.exists()) {
-                    currentShop = { id: docSnap.id, ...docSnap.data() };
-                    localStorage.setItem('rest_shop_session', JSON.stringify(currentShop));
-                    if (currentShop.imageUrl) {
-                        document.getElementById('currentShopPhotoPreview').src = currentShop.imageUrl;
-                    }
-                }
-            });
-
-            const qOrders = query(collection(db, "orders"), where("assignedShopId", "==", currentShop.id));
-            
-            onSnapshot(qOrders, (snapshot) => {
+            // Realtime Sync for Orders (Listening to all orders and filtering safely in memory)
+            onSnapshot(collection(db, "orders"), (snapshot) => {
                 const liveTable = document.getElementById('liveOrdersTableBody');
                 const hisabTable = document.getElementById('todayHisabTableBody');
                 liveTable.innerHTML = '';
                 hisabTable.innerHTML = '';
 
-                let todayDelivered = 0, todayCancelled = 0, todayCollection = 0, todayUpi = 0, todayCash = 0;
+                let todayCollection = 0;
+                let monthCollection = 0, monthDelivered = 0, monthUpi = 0, monthCash = 0;
+                monthlyDeliveredCache = [];
+
+                const curToday = new Date();
 
                 snapshot.forEach(docSnap => {
                     const order = { id: docSnap.id, ...docSnap.data() };
+                    
+                    // Filter: match by ID or Shop Name
+                    const isMyOrder = (order.assignedShopId === currentShop.id) || 
+                                      (order.shopId === currentShop.id) ||
+                                      (order.assignedShopName && currentShop.shopName && order.assignedShopName.toLowerCase() === currentShop.shopName.toLowerCase());
+
+                    if (!isMyOrder) return;
+
                     ordersDataCache[order.id] = order;
 
                     if (!isFirstLoad && !knownOrders.has(docSnap.id)) {
@@ -368,8 +383,14 @@
                     knownOrders.add(docSnap.id);
 
                     const st = (order.status || 'Placed').toLowerCase();
-                    const rawDate = order.orderDate?.seconds ? new Date(order.orderDate.seconds * 1000) : new Date(order.orderDate || Date.now());
-                    const isOrderToday = isToday(rawDate);
+                    const rawDate = parseOrderDate(order);
+
+                    const orderIsToday = (rawDate.getDate() === curToday.getDate() && 
+                                          rawDate.getMonth() === curToday.getMonth() && 
+                                          rawDate.getFullYear() === curToday.getFullYear());
+
+                    const orderIsMonth = (rawDate.getMonth() === curToday.getMonth() && 
+                                          rawDate.getFullYear() === curToday.getFullYear());
 
                     const itemsHtml = (order.items || []).map(i => "• " + i.name + " (₹" + i.price + ")").join('<br>');
 
@@ -380,11 +401,11 @@
                         liveTable.innerHTML += 
                             "<tr>" +
                                 "<td><small>" + (order.orderDateFormatted || 'Just now') + "</small></td>" +
-                                "<td><strong>" + order.customerName + "</strong><br><small>📞 " + order.customerPhone + "</small><br><small>📍 " + order.customerAddress + "</small></td>" +
+                                "<td><strong>" + (order.customerName || 'Customer') + "</strong><br><small>📞 " + (order.customerPhone || '-') + "</small><br><small>📍 " + (order.customerAddress || '-') + "</small></td>" +
                                 "<td>" + itemsHtml + "</td>" +
-                                "<td><strong>₹" + order.totalAmount + "</strong><br><small>" + order.paymentMethod + "</small></td>" +
+                                "<td><strong>₹" + order.totalAmount + "</strong><br><small>" + (order.paymentMethod || 'COD') + "</small></td>" +
                                 "<td>" +
-                                    "<span style='background:" + statusBg + "; color:" + statusColor + "; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:bold;'>" + order.status + "</span><br>" +
+                                    "<span style='background:" + statusBg + "; color:" + statusColor + "; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:bold;'>" + (order.status || 'Placed') + "</span><br>" +
                                     "<button class='btn-kitchen' onclick='setOrderStatus(\"" + order.id + "\", \"Preparing\")' style='margin-top:4px;'>🍳 Preparing</button>" +
                                     "<button class='btn-kitchen' style='background:#ca8a04; margin-top:4px;' onclick='setOrderStatus(\"" + order.id + "\", \"Food Ready\")'>🥡 Ready</button>" +
                                 "</td>" +
@@ -398,85 +419,134 @@
                             "</tr>";
                     }
 
-                    if (isOrderToday) {
-                        const amt = Number(order.totalAmount || 0);
-                        const payMethod = (order.paymentMethod || 'COD').toUpperCase();
+                    const amt = Number(order.totalAmount || 0);
+                    const payMethod = (order.paymentMethod || 'COD').toUpperCase();
 
-                        if (st === 'delivered') {
-                            todayDelivered++;
-                            todayCollection += amt;
-                            if (payMethod.includes('UPI')) todayUpi += amt; else todayCash += amt;
-                            hisabTable.innerHTML += "<tr><td><small>" + (order.orderDateFormatted || 'Today') + "</small></td><td>" + order.customerName + "</td><td>" + itemsHtml + "</td><td>" + payMethod + "</td><td>₹" + amt + "</td><td><span style='color:green; font-weight:bold;'>Delivered</span></td></tr>";
-                        } else if (st === 'cancelled') {
-                            todayCancelled++;
-                            hisabTable.innerHTML += "<tr><td><small>" + (order.orderDateFormatted || 'Today') + "</small></td><td>" + order.customerName + "</td><td>" + itemsHtml + "</td><td>" + payMethod + "</td><td>₹" + amt + "</td><td><span style='color:red; font-weight:bold;'>Cancelled</span></td></tr>";
+                    if (st === 'delivered') {
+                        if (orderIsMonth) {
+                            monthDelivered++;
+                            monthCollection += amt;
+                            if (payMethod.includes('UPI')) monthUpi += amt; else monthCash += amt;
+                            monthlyDeliveredCache.push(order);
                         }
+                        if (orderIsToday) {
+                            todayCollection += amt;
+                        }
+                        hisabTable.innerHTML += "<tr><td><small>" + (order.orderDateFormatted || 'Done') + "</small></td><td>" + (order.customerName || '') + "</td><td>" + itemsHtml + "</td><td>" + payMethod + "</td><td>₹" + amt + "</td><td><span style='color:green; font-weight:bold;'>Delivered</span></td></tr>";
+                    } else if (st === 'cancelled' && orderIsMonth) {
+                        hisabTable.innerHTML += "<tr><td><small>" + (order.orderDateFormatted || 'Done') + "</small></td><td>" + (order.customerName || '') + "</td><td>" + itemsHtml + "</td><td>" + payMethod + "</td><td>₹" + amt + "</td><td><span style='color:red; font-weight:bold;'>Cancelled</span></td></tr>";
                     }
                 });
 
                 isFirstLoad = false;
 
                 document.getElementById('statTodayCollection').innerText = "₹" + todayCollection;
-                document.getElementById('statDeliveredToday').innerText = todayDelivered;
-                document.getElementById('statCancelledToday').innerText = todayCancelled;
-                document.getElementById('statTodayUpi').innerText = "₹" + todayUpi;
-                document.getElementById('statTodayCash').innerText = "₹" + todayCash;
+                document.getElementById('statMonthCollection').innerText = "₹" + monthCollection;
+                document.getElementById('statMonthDelivered').innerText = monthDelivered;
+                document.getElementById('statMonthUpi').innerText = "₹" + monthUpi;
+                document.getElementById('statMonthCash').innerText = "₹" + monthCash;
             });
 
             // Menu Realtime
-            const qMenu = query(collection(db, "products"), where("shopId", "==", currentShop.id));
-            onSnapshot(qMenu, (snapshot) => {
+            onSnapshot(collection(db, "products"), (snapshot) => {
                 const tbody = document.getElementById('menuTableBody');
                 tbody.innerHTML = '';
                 snapshot.forEach(docSnap => {
                     const p = docSnap.data();
-                    const origPriceDisplay = p.originalPrice ? "<span style='text-decoration:line-through; color:#888; font-size:11px;'>(₹" + p.originalPrice + ")</span>" : "";
-                    tbody.innerHTML += 
-                        "<tr>" +
-                            "<td><img src='" + (p.imageUrl || '') + "' style='width:40px; height:40px; border-radius:4px; object-fit:cover;'></td>" +
-                            "<td><strong>" + p.name + "</strong></td>" +
-                            "<td>" + (p.subCategory || '-') + "</td>" +
-                            "<td>₹" + p.price + " " + origPriceDisplay + "</td>" +
-                            "<td><strong style='color:#16a34a;'>" + (p.discount || '-') + "</strong></td>" +
-                            "<td><button onclick='delDish(\"" + docSnap.id + "\")' style='background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;'>Delete</button></td>" +
-                        "</tr>";
+                    if (p.shopId === currentShop.id || (p.shopName && p.shopName === currentShop.shopName)) {
+                        const origPriceDisplay = p.originalPrice ? "<span style='text-decoration:line-through; color:#888; font-size:11px;'>(₹" + p.originalPrice + ")</span>" : "";
+                        tbody.innerHTML += 
+                            "<tr>" +
+                                "<td><img src='" + (p.imageUrl || '') + "' style='width:40px; height:40px; border-radius:4px; object-fit:cover;'></td>" +
+                                "<td><strong>" + p.name + "</strong></td>" +
+                                "<td>" + (p.subCategory || '-') + "</td>" +
+                                "<td>₹" + p.price + " " + origPriceDisplay + "</td>" +
+                                "<td><strong style='color:#16a34a;'>" + (p.discount || '-') + "</strong></td>" +
+                                "<td><button onclick='delDish(\"" + docSnap.id + "\")' style='background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;'>Delete</button></td>" +
+                            "</tr>";
+                    }
                 });
             });
         }
 
-        document.getElementById('updateShopPhotoForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // Print Statement and Clear Past Month Orders
+        window.printMonthlyStatementAndClearOld = async function() {
             if (!currentShop) return;
+            const currentMonthName = new Date().toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+            
+            const totalOrders = monthlyDeliveredCache.length;
+            const totalCollection = monthlyDeliveredCache.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
+            const totalUpi = monthlyDeliveredCache.filter(o => (o.paymentMethod||'').toUpperCase().includes('UPI')).reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
+            const totalCash = totalCollection - totalUpi;
 
-            const urlInput = document.getElementById('shopPhotoUrlInput').value.trim();
-            let finalPhoto = selectedShopBannerBase64 || urlInput;
+            const invoiceArea = document.getElementById('printableInvoice');
+            invoiceArea.style.display = 'block';
 
-            if (!finalPhoto) {
-                return alert("Kripya photo upload karein ya image URL enter karein!");
+            invoiceArea.innerHTML = 
+                "<div style='text-align:center; border-bottom:1px dashed #000; padding-bottom:6px; margin-bottom:6px;'>" +
+                    "<h2 style='margin:0; font-size:18px; font-weight:900;'>KSINDO MONTHLY STATEMENT</h2>" +
+                    "<p style='margin:2px 0; font-size:13px; font-weight:bold;'>" + (currentShop.shopName || 'Kitchen Partner') + "</p>" +
+                    "<p style='margin:0; font-size:11px;'>Statement Period: " + currentMonthName + "</p>" +
+                    (currentShop.gstin ? ("<p style='margin:1px 0; font-size:10px;'><strong>GSTIN/FSSAI:</strong> " + currentShop.gstin + "</p>") : "") +
+                "</div>" +
+                "<div style='font-size:11px; border-bottom:1px dashed #000; padding-bottom:6px; margin-bottom:6px;'>" +
+                    "<strong>Total Completed Orders:</strong> " + totalOrders + "<br>" +
+                    "<strong>Cash Collected:</strong> ₹" + totalCash + "<br>" +
+                    "<strong>Online / UPI Collected:</strong> ₹" + totalUpi + "<br>" +
+                    "<h3 style='margin:5px 0 0; font-size:14px;'>TOTAL SETTLEMENT: ₹" + totalCollection + "</h3>" +
+                "</div>" +
+                "<div style='font-size:10px; margin-bottom:6px; border-bottom:1px dashed #000; padding-bottom:6px;'>" +
+                    "<strong>ORDERS SUMMARY:</strong><br>" +
+                    monthlyDeliveredCache.map(o => (o.orderDateFormatted||'') + " - ₹" + o.totalAmount + " (" + (o.paymentMethod||'COD') + ")").join('<br>') +
+                "</div>" +
+                "<div style='text-align:center; font-size:10px; margin-top:5px;'>" +
+                    "Printed on: " + new Date().toLocaleString('en-IN') +
+                "</div>";
+
+            window.print();
+            invoiceArea.style.display = 'none';
+
+            // Auto Remove Past Month Orders Safely
+            const confirmDelete = confirm("Statement print ho gaya! Kya aap pichhle month ke purane delivered/closed records ko clear karna chahte hain?");
+            if (confirmDelete) {
+                const now = new Date();
+                const curMonth = now.getMonth();
+                const curYear = now.getFullYear();
+
+                try {
+                    const snap = await getDocs(collection(db, "orders"));
+                    let deletedCount = 0;
+
+                    for (const docSnap of snap.docs) {
+                        const ord = docSnap.data();
+                        const isMine = (ord.assignedShopId === currentShop.id) || (ord.shopId === currentShop.id);
+                        const st = (ord.status || '').toLowerCase();
+
+                        if (isMine && (st === 'delivered' || st === 'cancelled')) {
+                            const rawDate = parseOrderDate(ord);
+                            if (rawDate.getFullYear() < curYear || (rawDate.getFullYear() === curYear && rawDate.getMonth() < curMonth)) {
+                                await deleteDoc(doc(db, "orders", docSnap.id));
+                                deletedCount++;
+                            }
+                        }
+                    }
+                    alert("✅ Pichhle month ke " + deletedCount + " purane records database se clear kar diye gaye!");
+                } catch(e) {
+                    alert("Clear karne me error: " + e.message);
+                }
             }
-
-            try {
-                await updateDoc(doc(db, "shops", currentShop.id), {
-                    imageUrl: finalPhoto,
-                    updatedAt: serverTimestamp()
-                });
-                currentShop.imageUrl = finalPhoto;
-                localStorage.setItem('rest_shop_session', JSON.stringify(currentShop));
-                alert("✅ ksindo Restaurant profile photo update ho gayi!");
-            } catch(err) {
-                alert("Error: " + err.message);
-            }
-        });
+        };
 
         window.setOrderStatus = async (id, st) => await updateDoc(doc(db, "orders", id), { status: st });
+        
         window.assignBoy = async (id) => {
             const phone = document.getElementById("boyPhone_" + id).value.trim();
-            if (phone.length !== 10) return alert("10-digit phone number dalein!");
+            if (phone.length !== 10) return alert("10-digit mobile number dalein!");
             await updateDoc(doc(db, "orders", id), { assignedBoyPhone: phone, status: "Assigned" });
             alert("Delivery boy assign ho gaya!");
         };
 
-        // 1-Click Thermal Bill Print (Top: KSINDO, Below: Restaurant Name)
+        // Guaranteed Print Bill with KSINDO Header & Restaurant Name
         window.printOrderInvoice = async function(orderId) {
             const order = ordersDataCache[orderId];
             if (!order) return alert("Order data nahi mila!");
@@ -493,19 +563,22 @@
 
             const deliveryCharge = Number(order.deliveryCharge !== undefined ? order.deliveryCharge : (Number(order.totalAmount) < 100 ? 20 : 0));
             const subtotal = order.subtotal !== undefined ? order.subtotal : (Number(order.totalAmount) - deliveryCharge);
+            const finalRestName = order.assignedShopName || currentShop?.shopName || 'Kitchen Partner';
+            const finalGstin = currentShop?.gstin ? ("<p style='margin:2px 0 0; font-size:10px;'><strong>GSTIN/FSSAI:</strong> " + currentShop.gstin + "</p>") : "";
 
             invoiceArea.innerHTML = 
                 "<div style='text-align:center; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;'>" +
-                    "<h2 style='margin:0; font-size:18px; font-weight:900; letter-spacing:1px;'>KSINDO</h2>" +
-                    "<p style='margin:2px 0 0; font-size:12px; font-weight:bold; color:#000;'>" + (currentShop.shopName || 'Kitchen Partner') + "</p>" +
+                    "<h2 style='margin:0; font-size:20px; font-weight:900; letter-spacing:1px;'>KSINDO</h2>" +
+                    "<p style='margin:2px 0 0; font-size:13px; font-weight:bold; color:#000;'>" + finalRestName + "</p>" +
+                    finalGstin +
                     "<p style='margin:0; font-size:10px; color:#555;'>" + (order.orderDateFormatted || new Date().toLocaleString()) + "</p>" +
                 "</div>" +
                 "<div style='font-size:11px; margin-bottom:5px; border-bottom:1px dashed #000; padding-bottom:5px;'>" +
-                    "<strong>Customer:</strong> " + order.customerName + "<br>" +
-                    "<strong>Phone:</strong> " + order.customerPhone + "<br>" +
-                    "<strong>Address:</strong> " + order.customerAddress + " (PIN: " + (order.customerPincode || '') + ")" +
+                    "<strong>Customer:</strong> " + (order.customerName || '') + "<br>" +
+                    "<strong>Phone:</strong> " + (order.customerPhone || '') + "<br>" +
+                    "<strong>Address:</strong> " + (order.customerAddress || '') + " (PIN: " + (order.customerPincode || '') + ")" +
                 "</div>" +
-                "<div style='margin-bottom:5px; border-bottom:1px dashed #000; padding-bottom:5px;'>" +
+                "<div style='margin-bottom:5px; border-bottom:1px dashed #000; padding-bottom:5px;'>"+
                     "<div style='font-weight:bold; font-size:11px; margin-bottom:3px;'>DISHES:</div>" +
                     itemsRow +
                 "</div>" +
@@ -556,7 +629,7 @@
             let photos = [];
             if (foodPhotosArray.length > 0) photos = foodPhotosArray;
             else if (link) photos = [link];
-            else return alert("Photo link dalein ya 1-6 photos upload karein!");
+            else return alert("Photo upload karein ya image link dalein!");
 
             try {
                 await addDoc(collection(db, "products"), {
