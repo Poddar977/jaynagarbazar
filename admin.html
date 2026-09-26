@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - ksindo</title>
+    <title>ksindo - Admin Master Control</title>
     <link rel="preconnect" href="https://firestore.googleapis.com">
     <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background-color: #0f172a; color: #f8fafc; min-height: 100vh; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Roboto, sans-serif; }
+        body { background:#f4f6f9; color:#333; display:flex; height:100vh; overflow:hidden; }
 
-        /* Login Screen Overlay */
+        /* DIRECT FIREBASE LOGIN SCREEN */
         #adminLoginScreen {
             position: fixed;
             inset: 0;
@@ -18,156 +18,516 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 9999;
+            z-index: 99999;
             padding: 20px;
         }
-
         .login-card {
             background: #1e293b;
             border: 1.5px solid #334155;
             border-radius: 16px;
-            padding: 30px;
+            padding: 35px 30px;
             width: 100%;
-            max-width: 400px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            max-width: 420px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
             text-align: center;
         }
-
-        .login-card h2 {
-            font-size: 22px;
-            font-weight: 800;
-            color: #f8fafc;
-            margin-bottom: 6px;
-        }
-
-        .login-card p {
-            font-size: 13px;
-            color: #94a3b8;
-            margin-bottom: 20px;
-        }
-
+        .login-card h2 { font-size: 24px; font-weight: 900; color: #f8fafc; margin-bottom: 6px; }
+        .login-card p { font-size: 13px; color: #94a3b8; margin-bottom: 22px; }
         .login-card input {
             width: 100%;
-            padding: 12px 14px;
+            padding: 13px 15px;
             border: 1.5px solid #334155;
             background: #0f172a;
             color: white;
             border-radius: 10px;
             font-size: 14px;
-            margin-bottom: 14px;
+            margin-bottom: 15px;
             outline: none;
             transition: 0.2s;
         }
-
-        .login-card input:focus {
-            border-color: #22c55e;
-        }
-
+        .login-card input:focus { border-color: #22c55e; }
         .btn-admin-login {
             width: 100%;
             background: linear-gradient(135deg, #22c55e, #15803d);
             color: white;
             border: none;
-            padding: 12px;
+            padding: 13px;
             border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
+            font-size: 15px;
+            font-weight: 800;
             cursor: pointer;
             transition: 0.15s;
         }
+        .btn-admin-login:hover { opacity: 0.95; }
+        
+        aside { width:250px; background:#1e293b; color:white; display:flex; flex-direction:column; flex-shrink:0; }
+        aside .logo { padding:20px; font-size:18px; font-weight:bold; background:#0f172a; display:flex; justify-content:space-between; align-items:center; }
+        aside nav { flex:1; padding:15px 0; overflow-y:auto; }
+        aside nav a { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; color:#cbd5e1; text-decoration:none; font-size:14px; font-weight:600; cursor:pointer; }
+        aside nav a:hover, aside nav a.active { background:#16a34a; color:white; }
+        .nav-count { background:#ef4444; color:white; padding:2px 7px; border-radius:12px; font-size:11px; font-weight:bold; }
 
-        .btn-admin-login:hover {
-            background: #16a34a;
-        }
+        main { flex:1; display:flex; flex-direction:column; overflow-y:auto; }
+        header { background:white; padding:12px 30px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; }
+        
+        .content-body { padding:25px 30px; flex:1; }
+        .stats-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:15px; margin-bottom:25px; }
+        .stat-card { background:white; padding:18px; border-radius:10px; border:1px solid #e2e8f0; }
+        .stat-card h3 { font-size:12px; color:#64748b; margin-bottom:5px; text-transform:uppercase; }
+        .stat-card .val { font-size:22px; font-weight:bold; color:#0f172a; }
 
-        /* Dashboard Styles */
-        #adminDashboard {
-            display: none;
-        }
+        .tab-section { display:none; }
+        .tab-section.active { display:block; }
+        
+        .card { background:white; border-radius:10px; padding:20px; border:1px solid #e2e8f0; margin-bottom:20px; }
+        table { width:100%; border-collapse:collapse; font-size:13px; text-align:left; }
+        table th { background:#f8fafc; padding:10px 12px; border-bottom:1px solid #e2e8f0; color:#475569; }
+        table td { padding:12px; border-bottom:1px solid #e2e8f0; }
+        
+        .clickable-customer-row { cursor:pointer; transition:background-color 0.2s; }
+        .clickable-customer-row:hover { background-color:#e0f2fe !important; }
 
-        header {
-            background-color: #1e293b;
-            padding: 14px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1.5px solid #334155;
-        }
+        .form-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; }
+        input, select, textarea { width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:6px; font-size:13px; outline:none; }
+        .btn-primary { background:#16a34a; color:white; border:none; padding:8px 14px; border-radius:6px; font-weight:bold; cursor:pointer; }
+        .btn-edit { background:#0284c7; color:white; border:none; padding:6px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px; margin-right:4px; }
+        .btn-danger { background:#ef4444; color:white; border:none; padding:6px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px; }
+        .btn-print { background:#0284c7; color:white; border:none; padding:4px 8px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px; }
+        .btn-print:hover { background:#0369a1; }
+        .btn-secondary { background:#475569; color:white; border:none; padding:8px 12px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:12px; }
 
-        .logo {
-            font-size: 22px;
-            font-weight: 900;
-            font-style: italic;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, #ff007f, #a855f7, #06b6d4, #facc15);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .status-pill { padding:4px 8px; border-radius:12px; font-size:11px; font-weight:bold; text-transform:uppercase; }
 
-        .btn-logout {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        .cat-checkbox-group { display:flex; gap:15px; flex-wrap:wrap; background:#f8fafc; padding:10px; border-radius:6px; border:1px solid #cbd5e1; }
+        .cat-checkbox-group label { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; cursor:pointer; }
+        .cat-checkbox-group input { width:auto; }
 
-        .container {
-            max-width: 1100px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
+        .preview-grid { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+        .preview-box { width:60px; height:60px; border-radius:6px; border:1px solid #ddd; object-fit:cover; }
+        
+        .variant-row { display:grid; grid-template-columns:1.2fr 1fr 1fr 1fr auto; gap:8px; align-items:center; margin-bottom:8px; background:#fff; padding:8px; border-radius:6px; border:1px solid #e2e8f0; }
 
-        .card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 14px;
-            padding: 24px;
-            margin-bottom: 20px;
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:500; }
+        .modal-overlay.active { display:flex; }
+        .modal-box { background:white; padding:25px; border-radius:14px; width:92%; max-width:750px; box-shadow:0 6px 30px rgba(0,0,0,0.25); position:relative; max-height:85vh; overflow-y:auto; }
+        .close-modal-btn { position:absolute; right:18px; top:18px; cursor:pointer; font-size:20px; font-weight:bold; width:32px; height:32px; border-radius:50%; background:#f1f2f6; display:flex; align-items:center; justify-content:center; border:none; }
+
+        .filter-search-bar { display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; align-items:center; }
+        .filter-search-bar input { max-width:240px; padding:7px 12px; }
+        .filter-search-bar select { max-width:180px; padding:7px 12px; }
+
+        @media print {
+            body * { visibility:hidden; }
+            #adminPrintableBill, #adminPrintableBill * { visibility:visible; }
+            #adminPrintableBill { position:absolute; left:0; top:0; width:80mm; font-family:monospace; color:black; padding:5px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. ADMIN DIRECT LOGIN SCREEN -->
+    <!-- 1. DIRECT FIREBASE LOGIN SCREEN -->
     <div id="adminLoginScreen">
         <div class="login-card">
-            <h2>🛡️ ksindo Admin Portal</h2>
-            <p>Direct login with verified administrator credentials</p>
+            <h2>🛡️ ksindo Master Login</h2>
+            <p>Direct login with Administrator credentials</p>
             <form id="adminLoginForm">
-                <input type="email" id="adminEmail" placeholder="Admin Login ID / Email" required autocomplete="username">
+                <input type="email" id="adminEmail" placeholder="Admin Email ID" required autocomplete="username">
                 <input type="password" id="adminPassword" placeholder="Admin Password" required autocomplete="current-password">
-                <button type="submit" class="btn-admin-login" id="loginBtnText">Authorize & Enter</button>
+                <button type="submit" class="btn-admin-login" id="loginBtn">Authorize & Enter</button>
             </form>
         </div>
     </div>
 
-    <!-- 2. ADMIN DASHBOARD SCREEN (Protected) -->
-    <div id="adminDashboard">
+    <!-- 2. MAIN ADMIN DASHBOARD -->
+    <aside>
+        <div class="logo">
+            <span>⚡ ksindo Master</span>
+        </div>
+        <nav>
+            <a onclick="showTab('tab-orders', this)" class="active">
+                <span>📦 General Live</span>
+                <span class="nav-count" id="badgeGeneralOrders" style="display:none;">0</span>
+            </a>
+            <a onclick="showTab('tab-food', this)">
+                <span>🍕 Food Live</span>
+                <span class="nav-count" id="badgeFoodOrders" style="background:#ea580c; display:none;">0</span>
+            </a>
+            <a onclick="showTab('tab-hisab', this)">💰 Payment & Boys</a>
+            <a onclick="showTab('tab-shops', this)">🏪 Manage Shops</a>
+            <a onclick="showTab('tab-ads', this)">📢 5-Second Ads</a>
+            <a onclick="showTab('tab-delivered', this)">📜 Delivered History</a>
+            <a onclick="showTab('tab-products', this)">🛍️ Products & Edit</a>
+            <a onclick="showTab('tab-users', this)">👥 Customers</a>
+        </nav>
+    </aside>
+
+    <main>
         <header>
-            <div class="logo">ksindo Control Panel</div>
             <div style="display:flex; align-items:center; gap:15px;">
-                <span id="activeAdminText" style="font-size:13px; color:#94a3b8;">Admin</span>
-                <button class="btn-logout" onclick="handleAdminLogout()">🚪 Logout</button>
+                <h2 style="font-size:18px;">Admin Master Dashboard</h2>
+                <button onclick="toggleAudioAlarm()" id="audioToggleBtn" class="btn-secondary" style="font-size:11px; padding:4px 10px;">🔔 Sound: ON</button>
+            </div>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <span id="activeAdminEmail" style="font-size:12px; font-weight:700; color:#16a34a;">admin</span>
+                <span id="liveClock" style="font-size:13px; font-weight:600; color:#64748b;">Loading...</span>
+                <button onclick="logoutAdminMaster()" class="btn-danger" style="padding:6px 12px; font-size:12px;">🚪 Logout</button>
             </div>
         </header>
 
-        <div class="container">
-            <div class="card">
-                <h3 style="color:#22c55e; margin-bottom:8px;">✅ Access Granted</h3>
-                <p style="font-size:14px; color:#cbd5e1;">Aapka Admin authentication verify ho gaya hai. Aap yahan se Orders, Ads, aur Products manage kar sakte hain.</p>
+        <div class="content-body">
+            <div class="stats-grid">
+                <div class="stat-card"><h3>Total Revenue</h3><div class="val" id="statRevenue" style="color:#16a34a;">₹0</div></div>
+                <div class="stat-card"><h3>Cash (COD)</h3><div class="val" id="statTotalCash" style="color:#d97706;">₹0</div></div>
+                <div class="stat-card"><h3>Live Food</h3><div class="val" id="statFood" style="color:#ea580c;">0</div></div>
+                <div class="stat-card"><h3>Live General</h3><div class="val" id="statGeneral" style="color:#16a34a;">0</div></div>
             </div>
 
-            <!-- Aapke purane Admin Controls/Sections yahan niche add honge -->
+            <!-- TAB 1: General Live Orders -->
+            <section id="tab-orders" class="tab-section active">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+                        <h2>📦 General Live Orders Queue</h2>
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" id="orderSearchInput" onkeyup="filterOrdersTableLive()" placeholder="Search customer or phone..." style="width:200px; padding:6px 10px; font-size:12px;">
+                            <button onclick="exportOrdersToCSV()" class="btn-secondary" style="font-size:11px;">📥 Export CSV</button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr><th>Time</th><th>Customer</th><th>Address</th><th>Items</th><th>Total</th><th>OTP</th><th>Status</th><th>Receipt</th><th>Assign Boy</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="generalOrdersTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 2: Food Live Orders -->
+            <section id="tab-food" class="tab-section">
+                <div class="card" style="border-left:5px solid #ea580c;">
+                    <h2>🍕 Live Food Orders (Auto Assigned)</h2>
+                    <table>
+                        <thead>
+                            <tr><th>Time</th><th>Food Items</th><th>Customer</th><th>Total</th><th>OTP</th><th>Status</th><th>Kitchen Shop</th><th>Receipt</th><th>Assign Boy</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="foodOrdersTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 3: Delivery Boys Audit -->
+            <section id="tab-hisab" class="tab-section">
+                <div class="card">
+                    <h2>🚴 Delivery Boy Performance & Cash Collection Audit</h2>
+                    <table>
+                        <thead>
+                            <tr><th>Delivery Boy Phone</th><th>Delivered Count</th><th>Cash Collected</th><th>Online Paid</th><th>Total Handled</th></tr>
+                        </thead>
+                        <tbody id="deliveryBoyAuditBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 4: Manage Shops (With GSTIN / FSSAI Support) -->
+            <section id="tab-shops" class="tab-section">
+                <div class="card">
+                    <h2>+ Nayi Shop / Kitchen Register Karein</h2>
+                    <form id="addShopForm">
+                        <div class="form-grid">
+                            <input type="text" id="shopNameInput" placeholder="Shop Name" required>
+                            <select id="shopTypeInput" required style="font-weight:bold;">
+                                <option value="restaurant">🍔 Fast Food & Restaurant</option>
+                                <option value="mart">⚡ Quick Mart (Store Name Hidden from Product)</option>
+                            </select>
+                            <input type="text" id="shopOwnerInput" placeholder="Owner Name" required>
+                            <input type="tel" id="shopPhoneInput" placeholder="Mobile Number (10 Digit)" maxlength="10" required>
+                            <input type="text" id="shopGstinInput" placeholder="GSTIN / FSSAI License Number (Optional)">
+                            <input type="text" id="shopPincodeInput" placeholder="Pincode (6-digit)" maxlength="6" required>
+                            <input type="text" id="shopAddressInput" placeholder="Shop Address" required>
+                            <input type="text" id="shopUserInput" placeholder="Username" required>
+                            <input type="text" id="shopPassInput" placeholder="Password" required>
+                        </div>
+                        <button type="submit" class="btn-primary" style="margin-top:12px;">Shop Account Banayein</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h2>Registered Shops & Kitchens</h2>
+                    <table>
+                        <thead><tr><th>Shop Name</th><th>Type</th><th>GSTIN / FSSAI</th><th>Owner</th><th>Phone</th><th>Pincode</th><th>Username</th><th>Action</th></tr></thead>
+                        <tbody id="shopsTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 5: 5-Second Multi-Ads Manager -->
+            <section id="tab-ads" class="tab-section">
+                <div class="card">
+                    <h2>📢 5-Second Advertisement Manager (Photo & Video Upload)</h2>
+                    <form id="createAdForm">
+                        <div class="form-grid">
+                            <input type="text" id="adTitle" placeholder="Ad Offer Title (e.g. 50% Off Mega Sale)" required>
+                            <select id="adType" required onchange="handleAdTypeChange(this.value)">
+                                <option value="image">🖼️ Photo / Image Banner</option>
+                                <option value="video">🎥 5-Second Video (MP4)</option>
+                            </select>
+                            <div>
+                                <label style="font-size:11px; font-weight:bold;">Option 1: Direct File Upload:</label>
+                                <input type="file" id="adDirectFile" accept="image/*,video/mp4" onchange="previewAdDirectFile(this)">
+                            </div>
+                            <div>
+                                <label style="font-size:11px; font-weight:bold;">Option 2: Online Media URL:</label>
+                                <input type="url" id="adMediaUrl" placeholder="https://...">
+                            </div>
+                            <input type="text" id="adTargetUrl" placeholder="Target Link (product.html?id=...)">
+                        </div>
+                        <div id="adFilePreviewContainer" style="margin-top:10px;"></div>
+                        <button type="submit" class="btn-primary" style="margin-top:12px; background:#e11d48;">+ Publish 5s Ad</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h2>Active Live Ads</h2>
+                    <table>
+                        <thead><tr><th>Preview</th><th>Title</th><th>Type</th><th>Target Link</th><th>Action</th></tr></thead>
+                        <tbody id="adsTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 6: Delivered History -->
+            <section id="tab-delivered" class="tab-section">
+                <div class="card">
+                    <h2>📜 Delivered & Cancelled Orders (Auto-delete in 24h)</h2>
+                    <table>
+                        <thead><tr><th>Time</th><th>Customer</th><th>Mode</th><th>Amount</th><th>Boy</th><th>Status</th></tr></thead>
+                        <tbody id="deliveredTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 7: Products Management (Add + Edit System) -->
+            <section id="tab-products" class="tab-section">
+                <div class="card">
+                    <h2 id="productFormHeader">+ Naya Product Add Karein (Individual Size MRP, Selling Price & Auto-Discount)</h2>
+                    <form id="addProductForm">
+                        <input type="hidden" id="editProductId" value="">
+                        <div class="form-grid">
+                            <input type="text" id="prodName" placeholder="Product Title / Name" required>
+                            
+                            <div>
+                                <select id="prodSubCategory">
+                                    <option value="none">Sub-Category: Normal / General</option>
+                                    <option value="lingerie">Fashion: Lingerie / Innerwear</option>
+                                    <option value="women">Fashion: Women Dresses</option>
+                                    <option value="men">Fashion: Men Wear</option>
+                                    <option value="cosmetics">Beauty: Cosmetics & Makeup</option>
+                                    <option value="skincare">Beauty: Skin & Hair Care</option>
+                                    <option value="daily-need">Grocery: Daily Needs / Packets</option>
+                                    <option value="gift-combo">Gift: Hamper / Combo Box</option>
+                                </select>
+                            </div>
+
+                            <input type="url" id="prodImageLink" placeholder="Option 1: Image URL Link">
+                            <div>
+                                <input type="file" id="prodFilePhotos" accept="image/*" multiple onchange="previewSelectedFiles(this)">
+                            </div>
+                        </div>
+
+                        <!-- Multi-Category Select Checkboxes -->
+                        <div style="margin-top:14px;">
+                            <label style="font-size:12px; font-weight:bold; display:block; margin-bottom:6px;">Categories (Multi-Select Supported):</label>
+                            <div class="cat-checkbox-group">
+                                <label><input type="checkbox" name="productCats" value="fashion"> 👗 Fashion</label>
+                                <label><input type="checkbox" name="productCats" value="beauty"> 💄 Beauty</label>
+                                <label><input type="checkbox" name="productCats" value="grocery"> 🛒 Grocery</label>
+                                <label><input type="checkbox" name="productCats" value="gift"> 🎁 Gift</label>
+                                <label><input type="checkbox" name="productCats" value="food"> 🍔 Food</label>
+                            </div>
+                        </div>
+
+                        <div class="preview-grid" id="photoPreviewContainer"></div>
+
+                        <!-- Dynamic Variants Builder -->
+                        <div style="margin-top:16px; padding:15px; background:#f8fafc; border:1px dashed #16a34a; border-radius:8px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                <div>
+                                    <strong style="font-size:13px; color:#0f172a;">📏 Size / Weight Variants:</strong>
+                                    <p style="font-size:11px; color:#64748b; margin-top:2px;">Size, Selling Price aur MRP dalne par discount automatic calculate hoga.</p>
+                                </div>
+                                <button type="button" onclick="addVariantRow()" style="background:#16a34a; color:white; border:none; padding:7px 14px; border-radius:4px; font-weight:bold; font-size:12px; cursor:pointer;">+ Add Size Variant</button>
+                            </div>
+                            <div id="variantsContainer"></div>
+                        </div>
+
+                        <textarea id="prodDesc" placeholder="Product Description..." style="margin-top:12px; height:60px;"></textarea>
+                        <div style="display:flex; gap:10px; margin-top:12px;">
+                            <button type="submit" class="btn-primary" id="productSubmitBtn" style="padding:10px 20px;">Publish Product</button>
+                            <button type="button" class="btn-danger" id="cancelEditBtn" onclick="resetProductForm()" style="display:none; padding:10px 18px;">Cancel Edit</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+                        <h2>Store Catalog</h2>
+                        <div class="filter-search-bar" style="margin-bottom:0;">
+                            <input type="text" id="catalogSearchInput" onkeyup="filterCatalogLive()" placeholder="Search product name..." style="font-size:12px;">
+                            <select id="catalogCatFilter" onchange="filterCatalogLive()" style="font-size:12px;">
+                                <option value="all">All Categories</option>
+                                <option value="fashion">Fashion</option>
+                                <option value="beauty">Beauty</option>
+                                <option value="grocery">Grocery</option>
+                                <option value="food">Food</option>
+                                <option value="gift">Gift</option>
+                            </select>
+                        </div>
+                    </div>
+                    <table>
+                        <thead><tr><th>Image</th><th>Name</th><th>Categories</th><th>Price</th><th>Variants</th><th>Action</th></tr></thead>
+                        <tbody id="productsTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 8: Customers List -->
+            <section id="tab-users" class="tab-section">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <h2>👥 Customers</h2>
+                        <small style="color:#16a34a; font-weight:700;">👉 Row par click karke customer ki complete order history dekhein</small>
+                    </div>
+                    <table>
+                        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Address</th><th>Orders</th><th>Action</th></tr></thead>
+                        <tbody id="usersTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <div id="adminPrintableBill" style="display:none;"></div>
+
+    <div class="modal-overlay" id="customerAuditModal">
+        <div class="modal-box">
+            <button class="close-modal-btn" onclick="closeCustomerAudit()">&times;</button>
+            <h2 id="modalCustName">Customer History</h2>
+            <p id="modalCustEmail" style="font-size:12px; color:#64748b; margin-bottom:15px;"></p>
+            <div id="modalOrdersContainer">Loading...</div>
         </div>
     </div>
 
+    <script>
+        let isAudioAlarmMuted = false;
+        function toggleAudioAlarm() {
+            isAudioAlarmMuted = !isAudioAlarmMuted;
+            document.getElementById('audioToggleBtn').innerText = isAudioAlarmMuted ? "🔕 Sound: MUTED" : "🔔 Sound: ON";
+            document.getElementById('audioToggleBtn').style.background = isAudioAlarmMuted ? "#ef4444" : "#475569";
+        }
+
+        function calculateRowDiscount(row) {
+            const priceInput = row.querySelector('.v-price');
+            const origPriceInput = row.querySelector('.v-orig-price');
+            const discountPill = row.querySelector('.v-discount-pill');
+
+            const price = parseFloat(priceInput.value);
+            const orig = parseFloat(origPriceInput.value);
+
+            if (!isNaN(price) && !isNaN(orig) && orig > price && price > 0) {
+                const perc = Math.round(((orig - price) / orig) * 100);
+                discountPill.value = perc + "% OFF";
+                discountPill.style.color = "#16a34a";
+            } else {
+                discountPill.value = '';
+            }
+        }
+
+        window.addVariantRow = function(valName, valPrice, valOrigPrice, valDisc) {
+            valName = valName || '';
+            valPrice = valPrice || '';
+            valOrigPrice = valOrigPrice || '';
+            valDisc = valDisc || '';
+            const container = document.getElementById('variantsContainer');
+            const row = document.createElement('div');
+            row.className = 'variant-row';
+            row.innerHTML = 
+                '<input type="text" placeholder="Size (e.g. 75cm, 1kg)" value="' + valName + '" class="v-name" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;" required>' +
+                '<input type="number" placeholder="Selling Price (₹)" value="' + valPrice + '" class="v-price" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;" required>' +
+                '<input type="number" placeholder="Original MRP (₹)" value="' + valOrigPrice + '" class="v-orig-price" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;">' +
+                '<input type="text" placeholder="Discount" value="' + valDisc + '" class="v-discount-pill" readonly style="padding:7px 10px; border:1px solid #bbf7d0; background:#f0fdf4; border-radius:4px; font-size:12px; font-weight:bold; color:#16a34a;">' +
+                '<button type="button" onclick="this.parentElement.remove()" style="background:#ef4444; color:white; border:none; padding:7px 12px; border-radius:4px; cursor:pointer; font-weight:bold;">✕</button>';
+
+            const priceInp = row.querySelector('.v-price');
+            const origInp = row.querySelector('.v-orig-price');
+
+            priceInp.addEventListener('input', function() { calculateRowDiscount(row); });
+            origInp.addEventListener('input', function() { calculateRowDiscount(row); });
+
+            container.appendChild(row);
+            if (valPrice && valOrigPrice) calculateRowDiscount(row);
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('variantsContainer').children.length === 0) {
+                addVariantRow();
+            }
+        });
+
+        let base64PhotosArray = [];
+        function previewSelectedFiles(input) {
+            const container = document.getElementById('photoPreviewContainer');
+            container.innerHTML = '';
+            base64PhotosArray = [];
+
+            if (input.files.length > 6) {
+                alert("Maximum 6 photos allowed hain!");
+                input.value = '';
+                return;
+            }
+
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    base64PhotosArray.push(e.target.result);
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'preview-box';
+                    container.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Ads File Preview Handler
+        let base64AdMedia = '';
+        window.previewAdDirectFile = function(input) {
+            const container = document.getElementById('adFilePreviewContainer');
+            container.innerHTML = '';
+            base64AdMedia = '';
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                base64AdMedia = e.target.result;
+                if (file.type.startsWith('video/')) {
+                    container.innerHTML = '<video src="' + e.target.result + '" style="width:160px; height:80px; object-fit:cover; border-radius:8px; border:2px solid #e11d48;" controls muted></video>';
+                    document.getElementById('adType').value = 'video';
+                } else {
+                    container.innerHTML = '<img src="' + e.target.result + '" style="width:160px; height:80px; object-fit:cover; border-radius:8px; border:2px solid #e11d48;">';
+                    document.getElementById('adType').value = 'image';
+                }
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.handleAdTypeChange = function(type) {
+            const fileInput = document.getElementById('adDirectFile');
+            if (type === 'video') fileInput.accept = 'video/mp4';
+            else fileInput.accept = 'image/*';
+        };
+    </script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, doc, getDocs, onSnapshot, updateDoc, deleteDoc, serverTimestamp, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -180,61 +540,648 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // Security: Yahan apna exact authorized admin email daalein
-        const AUTHORIZED_ADMIN_EMAIL = "support@ksindo.com"; // <-- Apne admin email se replace karein
-
-        const loginScreen = document.getElementById('adminLoginScreen');
-        const dashboard = document.getElementById('adminDashboard');
-        const loginForm = document.getElementById('adminLoginForm');
-        const loginBtnText = document.getElementById('loginBtnText');
-
-        // Check Authentication State
+        // Security Authentication Listener
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Check if this user is the allowed admin
-                if (AUTHORIZED_ADMIN_EMAIL === "" || user.email.toLowerCase() === AUTHORIZED_ADMIN_EMAIL.toLowerCase()) {
-                    loginScreen.style.display = "none";
-                    dashboard.style.display = "block";
-                    document.getElementById('activeAdminText').innerText = "Logged in: " + user.email;
-                } else {
-                    alert("⚠️ Access Denied: Yeh account admin panel ke liye authorized nahi hai.");
-                    signOut(auth);
-                }
+                document.getElementById('adminLoginScreen').style.display = 'none';
+                document.getElementById('activeAdminEmail').innerText = user.email;
             } else {
-                loginScreen.style.display = "flex";
-                dashboard.style.display = "none";
+                document.getElementById('adminLoginScreen').style.display = 'flex';
             }
         });
 
-        // Handle Direct Admin Login
-        loginForm.addEventListener('submit', async (e) => {
+        // Login Handler
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('adminEmail').value.trim();
-            const password = document.getElementById('adminPassword').value;
+            const pass = document.getElementById('adminPassword').value;
+            const btn = document.getElementById('loginBtn');
 
-            loginBtnText.innerText = "Verifying...";
-            loginBtnText.disabled = true;
+            btn.innerText = "Authorizing...";
+            btn.disabled = true;
 
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-                // Success hone par onAuthStateChanged automatically dashboard show kar dega
-            } catch (error) {
-                alert("❌ Login Failed: " + error.message);
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (err) {
+                alert("Login Error: " + err.message);
             } finally {
-                loginBtnText.innerText = "Authorize & Enter";
-                loginBtnText.disabled = false;
+                btn.innerText = "Authorize & Enter";
+                btn.disabled = false;
             }
         });
 
-        // Admin Logout
-        window.handleAdminLogout = function() {
-            if (confirm("Kya aap Admin panel se logout karna chahte hain?")) {
-                signOut(auth).then(() => {
-                    location.reload();
-                });
+        window.logoutAdminMaster = () => {
+            if (confirm("Logout from Master Admin Panel?")) {
+                signOut(auth).then(() => location.reload());
             }
+        };
+
+        const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+        let isFirstLoad = true;
+        let knownOrders = new Set();
+        let ordersDataCache = {};
+        let productsDataCache = {};
+        let shopsDataCache = {};
+
+        function playBellAlarm() {
+            if (isAudioAlarmMuted) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = ctx.currentTime;
+                [0, 0.25, 0.5, 0.75].forEach((delay, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = "sine";
+                    osc.frequency.setValueAtTime(idx % 2 === 0 ? 880 : 1046.5, now + delay);
+                    gain.gain.setValueAtTime(0.5, now + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.22);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + delay);
+                    osc.stop(now + delay + 0.22);
+                });
+            } catch(e) {}
+        }
+
+        window.showTab = function(tabId, el) {
+            document.querySelectorAll('.tab-section').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('aside nav a').forEach(a => a.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            el.classList.add('active');
+        };
+
+        setInterval(() => {
+            document.getElementById('liveClock').innerText = new Date().toLocaleString('en-IN');
+        }, 1000);
+
+        // Realtime Orders Queue
+        onSnapshot(collection(db, "orders"), async (snapshot) => {
+            let totalRevenue = 0, totalCash = 0;
+            let foodCount = 0, generalCount = 0;
+            let boyStats = {};
+            const now = Date.now();
+
+            const generalTable = document.getElementById('generalOrdersTableBody');
+            const foodTable = document.getElementById('foodOrdersTableBody');
+            const historyTable = document.getElementById('deliveredTableBody');
+            const auditTable = document.getElementById('deliveryBoyAuditBody');
+
+            generalTable.innerHTML = '';
+            foodTable.innerHTML = '';
+            historyTable.innerHTML = '';
+            auditTable.innerHTML = '';
+
+            for (const docSnap of snapshot.docs) {
+                const order = { id: docSnap.id, ...docSnap.data() };
+                ordersDataCache[order.id] = order;
+
+                if (!isFirstLoad && !knownOrders.has(docSnap.id)) {
+                    playBellAlarm();
+                }
+                knownOrders.add(docSnap.id);
+
+                const st = (order.status || 'Placed').toLowerCase();
+                const amt = Number(order.totalAmount || 0);
+
+                if (st === 'delivered' || st === 'cancelled') {
+                    let closedTime = order.closedAt ? new Date(order.closedAt).getTime() : (order.deliveredAt ? new Date(order.deliveredAt).getTime() : now);
+                    if (now - closedTime >= TWENTY_FOUR_HOURS_MS) {
+                        try { await deleteDoc(doc(db, "orders", order.id)); } catch (err) {}
+                        continue;
+                    }
+                    if (st === 'delivered') {
+                        totalRevenue += amt;
+                        totalCash += amt;
+                        if (order.assignedBoyPhone) {
+                            const b = order.assignedBoyPhone;
+                            if (!boyStats[b]) boyStats[b] = { count: 0, cash: 0 };
+                            boyStats[b].count++;
+                            boyStats[b].cash += amt;
+                        }
+                    }
+
+                    historyTable.innerHTML += 
+                        '<tr>' +
+                            '<td><small>' + (order.orderDateFormatted || 'Done') + '</small></td>' +
+                            '<td>' + (order.customerName || '') + '</td>' +
+                            '<td>' + (order.paymentMethod || 'COD') + '</td>' +
+                            '<td>₹' + order.totalAmount + '</td>' +
+                            '<td>' + (order.assignedBoyPhone || '-') + '</td>' +
+                            '<td><span class="status-pill">' + order.status + '</span></td>' +
+                        '</tr>';
+                } else {
+                    const hasFood = (order.items || []).some(i => (i.category || '').toLowerCase() === 'food');
+                    const itemsText = (order.items || []).map(i => i.name + ' (x' + (i.qty || 1) + ')').join(', ');
+                    const statusColor = (st === 'confirmed') ? '#dbeafe' : '#fed7aa';
+                    const textColor = (st === 'confirmed') ? '#1d4ed8' : '#c2410c';
+
+                    if (hasFood) {
+                        foodCount++;
+                        foodTable.innerHTML += 
+                            '<tr>' +
+                                '<td><small>' + (order.orderDateFormatted || 'Just now') + '</small></td>' +
+                                '<td>' + itemsText + '</td>' +
+                                '<td><strong>' + (order.customerName || '') + '</strong><br><small>📞 ' + (order.customerPhone || '') + '</small></td>' +
+                                '<td>₹' + order.totalAmount + '</td>' +
+                                '<td><strong>' + (order.deliveryOtp || 'N/A') + '</strong></td>' +
+                                '<td><span style="background:' + statusColor + '; color:' + textColor + '; padding:3px 6px; border-radius:10px; font-weight:bold; font-size:11px;">' + order.status + '</span></td>' +
+                                '<td><strong style="color:#ea580c;">' + (order.assignedShopName || 'Kitchen') + '</strong></td>' +
+                                '<td><button class="btn-print" onclick="printAdminBill(\'' + order.id + '\')">🖨️ Bill</button></td>' +
+                                '<td>' +
+                                    '<input type="tel" id="boy_' + order.id + '" placeholder="Boy Phone" value="' + (order.assignedBoyPhone || '') + '" style="width:100px; font-size:11px; padding:3px;"> ' +
+                                    '<button onclick="assignBoy(\'' + order.id + '\')" class="btn-primary" style="padding:3px 6px;">Assign</button>' +
+                                '</td>' +
+                                '<td><button onclick="cancelOrder(\'' + order.id + '\')" class="btn-danger">Cancel</button></td>' +
+                            '</tr>';
+                    } else {
+                        generalCount++;
+                        generalTable.innerHTML += 
+                            '<tr>' +
+                                '<td><small>' + (order.orderDateFormatted || 'Just now') + '</small></td>' +
+                                '<td><strong>' + (order.customerName || '') + '</strong><br><small>📞 ' + (order.customerPhone || '') + '</small></td>' +
+                                '<td>' + (order.customerAddress || '') + '</td>' +
+                                '<td>' + itemsText + '</td>' +
+                                '<td>₹' + order.totalAmount + '</td>' +
+                                '<td><strong>' + (order.deliveryOtp || 'N/A') + '</strong></td>' +
+                                '<td><span style="background:' + statusColor + '; color:' + textColor + '; padding:3px 6px; border-radius:10px; font-weight:bold; font-size:11px;">' + order.status + '</span></td>' +
+                                '<td><button class="btn-print" onclick="printAdminBill(\'' + order.id + '\')">🖨️ Bill</button></td>' +
+                                '<td>' +
+                                    '<input type="tel" id="boy_' + order.id + '" placeholder="Boy Phone" value="' + (order.assignedBoyPhone || '') + '" style="width:100px; font-size:11px; padding:3px;"> ' +
+                                    '<button onclick="assignBoy(\'' + order.id + '\')" class="btn-primary" style="padding:3px 6px;">Assign</button>' +
+                                '</td>' +
+                                '<td><button onclick="cancelOrder(\'' + order.id + '\')" class="btn-danger">Cancel</button></td>' +
+                            '</tr>';
+                    }
+                }
+            }
+
+            isFirstLoad = false;
+
+            // Update Badges
+            const bGen = document.getElementById('badgeGeneralOrders');
+            const bFood = document.getElementById('badgeFoodOrders');
+            if (generalCount > 0) { bGen.innerText = generalCount; bGen.style.display = 'inline-block'; } else { bGen.style.display = 'none'; }
+            if (foodCount > 0) { bFood.innerText = foodCount; bFood.style.display = 'inline-block'; } else { bFood.style.display = 'none'; }
+
+            Object.keys(boyStats).forEach(phone => {
+                const b = boyStats[phone];
+                auditTable.innerHTML += 
+                    '<tr>' +
+                        '<td><strong>📞 ' + phone + '</strong></td>' +
+                        '<td>' + b.count + ' Orders</td>' +
+                        '<td><strong style="color:#d97706;">₹' + b.cash + ' (Cash)</strong></td>' +
+                        '<td>₹0</td>' +
+                        '<td>₹' + b.cash + '</td>' +
+                    '</tr>';
+            });
+
+            document.getElementById('statRevenue').innerText = '₹' + totalRevenue;
+            document.getElementById('statTotalCash').innerText = '₹' + totalCash;
+            document.getElementById('statFood').innerText = foodCount;
+            document.getElementById('statGeneral').innerText = generalCount;
+        });
+
+        // Live Order Filter Search
+        window.filterOrdersTableLive = function() {
+            const query = (document.getElementById('orderSearchInput').value || '').toLowerCase();
+            const rows = document.querySelectorAll('#generalOrdersTableBody tr');
+            rows.forEach(r => {
+                const text = r.innerText.toLowerCase();
+                r.style.display = text.includes(query) ? '' : 'none';
+            });
+        };
+
+        // Export Orders to CSV
+        window.exportOrdersToCSV = function() {
+            let csv = "Order ID,Date,Customer,Phone,Amount,Status,OTP,Boy Phone\n";
+            Object.values(ordersDataCache).forEach(o => {
+                csv += `"${o.id}","${o.orderDateFormatted || ''}","${o.customerName || ''}","${o.customerPhone || ''}","${o.totalAmount || 0}","${o.status || ''}","${o.deliveryOtp || ''}","${o.assignedBoyPhone || ''}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `ksindo_orders_${Date.now()}.csv`);
+            a.click();
+        };
+
+        // 1-Click Bill Print
+        window.printAdminBill = async function(orderId) {
+            const order = ordersDataCache[orderId];
+            if (!order) return alert("Order data nahi mila!");
+
+            const invoiceArea = document.getElementById('adminPrintableBill');
+            invoiceArea.style.display = 'block';
+
+            let itemsRow = (order.items || []).map(i => 
+                '<div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px;">' +
+                    '<span>' + i.name + ' (x' + (i.qty || 1) + ')</span>' +
+                    '<span>₹' + ((i.price) * (i.qty || 1)) + '</span>' +
+                '</div>'
+            ).join('');
+
+            const deliveryCharge = Number(order.deliveryCharge !== undefined ? order.deliveryCharge : (Number(order.totalAmount) < 100 ? 20 : 0));
+            const subtotal = order.subtotal !== undefined ? order.subtotal : (Number(order.totalAmount) - deliveryCharge);
+
+            let shopGstinLine = '';
+            if (order.assignedShopId && shopsDataCache[order.assignedShopId]?.gstin) {
+                shopGstinLine = '<p style="margin:2px 0 0; font-size:10px;"><strong>GSTIN/FSSAI:</strong> ' + shopsDataCache[order.assignedShopId].gstin + '</p>';
+            }
+
+            invoiceArea.innerHTML = 
+                '<div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">' +
+                    '<h3 style="margin:0; font-size:16px;">KSINDO</h3>' +
+                    '<p style="margin:0; font-size:10px;">Official Invoice Receipt</p>' +
+                    shopGstinLine +
+                    '<p style="margin:0; font-size:10px;">' + (order.orderDateFormatted || new Date().toLocaleString()) + '</p>' +
+                '</div>' +
+                '<div style="font-size:11px; margin-bottom:5px; border-bottom:1px dashed #000; padding-bottom:5px;">' +
+                    '<strong>Customer:</strong> ' + (order.customerName || '') + '<br>' +
+                    '<strong>Phone:</strong> ' + (order.customerPhone || '') + '<br>' +
+                    '<strong>Address:</strong> ' + (order.customerAddress || '') + ' (PIN: ' + (order.customerPincode || '') + ')' +
+                '</div>' +
+                '<div style="margin-bottom:5px; border-bottom:1px dashed #000; padding-bottom:5px;">' +
+                    '<div style="font-weight:bold; font-size:11px; margin-bottom:3px;">ITEMS:</div>' +
+                    itemsRow +
+                '</div>' +
+                '<div style="font-size:12px; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">' +
+                    '<div style="display:flex; justify-content:space-between; margin-bottom:2px;">' +
+                        '<span>Item Subtotal:</span>' +
+                        '<span>₹' + subtotal + '</span>' +
+                    '</div>' +
+                    '<div style="display:flex; justify-content:space-between; font-weight:bold;">' +
+                        '<span>Delivery Charge:</span>' +
+                        '<span>' + (deliveryCharge > 0 ? ('+ ₹' + deliveryCharge) : 'FREE (₹0)') + '</span>' +
+                    '</div>' +
+                '</div>' +
+                '<div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px; margin-bottom:5px;">' +
+                    '<span>FINAL PAYABLE:</span>' +
+                    '<span>₹' + order.totalAmount + '</span>' +
+                '</div>' +
+                '<div style="text-align:center; font-size:10px; border-top:1px dashed #000; padding-top:5px; margin-top:5px;">' +
+                    'Payment: ' + (order.paymentMethod || 'COD') + '<br>' +
+                    'Helpline: 8252731656 , 06246451082<br>' +
+                    '<em>Doorstep OTP verification compulsory</em>' +
+                '</div>';
+
+            window.print();
+            invoiceArea.style.display = 'none';
+
+            try {
+                if ((order.status || '').toLowerCase() === 'placed') {
+                    await updateDoc(doc(db, "orders", orderId), {
+                        status: "Confirmed",
+                        billPrintedAt: new Date().toISOString()
+                    });
+                }
+            } catch(e) {}
+        };
+
+        window.assignBoy = async (id) => {
+            const phone = document.getElementById('boy_' + id).value.trim();
+            if (phone.length !== 10) return alert("10-digit phone number dalein!");
+            await updateDoc(doc(db, "orders", id), { assignedBoyPhone: phone, status: "Assigned" });
+            alert("Delivery boy assigned!");
+        };
+
+        window.cancelOrder = async (id) => {
+            if (confirm("Cancel order?")) {
+                await updateDoc(doc(db, "orders", id), { status: "Cancelled", closedAt: new Date().toISOString() });
+            }
+        };
+
+        // Customers Realtime
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const u = docSnap.data();
+                const tr = document.createElement('tr');
+                tr.className = 'clickable-customer-row';
+                tr.innerHTML = 
+                    '<td><strong>' + (u.fullName || 'User') + '</strong></td>' +
+                    '<td>' + (u.userEmail || u.email || '') + '</td>' +
+                    '<td>' + (u.phone || '-') + '</td>' +
+                    '<td>' + (u.address || '-') + '</td>' +
+                    '<td>' + (u.totalOrdersCount || 0) + '</td>' +
+                    '<td><button class="btn-primary" style="padding:3px 8px; font-size:11px;">View</button></td>';
+                tr.addEventListener('click', () => viewCustomerAudit(u.userEmail || u.email, u.fullName));
+                tbody.appendChild(tr);
+            });
+        });
+
+        window.viewCustomerAudit = async function(email, name) {
+            const modal = document.getElementById('customerAuditModal');
+            document.getElementById('modalCustName').innerText = 'History: ' + (name || 'Customer');
+            document.getElementById('modalCustEmail').innerText = 'Email: ' + (email || '');
+            const container = document.getElementById('modalOrdersContainer');
+            container.innerHTML = 'Searching orders...';
+            modal.classList.add('active');
+
+            try {
+                const q = query(collection(db, "orders"), where("userEmail", "==", email));
+                const snap = await getDocs(q);
+                if (snap.empty) { container.innerHTML = 'Koi order record nahi mila.'; return; }
+                container.innerHTML = '';
+                snap.forEach(d => {
+                    const o = d.data();
+                    const itemNames = (o.items || []).map(i => i.name + ' (x' + (i.qty || 1) + ')').join(', ');
+                    container.innerHTML += 
+                        '<div style="background:#f8fafc; border:1px solid #ddd; padding:10px; border-radius:8px; margin-bottom:8px;">' +
+                            '<strong>Date:</strong> ' + (o.orderDateFormatted || 'N/A') + ' | <strong>Status:</strong> ' + o.status + '<br>' +
+                            '<strong>Amount:</strong> ₹' + o.totalAmount + ' | <strong>OTP:</strong> ' + (o.deliveryOtp || 'N/A') + '<br>' +
+                            '<strong>Items:</strong> ' + itemNames +
+                        '</div>';
+                });
+            } catch(e) { container.innerHTML = 'Error: ' + e.message; }
+        };
+
+        window.closeCustomerAudit = () => document.getElementById('customerAuditModal').classList.remove('active');
+
+        // Manage Shops with GSTIN / FSSAI
+        document.getElementById('addShopForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const shopName = document.getElementById('shopNameInput').value.trim();
+            const shopType = document.getElementById('shopTypeInput').value;
+            const ownerName = document.getElementById('shopOwnerInput').value.trim();
+            const phone = document.getElementById('shopPhoneInput').value.trim();
+            const gstin = document.getElementById('shopGstinInput').value.trim();
+            const pincode = document.getElementById('shopPincodeInput').value.trim();
+            const address = document.getElementById('shopAddressInput').value.trim();
+            const username = document.getElementById('shopUserInput').value.trim().toLowerCase();
+            const password = document.getElementById('shopPassInput').value.trim();
+
+            try {
+                await addDoc(collection(db, "shops"), {
+                    shopName, shopType, ownerName, phone, gstin, pincode, address, username, password,
+                    createdAt: serverTimestamp()
+                });
+                alert('✅ Shop Registered with GSTIN/FSSAI! User: ' + username);
+                document.getElementById('addShopForm').reset();
+            } catch(err) { alert("Error: " + err.message); }
+        });
+
+        onSnapshot(collection(db, "shops"), (snapshot) => {
+            const tbody = document.getElementById('shopsTableBody');
+            tbody.innerHTML = '';
+            shopsDataCache = {};
+
+            snapshot.forEach(docSnap => {
+                const s = { id: docSnap.id, ...docSnap.data() };
+                shopsDataCache[s.id] = s;
+
+                const typeBadge = (s.shopType === 'mart') 
+                    ? '<span style="background:#dcfce7; color:#15803d; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">⚡ Quick Mart</span>'
+                    : '<span style="background:#ffedd5; color:#c2410c; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">🍔 Restaurant</span>';
+
+                tbody.innerHTML += 
+                    '<tr>' +
+                        '<td><strong>' + s.shopName + '</strong></td>' +
+                        '<td>' + typeBadge + '</td>' +
+                        '<td><small><strong>' + (s.gstin || 'None') + '</strong></small></td>' +
+                        '<td>' + s.ownerName + '</td>' +
+                        '<td>' + s.phone + '</td>' +
+                        '<td>' + (s.pincode || '-') + '</td>' +
+                        '<td><code>' + s.username + '</code></td>' +
+                        '<td><button class="btn-danger" onclick="deleteShop(\'' + docSnap.id + '\')">Delete</button></td>' +
+                    '</tr>';
+            });
+        });
+        window.deleteShop = async (id) => { if (confirm("Delete shop?")) await deleteDoc(doc(db, "shops", id)); };
+
+        // 5-Second Ads Management
+        onSnapshot(collection(db, "ads"), (snap) => {
+            const tbody = document.getElementById('adsTableBody');
+            tbody.innerHTML = '';
+
+            snap.forEach(d => {
+                const ad = { id: d.id, ...d.data() };
+                const mediaMarkup = (ad.type === 'video')
+                    ? '<video src="' + ad.mediaUrl + '" style="width:60px; height:35px; object-fit:cover; border-radius:4px;" muted></video>'
+                    : '<img src="' + ad.mediaUrl + '" style="width:60px; height:35px; object-fit:cover; border-radius:4px;">';
+
+                tbody.innerHTML += 
+                    '<tr>' +
+                        '<td>' + mediaMarkup + '</td>' +
+                        '<td><strong>' + (ad.title || 'Special Deal') + '</strong></td>' +
+                        '<td>' + ad.type.toUpperCase() + '</td>' +
+                        '<td><small>' + (ad.targetUrl || 'None') + '</small></td>' +
+                        '<td><button onclick="delAd(\'' + ad.id + '\')" class="btn-danger">Delete</button></td>' +
+                    '</tr>';
+            });
+        });
+
+        document.getElementById('createAdForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('adTitle').value.trim();
+            const type = document.getElementById('adType').value;
+            const linkUrl = document.getElementById('adMediaUrl').value.trim();
+            const targetUrl = document.getElementById('adTargetUrl').value.trim();
+
+            let finalMedia = base64AdMedia || linkUrl;
+            if (!finalMedia) return alert("Photo/Video direct upload karein ya URL link dalein!");
+
+            try {
+                await addDoc(collection(db, "ads"), {
+                    title, type, mediaUrl: finalMedia, targetUrl, createdAt: serverTimestamp()
+                });
+                alert("🎉 Ad successfully publish ho gaya! Index me live scroll hoga.");
+                document.getElementById('createAdForm').reset();
+                document.getElementById('adFilePreviewContainer').innerHTML = '';
+                base64AdMedia = '';
+            } catch(err) { alert("Error: " + err.message); }
+        });
+        window.delAd = async (id) => { if(confirm("Ad delete karein?")) await deleteDoc(doc(db, "ads", id)); };
+
+        // Product Edit System
+        window.editProduct = function(productId) {
+            const p = productsDataCache[productId];
+            if (!p) return alert("Product data load nahi ho paya!");
+
+            document.getElementById('editProductId').value = productId;
+            document.getElementById('prodName').value = p.name || '';
+            document.getElementById('prodSubCategory').value = p.subCategory || 'none';
+            document.getElementById('prodImageLink').value = p.imageUrl || '';
+            document.getElementById('prodDesc').value = p.description || '';
+
+            const selectedCats = p.categories || [p.category];
+            document.querySelectorAll('input[name="productCats"]').forEach(cb => {
+                cb.checked = selectedCats.includes(cb.value);
+            });
+
+            const container = document.getElementById('variantsContainer');
+            container.innerHTML = '';
+            if (p.sizes && p.sizes.length > 0) {
+                p.sizes.forEach(v => {
+                    addVariantRow(v.size, v.price, v.originalPrice, v.discount || '');
+                });
+            } else {
+                addVariantRow('Default', p.price, p.originalPrice, p.discount || '');
+            }
+
+            document.getElementById('productFormHeader').innerText = '✏️ Edit Product: ' + p.name;
+            document.getElementById('productSubmitBtn').innerText = 'Update Product';
+            document.getElementById('cancelEditBtn').style.display = 'inline-block';
+
+            window.scrollTo({ top: document.getElementById('tab-products').offsetTop, behavior: 'smooth' });
+        };
+
+        window.resetProductForm = function() {
+            document.getElementById('addProductForm').reset();
+            document.getElementById('editProductId').value = '';
+            document.getElementById('productFormHeader').innerText = '+ Naya Product Add Karein (Individual Size MRP, Selling Price & Auto-Discount)';
+            document.getElementById('productSubmitBtn').innerText = 'Publish Product';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+            document.getElementById('photoPreviewContainer').innerHTML = '';
+            document.getElementById('variantsContainer').innerHTML = '';
+            base64PhotosArray = [];
+            addVariantRow();
+        };
+
+        // Publish OR Update Product
+        document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('editProductId').value;
+            const name = document.getElementById('prodName').value.trim();
+            const subCategory = document.getElementById('prodSubCategory').value;
+            const desc = document.getElementById('prodDesc').value.trim();
+            const imgLink = document.getElementById('prodImageLink').value.trim();
+
+            const selectedCats = Array.from(document.querySelectorAll('input[name="productCats"]:checked')).map(cb => cb.value);
+            if (selectedCats.length === 0) return alert("Kam se kam ek Category select karein!");
+
+            const vNames = document.querySelectorAll('.v-name');
+            const vPrices = document.querySelectorAll('.v-price');
+            const vOrigPrices = document.querySelectorAll('.v-orig-price');
+            let variantsList = [];
+
+            vNames.forEach((nEl, idx) => {
+                const vName = nEl.value.trim();
+                const vPrice = Number(vPrices[idx].value);
+                const vOrig = Number(vOrigPrices[idx].value) || '';
+                
+                if (vName && !isNaN(vPrice) && vPrice > 0) {
+                    let vDisc = '';
+                    if (vOrig && vOrig > vPrice) {
+                        vDisc = Math.round(((vOrig - vPrice) / vOrig) * 100) + '% OFF';
+                    }
+                    variantsList.push({ 
+                        size: vName, 
+                        price: vPrice, 
+                        originalPrice: vOrig,
+                        discount: vDisc
+                    });
+                }
+            });
+
+            if (variantsList.length === 0) {
+                return alert("Kam se kam 1 Size/Variant add karein!");
+            }
+
+            const defaultBasePrice = variantsList[0].price;
+            const defaultOriginalPrice = variantsList[0].originalPrice || '';
+            const defaultDiscount = variantsList[0].discount || '';
+
+            let photos = [];
+            if (base64PhotosArray.length > 0) {
+                photos = base64PhotosArray;
+            } else if (imgLink) {
+                photos = [imgLink];
+            } else if (editId && productsDataCache[editId]) {
+                photos = productsDataCache[editId].images || [productsDataCache[editId].imageUrl];
+            } else {
+                return alert("Photo link dalein ya 1-6 photos upload karein!");
+            }
+
+            try {
+                const productData = {
+                    name,
+                    price: defaultBasePrice,
+                    originalPrice: defaultOriginalPrice,
+                    discount: defaultDiscount,
+                    categories: selectedCats,
+                    category: selectedCats[0],
+                    subCategory,
+                    description: desc,
+                    imageUrl: photos[0],
+                    images: photos,
+                    hasVariants: true,
+                    sizes: variantsList
+                };
+
+                if (editId) {
+                    await updateDoc(doc(db, "products", editId), {
+                        ...productData,
+                        updatedAt: serverTimestamp()
+                    });
+                    alert("✅ Product update ho gaya!");
+                } else {
+                    await addDoc(collection(db, "products"), {
+                        ...productData,
+                        createdAt: serverTimestamp()
+                    });
+                    alert("✅ Product publish ho gaya!");
+                }
+
+                resetProductForm();
+            } catch(err) { alert("Error: " + err.message); }
+        });
+
+        // Realtime Products Sync
+        onSnapshot(collection(db, "products"), (snapshot) => {
+            productsDataCache = {};
+            snapshot.forEach(docSnap => {
+                productsDataCache[docSnap.id] = { id: docSnap.id, ...docSnap.data() };
+            });
+            renderCatalogRows();
+        });
+
+        function renderCatalogRows(filteredList = null) {
+            const tbody = document.getElementById('productsTableBody');
+            tbody.innerHTML = '';
+            const list = filteredList || Object.values(productsDataCache);
+
+            list.forEach(p => {
+                const cats = p.categories ? p.categories.join(', ') : p.category;
+                const vCount = (p.sizes && p.sizes.length > 0) ? (p.sizes.length + ' Sizes') : 'Single';
+                const origMarkup = p.originalPrice ? ('<span style="text-decoration:line-through; color:#888; font-size:11px;">(₹' + p.originalPrice + ')</span>') : '';
+                const imgUrl = p.imageUrl || (p.images ? p.images[0] : '');
+
+                tbody.innerHTML += 
+                    '<tr>' +
+                        '<td><img src="' + imgUrl + '" style="width:35px; height:35px; border-radius:4px; object-fit:cover;"></td>' +
+                        '<td><strong>' + p.name + '</strong></td>' +
+                        '<td><span style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:6px; font-weight:bold; font-size:11px;">' + cats + '</span></td>' +
+                        '<td>₹' + p.price + ' ' + origMarkup + '</td>' +
+                        '<td><span style="background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:10px; font-weight:bold; font-size:11px;">' + vCount + '</span></td>' +
+                        '<td>' +
+                            '<button onclick="editProduct(\'' + p.id + '\')" class="btn-edit">✏️ Edit</button>' +
+                            '<button onclick="delProd(\'' + p.id + '\')" class="btn-danger">Delete</button>' +
+                        '</td>' +
+                    '</tr>';
+            });
+        }
+
+        // Live Filter for Store Catalog
+        window.filterCatalogLive = function() {
+            const query = (document.getElementById('catalogSearchInput').value || '').toLowerCase();
+            const cat = document.getElementById('catalogCatFilter').value;
+
+            const filtered = Object.values(productsDataCache).filter(p => {
+                const matchesName = (p.name || '').toLowerCase().includes(query);
+                const cats = p.categories || [p.category || ''];
+                const matchesCat = (cat === 'all') || cats.includes(cat);
+                return matchesName && matchesCat;
+            });
+
+            renderCatalogRows(filtered);
+        };
+
+        window.delProd = async (id) => { 
+            if (confirm("Delete product?")) await deleteDoc(doc(db, "products", id)); 
         };
     </script>
 </body>
