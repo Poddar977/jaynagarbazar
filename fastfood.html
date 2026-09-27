@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ksindo Fast Food & Kitchens</title>
+    <!-- Stable Firebase Compat SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color:transparent; }
+        body { background-color:#fff7ed; color:#1e293b; padding-bottom:60px; }
+
+        header { 
+            background-color:#ea580c; color:white; padding:12px 5%; 
+            display:flex; align-items:center; justify-content:space-between; 
+            position:sticky; top:0; z-index:1000; box-shadow:0 2px 10px rgba(234, 88, 12, 0.3); 
+        }
+        .header-left { display:flex; align-items:center; gap:12px; }
+        .back-btn { 
+            background:white; color:#ea580c; border:none; padding:7px 14px; 
+            border-radius:20px; font-weight:800; cursor:pointer; font-size:12px; text-decoration:none;
+        }
+        .logo-text { font-size:22px; font-weight:900; letter-spacing:1px; cursor:pointer; }
+        
+        .location-pill {
+            background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4);
+            padding:6px 14px; border-radius:20px; font-size:12px; font-weight:700;
+            display:flex; align-items:center; gap:6px; cursor:pointer;
+        }
+
+        .nav-actions { display:flex; gap:10px; align-items:center; }
+        .nav-round-btn { 
+            background-color:#fff; color:#ea580c; border:none; width:38px; height:38px; 
+            border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; 
+            font-size:16px; position:relative; font-weight:bold;
+        }
+        .cart-badge { 
+            background-color:#0f172a; color:white; padding:2px 6px; border-radius:12px; 
+            font-size:11px; position:absolute; top:-4px; right:-4px; font-weight:bold; 
+        }
+
+        /* LOCATION GATEWAY BLOCKER */
+        #locationGatewayModal {
+            position:fixed; inset:0; background:rgba(15, 23, 42, 0.85); backdrop-filter:blur(5px);
+            z-index:99999; display:flex; align-items:center; justify-content:center; padding:20px;
+        }
+        .gateway-card {
+            background:white; border-radius:20px; padding:30px 25px; width:100%; max-width:420px;
+            text-align:center; box-shadow:0 20px 40px rgba(0,0,0,0.3); border:2px solid #fed7aa;
+        }
+        .gateway-icon { font-size:48px; margin-bottom:12px; display:inline-block; }
+        .gateway-card h2 { font-size:20px; color:#c2410c; margin-bottom:8px; font-weight:800; }
+        .gateway-card p { font-size:13px; color:#64748b; margin-bottom:20px; line-height:1.5; }
+        
+        .btn-gps {
+            width:100%; background:#ea580c; color:white; border:none; padding:13px;
+            border-radius:12px; font-size:14px; font-weight:bold; cursor:pointer; margin-bottom:14px;
+            display:flex; align-items:center; justify-content:center; gap:8px;
+        }
+        .divider { display:flex; align-items:center; color:#94a3b8; font-size:12px; margin:14px 0; }
+        .divider::before, .divider::after { content:''; flex:1; height:1px; background:#e2e8f0; }
+        .divider span { padding:0 10px; }
+
+        .pincode-input-box { display:flex; gap:8px; }
+        .pincode-input-box input {
+            flex:1; padding:12px; border:2px solid #cbd5e1; border-radius:10px;
+            font-size:14px; font-weight:bold; text-align:center; outline:none;
+        }
+        .pincode-input-box input:focus { border-color:#ea580c; }
+        .pincode-input-box button {
+            background:#0f172a; color:white; border:none; padding:0 20px;
+            border-radius:10px; font-weight:bold; cursor:pointer;
+        }
+
+        .container { max-width:1150px; margin:20px auto; padding:0 15px; }
+        .page-title { font-size:18px; font-weight:800; color:#c2410c; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; }
+        
+        .restaurant-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:18px; }
+        .restaurant-card {
+            background:white; border-radius:16px; overflow:hidden; border:1.5px solid #fed7aa;
+            cursor:pointer; transition:0.2s; box-shadow:0 4px 12px rgba(234, 88, 12, 0.06);
+        }
+        .restaurant-card:hover { transform:translateY(-4px); box-shadow:0 8px 20px rgba(234, 88, 12, 0.15); }
+        .restaurant-img { width:100%; height:140px; object-fit:cover; background:#fed7aa; }
+        .restaurant-info { padding:14px; }
+        .restaurant-title { font-size:16px; font-weight:800; color:#0f172a; margin-bottom:4px; }
+        .restaurant-sub { font-size:12px; color:#64748b; margin-bottom:8px; }
+        .restaurant-badge { background:#ffedd5; color:#ea580c; font-size:11px; font-weight:bold; padding:3px 8px; border-radius:6px; }
+
+        .product-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:16px; }
+        @media(max-width:600px){ .product-grid { grid-template-columns:repeat(auto-fill, minmax(145px, 1fr)); gap:10px; } }
+        
+        .dish-card { 
+            background:white; border:1.5px solid #fed7aa; border-radius:14px; padding:12px; 
+            display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 4px 10px rgba(234, 88, 12, 0.05);
+        }
+        .dish-card img { width:100%; height:130px; object-fit:contain; border-radius:8px; margin-bottom:8px; background:#fffaf0; }
+        .dish-title { font-size:13px; font-weight:700; color:#0f172a; height:34px; overflow:hidden; line-height:1.3; }
+        .dish-price { font-size:16px; font-weight:900; color:#ea580c; margin:6px 0; }
+        
+        .card-actions { display:flex; gap:6px; margin-top:8px; }
+        .btn-dish-add { background:#ea580c; color:white; border:none; padding:8px; border-radius:8px; font-weight:bold; font-size:11px; flex:1; cursor:pointer; }
+        .btn-dish-order { background:#16a34a; color:white; border:none; padding:8px; border-radius:8px; font-weight:bold; font-size:11px; flex:1; cursor:pointer; }
+
+        .cart-modal { 
+            position:fixed; top:0; right:-100%; width:100%; max-width:380px; height:100%; 
+            background:white; box-shadow:-5px 0 20px rgba(0,0,0,0.3); 
+            transition:right 0.3s ease; z-index:99999; display:flex; flex-direction:column; 
+        }
+        .cart-modal.open { right:0 !important; }
+        .cart-header { background:#ea580c; color:white; padding:15px; display:flex; justify-content:space-between; align-items:center; }
+        .cart-items { flex:1; overflow-y:auto; padding:15px; }
+        .cart-item { display:flex; gap:10px; align-items:center; border-bottom:1px solid #eee; padding:10px 0; }
+        .cart-item img { width:45px; height:45px; object-fit:cover; border-radius:8px; }
+        .qty-controls { display:inline-flex; align-items:center; border:1px solid #fed7aa; border-radius:20px; background:#fff7ed; overflow:hidden; margin-top:4px; }
+        .qty-btn { background:#ffedd5; border:none; width:26px; height:26px; cursor:pointer; font-weight:bold; color:#ea580c; }
+        .qty-val { min-width:24px; text-align:center; font-size:12px; font-weight:bold; }
+        .cart-footer { padding:15px; border-top:1px solid #eee; background:#fffaf0; }
+        .btn-order-confirm { background:#ea580c; color:white; border:none; font-weight:bold; cursor:pointer; width:100%; padding:13px; border-radius:25px; font-size:14px; }
+
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:100000; padding:15px; }
+        .modal-overlay.active { display:flex; }
+        .modal-box { background:white; padding:25px; border-radius:18px; width:100%; max-width:500px; max-height:90vh; overflow-y:auto; position:relative; }
+        .close-btn { position:absolute; right:15px; top:15px; cursor:pointer; font-size:22px; font-weight:bold; width:30px; height:30px; border-radius:50%; background:#f1f2f6; display:flex; align-items:center; justify-content:center; border:none; }
+        .form-row { margin-bottom:12px; }
+        .form-row label { display:block; font-size:12px; font-weight:bold; margin-bottom:4px; color:#475569; }
+        .form-row input { width:100%; padding:10px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <a href="index.html" class="back-btn">← Market</a>
+            <div class="logo-text" onclick="window.location.reload()">ksindo Food</div>
+        </div>
+
+        <div class="location-pill" onclick="reopenLocationGateway()">
+            <span>📍</span>
+            <span id="headerLocationText">Select Location</span>
+            <small style="font-size:10px;">▼</small>
+        </div>
+
+        <div class="nav-actions">
+            <button class="nav-round-btn" onclick="toggleCart(true)">
+                🛒 <span class="cart-badge" id="cart-count">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MANDATORY LOCATION GATEWAY -->
+    <div id="locationGatewayModal">
+        <div class="gateway-card">
+            <span class="gateway-icon">🛵</span>
+            <h2>Enter Delivery Location</h2>
+            <p>Fresh restaurant meals sirf aapke delivery zone ke active kitchens se dispatch kiye jaate hain. Pehle apni location confirm karein.</p>
+            
+            <button class="btn-gps" onclick="fetchGPSLocation()">
+                <span>🎯</span> Use Current GPS Location
+            </button>
+
+            <div class="divider"><span>YA PINCODE DALEIN</span></div>
+
+            <div class="pincode-input-box">
+                <input type="text" id="manualPincodeInput" placeholder="6-Digit Pincode (e.g. 847226)" maxlength="6">
+                <button type="button" onclick="submitManualPincode()">Verify</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN RESTAURANT CONTAINER -->
+    <div class="container" id="foodMainContent" style="display:none;">
+        <div id="restaurantListView">
+            <div class="page-title">
+                <span>Active Kitchens & Restaurants</span>
+                <small id="filteredCountBadge" style="background:#ffedd5; color:#c2410c; padding:3px 8px; border-radius:10px; font-size:12px;"></small>
+            </div>
+            <div class="restaurant-grid" id="restaurantsContainer"></div>
+        </div>
+
+        <div id="restaurantMenuView" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:white; padding:15px 20px; border-radius:12px; border:1px solid #fed7aa;">
+                <div>
+                    <button onclick="backToShopsList()" style="background:#ea580c; color:white; border:none; padding:5px 12px; border-radius:15px; font-weight:bold; cursor:pointer; font-size:12px; margin-bottom:4px;">← Change Restaurant</button>
+                    <h2 id="activeShopName" style="color:#0f172a; font-size:18px;">Restaurant Menu</h2>
+                    <small id="activeShopAddress" style="color:#64748b; font-size:12px;"></small>
+                </div>
+                <span id="activeShopPincode" style="background:#ffedd5; color:#ea580c; font-weight:bold; padding:4px 10px; border-radius:10px; font-size:12px;"></span>
+            </div>
+            <div class="product-grid" id="dishesGrid"></div>
+        </div>
+    </div>
+
+    <!-- CART MODAL -->
+    <div class="cart-modal" id="cart-modal">
+        <div class="cart-header">
+            <h3>Food Cart</h3>
+            <span style="cursor:pointer; font-size:24px; font-weight:bold;" onclick="toggleCart(false)">&times;</span>
+        </div>
+        <div class="cart-items" id="cart-items"></div>
+        <div class="cart-footer">
+            <div style="font-size:13px; margin-bottom:4px;">Food Subtotal: ₹<span id="cart-subtotal">0</span></div>
+            <div style="font-size:13px; margin-bottom:4px; color:#c2410c; font-weight:bold;">Delivery Fee: ₹<span id="delivery-charge">0</span></div>
+            <h4 style="margin:6px 0; color:#ea580c;">Total Payable: ₹<span id="cart-total">0</span></h4>
+            <button class="btn-order-confirm" onclick="openCheckoutModal()">PROCEED TO CHECKOUT</button>
+        </div>
+    </div>
+
+    <!-- CHECKOUT MODAL -->
+    <div class="modal-overlay" id="checkout-modal-overlay">
+        <div class="modal-box">
+            <button class="close-btn" onclick="closeCheckoutModal()">&times;</button>
+            <h2 style="font-size:18px; color:#ea580c; margin-bottom:14px;">🛵 Confirm Kitchen Order</h2>
+            <form id="foodCheckoutForm">
+                <div class="form-row">
+                    <label>Customer Name</label>
+                    <input type="text" id="custName" placeholder="Full Name" required>
+                </div>
+                <div class="form-row">
+                    <label>Phone Number</label>
+                    <input type="tel" id="custPhone" placeholder="10-digit Phone" maxlength="10" required>
+                </div>
+                <div class="form-row">
+                    <label>Delivery Address</label>
+                    <input type="text" id="custAddress" placeholder="Room/Ward, Street, Landmark" required>
+                </div>
+                <div class="form-row">
+                    <label>Delivery Pincode</label>
+                    <input type="text" id="custPincode" readonly style="background:#f1f5f9;">
+                </div>
+                <div style="background:#fff7ed; border:1px dashed #ea580c; padding:12px; border-radius:10px; margin:12px 0;">
+                    <div style="display:flex; justify-content:space-between; font-size:13px;">
+                        <span>Final Bill:</span>
+                        <strong style="color:#ea580c; font-size:15px;">₹<span id="checkoutTotalAmount">0</span></strong>
+                    </div>
+                    <small style="color:#c2410c; display:block; margin-top:4px;">⚠️ Kitchen dispatch ke baad restaurant food order cancel nahi hota.</small>
+                </div>
+                <button type="submit" class="btn-order-confirm" id="btnPlaceFoodOrder">Confirm & Send to Kitchen</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyA7f9PWSyws4XkzKq077sNdlF0J33DSVSo",
+            authDomain: "jaynagar-srote.firebaseapp.com",
+            projectId: "jaynagar-srote",
+            storageBucket: "jaynagar-srote.firebasestorage.app",
+            messagingSenderId: "820632565818",
+            appId: "1:820632565818:web:0b2f4676cecd799a801d03"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        var db = firebase.firestore();
+        var auth = firebase.auth();
+
+        var currentUser = null;
+        var currentUserProfile = JSON.parse(localStorage.getItem('user_profile') || '{}');
+        var userLocationPin = localStorage.getItem('ksindo_user_pin') || '';
+
+        var allShops = [];
+        var allFoodDishes = [];
+        var activeShopId = null;
+
+        auth.onAuthStateChanged(function(user) {
+            currentUser = user;
+            if (user && !currentUserProfile.userEmail) {
+                db.collection("users").doc(user.uid).get().then(function(doc) {
+                    if (doc.exists) {
+                        currentUserProfile = doc.data();
+                        localStorage.setItem('user_profile', JSON.stringify(currentUserProfile));
+                    }
+                });
+            }
+        });
+
+        function checkLocationStatus() {
+            if (userLocationPin && userLocationPin.length === 6) {
+                document.getElementById('locationGatewayModal').style.display = 'none';
+                document.getElementById('foodMainContent').style.display = 'block';
+                document.getElementById('headerLocationText').innerText = "PIN: " + userLocationPin;
+                loadFoodData();
+            } else {
+                document.getElementById('locationGatewayModal').style.display = 'flex';
+                document.getElementById('foodMainContent').style.display = 'none';
+            }
+        }
+
+        window.submitManualPincode = function() {
+            var pin = (document.getElementById('manualPincodeInput').value || '').trim();
+            if (pin.length !== 6 || isNaN(pin)) {
+                alert("Kripya sahi 6-digit Pincode dalein!");
+                return;
+            }
+            userLocationPin = pin;
+            localStorage.setItem('ksindo_user_pin', pin);
+            checkLocationStatus();
+        };
+
+        window.fetchGPSLocation = function() {
+            if (!navigator.geolocation) {
+                alert("Aapka browser GPS support nahi karta. Kripya pincode dalein.");
+                return;
+            }
+            var btn = document.querySelector('.btn-gps');
+            btn.innerText = "Locating...";
+            navigator.geolocation.getCurrentPosition(function(pos) {
+                var detectedPin = currentUserProfile.pincode || "847226";
+                userLocationPin = detectedPin;
+                localStorage.setItem('ksindo_user_pin', detectedPin);
+                alert("Location detect ho gayi! (PIN: " + detectedPin + ")");
+                checkLocationStatus();
+            }, function(err) {
+                alert("GPS permission deny ho gaya. Kripya neeche apna 6-digit Pincode dalein.");
+                btn.innerHTML = '<span>🎯</span> Use Current GPS Location';
+            });
+        };
+
+        window.reopenLocationGateway = function() {
+            document.getElementById('locationGatewayModal').style.display = 'flex';
+        };
+
+        function loadFoodData() {
+            db.collection("shops").onSnapshot(function(snap) {
+                allShops = [];
+                snap.forEach(function(d) {
+                    var s = { id: d.id, ...d.data() };
+                    if (s.pincode === userLocationPin || !s.pincode || (s.address || '').includes(userLocationPin)) {
+                        allShops.push(s);
+                    }
+                });
+                renderShopsList();
+            });
+
+            db.collection("products").onSnapshot(function(snap) {
+                allFoodDishes = [];
+                snap.forEach(function(d) {
+                    var p = { id: d.id, ...d.data() };
+                    var isFood = (p.category || '').toLowerCase() === 'food' || (p.categories && p.categories.includes('food'));
+                    if (isFood) allFoodDishes.push(p);
+                });
+                if (activeShopId) renderActiveMenu();
+            });
+        }
+
+        function renderShopsList() {
+            var container = document.getElementById('restaurantsContainer');
+            var badge = document.getElementById('filteredCountBadge');
+            badge.innerText = allShops.length + " Kitchens Available";
+
+            if (allShops.length === 0) {
+                container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; background:white; border-radius:16px;">' +
+                    '<h3 style="color:#c2410c;">Is Location Par Abhi Kitchen Live Nahi Hai</h3>' +
+                    '<p style="color:#64748b; font-size:13px; margin-top:6px;">Pincode ' + userLocationPin + ' par deliver karne wale restaurants jald shamil honge.</p>' +
+                    '<button onclick="reopenLocationGateway()" style="margin-top:14px; background:#ea580c; color:white; border:none; padding:8px 16px; border-radius:20px; font-weight:bold; cursor:pointer;">Change Pincode</button>' +
+                '</div>';
+                return;
+            }
+
+            var html = '';
+            allShops.forEach(function(shop) {
+                var dishCount = allFoodDishes.filter(function(d) {
+                    return (d.assignedShopId === shop.id || d.shopName === shop.shopName);
+                }).length;
+
+                var banner = shop.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500';
+
+                html += '<div class="restaurant-card" onclick="openShopMenu(\'' + shop.id + '\')">' +
+                    '<img src="' + banner + '" class="restaurant-img">' +
+                    '<div class="restaurant-info">' +
+                        '<div class="restaurant-title">' + shop.shopName + '</div>' +
+                        '<div class="restaurant-sub">📍 ' + (shop.address || 'Local Market') + ' (PIN: ' + (shop.pincode || userLocationPin) + ')</div>' +
+                        '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+                            '<span class="restaurant-badge">' + dishCount + ' Dishes Available</span>' +
+                            '<strong style="color:#ea580c; font-size:12px;">Order Now →</strong>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            });
+            container.innerHTML = html;
+        }
+
+        window.openShopMenu = function(shopId) {
+            activeShopId = shopId;
+            var shop = allShops.find(function(s){ return s.id === shopId; });
+            if (!shop) return;
+
+            document.getElementById('restaurantListView').style.display = 'none';
+            document.getElementById('restaurantMenuView').style.display = 'block';
+
+            document.getElementById('activeShopName').innerText = shop.shopName;
+            document.getElementById('activeShopAddress').innerText = "📍 " + (shop.address || '');
+            document.getElementById('activeShopPincode').innerText = "PIN: " + (shop.pincode || userLocationPin);
+
+            renderActiveMenu();
+        };
+
+        window.backToShopsList = function() {
+            activeShopId = null;
+            document.getElementById('restaurantListView').style.display = 'block';
+            document.getElementById('restaurantMenuView').style.display = 'none';
+        };
+
+        function renderActiveMenu() {
+            var grid = document.getElementById('dishesGrid');
+            var shop = allShops.find(function(s){ return s.id === activeShopId; });
+            if (!shop) return;
+
+            var dishes = allFoodDishes.filter(function(d) {
+                return (d.assignedShopId === shop.id || d.shopName === shop.shopName);
+            });
+
+            if (dishes.length === 0) {
+                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:30px; background:white; border-radius:12px;">Is restaurant ke dishes jald live honge.</p>';
+                return;
+            }
+
+            var html = '';
+            dishes.forEach(function(d) {
+                var img = (d.images && d.images.length > 0) ? d.images[0] : (d.imageUrl || 'https://via.placeholder.com/150');
+                html += '<div class="dish-card">' +
+                    '<img src="' + img + '">' +
+                    '<div class="dish-title">' + d.name + '</div>' +
+                    '<div class="dish-price">₹' + d.price + '</div>' +
+                    '<div class="card-actions">' +
+                        '<button class="btn-dish-add" onclick="addDishToCart(\'' + d.id + '\')">🛒 Add</button>' +
+                        '<button class="btn-dish-order" onclick="directOrderDish(\'' + d.id + '\')">⚡ Order</button>' +
+                    '</div>' +
+                '</div>';
+            });
+            grid.innerHTML = html;
+        }
+
+        function getFoodCart() {
+            try {
+                var c = JSON.parse(localStorage.getItem('store_cart')) || [];
+                return Array.isArray(c) ? c : [];
+            } catch(e) { return []; }
+        }
+
+        function saveFoodCart(cart) {
+            localStorage.setItem('store_cart', JSON.stringify(cart));
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartUI();
+        }
+
+        window.toggleCart = function(open) {
+            var drawer = document.getElementById('cart-modal');
+            if (open === true) drawer.classList.add('open');
+            else if (open === false) drawer.classList.remove('open');
+            else drawer.classList.toggle('open');
+            updateCartUI();
+        };
+
+        window.addDishToCart = function(dishId) {
+            var dish = allFoodDishes.find(function(x){ return x.id === dishId; });
+            var shop = allShops.find(function(s){ return s.id === activeShopId; });
+            if (!dish || !shop) return;
+
+            var cart = getFoodCart();
+            var existingOther = cart.find(function(i){ return i.assignedShopId && i.assignedShopId !== shop.id; });
+            if (existingOther) {
+                if (!confirm('Cart me doosre restaurant ka khana hai. Naye restaurant (' + shop.shopName + ') se order karne par purana cart clear ho jayega. Continue?')) {
+                    return;
+                }
+                cart = [];
+            }
+
+            var item = cart.find(function(i){ return i.id === dishId; });
+            if (item) {
+                item.qty = (Number(item.qty) || 1) + 1;
+            } else {
+                cart.push({
+                    id: dish.id,
+                    name: dish.name,
+                    price: Number(dish.price) || 0,
+                    imageUrl: dish.imageUrl || (dish.images ? dish.images[0] : ''),
+                    category: 'food',
+                    assignedShopId: shop.id,
+                    assignedShopName: shop.shopName,
+                    qty: 1
+                });
+            }
+
+            saveFoodCart(cart);
+            toggleCart(true);
+        };
+
+        window.directOrderDish = function(dishId) {
+            addDishToCart(dishId);
+            openCheckoutModal();
+        };
+
+        function updateCartUI() {
+            var cart = getFoodCart();
+            var totalQty = 0, subtotal = 0;
+            cart.forEach(function(i){
+                totalQty += (Number(i.qty) || 1);
+                subtotal += (Number(i.price) * (Number(i.qty) || 1));
+            });
+
+            document.getElementById('cart-count').innerText = totalQty;
+            var container = document.getElementById('cart-items');
+
+            if (cart.length === 0) {
+                container.innerHTML = '<p style="text-align:center; padding:30px; color:#64748b;">Aapka cart khali hai.</p>';
+                document.getElementById('cart-subtotal').innerText = '0';
+                document.getElementById('delivery-charge').innerText = '0';
+                document.getElementById('cart-total').innerText = '0';
+                return;
+            }
+
+            var html = '';
+            cart.forEach(function(item, idx) {
+                html += '<div class="cart-item">' +
+                    '<img src="' + (item.imageUrl || 'https://via.placeholder.com/50') + '">' +
+                    '<div style="flex:1;">' +
+                        '<strong style="font-size:13px; color:#0f172a;">' + item.name + '</strong><br>' +
+                        '<small style="color:#ea580c; font-weight:bold;">₹' + item.price + '</small><br>' +
+                        '<div class="qty-controls">' +
+                            '<button class="qty-btn" onclick="modifyQty(' + idx + ', -1)">−</button>' +
+                            '<span class="qty-val">' + item.qty + '</span>' +
+                            '<button class="qty-btn" onclick="modifyQty(' + idx + ', 1)">+</button>' +
+                        '</div>' +
+                    '</div>' +
+                    '<button onclick="removeFoodItem(' + idx + ')" style="background:none; border:none; color:red; cursor:pointer;">✕</button>' +
+                '</div>';
+            });
+            container.innerHTML = html;
+
+            var deliveryCharge = (subtotal > 0 && subtotal < 100) ? 20 : 0;
+            document.getElementById('cart-subtotal').innerText = subtotal;
+            document.getElementById('delivery-charge').innerText = deliveryCharge;
+            document.getElementById('cart-total').innerText = (subtotal + deliveryCharge);
+            document.getElementById('checkoutTotalAmount').innerText = (subtotal + deliveryCharge);
+        }
+
+        window.modifyQty = function(idx, delta) {
+            var cart = getFoodCart();
+            cart[idx].qty = (Number(cart[idx].qty) || 1) + delta;
+            if (cart[idx].qty <= 0) cart.splice(idx, 1);
+            saveFoodCart(cart);
+        };
+
+        window.removeFoodItem = function(idx) {
+            var cart = getFoodCart();
+            cart.splice(idx, 1);
+            saveFoodCart(cart);
+        };
+
+        window.openCheckoutModal = function() {
+            var cart = getFoodCart();
+            if (cart.length === 0) return alert("Cart khali hai!");
+
+            document.getElementById('custName').value = currentUserProfile.fullName || '';
+            document.getElementById('custPhone').value = currentUserProfile.phone || '';
+            document.getElementById('custAddress').value = currentUserProfile.address || '';
+            document.getElementById('custPincode').value = userLocationPin;
+
+            toggleCart(false);
+            document.getElementById('checkout-modal-overlay').classList.add('active');
+        };
+
+        window.closeCheckoutModal = function() {
+            document.getElementById('checkout-modal-overlay').classList.remove('active');
+        };
+
+        document.getElementById('foodCheckoutForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var cart = getFoodCart();
+            var btn = document.getElementById('btnPlaceFoodOrder');
+            btn.innerText = "Sending Order...";
+            btn.disabled = true;
+
+            var name = document.getElementById('custName').value.trim();
+            var phone = document.getElementById('custPhone').value.trim();
+            var address = document.getElementById('custAddress').value.trim();
+            var subtotal = Number(document.getElementById('cart-subtotal').innerText);
+            var deliveryCharge = Number(document.getElementById('delivery-charge').innerText);
+            var total = subtotal + deliveryCharge;
+            var deliveryOtp = Math.floor(1000 + Math.random() * 9000).toString();
+
+            var firstItem = cart[0] || {};
+            var shopId = firstItem.assignedShopId || '';
+            var shopName = firstItem.assignedShopName || 'Kitchen';
+
+            db.collection("orders").add({
+                customerName: name,
+                customerPhone: phone,
+                customerAddress: address,
+                customerPincode: userLocationPin,
+                paymentMethod: "COD",
+                items: cart,
+                subtotal: subtotal,
+                deliveryCharge: deliveryCharge,
+                totalAmount: total,
+                status: "Placed",
+                deliveryOtp: deliveryOtp,
+                assignedShopId: shopId,
+                assignedShopName: shopName,
+                userEmail: currentUser ? currentUser.email : (currentUserProfile.userEmail || "guest@ksindo.com"),
+                orderDateFormatted: new Date().toLocaleString('en-IN'),
+                orderDate: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(function() {
+                alert("🎉 Kitchen Order Placed!\nAapka Doorstep OTP hai: " + deliveryOtp + "\nFood deliver hone par boy ko share karein.");
+                saveFoodCart([]);
+                closeCheckoutModal();
+                window.location.href = "index.html";
+            }).catch(function(err) {
+                alert("Order error: " + err.message);
+            }).finally(function() {
+                btn.innerText = "Confirm & Send to Kitchen";
+                btn.disabled = false;
+            });
+        });
+
+        checkLocationStatus();
+    </script>
+</body>
+</html>
