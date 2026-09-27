@@ -175,7 +175,7 @@
     <div class="container" id="foodMainContent" style="display:none;">
         <div id="restaurantListView">
             <div class="page-title">
-                <span>Active Kitchens & Restaurants</span>
+                <span>Active Restaurants Near You</span>
                 <small id="filteredCountBadge" style="background:#ffedd5; color:#c2410c; padding:3px 8px; border-radius:10px; font-size:12px;"></small>
             </div>
             <div class="restaurant-grid" id="restaurantsContainer"></div>
@@ -236,7 +236,7 @@
                         <span>Final Bill:</span>
                         <strong style="color:#ea580c; font-size:15px;">₹<span id="checkoutTotalAmount">0</span></strong>
                     </div>
-                    <small style="color:#c2410c; display:block; margin-top:4px;">⚠️ Kitchen dispatch ke baad restaurant food order cancel nahi hota.</small>
+                    <small style="color:#c2410c; display:block; margin-top:4px;">⚠️ Kitchen dispatch ke baad restaurant order cancel nahi hota.</small>
                 </div>
                 <button type="submit" class="btn-order-confirm" id="btnPlaceFoodOrder">Confirm & Send to Kitchen</button>
             </form>
@@ -350,11 +350,11 @@
         function renderShopsList() {
             var container = document.getElementById('restaurantsContainer');
             var badge = document.getElementById('filteredCountBadge');
-            badge.innerText = allShops.length + " Kitchens Available";
+            badge.innerText = allShops.length + " Restaurants Available";
 
             if (allShops.length === 0) {
                 container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; background:white; border-radius:16px;">' +
-                    '<h3 style="color:#c2410c;">Is Location Par Abhi Kitchen Live Nahi Hai</h3>' +
+                    '<h3 style="color:#c2410c;">Is Location Par Abhi Restaurants Live Nahi Hain</h3>' +
                     '<p style="color:#64748b; font-size:13px; margin-top:6px;">Pincode ' + userLocationPin + ' par deliver karne wale restaurants jald shamil honge.</p>' +
                     '<button onclick="reopenLocationGateway()" style="margin-top:14px; background:#ea580c; color:white; border:none; padding:8px 16px; border-radius:20px; font-weight:bold; cursor:pointer;">Change Pincode</button>' +
                 '</div>';
@@ -435,16 +435,16 @@
             grid.innerHTML = html;
         }
 
+        // ISOLATED FOOD CART (STORED IN food_cart TO PREVENT INDEX CART CONFLICT)
         function getFoodCart() {
             try {
-                var c = JSON.parse(localStorage.getItem('store_cart')) || [];
+                var c = JSON.parse(localStorage.getItem('food_cart')) || [];
                 return Array.isArray(c) ? c : [];
             } catch(e) { return []; }
         }
 
         function saveFoodCart(cart) {
-            localStorage.setItem('store_cart', JSON.stringify(cart));
-            localStorage.setItem('cart', JSON.stringify(cart));
+            localStorage.setItem('food_cart', JSON.stringify(cart));
             updateCartUI();
         }
 
@@ -456,18 +456,20 @@
             updateCartUI();
         };
 
+        // CONDITION: ONLY ONE RESTAURANT ALLOWED AT A TIME
         window.addDishToCart = function(dishId) {
             var dish = allFoodDishes.find(function(x){ return x.id === dishId; });
             var shop = allShops.find(function(s){ return s.id === activeShopId; });
             if (!dish || !shop) return;
 
             var cart = getFoodCart();
-            var existingOther = cart.find(function(i){ return i.assignedShopId && i.assignedShopId !== shop.id; });
-            if (existingOther) {
-                if (!confirm('Cart me doosre restaurant ka khana hai. Naye restaurant (' + shop.shopName + ') se order karne par purana cart clear ho jayega. Continue?')) {
-                    return;
-                }
-                cart = [];
+            
+            // Check if cart already has items from another restaurant
+            var existingOtherShop = cart.find(function(i){ return i.assignedShopId && i.assignedShopId !== shop.id; });
+            if (existingOtherShop) {
+                var change = confirm('Aapke cart me pehle se "' + existingOtherShop.assignedShopName + '" ka khana add hai.\n\nNaye restaurant (' + shop.shopName + ') se order karne par purana cart replace ho jayega. Continue karein?');
+                if (!change) return;
+                cart = []; // Clear previous restaurant
             }
 
             var item = cart.find(function(i){ return i.id === dishId; });
