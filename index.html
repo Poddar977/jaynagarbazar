@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
+    <!-- PWA Settings -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ksindo">
+    <link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="google-site-verification" content="72NquAkB-h-rhGmC663QSuZ3Y40bASxjPp0xk2tme2w" />
@@ -381,7 +389,9 @@
 <body>
 
     <header>
-        <div class="logo" onclick="window.location.reload()">ksindo</div>
+        <div class="logo" onclick="window.location.reload()">
+    <img src="logo.png" alt="ksindo" style="height: 38px; width: auto; object-fit: contain; display: block;">
+</div>
         <div class="search-container">
             <input type="text" id="search-input" placeholder="Search products, brands, groceries..." onkeyup="window.handleSearch()">
             <button class="search-btn-round" onclick="window.handleSearch()">🔍</button>
@@ -439,10 +449,13 @@
         <div class="icon-item" onclick="window.filterCategory('fashion', this)"><div class="icon-symbol">👕</div><span class="icon-title">Fashion</span></div>
         <div class="icon-item" onclick="window.filterCategory('beauty', this)"><div class="icon-symbol">💄</div><span class="icon-title">Beauty</span></div>
         <div class="icon-item" onclick="window.filterCategory('grocery', this)"><div class="icon-symbol">🛒</div><span class="icon-title">Grocery</span></div>
+        <div class="icon-item" onclick="window.filterCategory('fresh', this)">
+    <div class="icon-symbol">🥦</div>
+    <span class="icon-title">24x7 Fresh</span>
+</div>
         <div class="icon-item" onclick="window.filterCategory('gift', this)"><div class="icon-symbol">🎁</div><span class="icon-title">Gifts</span></div>
         <div class="icon-item" onclick="window.filterCategory('mobiles', this)"><div class="icon-symbol">📱</div><span class="icon-title">Mobiles</span></div>
         <div class="icon-item" onclick="window.filterCategory('electronics', this)"><div class="icon-symbol">💻</div><span class="icon-title">Electronics</span></div>
-        <div class="icon-item" onclick="window.filterCategory('home', this)"><div class="icon-symbol">🏠</div><span class="icon-title">Home</span></div>
     </div>
 
     <!-- Fashion Sub-Categories Strip -->
@@ -451,6 +464,13 @@
         <button class="sub-cat-btn" onclick="window.filterSubCat('lingerie', this)">👙 Lingerie & Innerwear</button>
         <button class="sub-cat-btn" onclick="window.filterSubCat('women', this)">👗 Women Dresses</button>
         <button class="sub-cat-btn" onclick="window.filterSubCat('men', this)">👕 Men Wear</button>
+        <!-- 24x7 Fresh Sub-Categories Strip -->
+    </div>
+<div class="sub-cat-bar" id="freshSubCatBar">
+    <button class="sub-cat-btn active" onclick="window.filterSubCat('all', this)">All Fresh</button>
+    <button class="sub-cat-btn" onclick="window.filterSubCat('vegetables', this)">🥔 Daily Vegetables (सब्जियां)</button>
+    <button class="sub-cat-btn" onclick="window.filterSubCat('fruits', this)">🍎 Fresh Fruits (ताजे फल)</button>
+    <button class="sub-cat-btn" onclick="window.filterSubCat('seasonal', this)">🥭 Seasonal Special</button>
     </div>
 
     <!-- Multi-Ads Section -->
@@ -813,24 +833,154 @@
             }
             grid.innerHTML = html;
         }
+           
+ // ==========================================
+        // FLIPKART-STYLE AI/ML PREFERENCE RANKER
+        // ==========================================
+        function getRankedProducts(productsList) {
+            var profile = JSON.parse(localStorage.getItem('ksindo_user_dna') || '{}');
+            var now = Date.now();
+            var decayWindow = 7 * 24 * 60 * 60 * 1000; // 7 din ka decay factor
+
+            var weights = {};
+            for (var cat in profile) {
+                var elapsed = now - (profile[cat].lastActive || now);
+                var decayFactor = Math.max(0.2, 1 - (elapsed / decayWindow)); 
+                var finalScore = (profile[cat].score || 0) * decayFactor;
+
+                // 5+ affinity score threshold
+                if (finalScore >= 5) {
+                    weights[cat] = finalScore;
+                }
+            }
+
+            return productsList.map(function(item) {
+                var itemCat = (item.category || '').toLowerCase().trim();
+                var catWeight = weights[itemCat] || 0;
+
+                // Discount boost (+0 to +2 points)
+                var discountBoost = 0;
+                if (item.originalPrice && Number(item.originalPrice) > Number(item.price)) {
+                    discountBoost = ((Number(item.originalPrice) - Number(item.price)) / Number(item.originalPrice)) * 2;
+                }
+
+                var rankScore = (catWeight * 10) + discountBoost;
+                return { product: item, rank: rankScore };
+            }).sort(function(a, b) {
+                return b.rank - a.rank; // Top affinity categories sabse upar
+            }).map(function(wrapper) {
+                return wrapper.product;
+            });
+        }
+
+        // ==========================================
+        // RENDER FILTERED PRODUCTS WITH AI PERSONALIZATION
+        // ==========================================
+        function renderFilteredProducts() {
+            // 1. Food items ko isolate karein
+            var list = allProducts.filter(function(p){
+                return (p.category || '').toLowerCase() !== 'food' && (!p.categories || !p.categories.includes('food'));
+            });
+
+            // 2. Strict Category Filtering (Agar chip select hai to AI override nahi karega)
+            if (activeCategory !== 'all') {
+                list = list.filter(function(p){
+                    if (p.categories && Array.isArray(p.categories)) return p.categories.includes(activeCategory);
+                    return (p.category || '').toLowerCase() === activeCategory;
+                });
+
+                if (activeSubCategory !== 'all') {
+                    list = list.filter(function(p){ return (p.subCategory || '').toLowerCase() === activeSubCategory; });
+                }
+            } 
+            // 3. "For You" / All Products par AI/ML Personalization Ranker chalega
+            else {
+                list = getRankedProducts(list);
+            }
+
+            var grid = document.getElementById('generalProductGrid');
+            if (!grid) return;
+
+            if (list.length === 0) {
+                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:30px; color:#64748b;">Is category me koi product nahi mila.</p>';
+                return;
+            }
+
+            var html = '';
+            for (var j = 0; j < list.length; j++) {
+                var p = list[j];
+                var img = (p.images && p.images.length > 0) ? p.images[0] : (p.imageUrl || 'https://via.placeholder.com/200');
+                var discBadge = getDiscountMarkup(p);
+                var origVal = p.originalPrice || (p.sizes && p.sizes[0]?.originalPrice) || '';
+                var origMarkup = (origVal && Number(origVal) > Number(p.price)) ? '<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:6px;">₹' + origVal + '</span>' : '';
+
+                html += '<div class="product-card">' +
+                    '<img src="' + img + '" class="card-main-img" loading="lazy" decoding="async" alt="' + p.name + '" onclick="window.openProductDetail(\'' + p.id + '\')">' +
+                    '<div class="product-title" onclick="window.openProductDetail(\'' + p.id + '\')">' + p.name + '</div>' +
+                    '<div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">' +
+                        '<span style="font-size:18px; font-weight:900; color:#15803d;">₹' + p.price + '</span>' +
+                        origMarkup +
+                        discBadge +
+                    '</div>' +
+                    '<div style="display:flex; gap:6px;">' +
+                        '<button class="add-btn-round" onclick="window.addToCart(\'' + p.id + '\')">🛒 Add</button>' +
+                        '<button class="buy-now-round" onclick="window.buyNow(\'' + p.id + '\')">⚡ Buy</button>' +
+                    '</div>' +
+                '</div>';
+            }
+            grid.innerHTML = html;
+        }
 
         if (allProducts.length > 0) {
             renderFilteredProducts();
         }
 
+        // ==========================================
+        // DYNAMIC CATEGORY & SUB-CATEGORY CONTROLLER
+        // ==========================================
         window.filterCategory = function(cat, el) {
             document.querySelectorAll('.icon-item').forEach(function(b){ b.classList.remove('active'); });
             if (el) el.classList.add('active');
             activeCategory = cat;
             activeSubCategory = 'all';
 
-            var subBar = document.getElementById('fashionSubCatBar');
-            if (cat === 'fashion') {
-                subBar.style.display = 'flex';
-                document.querySelectorAll('.sub-cat-btn').forEach(function(b, i){ if(i===0) b.classList.add('active'); else b.classList.remove('active'); });
-            } else {
-                subBar.style.display = 'none';
+            var fashionSubBar = document.getElementById('fashionSubCatBar');
+            var freshSubBar = document.getElementById('freshSubCatBar');
+
+            // Fashion Sub-bar Controller
+            if (fashionSubBar) {
+                if (cat === 'fashion') {
+                    fashionSubBar.style.display = 'flex';
+                    fashionSubBar.querySelectorAll('.sub-cat-btn').forEach(function(b, i){ 
+                        if(i === 0) b.classList.add('active'); else b.classList.remove('active'); 
+                    });
+                } else {
+                    fashionSubBar.style.display = 'none';
+                }
             }
+
+            // 24x7 Fresh (Vegetables & Fruits) Sub-bar Controller
+            if (freshSubBar) {
+                if (cat === 'fresh') {
+                    freshSubBar.style.display = 'flex';
+                    freshSubBar.querySelectorAll('.sub-cat-btn').forEach(function(b, i){ 
+                        if(i === 0) b.classList.add('active'); else b.classList.remove('active'); 
+                    });
+                } else {
+                    freshSubBar.style.display = 'none';
+                }
+            }
+
+            renderFilteredProducts();
+        };
+//new line AI ML end
+        window.filterSubCat = function(subCat, el) {
+            var parent = el ? el.parentElement : null;
+            if (parent) {
+                parent.querySelectorAll('.sub-cat-btn').forEach(function(b){ b.classList.remove('active'); });
+            }
+            if (el) el.classList.add('active');
+            activeSubCategory = subCat;
             renderFilteredProducts();
         };
 
@@ -1297,6 +1447,22 @@
                 }, 250);
             }
         });
+        // Register PWA Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then((reg) => console.log('PWA Service Worker registered:', reg.scope))
+      .catch((err) => console.log('Service Worker registration failed:', err));
+  });
+}
+
+// In-App Install Prompt Banner (Optional / Custom Prompt)
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Browser automatically bottom bar ya address bar me "Install" icon show karega
+});
     </script>
 </body>
 </html>
