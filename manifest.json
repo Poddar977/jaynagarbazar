@@ -1,8 +1,9 @@
 {
   "name": "ksindo - Everything. One Place.",
   "short_name": "ksindo",
-  "description": "ksindo Super App - Fast Local Shopping &amp;amp;amp;amp;amp;amp;amp; Food Delivery",
-  "start_url": "ksindo.com/inde.html",
+  "description": "ksindo Super App - Fast Local Shopping & Food Delivery",
+  "start_url": "index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#122657",
   "theme_color": "#0f172a",
@@ -10,7 +11,7 @@
   "icons": [
     {
       "src": "logo.png",
-      "sizes": "512x512",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
@@ -23,18 +24,17 @@
   ],
   "categories": [
     "beauty",
-    "books",
     "fashion",
     "shopping"
   ],
   "dir": "auto",
   "shortcuts": [
     {
-      "name": "ksindo",
-      "url": "ksindo.com",
-      "description": null
+      "name": "ksindo Home",
+      "url": "index.html",
+      "description": "Open ksindo Store"
     }
   ],
   "prefer_related_applications": false,
-  "id": "ksindo.com"
+  "id": "/"
 }
