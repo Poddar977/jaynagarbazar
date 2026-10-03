@@ -1,7 +1,7 @@
 {
   "name": "ksindo - Everything. One Place.",
   "short_name": "ksindo",
-  "description": "ksindo Super App - Fast Local Shopping &amp;amp;amp;amp;amp; Food Delivery",
+  "description": "ksindo Super App - Fast Local Shopping &amp;amp;amp;amp;amp;amp; Food Delivery",
   "start_url": "ksindo.com/inde.html",
   "display": "standalone",
   "background_color": "#122657",
@@ -34,5 +34,7 @@
       "url": "ksindo.com",
       "description": null
     }
-  ]
+  ],
+  "prefer_related_applications": true,
+  "id": "ksindo.com"
 }
