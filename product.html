@@ -2,12 +2,12 @@
 <html lang="hi">
 <head>
     <!-- PWA Settings -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f172a">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="ksindo">
-<link rel="apple-touch-icon" href="https://poddar977.github.io/jaynagarbazar/logo.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ksindo">
+    <link rel="apple-touch-icon" href="https://poddar977.github.io/jaynagarbazar/logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details - ksindo</title>
@@ -80,7 +80,6 @@
             font-weight: bold; 
         }
 
-        /* Detail Card */
         .detail-container { 
             max-width: 1100px; 
             margin: 25px auto; 
@@ -130,7 +129,6 @@
             border: 1px solid #86efac; 
         }
 
-        /* Size / Variants */
         .variant-section { margin: 16px 0; border-top: 1.5px dashed #fde047; padding-top: 12px; }
         .variant-title { font-size: 13px; font-weight: bold; color: #854d0e; margin-bottom: 10px; }
         .pills-grid { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -178,7 +176,6 @@
             font-size: 14px; 
         }
 
-        /* Cart Drawer */
         .cart-modal { position: fixed; top: 0; right: -420px; width: 360px; height: 100%; background-color: white; box-shadow: -2px 0 10px rgba(0,0,0,0.2); transition: right 0.25s ease; z-index: 200; display: flex; flex-direction: column; }
         .cart-modal.open { right: 0; }
         .cart-header { background-color: #0f172a; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
@@ -191,7 +188,6 @@
         .cart-footer { padding: 15px; border-top: 1px solid #eee; background: #fffdf0; }
         .btn-submit { background: #16a34a; color: white; border: none; font-weight: bold; cursor: pointer; width: 100%; padding: 12px; border-radius: 25px; }
 
-        /* ML Recommendations & Recent Section */
         .section-block { max-width: 1100px; margin: 30px auto 0; padding: 0 15px; }
         .section-header { font-size: 18px; font-weight: 800; color: #166534; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
         .rec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
@@ -202,15 +198,14 @@
             text-align: center; 
             border: 2px solid #facc15; 
             cursor: pointer; 
-            transition: 0.2s;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            transition: 0.2s; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
         }
         .rec-card:hover { transform: translateY(-3px); border-color: #16a34a; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15); }
         .rec-card img { width: 100%; height: 140px; object-fit: contain; background: #ffffff; border-radius: 8px; margin-bottom: 8px; }
 
-        /* Modal Overlay */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 300; }
         .modal-overlay.active { display: flex; }
         .modal-box { background: white; padding: 25px; border-radius: 16px; width: 92%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; }
@@ -228,12 +223,10 @@
         </div>
     </header>
 
-    <!-- Main Product Details Box -->
     <div class="detail-container" id="detailContainer">
         <p style="text-align:center; grid-column:1/-1; padding:30px; font-weight:bold; color:#166534;">Product details load ho rahe hain...</p>
     </div>
 
-    <!-- 1. ML Auto-Similar Products Grid -->
     <div class="section-block">
         <div class="section-header">
             <span>🤖 AI & ML Recommended Similar Products</span>
@@ -242,7 +235,6 @@
         <div class="rec-grid" id="recommendationsGrid"></div>
     </div>
 
-    <!-- 2. Recently Viewed Products Grid -->
     <div class="section-block" id="recentBlock" style="display:none; margin-top:35px;">
         <div class="section-header">
             <span>🕒 Recently Viewed Products</span>
@@ -251,7 +243,6 @@
         <div class="rec-grid" id="recentViewsGrid"></div>
     </div>
 
-    <!-- Cart Modal Drawer -->
     <div class="cart-modal" id="cart-modal">
         <div class="cart-header">
             <h3>ksindo Shopping Cart</h3>
@@ -266,7 +257,6 @@
         </div>
     </div>
 
-    <!-- Realtime Live Orders & OTP Tracking Modal -->
     <div class="modal-overlay" id="orders-modal-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="closeOrdersModal()">&times;</span>
@@ -302,13 +292,31 @@
         let currentUser = null;
         let currentUserProfile = JSON.parse(localStorage.getItem('user_profile')) || null;
 
+        // ==========================================
+        // AI/ML USER AFFINITY ENGINE
+        // ==========================================
+        const UserAffinityEngine = {
+            recordSignal: (category, weight) => {
+                if (!category || category.toLowerCase() === 'food') return;
+                const catKey = category.toLowerCase().trim();
+                try {
+                    const profile = JSON.parse(localStorage.getItem('ksindo_user_dna') || '{}');
+                    if (!profile[catKey]) {
+                        profile[catKey] = { score: 0, lastActive: Date.now() };
+                    }
+                    profile[catKey].score += weight;
+                    profile[catKey].lastActive = Date.now();
+                    localStorage.setItem('ksindo_user_dna', JSON.stringify(profile));
+                } catch(e) {}
+            }
+        };
+
         updateCartUI();
 
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
         });
 
-        // 1. Instant Cache Render
         if (productId && cachedProducts.length > 0) {
             const localHit = cachedProducts.find(p => p.id === productId);
             if (localHit) {
@@ -318,7 +326,6 @@
             }
         }
 
-        // 2. Fresh Network Fetch
         if (productId) {
             getDoc(doc(db, "products", productId)).then(snap => {
                 if (snap.exists()) {
@@ -330,16 +337,12 @@
             }).catch(() => {});
         }
 
-        // ==========================================
-        // ADVANCED CONTENT-BASED ML RECOMMENDER
-        // ==========================================
         function runMLRecommendation(target) {
             if (!cachedProducts || cachedProducts.length <= 1) {
                 document.getElementById('recommendationsGrid').innerHTML = '<p style="color:#64748b; font-size:13px; grid-column:1/-1;">Not enough catalog data for ML models.</p>';
                 return;
             }
 
-            // Keyword token generator
             function tokenize(str) {
                 return (str || '').toLowerCase()
                     .replace(/[^a-z0-9 ]/g, ' ')
@@ -352,29 +355,23 @@
             const targetSubCat = (target.subCategory || '').toLowerCase();
             const targetPrice = Number(target.price) || 1;
 
-            // Compute similarity vector for every other product
             const scoredProducts = cachedProducts
                 .filter(p => p.id !== target.id)
                 .map(p => {
                     let score = 0;
-                    
-                    // 1. Category Vector (Weight: 40)
                     const pCat = (p.category || '').toLowerCase();
                     if (pCat === targetCat) score += 40;
                     else if (p.categories && Array.isArray(p.categories) && p.categories.includes(targetCat)) score += 30;
 
-                    // 2. Sub-Category Vector (Weight: 35)
                     const pSubCat = (p.subCategory || '').toLowerCase();
                     if (targetSubCat && pSubCat && pSubCat === targetSubCat) score += 35;
 
-                    // 3. Text Token Jaccard Similarity (Weight: 15)
                     const pTokens = tokenize(p.name + " " + (p.description || ''));
                     let tokenOverlap = 0;
                     pTokens.forEach(t => { if (targetTokens.has(t)) tokenOverlap++; });
                     const jaccard = tokenOverlap / Math.max(1, (targetTokens.size + pTokens.length - tokenOverlap));
                     score += (jaccard * 15);
 
-                    // 4. Price Proximity Score (Weight: 10)
                     const pPrice = Number(p.price) || 1;
                     const priceDiffRatio = Math.abs(targetPrice - pPrice) / Math.max(targetPrice, pPrice);
                     score += Math.max(0, (1 - priceDiffRatio) * 10);
@@ -382,7 +379,6 @@
                     return { product: p, score: score };
                 });
 
-            // Sort by ML relevance score descending
             scoredProducts.sort((a, b) => b.score - a.score);
             const topMatches = scoredProducts.slice(0, 4).map(item => item.product);
 
@@ -407,20 +403,13 @@
             }).join('');
         }
 
-        // ==========================================
-        // RECENTLY VIEWED TRACKER & RENDERER
-        // ==========================================
         function trackAndRenderRecentlyViewed(current) {
             let recentIds = JSON.parse(localStorage.getItem('ksindo_recent_views')) || [];
-            
-            // Deduplicate and place latest at front
             recentIds = recentIds.filter(id => id !== current.id);
             recentIds.unshift(current.id);
             if (recentIds.length > 8) recentIds = recentIds.slice(0, 8);
-            
             localStorage.setItem('ksindo_recent_views', JSON.stringify(recentIds));
 
-            // Render other recently viewed products
             const otherRecentIds = recentIds.filter(id => id !== current.id);
             const recentBlock = document.getElementById('recentBlock');
             const recentGrid = document.getElementById('recentViewsGrid');
@@ -457,9 +446,6 @@
             document.getElementById('recentBlock').style.display = 'none';
         };
 
-        // ==========================================
-        // PRODUCT DETAILS UI BUILDER
-        // ==========================================
         function renderProductUI(product) {
             loadedProduct = product;
             const imgList = (product.images && product.images.length > 0) ? product.images : [product.imageUrl || 'https://via.placeholder.com/300'];
@@ -514,6 +500,17 @@
                     </div>
                 </div>
             `;
+
+            // AI View Signal (+1)
+            if (product && product.category) {
+                UserAffinityEngine.recordSignal(product.category, 1);
+            }
+            // 10-Second Reading Signal (+2)
+            setTimeout(() => {
+                if (loadedProduct && loadedProduct.category) {
+                    UserAffinityEngine.recordSignal(loadedProduct.category, 2);
+                }
+            }, 10000);
         }
 
         window.setMainImage = (src, el) => {
@@ -523,6 +520,10 @@
         };
 
         window.onSelectVariant = (size, price, origPrice, el) => {
+            if (loadedProduct && loadedProduct.category) {
+                UserAffinityEngine.recordSignal(loadedProduct.category, 2);
+            }
+
             document.querySelectorAll('.size-pill').forEach(p => p.classList.remove('active'));
             el.classList.add('active');
             
@@ -550,6 +551,10 @@
         };
 
         window.addToCartVariant = () => {
+            if (loadedProduct && loadedProduct.category) {
+                UserAffinityEngine.recordSignal(loadedProduct.category, 4);
+            }
+
             const variantTitle = (selectedVariant && selectedVariant.size) ? `${loadedProduct.name} (${selectedVariant.size})` : loadedProduct.name;
             const finalPrice = selectedVariant ? selectedVariant.price : loadedProduct.price;
 
@@ -562,6 +567,10 @@
         };
 
         window.buyDirectVariant = () => {
+            if (loadedProduct && loadedProduct.category) {
+                UserAffinityEngine.recordSignal(loadedProduct.category, 4);
+            }
+
             const variantTitle = (selectedVariant && selectedVariant.size) ? `${loadedProduct.name} (${selectedVariant.size})` : loadedProduct.name;
             const finalPrice = selectedVariant ? selectedVariant.price : loadedProduct.price;
             localStorage.setItem('store_cart', JSON.stringify([{ ...loadedProduct, name: variantTitle, price: finalPrice, selectedSize: selectedVariant?.size || '', qty: 1 }]));
@@ -630,7 +639,6 @@
             window.location.href = "index.html";
         };
 
-        // Realtime Orders Tracking Modal (Live Status & Doorstep OTP)
         window.openOrdersTab = function(type) {
             const email = currentUser?.email || currentUserProfile?.userEmail;
             if (!email) {
