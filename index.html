@@ -384,6 +384,79 @@
             font-weight: bold;
             text-decoration: underline;
         }
+        /* Bottom PWA Install Popup Banner */
+.pwa-bottom-banner {
+    position: fixed;
+    bottom: -150px; /* Shuru me chhipa rahega */
+    left: 15px;
+    right: 15px;
+    background: #0f172a;
+    color: white;
+    padding: 12px 16px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    z-index: 99999;
+    border: 1.5px solid #ca8a04;
+    transition: bottom 0.4s ease-in-out;
+}
+.pwa-bottom-banner.show {
+    bottom: 20px; /* Slide hokar upar aayega */
+}
+.pwa-banner-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.pwa-banner-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: #ffffff;
+    object-fit: contain;
+    padding: 2px;
+    border: 1px solid #e2e8f0;
+}
+.pwa-banner-text h4 {
+    font-size: 14px;
+    color: #ffffff;
+    margin: 0;
+    font-weight: 800;
+}
+.pwa-banner-text p {
+    font-size: 11px;
+    color: #94a3b8;
+    margin: 2px 0 0;
+}
+.pwa-banner-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-pwa-install {
+    background: linear-gradient(135deg, #22c55e, #15803d);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(34, 197, 94, 0.3);
+    white-space: nowrap;
+}
+.btn-pwa-close {
+    background: transparent;
+    color: #94a3b8;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+}
     </style>
 </head>
 <body>
@@ -1411,12 +1484,72 @@
             });
         }
 
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-    // preventDefault() nahi lagayenge to browser apna native "Install App" banner khud show karega
-    deferredPrompt = e;
-    console.log("📱 PWA Install prompt ready!");
+       // PWA Custom Bottom Popup Controller
+let deferredPWAEvent = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Default mini-infobar ko rok kar apna popup dikhayenge
+    e.preventDefault();
+    deferredPWAEvent = e;
+
+    // Agar user ne pehle dismiss nahi kiya hai to popup show karein
+    if (localStorage.getItem('pwa_banner_dismissed') !== 'true') {
+        setTimeout(() => {
+            const banner = document.getElementById('pwaBottomBanner');
+            if (banner) banner.classList.add('show');
+        }, 1500); // 1.5 second baad smooth animation se khulega
+    }
+});
+
+// Install Button Click Handler
+window.triggerPWAInstall = async () => {
+    const banner = document.getElementById('pwaBottomBanner');
+    if (!deferredPWAEvent) {
+        // Agar prompt trigger nahi ho saka to chrome menu guide karein
+        alert("Mobile menu (3-dots ⋮) par click karke 'Install App' ya 'Add to Home screen' chunein.");
+        return;
+    }
+
+    // Browser ka native install popup open hoga
+    deferredPWAEvent.prompt();
+    const { outcome } = await deferredPWAEvent.userChoice;
+    
+    if (outcome === 'accepted') {
+        console.log('User ne app install kar liya');
+        if (banner) banner.classList.remove('show');
+    }
+    deferredPWAEvent = null;
+};
+
+// Cross (X) Close Button Handler
+window.dismissPWABanner = () => {
+    const banner = document.getElementById('pwaBottomBanner');
+    if (banner) banner.classList.remove('show');
+    // Baar-baar pareshan na kare isliye temporarily remember karega
+    localStorage.setItem('pwa_banner_dismissed', 'true');
+};
+
+// Agar app pehle se install ho chuka hai to popup kabhi na dikhaye
+window.addEventListener('appinstalled', () => {
+    const banner = document.getElementById('pwaBottomBanner');
+    if (banner) banner.classList.remove('show');
+    localStorage.setItem('pwa_banner_dismissed', 'true');
+    console.log('ksindo App installed successfully!');
 });
     </script>
+    <!-- Bottom PWA Install Popup Banner -->
+<div class="pwa-bottom-banner" id="pwaBottomBanner">
+    <div class="pwa-banner-left">
+        <img src="logo.png" alt="ksindo" class="pwa-banner-icon">
+        <div class="pwa-banner-text">
+            <h4>ksindo App</h4>
+            <p>Fast & Light Shopping App</p>
+        </div>
+    </div>
+    <div class="pwa-banner-actions">
+        <button class="btn-pwa-install" onclick="window.triggerPWAInstall()">Install</button>
+        <button class="btn-pwa-close" onclick="window.dismissPWABanner()">&times;</button>
+    </div>
+</div>
 </body>
 </html>
