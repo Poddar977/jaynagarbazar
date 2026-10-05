@@ -10,7 +10,6 @@
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Roboto, sans-serif; }
         body { background:#f4f6f9; color:#333; display:flex; height:100vh; overflow:hidden; }
 
-        /* DIRECT FIREBASE LOGIN SCREEN */
         #adminLoginScreen {
             position: fixed;
             inset: 0;
@@ -125,7 +124,6 @@
 </head>
 <body>
 
-    <!-- 1. DIRECT FIREBASE LOGIN SCREEN -->
     <div id="adminLoginScreen">
         <div class="login-card">
             <h2>🛡️ ksindo Master Login</h2>
@@ -138,7 +136,6 @@
         </div>
     </div>
 
-    <!-- 2. MAIN ADMIN DASHBOARD -->
     <aside>
         <div class="logo">
             <span>⚡ ksindo Master</span>
@@ -227,30 +224,32 @@
                 </div>
             </section>
 
-            <!-- TAB 4: Manage Shops (With GSTIN / FSSAI Support) -->
+            <!-- TAB 4: Manage Shops (With GSTIN / FSSAI & 24x7 Fresh/Seasonal Partner Support) -->
             <section id="tab-shops" class="tab-section">
                 <div class="card">
-                    <h2>+ Nayi Shop / Kitchen Register Karein</h2>
+                    <h2>+ Nayi Shop / Merchant Register Karein (Restaurent, 24x7 Fresh, Seasonal)</h2>
                     <form id="addShopForm">
                         <div class="form-grid">
                             <input type="text" id="shopNameInput" placeholder="Shop Name" required>
                             <select id="shopTypeInput" required style="font-weight:bold;">
                                 <option value="restaurant">🍔 Fast Food & Restaurant</option>
-                                <option value="mart">⚡ Quick Mart (Store Name Hidden from Product)</option>
+                                <option value="fresh">🥦 24x7 Fresh (Vegetables, Fruits, Dairy)</option>
+                                <option value="seasonal">🪔 Seasonal & Festive (Pooja, Shringar)</option>
+                                <option value="mart">⚡ Quick Mart</option>
                             </select>
                             <input type="text" id="shopOwnerInput" placeholder="Owner Name" required>
                             <input type="tel" id="shopPhoneInput" placeholder="Mobile Number (10 Digit)" maxlength="10" required>
                             <input type="text" id="shopGstinInput" placeholder="GSTIN / FSSAI License Number (Optional)">
                             <input type="text" id="shopPincodeInput" placeholder="Pincode (6-digit)" maxlength="6" required>
                             <input type="text" id="shopAddressInput" placeholder="Shop Address" required>
-                            <input type="text" id="shopUserInput" placeholder="Username" required>
+                            <input type="text" id="shopUserInput" placeholder="Username / Email" required>
                             <input type="text" id="shopPassInput" placeholder="Password" required>
                         </div>
                         <button type="submit" class="btn-primary" style="margin-top:12px;">Shop Account Banayein</button>
                     </form>
                 </div>
                 <div class="card">
-                    <h2>Registered Shops & Kitchens</h2>
+                    <h2>Registered Shops & Partners</h2>
                     <table>
                         <thead><tr><th>Shop Name</th><th>Type</th><th>GSTIN / FSSAI</th><th>Owner</th><th>Phone</th><th>Pincode</th><th>Username</th><th>Action</th></tr></thead>
                         <tbody id="shopsTableBody"></tbody>
@@ -258,13 +257,13 @@
                 </div>
             </section>
 
-            <!-- TAB 5: 5-Second Multi-Ads Manager -->
+            <!-- TAB 5: Ads Manager -->
             <section id="tab-ads" class="tab-section">
                 <div class="card">
                     <h2>📢 5-Second Advertisement Manager (Photo & Video Upload)</h2>
                     <form id="createAdForm">
                         <div class="form-grid">
-                            <input type="text" id="adTitle" placeholder="Ad Offer Title (e.g. 50% Off Mega Sale)" required>
+                            <input type="text" id="adTitle" placeholder="Ad Offer Title" required>
                             <select id="adType" required onchange="handleAdTypeChange(this.value)">
                                 <option value="image">🖼️ Photo / Image Banner</option>
                                 <option value="video">🎥 5-Second Video (MP4)</option>
@@ -277,7 +276,10 @@
                                 <label style="font-size:11px; font-weight:bold;">Option 2: Online Media URL:</label>
                                 <input type="url" id="adMediaUrl" placeholder="https://...">
                             </div>
-                            <input type="text" id="adTargetUrl" placeholder="Target Link (product.html?id=...)">
+                            <div>
+                                <label style="font-size:11px; font-weight:bold;">Target Link (product.html?id=... / fresh.html / seasonable.html):</label>
+                                <input type="text" id="adTargetUrl" placeholder="e.g. fresh.html ya seasonable.html?fest=durga-puja">
+                            </div>
                         </div>
                         <div id="adFilePreviewContainer" style="margin-top:10px;"></div>
                         <button type="submit" class="btn-primary" style="margin-top:12px; background:#e11d48;">+ Publish 5s Ad</button>
@@ -295,7 +297,7 @@
             <!-- TAB 6: Delivered History -->
             <section id="tab-delivered" class="tab-section">
                 <div class="card">
-                    <h2>📜 Delivered & Cancelled Orders (Auto-delete in 24h)</h2>
+                    <h2>📜 Delivered & Cancelled Orders</h2>
                     <table>
                         <thead><tr><th>Time</th><th>Customer</th><th>Mode</th><th>Amount</th><th>Boy</th><th>Status</th></tr></thead>
                         <tbody id="deliveredTableBody"></tbody>
@@ -303,18 +305,26 @@
                 </div>
             </section>
 
-            <!-- TAB 7: Products Management (Add + Edit System) -->
+            <!-- TAB 7: Products Management (With Fresh 24x7 & Seasonal Festival Support) -->
             <section id="tab-products" class="tab-section">
                 <div class="card">
-                    <h2 id="productFormHeader">+ Naya Product Add Karein (Individual Size MRP, Selling Price & Auto-Discount)</h2>
+                    <h2 id="productFormHeader">+ Naya Product Add Karein</h2>
                     <form id="addProductForm">
                         <input type="hidden" id="editProductId" value="">
                         <div class="form-grid">
                             <input type="text" id="prodName" placeholder="Product Title / Name" required>
                             
                             <div>
-                                <select id="prodSubCategory">
+                                <select id="prodSubCategory" onchange="checkSeasonalInput(this.value)">
                                     <option value="none">Sub-Category: Normal / General</option>
+                                    <option value="daily vegetables">24x7 Fresh: Daily vegetables (सब्जियां)</option>
+                                    <option value="fresh fruits">24x7 Fresh: Fresh fruits (फल)</option>
+                                    <option value="dairy">24x7 Fresh: Milk & Dairy (दूध, पनीर)</option>
+                                    <option value="eggs">24x7 Fresh: Eggs (अंडे)</option>
+                                    <option value="dryfruits">24x7 Fresh: Dry Fruits (काजू, बादाम)</option>
+                                    <option value="shringar">Seasonal: Chunri & Shringar (चुनरी, श्रृंगार)</option>
+                                    <option value="pooja">Seasonal: Pooja & Hawan Samagri</option>
+                                    <option value="seasonal special">Seasonal: Festival Special (Durga Puja, Diwali, Chhath, Eid)</option> 
                                     <option value="lingerie">Fashion: Lingerie / Innerwear</option>
                                     <option value="women">Fashion: Women Dresses</option>
                                     <option value="men">Fashion: Men Wear</option>
@@ -322,10 +332,11 @@
                                     <option value="skincare">Beauty: Skin & Hair Care</option>
                                     <option value="daily-need">Grocery: Daily Needs / Packets</option>
                                     <option value="gift-combo">Gift: Hamper / Combo Box</option>
-                                    <option value="daily vegetables">24x7 Fresh: Daily vegetables</option>
-                                    <option value="fresh fruits">24x7 Fresh: fresh fruits</option>
-                                    <option value="seasonal special">24x7 Fresh: Seasonal Special</option> 
                                 </select>
+                            </div>
+
+                            <div id="festivalTagContainer" style="display:none;">
+                                <input type="text" id="prodFestivalTag" placeholder="Festival Tag (e.g. durga-puja, diwali, chhath, eid)">
                             </div>
 
                             <input type="url" id="prodImageLink" placeholder="Option 1: Image URL Link">
@@ -341,7 +352,8 @@
                                 <label><input type="checkbox" name="productCats" value="fashion"> 👗 Fashion</label>
                                 <label><input type="checkbox" name="productCats" value="beauty"> 💄 Beauty</label>
                                 <label><input type="checkbox" name="productCats" value="grocery"> 🛒 Grocery</label>
-                                <label><input type="checkbox" name="productCats" value="24x7 Fresh"> 🥦24x7 Fresh</label>
+                                <label><input type="checkbox" name="productCats" value="fresh"> 🥦 24x7 Fresh</label>
+                                <label><input type="checkbox" name="productCats" value="seasonal"> 🪔 Seasonal / Festive</label>
                                 <label><input type="checkbox" name="productCats" value="gift"> 🎁 Gift</label>
                                 <label><input type="checkbox" name="productCats" value="food"> 🍔 Food</label>
                             </div>
@@ -379,7 +391,8 @@
                                 <option value="fashion">Fashion</option>
                                 <option value="beauty">Beauty</option>
                                 <option value="grocery">Grocery</option>
-                                <option value="24x7 fresh">24x7 Fresh</option>
+                                <option value="fresh">24x7 Fresh</option>
+                                <option value="seasonal">Seasonal</option>
                                 <option value="food">Food</option>
                                 <option value="gift">Gift</option>
                             </select>
@@ -425,6 +438,15 @@
             isAudioAlarmMuted = !isAudioAlarmMuted;
             document.getElementById('audioToggleBtn').innerText = isAudioAlarmMuted ? "🔕 Sound: MUTED" : "🔔 Sound: ON";
             document.getElementById('audioToggleBtn').style.background = isAudioAlarmMuted ? "#ef4444" : "#475569";
+        }
+
+        function checkSeasonalInput(val) {
+            const container = document.getElementById('festivalTagContainer');
+            if (val === 'seasonal special' || val === 'shringar' || val === 'pooja') {
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
         }
 
         function calculateRowDiscount(row) {
@@ -500,7 +522,6 @@
             });
         }
 
-        // Ads File Preview Handler
         let base64AdMedia = '';
         window.previewAdDirectFile = function(input) {
             const container = document.getElementById('adFilePreviewContainer');
@@ -548,7 +569,6 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // Security Authentication Listener
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('adminLoginScreen').style.display = 'none';
@@ -558,7 +578,6 @@
             }
         });
 
-        // Login Handler
         document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('adminEmail').value.trim();
@@ -725,7 +744,6 @@
 
             isFirstLoad = false;
 
-            // Update Badges
             const bGen = document.getElementById('badgeGeneralOrders');
             const bFood = document.getElementById('badgeFoodOrders');
             if (generalCount > 0) { bGen.innerText = generalCount; bGen.style.display = 'inline-block'; } else { bGen.style.display = 'none'; }
@@ -749,7 +767,6 @@
             document.getElementById('statGeneral').innerText = generalCount;
         });
 
-        // Live Order Filter Search
         window.filterOrdersTableLive = function() {
             const query = (document.getElementById('orderSearchInput').value || '').toLowerCase();
             const rows = document.querySelectorAll('#generalOrdersTableBody tr');
@@ -759,7 +776,6 @@
             });
         };
 
-        // Export Orders to CSV
         window.exportOrdersToCSV = function() {
             let csv = "Order ID,Date,Customer,Phone,Amount,Status,OTP,Boy Phone\n";
             Object.values(ordersDataCache).forEach(o => {
@@ -773,7 +789,6 @@
             a.click();
         };
 
-        // 1-Click Bill Print
         window.printAdminBill = async function(orderId) {
             const order = ordersDataCache[orderId];
             if (!order) return alert("Order data nahi mila!");
@@ -858,7 +873,6 @@
             }
         };
 
-        // Customers Realtime
         onSnapshot(collection(db, "users"), (snapshot) => {
             const tbody = document.getElementById('usersTableBody');
             tbody.innerHTML = '';
@@ -906,7 +920,7 @@
 
         window.closeCustomerAudit = () => document.getElementById('customerAuditModal').classList.remove('active');
 
-        // Manage Shops with GSTIN / FSSAI
+        // Manage Shops with Merchant support
         document.getElementById('addShopForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const shopName = document.getElementById('shopNameInput').value.trim();
@@ -921,10 +935,11 @@
 
             try {
                 await addDoc(collection(db, "shops"), {
-                    shopName, shopType, ownerName, phone, gstin, pincode, address, username, password,
+                    shopName, shopType, ownerName, phone, gstin, pincode, address, 
+                    username, email: username, password,
                     createdAt: serverTimestamp()
                 });
-                alert('✅ Shop Registered with GSTIN/FSSAI! User: ' + username);
+                alert('✅ Shop / Merchant Registered! User: ' + username);
                 document.getElementById('addShopForm').reset();
             } catch(err) { alert("Error: " + err.message); }
         });
@@ -938,9 +953,10 @@
                 const s = { id: docSnap.id, ...docSnap.data() };
                 shopsDataCache[s.id] = s;
 
-                const typeBadge = (s.shopType === 'mart') 
-                    ? '<span style="background:#dcfce7; color:#15803d; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">⚡ Quick Mart</span>'
-                    : '<span style="background:#ffedd5; color:#c2410c; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">🍔 Restaurant</span>';
+                let typeBadge = '<span style="background:#ffedd5; color:#c2410c; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">🍔 Restaurant</span>';
+                if (s.shopType === 'fresh') typeBadge = '<span style="background:#dcfce7; color:#15803d; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">🥦 24x7 Fresh</span>';
+                else if (s.shopType === 'seasonal') typeBadge = '<span style="background:#fef08a; color:#854d0e; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">🪔 Seasonal</span>';
+                else if (s.shopType === 'mart') typeBadge = '<span style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">⚡ Quick Mart</span>';
 
                 tbody.innerHTML += 
                     '<tr>' +
@@ -950,7 +966,7 @@
                         '<td>' + s.ownerName + '</td>' +
                         '<td>' + s.phone + '</td>' +
                         '<td>' + (s.pincode || '-') + '</td>' +
-                        '<td><code>' + s.username + '</code></td>' +
+                        '<td><code>' + (s.username || s.email) + '</code></td>' +
                         '<td><button class="btn-danger" onclick="deleteShop(\'' + docSnap.id + '\')">Delete</button></td>' +
                     '</tr>';
             });
@@ -1011,6 +1027,13 @@
             document.getElementById('prodSubCategory').value = p.subCategory || 'none';
             document.getElementById('prodImageLink').value = p.imageUrl || '';
             document.getElementById('prodDesc').value = p.description || '';
+            
+            if (p.festivalTag) {
+                document.getElementById('festivalTagContainer').style.display = 'block';
+                document.getElementById('prodFestivalTag').value = p.festivalTag;
+            } else {
+                document.getElementById('festivalTagContainer').style.display = 'none';
+            }
 
             const selectedCats = p.categories || [p.category];
             document.querySelectorAll('input[name="productCats"]').forEach(cb => {
@@ -1037,11 +1060,12 @@
         window.resetProductForm = function() {
             document.getElementById('addProductForm').reset();
             document.getElementById('editProductId').value = '';
-            document.getElementById('productFormHeader').innerText = '+ Naya Product Add Karein (Individual Size MRP, Selling Price & Auto-Discount)';
+            document.getElementById('productFormHeader').innerText = '+ Naya Product Add Karein';
             document.getElementById('productSubmitBtn').innerText = 'Publish Product';
             document.getElementById('cancelEditBtn').style.display = 'none';
             document.getElementById('photoPreviewContainer').innerHTML = '';
             document.getElementById('variantsContainer').innerHTML = '';
+            document.getElementById('festivalTagContainer').style.display = 'none';
             base64PhotosArray = [];
             addVariantRow();
         };
@@ -1052,6 +1076,7 @@
             const editId = document.getElementById('editProductId').value;
             const name = document.getElementById('prodName').value.trim();
             const subCategory = document.getElementById('prodSubCategory').value;
+            const festivalTag = document.getElementById('prodFestivalTag').value.trim().toLowerCase().replace(/\s+/g, '-');
             const desc = document.getElementById('prodDesc').value.trim();
             const imgLink = document.getElementById('prodImageLink').value.trim();
 
@@ -1076,7 +1101,7 @@
                     variantsList.push({ 
                         size: vName, 
                         price: vPrice, 
-                        originalPrice: vOrig,
+                        originalPrice: vOrig, 
                         discount: vDisc
                     });
                 }
@@ -1110,6 +1135,7 @@
                     categories: selectedCats,
                     category: selectedCats[0],
                     subCategory,
+                    festivalTag: festivalTag || '',
                     description: desc,
                     imageUrl: photos[0],
                     images: photos,
@@ -1170,7 +1196,6 @@
             });
         }
 
-        // Live Filter for Store Catalog
         window.filterCatalogLive = function() {
             const query = (document.getElementById('catalogSearchInput').value || '').toLowerCase();
             const cat = document.getElementById('catalogCatFilter').value;
