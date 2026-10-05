@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Festive, Shringar & Seasonal Store - ksindo</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#b91c1c">
+    <link rel="icon" type="image/png" href="logo.png">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color:transparent; }
+        body { background:#fffdf5; color:#1e293b; padding-bottom:60px; scroll-behavior:smooth; }
+
+        header {
+            background:#0f172a;
+            color:white;
+            padding:12px 4%;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            position:sticky;
+            top:0;
+            z-index:100;
+            box-shadow:0 2px 10px rgba(0,0,0,0.15);
+        }
+        .back-btn { background:#15803d; color:white; border:none; padding:6px 14px; border-radius:20px; font-weight:800; cursor:pointer; font-size:12px; }
+        .logo-text { font-size:20px; font-weight:900; color:#facc15; cursor:pointer; }
+        .cart-icon-btn { background:white; color:#0f172a; border:none; width:36px; height:36px; border-radius:50%; font-size:16px; cursor:pointer; font-weight:bold; position:relative; }
+        .cart-badge { background:#ca8a04; color:white; font-size:10px; border-radius:10px; padding:2px 6px; position:absolute; top:-4px; right:-4px; }
+
+        /* Search Bar */
+        .search-strip {
+            background:#0f172a;
+            padding:0 4% 12px;
+        }
+        .search-box {
+            display:flex;
+            max-width:600px;
+            margin:0 auto;
+        }
+        .search-box input {
+            width:100%;
+            padding:10px 16px;
+            border:none;
+            outline:none;
+            border-radius:25px 0 0 25px;
+            font-size:13px;
+        }
+        .search-box button {
+            background:white;
+            border:none;
+            border-radius:0 25px 25px 0;
+            padding:0 14px;
+            cursor:pointer;
+            font-size:15px;
+            color:#16a34a;
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            background:linear-gradient(135deg, #b91c1c 0%, #ea580c 50%, #ca8a04 100%);
+            color:white;
+            padding:22px 4%;
+            text-align:center;
+            border-bottom-left-radius:24px;
+            border-bottom-right-radius:24px;
+            box-shadow:0 6px 18px rgba(185, 28, 28, 0.25);
+        }
+        .hero-banner h1 { font-size:22px; font-weight:900; margin-bottom:4px; text-transform:capitalize; }
+        .hero-banner p { font-size:12px; color:#fef08a; }
+
+        /* Tabs Strip */
+        .tabs-strip {
+            display:flex;
+            gap:10px;
+            padding:12px 4%;
+            overflow-x:auto;
+            scrollbar-width:none;
+            background:#ffffff;
+            border-bottom:1px solid #fed7aa;
+        }
+        .tabs-strip::-webkit-scrollbar { display:none; }
+        .tab-btn {
+            background:#fff7ed;
+            border:1.5px solid #fed7aa;
+            color:#9a3412;
+            padding:7px 16px;
+            border-radius:25px;
+            font-size:12px;
+            font-weight:800;
+            white-space:nowrap;
+            cursor:pointer;
+            transition:all 0.15s;
+        }
+        .tab-btn.active {
+            background:#ea580c;
+            color:white;
+            border-color:#ea580c;
+            box-shadow:0 4px 10px rgba(234, 88, 12, 0.25);
+        }
+
+        /* Product Grid */
+        .container { max-width:1100px; margin:0 auto; padding:15px 14px 40px; }
+        .products-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:12px; }
+        @media(min-width:768px) { .products-grid { grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:16px; } }
+
+        .card {
+            background:#ffffff;
+            border:1.5px solid #fed7aa;
+            border-radius:14px;
+            padding:12px;
+            text-align:center;
+            display:flex;
+            flex-direction:column;
+            justify-content:space-between;
+            transition:transform 0.15s;
+            box-shadow:0 2px 8px rgba(0,0,0,0.04);
+        }
+        .card:hover { transform:translateY(-2px); border-color:#ea580c; }
+        .card img { width:100%; height:130px; object-fit:contain; border-radius:8px; margin-bottom:6px; cursor:pointer; background:#fff7ed; border:1px solid #ffedd5; }
+        .card-title { font-size:12px; font-weight:700; color:#0f172a; height:34px; overflow:hidden; line-height:1.3; cursor:pointer; }
+        .card-price-row { margin:6px 0; display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap; }
+        .card-price { font-size:16px; font-weight:900; color:#15803d; }
+        .card-mrp { font-size:11px; text-decoration:line-through; color:#888; }
+        .discount-badge { font-size:10px; background:#bbf7d0; color:#166534; font-weight:800; padding:1px 5px; border-radius:4px; }
+        .card-actions { display:flex; gap:6px; }
+        .btn-add { background:#ca8a04; color:white; border:none; padding:7px 0; border-radius:18px; font-weight:bold; font-size:11px; flex:1; cursor:pointer; }
+        .btn-buy { background:#16a34a; color:white; border:none; padding:7px 0; border-radius:18px; font-weight:bold; font-size:11px; flex:1; cursor:pointer; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <button class="back-btn" onclick="window.location.href='index.html'">← Home</button>
+        <div class="logo-text" onclick="window.location.href='index.html'">ksindo Festive & Fresh</div>
+        <button class="cart-icon-btn" onclick="window.location.href='index.html'">
+            🛒 <span class="cart-badge" id="festCartCount">0</span>
+        </button>
+    </header>
+
+    <!-- Search Strip -->
+    <div class="search-strip">
+        <div class="search-box">
+            <input type="text" id="seasonSearchInput" placeholder="Chunri, Shringar, Pooja Samagri, Fruits khojein..." onkeyup="handleSeasonSearch()">
+            <button onclick="handleSeasonSearch()">🔍</button>
+        </div>
+    </div>
+
+    <!-- Hero Header -->
+    <div class="hero-banner">
+        <h1 id="heroTitle">🪔 Festive, Shringar & Seasonal Store</h1>
+        <p id="heroSubtitle">Mata ki Chunri, Shringar Samagri, Pooja kit aur Fresh Fruits — Instant Doorstep Delivery!</p>
+    </div>
+
+    <!-- Filter Strip (Admin & Preset Pills) -->
+    <div class="tabs-strip" id="filterTabsStrip">
+        <button class="tab-btn active" onclick="applyCustomFilter('all', null, this)">✨ All Items</button>
+        <button class="tab-btn" onclick="applyCustomFilter('tag', 'shringar', this)">💄 Shringar & Chunri</button>
+        <button class="tab-btn" onclick="applyCustomFilter('tag', 'pooja', this)">🪔 Pooja Samagri</button>
+        <button class="tab-btn" onclick="applyCustomFilter('price', 99, this)">💰 Under ₹99</button>
+        <button class="tab-btn" onclick="applyCustomFilter('price', 199, this)">🏷️ Under ₹199</button>
+        <button class="tab-btn" onclick="applyCustomFilter('tag', 'fruits', this)">🍎 Fresh Fruits</button>
+    </div>
+
+    <div class="container">
+        <div class="products-grid" id="festiveProductsGrid">
+            <!-- Products will load here -->
+        </div>
+    </div>
+
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyA7f9PWSyws4XkzKq077sNdlF0J33DSVSo",
+            authDomain: "jaynagar-srote.firebaseapp.com",
+            projectId: "jaynagar-srote",
+            storageBucket: "jaynagar-srote.firebasestorage.app",
+            messagingSenderId: "820632565818",
+            appId: "1:820632565818:web:0b2f4676cecd799a801d03"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        var db = firebase.firestore();
+
+        // DEFAULT PRE-LOADED PRODUCTS (Chunri, Shringar, Pooja Samagri)
+        var defaultFestiveProducts = [
+            {
+                id: "fest_chunri_red",
+                name: "Mata Rani Red Embroidered Chunri (माता की चुनरी)",
+                price: 49,
+                originalPrice: 80,
+                category: "seasonal",
+                subCategory: "shringar",
+                festivalTag: "durga-puja",
+                imageUrl: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=300"
+            },
+            {
+                id: "fest_shringar_kit",
+                name: "Complete Mata Shringar Kit (Sindoor, Bindi, Alta, Kajal, Chudi)",
+                price: 99,
+                originalPrice: 150,
+                category: "seasonal",
+                subCategory: "shringar",
+                festivalTag: "durga-puja",
+                imageUrl: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=300"
+            },
+            {
+                id: "fest_sindoor_powder",
+                name: "Pure Natural Red Sindoor (सिंदूर दाना) 50g",
+                price: 35,
+                originalPrice: 50,
+                category: "seasonal",
+                subCategory: "shringar",
+                festivalTag: "pooja",
+                imageUrl: "https://images.unsplash.com/photo-1599785209707-a456fc1337bb?w=300"
+            },
+            {
+                id: "fest_alta_liquid",
+                name: "Mahawar Shringar Alta Liquid Bottle",
+                price: 25,
+                originalPrice: 40,
+                category: "seasonal",
+                subCategory: "shringar",
+                festivalTag: "pooja",
+                imageUrl: "https://images.unsplash.com/photo-1608248597359-3a32f6448378?w=300"
+            },
+            {
+                id: "fest_pooja_samagri_kit",
+                name: "Durga Puja & Hawan Samagri Combo Pack",
+                price: 149,
+                originalPrice: 220,
+                category: "seasonal",
+                subCategory: "pooja",
+                festivalTag: "durga-puja",
+                imageUrl: "https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=300"
+            },
+            {
+                id: "fest_pure_ghee_diya",
+                name: "Ready-made Pure Ghee Diya Wicks (30 Pcs Pack)",
+                price: 85,
+                originalPrice: 120,
+                category: "seasonal",
+                subCategory: "pooja",
+                festivalTag: "diwali",
+                imageUrl: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=300"
+            },
+            {
+                id: "fest_dhoop_agarbatti",
+                name: "Mogra & Chandan Premium Dhoop Batti Pack",
+                price: 45,
+                originalPrice: 60,
+                category: "seasonal",
+                subCategory: "pooja",
+                festivalTag: "pooja",
+                imageUrl: "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=300"
+            },
+            {
+                id: "fest_fresh_coconut",
+                name: "Pooja Special Nariyal (ताजा पूजा नारियल)",
+                price: 35,
+                originalPrice: 45,
+                category: "fresh",
+                subCategory: "fruits",
+                festivalTag: "pooja",
+                imageUrl: "https://images.unsplash.com/photo-1588615419957-4630a94b419b?w=300"
+            },
+            {
+                id: "fest_fresh_apple",
+                name: "Fresh Shimla Red Apples (ताजे सेब) 500g",
+                price: 80,
+                originalPrice: 110,
+                category: "fresh",
+                subCategory: "fruits",
+                festivalTag: "fresh",
+                imageUrl: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=300"
+            }
+        ];
+
+        var festiveCatalog = [...defaultFestiveProducts];
+        var activeFilterType = 'all';
+        var activeFilterValue = null;
+        var searchQuery = '';
+
+        // URL Query parameter (?fest=durga-puja ya ?tab=under99)
+        var urlParams = new URLSearchParams(window.location.search);
+        var targetFest = (urlParams.get('fest') || urlParams.get('tab') || '').toLowerCase();
+        if (targetFest) {
+            if (targetFest === 'under99') {
+                activeFilterType = 'price';
+                activeFilterValue = 99;
+            } else {
+                activeFilterType = 'tag';
+                activeFilterValue = targetFest;
+                var displayTitle = targetFest.replace(/-/g, ' ').toUpperCase();
+                document.getElementById('heroTitle').innerText = `🪔 ${displayTitle} SPECIAL STORE`;
+            }
+        }
+
+        function updateCartBadge() {
+            var cart = JSON.parse(localStorage.getItem('store_cart') || '[]');
+            var count = cart.reduce(function(sum, item){ return sum + (item.qty || 1); }, 0);
+            document.getElementById('festCartCount').innerText = count;
+        }
+        updateCartBadge();
+
+        // 1. Fetch Realtime Products from Firebase Firestore
+        db.collection("products").onSnapshot(function(snap) {
+            var dbProducts = [];
+            snap.forEach(function(doc) {
+                var d = doc.data();
+                var cat = (d.category || '').toLowerCase();
+                var sub = (d.subCategory || '').toLowerCase();
+                var fest = (d.festivalTag || '').toLowerCase();
+
+                if (cat === 'seasonal' || cat === 'fresh' || fest !== '' || sub === 'shringar' || sub === 'pooja' || d.isReasonable === true) {
+                    dbProducts.push({ id: doc.id, ...d });
+                }
+            });
+
+            // Merge Database products with pre-loaded products (DB products take precedence)
+            if (dbProducts.length > 0) {
+                var dbIds = new Set(dbProducts.map(x => x.id));
+                festiveCatalog = [...dbProducts, ...defaultFestiveProducts.filter(x => !dbIds.has(x.id))];
+            } else {
+                festiveCatalog = [...defaultFestiveProducts];
+            }
+
+            renderFestiveGrid();
+        });
+
+        // 2. Fetch Dynamic Filters from Admin Panel
+        db.collection("seasonable_filters").orderBy("createdAt", "asc").onSnapshot(function(snap) {
+            if (snap.empty) return;
+            var strip = document.getElementById('filterTabsStrip');
+            var baseHtml = `
+                <button class="tab-btn ${activeFilterType === 'all' ? 'active' : ''}" onclick="applyCustomFilter('all', null, this)">✨ All Items</button>
+                <button class="tab-btn" onclick="applyCustomFilter('tag', 'shringar', this)">💄 Shringar & Chunri</button>
+                <button class="tab-btn" onclick="applyCustomFilter('tag', 'pooja', this)">🪔 Pooja Samagri</button>
+                <button class="tab-btn" onclick="applyCustomFilter('price', 99, this)">💰 Under ₹99</button>
+                <button class="tab-btn" onclick="applyCustomFilter('price', 199, this)">🏷️ Under ₹199</button>
+            `;
+
+            snap.forEach(function(doc) {
+                var d = doc.data();
+                if (d.type === 'price') {
+                    baseHtml += `<button class="tab-btn" onclick="applyCustomFilter('price', ${d.maxPrice}, this)">🏷️ ${d.label}</button>`;
+                } else {
+                    baseHtml += `<button class="tab-btn" onclick="applyCustomFilter('tag', '${d.tagKey}', this)">🪔 ${d.label}</button>`;
+                }
+            });
+
+            strip.innerHTML = baseHtml;
+        });
+
+        // Filter Actions
+        window.applyCustomFilter = function(type, val, el) {
+            activeFilterType = type;
+            activeFilterValue = val;
+
+            document.querySelectorAll('#filterTabsStrip .tab-btn').forEach(function(b){ b.classList.remove('active'); });
+            if (el) el.classList.add('active');
+
+            if (type === 'all') {
+                document.getElementById('heroTitle').innerText = "🪔 Festive, Shringar & Seasonal Store";
+            } else if (type === 'price') {
+                document.getElementById('heroTitle').innerText = `💰 Super Saver Deals Under ₹${val}`;
+            } else if (type === 'tag') {
+                var displayTitle = String(val).replace(/-/g, ' ').toUpperCase();
+                document.getElementById('heroTitle').innerText = `🪔 ${displayTitle} SPECIAL COLLECTION`;
+            }
+
+            renderFestiveGrid();
+        };
+
+        window.handleSeasonSearch = function() {
+            searchQuery = (document.getElementById('seasonSearchInput').value || '').toLowerCase().trim();
+            renderFestiveGrid();
+        };
+
+        // Render Product Cards
+        function renderFestiveGrid() {
+            var grid = document.getElementById('festiveProductsGrid');
+            if (!grid) return;
+
+            var list = festiveCatalog.filter(function(p) {
+                var pPrice = Number(p.price) || 0;
+                var pTag = (p.festivalTag || '').toLowerCase();
+                var pSub = (p.subCategory || '').toLowerCase();
+                var pCat = (p.category || '').toLowerCase();
+                var pName = (p.name || '').toLowerCase();
+
+                // Search matching
+                if (searchQuery) {
+                    var matchSearch = pName.includes(searchQuery) || pTag.includes(searchQuery) || pSub.includes(searchQuery) || pCat.includes(searchQuery);
+                    if (!matchSearch) return false;
+                }
+
+                // Filter matching
+                if (activeFilterType === 'price') {
+                    return pPrice <= Number(activeFilterValue);
+                } else if (activeFilterType === 'tag') {
+                    var target = String(activeFilterValue).toLowerCase();
+                    return pTag === target || pSub === target || pCat === target;
+                }
+                return true;
+            });
+
+            if (list.length === 0) {
+                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:35px; color:#ea580c; font-weight:bold;">Is category ya search me koi item nahi mila.</p>';
+                return;
+            }
+
+            var html = '';
+            list.forEach(function(p) {
+                var img = p.imageUrl || (p.images && p.images[0]) || 'https://via.placeholder.com/150';
+                var origPrice = p.originalPrice ? `<span class="card-mrp">₹${p.originalPrice}</span>` : '';
+                var discount = (p.originalPrice && Number(p.originalPrice) > Number(p.price))
+                    ? `<span class="discount-badge">${Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)}% OFF</span>`
+                    : '';
+
+                html += `
+                    <div class="card">
+                        <img src="${img}" alt="${p.name}" onclick="window.location.href='product.html?id=${p.id}'" loading="lazy">
+                        <div class="card-title" onclick="window.location.href='product.html?id=${p.id}'">${p.name}</div>
+                        <div class="card-price-row">
+                            <span class="card-price">₹${p.price}</span>
+                            ${origPrice}
+                            ${discount}
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-add" onclick="addFestCart('${p.id}')">🛒 Add</button>
+                            <button class="btn-buy" onclick="buyFestDirect('${p.id}')">⚡ Buy</button>
+                        </div>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+        }
+
+        window.addFestCart = function(id) {
+            var p = festiveCatalog.find(function(x){ return x.id === id; });
+            if (!p) return;
+            var cart = JSON.parse(localStorage.getItem('store_cart') || '[]');
+            var ex = cart.find(function(i){ return i.id === id; });
+            if (ex) ex.qty = (ex.qty || 1) + 1;
+            else cart.push({ id: p.id, name: p.name, price: Number(p.price) || 0, imageUrl: p.imageUrl || (p.images ? p.images[0] : ''), qty: 1 });
+            localStorage.setItem('store_cart', JSON.stringify(cart));
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartBadge();
+            alert("✅ " + p.name + " cart me add ho gaya!");
+        };
+
+        window.buyFestDirect = function(id) {
+            window.addFestCart(id);
+            localStorage.setItem('open_checkout_direct', 'true');
+            window.location.href = "index.html";
+        };
+
+        // Initial Load
+        renderFestiveGrid();
+    </script>
+</body>
+</html>
