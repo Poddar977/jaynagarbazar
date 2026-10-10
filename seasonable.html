@@ -225,7 +225,7 @@ if (targetFest) {
                 var sub = (d.subCategory || '').toLowerCase();
                 var fest = (d.festivalTag || '').toLowerCase();
 
-                if (cat === 'seasonal' || cat === 'fresh' || fest !== '' || sub === 'shringar' || sub === 'pooja' || d.isReasonable === true) {
+                if (cat === 'seasonal'  || fest !== '' || sub === 'shringar' || sub === 'pooja' || d.isReasonable === true) {
                     dbProducts.push({ id: doc.id, ...d });
                 }
             });
