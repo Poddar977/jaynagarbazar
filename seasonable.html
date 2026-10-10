@@ -163,8 +163,6 @@
         <button class="tab-btn active" onclick="applyCustomFilter('all', null, this)">✨ All Items</button>
         <button class="tab-btn" onclick="applyCustomFilter('tag', 'shringar', this)">💄 Shringar & Chunri</button>
         <button class="tab-btn" onclick="applyCustomFilter('tag', 'pooja', this)">🪔 Pooja Samagri</button>
-        <button class="tab-btn" onclick="applyCustomFilter('price', 99, this)">💰 Under ₹99</button>
-        <button class="tab-btn" onclick="applyCustomFilter('price', 199, this)">🏷️ Under ₹199</button>
         <button class="tab-btn" onclick="applyCustomFilter('tag', 'fruits', this)">🍎 Fresh Fruits</button>
     </div>
 
@@ -207,26 +205,7 @@
         var searchQuery = '';
 
         // URL Query parameter (?fest=durga-puja ya ?tab=under99)
-        var urlParams = new URLSearchParams(window.location.search);
-        var targetFest = (urlParams.get('fest') || urlParams.get('tab') || '').toLowerCase();
-        if (targetFest) {
-            if (targetFest === 'under99') {
-                activeFilterType = 'price';
-                activeFilterValue = 99;
-            } else {
-                activeFilterType = 'tag';
-                activeFilterValue = targetFest;
-                var displayTitle = targetFest.replace(/-/g, ' ').toUpperCase();
-                document.getElementById('heroTitle').innerText = `🪔 ${displayTitle} SPECIAL STORE`;
-            }
-        }
-
-        function updateCartBadge() {
-            var cart = JSON.parse(localStorage.getItem('store_cart') || '[]');
-            var count = cart.reduce(function(sum, item){ return sum + (item.qty || 1); }, 0);
-            document.getElementById('festCartCount').innerText = count;
-        }
-        updateCartBadge();
+       
 
         // 1. Fetch Realtime Products from Firebase Firestore
         db.collection("products").onSnapshot(function(snap) {
@@ -261,8 +240,6 @@
                 <button class="tab-btn ${activeFilterType === 'all' ? 'active' : ''}" onclick="applyCustomFilter('all', null, this)">✨ All Items</button>
                 <button class="tab-btn" onclick="applyCustomFilter('tag', 'shringar', this)">💄 Shringar & Chunri</button>
                 <button class="tab-btn" onclick="applyCustomFilter('tag', 'pooja', this)">🪔 Pooja Samagri</button>
-                <button class="tab-btn" onclick="applyCustomFilter('price', 99, this)">💰 Under ₹99</button>
-                <button class="tab-btn" onclick="applyCustomFilter('price', 199, this)">🏷️ Under ₹199</button>
             `;
 
             snap.forEach(function(doc) {
