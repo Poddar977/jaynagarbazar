@@ -205,6 +205,15 @@
         var searchQuery = '';
 
         // URL Query parameter (?fest=durga-puja ya ?tab=under99)
+        // URL Query parameter (?fest=durga-puja ya ?tab=pooja)
+var urlParams = new URLSearchParams(window.location.search);
+var targetFest = (urlParams.get('fest') || urlParams.get('tab') || '').toLowerCase();
+if (targetFest) {
+    activeFilterType = 'tag';
+    activeFilterValue = targetFest;
+    var displayTitle = targetFest.replace(/-/g, ' ').toUpperCase();
+    document.getElementById('heroTitle').innerText = `🪔 ${displayTitle} SPECIAL STORE`;
+}
        
 
         // 1. Fetch Realtime Products from Firebase Firestore
@@ -233,27 +242,25 @@
         });
 
         // 2. Fetch Dynamic Filters from Admin Panel
-        db.collection("seasonable_filters").orderBy("createdAt", "asc").onSnapshot(function(snap) {
-            if (snap.empty) return;
-            var strip = document.getElementById('filterTabsStrip');
-            var baseHtml = `
-                <button class="tab-btn ${activeFilterType === 'all' ? 'active' : ''}" onclick="applyCustomFilter('all', null, this)">✨ All Items</button>
-                <button class="tab-btn" onclick="applyCustomFilter('tag', 'shringar', this)">💄 Shringar & Chunri</button>
-                <button class="tab-btn" onclick="applyCustomFilter('tag', 'pooja', this)">🪔 Pooja Samagri</button>
-            `;
+       db.collection("seasonable_filters").orderBy("createdAt", "asc").onSnapshot(function(snap) {
+    if (snap.empty) return;
+    var strip = document.getElementById('filterTabsStrip');
+    var baseHtml = `
+        <button class="tab-btn ${activeFilterType === 'all' ? 'active' : ''}" onclick="applyCustomFilter('all', null, this)">✨ All Items</button>
+        <button class="tab-btn" onclick="applyCustomFilter('tag', 'shringar', this)">💄 Shringar & Chunri</button>
+        <button class="tab-btn" onclick="applyCustomFilter('tag', 'pooja', this)">🪔 Pooja Samagri</button>
+        <button class="tab-btn" onclick="applyCustomFilter('tag', 'fruits', this)">🍎 Fresh Fruits</button>
+    `;
 
-            snap.forEach(function(doc) {
-                var d = doc.data();
-                if (d.type === 'price') {
-                    baseHtml += `<button class="tab-btn" onclick="applyCustomFilter('price', ${d.maxPrice}, this)">🏷️ ${d.label}</button>`;
-                } else {
-                    baseHtml += `<button class="tab-btn" onclick="applyCustomFilter('tag', '${d.tagKey}', this)">🪔 ${d.label}</button>`;
-                }
-            });
+    snap.forEach(function(doc) {
+        var d = doc.data();
+        if (d.type === 'tag') {
+            baseHtml += `<button class="tab-btn" onclick="applyCustomFilter('tag', '${d.tagKey}', this)">🪔 ${d.label}</button>`;
+        }
+    });
 
-            strip.innerHTML = baseHtml;
-        });
-
+    strip.innerHTML = baseHtml;
+});
         // Filter Actions
         window.applyCustomFilter = function(type, val, el) {
             activeFilterType = type;
