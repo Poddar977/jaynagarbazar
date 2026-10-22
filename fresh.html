@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>24x7 Fresh Daily Needs - ksindo</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#15803d">
+    <link rel="icon" type="image/png" href="logo.png">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color:transparent; }
+        body { background:#f0fdf4; color:#1e293b; padding-bottom:70px; }
+
+        header {
+            background:#15803d;
+            color:white;
+            padding:12px 4%;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            position:sticky;
+            top:0;
+            z-index:1000;
+            box-shadow:0 2px 10px rgba(0,0,0,0.15);
+        }
+        .back-btn { background:#166534; color:white; border:none; padding:6px 14px; border-radius:20px; font-weight:800; cursor:pointer; font-size:12px; }
+        .logo-text { font-size:20px; font-weight:900; color:#fef08a; cursor:pointer; }
+        .cart-icon-btn { background:white; color:#15803d; border:none; width:36px; height:36px; border-radius:50%; font-size:16px; cursor:pointer; font-weight:bold; position:relative; }
+        .cart-badge { background:#ca8a04; color:white; font-size:10px; border-radius:10px; padding:2px 6px; position:absolute; top:-4px; right:-4px; }
+
+        /* Search Section */
+        .search-strip {
+            background:#15803d;
+            padding:0 4% 14px;
+        }
+        .search-box {
+            display:flex;
+            max-width:600px;
+            margin:0 auto;
+        }
+        .search-box input {
+            width:100%;
+            padding:10px 16px;
+            border:none;
+            outline:none;
+            border-radius:25px 0 0 25px;
+            font-size:13px;
+        }
+        .search-box button {
+            background:white;
+            border:none;
+            border-radius:0 25px 25px 0;
+            padding:0 14px;
+            cursor:pointer;
+            font-size:15px;
+            color:#15803d;
+        }
+
+        /* Banner */
+        .hero-banner {
+            background:linear-gradient(135deg, #15803d 0%, #16a34a 60%, #65a30d 100%);
+            color:white;
+            padding:20px 4%;
+            text-align:center;
+            border-bottom-left-radius:24px;
+            border-bottom-right-radius:24px;
+            box-shadow:0 6px 18px rgba(21, 128, 61, 0.2);
+        }
+        .hero-banner h1 { font-size:22px; font-weight:900; margin-bottom:4px; }
+        .hero-banner p { font-size:12px; color:#dcfce7; }
+
+        /* Daily Needs Category Tabs */
+        .tabs-strip {
+            display:flex;
+            gap:10px;
+            padding:12px 4%;
+            overflow-x:auto;
+            scrollbar-width:none;
+            background:#ffffff;
+            border-bottom:1px solid #bbf7d0;
+            position:sticky;
+            top:60px;
+            z-index:900;
+        }
+        .tabs-strip::-webkit-scrollbar { display:none; }
+        .tab-btn {
+            background:#f0fdf4;
+            border:1.5px solid #bbf7d0;
+            color:#166534;
+            padding:7px 15px;
+            border-radius:25px;
+            font-size:12px;
+            font-weight:800;
+            white-space:nowrap;
+            cursor:pointer;
+            transition:all 0.15s;
+        }
+        .tab-btn.active {
+            background:#16a34a;
+            color:white;
+            border-color:#16a34a;
+            box-shadow:0 4px 10px rgba(22, 163, 74, 0.25);
+        }
+
+        /* Product Grid */
+        .container { max-width:1100px; margin:0 auto; padding:15px 14px 40px; }
+        .products-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:12px; }
+        @media(min-width:768px) { .products-grid { grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:16px; } }
+
+        .card {
+            background:#ffffff;
+            border:1.5px solid #dcfce7;
+            border-radius:14px;
+            padding:12px;
+            text-align:center;
+            display:flex;
+            flex-direction:column;
+            justify-content:space-between;
+            transition:transform 0.15s;
+            box-shadow:0 2px 8px rgba(0,0,0,0.04);
+        }
+        .card:hover { transform:translateY(-2px); border-color:#22c55e; }
+        .card img { width:100%; height:130px; object-fit:contain; border-radius:8px; margin-bottom:6px; cursor:pointer; background:#f8fafc; }
+        .card-title { font-size:12px; font-weight:700; color:#14532d; height:34px; overflow:hidden; line-height:1.3; cursor:pointer; }
+        .card-price-row { margin:6px 0; display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap; }
+        .card-price { font-size:16px; font-weight:900; color:#15803d; }
+        .card-mrp { font-size:11px; text-decoration:line-through; color:#888; }
+        .discount-badge { font-size:10px; background:#bbf7d0; color:#166534; font-weight:800; padding:1px 5px; border-radius:4px; }
+        
+        .card-actions { display:flex; gap:6px; }
+        .btn-add { background:#ca8a04; color:white; border:none; padding:7px 0; border-radius:18px; font-weight:bold; font-size:11px; flex:1; cursor:pointer; }
+        .btn-buy { background:#16a34a; color:white; border:none; padding:7px 0; border-radius:18px; font-weight:bold; font-size:11px; flex:1; cursor:pointer; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <button class="back-btn" onclick="window.location.href='index.html'">← Home</button>
+        <div class="logo-text" onclick="window.location.href='index.html'">ksindo Fresh</div>
+        <button class="cart-icon-btn" onclick="window.location.href='index.html'">
+            🛒 <span class="cart-badge" id="freshCartCount">0</span>
+        </button>
+    </header>
+
+    <div class="search-strip">
+        <div class="search-box">
+            <input type="text" id="dailySearchInput" placeholder="Aloo, Tamatar, Doodh, Anda, Seb khojein..." onkeyup="handleDailySearch()">
+            <button onclick="handleDailySearch()">🔍</button>
+        </div>
+    </div>
+
+    <div class="hero-banner">
+        <h1>🥦 24x7 Fresh & Daily Essentials</h1>
+        <p>Taaza sabziyan, phal, doodh, ande aur dry fruits — Rozana aapke doorstep par!</p>
+    </div>
+
+    <!-- Daily Needs Categories -->
+    <div class="tabs-strip" id="dailyTabsStrip">
+        <button class="tab-btn active" onclick="filterDailyCategory('all', this)">✨ All Fresh</button>
+        <button class="tab-btn" onclick="filterDailyCategory('vegetables', this)">🥔 Daily Vegetables (सब्जियां)</button>
+        <button class="tab-btn" onclick="filterDailyCategory('fruits', this)">🍎 Fresh Fruits (फल)</button>
+        <button class="tab-btn" onclick="filterDailyCategory('dairy', this)">🥛 Milk & Dairy (दूध, दही, पनीर)</button>
+        <button class="tab-btn" onclick="filterDailyCategory('eggs', this)">🥚 Fresh Eggs (अंडे)</button>
+        <button class="tab-btn" onclick="filterDailyCategory('dryfruits', this)">🥜 Dry Fruits (काजू, बादाम)</button>
+    </div>
+
+    <div class="container">
+        <div class="products-grid" id="dailyProductsGrid"></div>
+    </div>
+
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyA7f9PWSyws4XkzKq077sNdlF0J33DSVSo",
+            authDomain: "jaynagar-srote.firebaseapp.com",
+            projectId: "jaynagar-srote",
+            storageBucket: "jaynagar-srote.firebasestorage.app",
+            messagingSenderId: "820632565818",
+            appId: "1:820632565818:web:0b2f4676cecd799a801d03"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        var db = firebase.firestore();
+
+        // PRE-LOADED DAILY NEEDS INVENTORY
+        var preloadedDailyItems = [
+            {
+                id: "dn_potato",
+                name: "Fresh Hybrid Potato (आलू) 1 Kg",
+                price: 25,
+                originalPrice: 35,
+                category: "fresh",
+                subCategory: "vegetables",
+                imageUrl: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=300"
+            },
+            {
+                id: "dn_tomato",
+                name: "Farm Fresh Red Tomato (टमाटर) 1 Kg",
+                price: 35,
+                originalPrice: 50,
+                category: "fresh",
+                subCategory: "vegetables",
+                imageUrl: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=300"
+            },
+            {
+                id: "dn_onion",
+                name: "Nashik Red Onion (प्याज) 1 Kg",
+                price: 40,
+                originalPrice: 55,
+                category: "fresh",
+                subCategory: "vegetables",
+                imageUrl: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=300"
+            },
+            {
+                id: "dn_milk_amul",
+                name: "Amul Taaza Homogenised Toned Milk 1L",
+                price: 56,
+                originalPrice: 58,
+                category: "fresh",
+                subCategory: "dairy",
+                imageUrl: "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300"
+            },
+            {
+                id: "dn_paneer",
+                name: "Fresh Malai Paneer 200g Pack",
+                price: 85,
+                originalPrice: 95,
+                category: "fresh",
+                subCategory: "dairy",
+                imageUrl: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=300"
+            },
+            {
+                id: "dn_curd",
+                name: "Sudha Plain Dahi / Curd 400g Pouch",
+                price: 35,
+                originalPrice: 40,
+                category: "fresh",
+                subCategory: "dairy",
+                imageUrl: "https://images.unsplash.com/photo-1571212515416-fef01fc43637?w=300"
+            },
+            {
+                id: "dn_eggs_tray",
+                name: "Farm Fresh Brown / White Eggs (6 Pcs Pack)",
+                price: 45,
+                originalPrice: 55,
+                category: "fresh",
+                subCategory: "eggs",
+                imageUrl: "https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=300"
+            },
+            {
+                id: "dn_apple",
+                name: "Crisp Shimla Apple (ताजे सेब) 500g",
+                price: 80,
+                originalPrice: 100,
+                category: "fresh",
+                subCategory: "fruits",
+                imageUrl: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=300"
+            },
+            {
+                id: "dn_banana",
+                name: "Fresh Robusta Bananas (ताजे केले) 1 Dozen",
+                price: 50,
+                originalPrice: 65,
+                category: "fresh",
+                subCategory: "fruits",
+                imageUrl: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=300"
+            },
+            {
+                id: "dn_almonds",
+                name: "California Premium Badam / Almonds 200g",
+                price: 180,
+                originalPrice: 240,
+                category: "fresh",
+                subCategory: "dryfruits",
+                imageUrl: "https://images.unsplash.com/photo-1508061253366-f7da158b6d46?w=300"
+            },
+            {
+                id: "dn_kaju",
+                name: "Whole White Cashew / Kaju 200g Pack",
+                price: 195,
+                originalPrice: 260,
+                category: "fresh",
+                subCategory: "dryfruits",
+                imageUrl: "https://images.unsplash.com/photo-1536591375315-0b818c213f27?w=300"
+            },
+            {
+                id: "dn_kishmish",
+                name: "Golden Long Raisins / Kishmish 200g",
+                price: 75,
+                originalPrice: 110,
+                category: "fresh",
+                subCategory: "dryfruits",
+                imageUrl: "https://images.unsplash.com/photo-1589927986089-35812388d1f4?w=300"
+            }
+        ];
+
+        var fullDailyCatalog = [...preloadedDailyItems];
+        var activeCategory = 'all';
+        var searchQuery = '';
+
+        function updateCartBadge() {
+            var cart = JSON.parse(localStorage.getItem('store_cart') || '[]');
+            var count = cart.reduce(function(sum, item){ return sum + (item.qty || 1); }, 0);
+            document.getElementById('freshCartCount').innerText = count;
+        }
+        updateCartBadge();
+
+        // Firestore Realtime Daily Items Sync
+        db.collection("products").onSnapshot(function(snap) {
+            var liveItems = [];
+            snap.forEach(function(doc) {
+                var d = doc.data();
+                var cat = (d.category || '').toLowerCase();
+                var sub = (d.subCategory || '').toLowerCase();
+                if (cat === 'fresh' || sub === 'vegetables' || sub === 'fruits' || sub === 'dairy' || sub === 'eggs' || sub === 'dryfruits') {
+                    liveItems.push({ id: doc.id, ...d });
+                }
+            });
+
+            if (liveItems.length > 0) {
+                var liveIds = new Set(liveItems.map(x => x.id));
+                fullDailyCatalog = [...liveItems, ...preloadedDailyItems.filter(x => !liveIds.has(x.id))];
+            } else {
+                fullDailyCatalog = [...preloadedDailyItems];
+            }
+            renderDailyGrid();
+        });
+
+        window.filterDailyCategory = function(cat, el) {
+            activeCategory = cat;
+            document.querySelectorAll('#dailyTabsStrip .tab-btn').forEach(function(b){ b.classList.remove('active'); });
+            if (el) el.classList.add('active');
+            renderDailyGrid();
+        };
+
+        window.handleDailySearch = function() {
+            searchQuery = (document.getElementById('dailySearchInput').value || '').toLowerCase().trim();
+            renderDailyGrid();
+        };
+
+        function renderDailyGrid() {
+            var grid = document.getElementById('dailyProductsGrid');
+            if (!grid) return;
+
+            var list = fullDailyCatalog.filter(function(p) {
+                var pSub = (p.subCategory || '').toLowerCase();
+                var pName = (p.name || '').toLowerCase();
+
+                if (searchQuery && !pName.includes(searchQuery) && !pSub.includes(searchQuery)) {
+                    return false;
+                }
+                if (activeCategory !== 'all' && pSub !== activeCategory) {
+                    return false;
+                }
+                return true;
+            });
+
+            if (list.length === 0) {
+                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:35px; color:#15803d; font-weight:bold;">Is category me filhal koi daily item nahi mila.</p>';
+                return;
+            }
+
+            var html = '';
+            list.forEach(function(p) {
+                var img = p.imageUrl || (p.images && p.images[0]) || 'https://via.placeholder.com/150';
+                var origPrice = p.originalPrice ? `<span class="card-mrp">₹${p.originalPrice}</span>` : '';
+                var discount = (p.originalPrice && Number(p.originalPrice) > Number(p.price))
+                    ? `<span class="discount-badge">${Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)}% OFF</span>`
+                    : '';
+
+                html += `
+                    <div class="card">
+                        <img src="${img}" alt="${p.name}" onclick="window.location.href='product.html?id=${p.id}'" loading="lazy">
+                        <div class="card-title" onclick="window.location.href='product.html?id=${p.id}'">${p.name}</div>
+                        <div class="card-price-row">
+                            <span class="card-price">₹${p.price}</span>
+                            ${origPrice}
+                            ${discount}
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-add" onclick="addDailyCart('${p.id}')">🛒 Add</button>
+                            <button class="btn-buy" onclick="buyDailyDirect('${p.id}')">⚡ Buy</button>
+                        </div>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+        }
+
+        window.addDailyCart = function(id) {
+            var p = fullDailyCatalog.find(function(x){ return x.id === id; });
+            if (!p) return;
+            var cart = JSON.parse(localStorage.getItem('store_cart') || '[]');
+            var ex = cart.find(function(i){ return i.id === id; });
+            if (ex) ex.qty = (ex.qty || 1) + 1;
+            else cart.push({ id: p.id, name: p.name, price: Number(p.price) || 0, imageUrl: p.imageUrl || (p.images ? p.images[0] : ''), qty: 1 });
+            localStorage.setItem('store_cart', JSON.stringify(cart));
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartBadge();
+            alert("✅ " + p.name + " cart me add ho gaya!");
+        };
+
+        window.buyDailyDirect = function(id) {
+            window.addDailyCart(id);
+            localStorage.setItem('open_checkout_direct', 'true');
+            window.location.href = "index.html";
+        };
+
+        renderDailyGrid();
+    </script>
+</body>
+</html>
