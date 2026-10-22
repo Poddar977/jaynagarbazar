@@ -7,8 +7,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ksindo">
-    <link rel="icon" type="image/png" href="logo.png">
-    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="icon" type="image/png" href="ksindo-icon.svg">
+    <link rel="apple-touch-icon" href="ksindo-icon.svg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="google-site-verification" content="72NquAkB-h-rhGmC663QSuZ3Y40bASxjPp0xk2tme2w" />
@@ -458,7 +458,29 @@
     line-height: 1;
 }
     </style>
-</head>
+
+<style id="ksindo-professional-upgrade">
+.ksindo-global-footer{background:#111827;color:#e5e7eb;padding:34px 5%;margin-top:40px;font:14px/1.6 system-ui,sans-serif}
+.ksindo-footer-inner{max-width:1240px;margin:auto;display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;gap:26px}
+.ksindo-global-footer h3,.ksindo-global-footer h4{margin:0 0 12px;color:#fff}
+.ksindo-global-footer p{color:#aeb8ca;font-size:12px;margin:8px 0}
+.ksindo-global-footer a{display:block;color:#cbd5e1;text-decoration:none;font-size:12px;margin:8px 0}
+.ksindo-global-footer a:hover{color:#fff;text-decoration:underline}
+.ksindo-footer-brand{font-size:22px;font-weight:900;letter-spacing:.5px;background:linear-gradient(90deg,#f472b6,#a78bfa,#22d3ee,#facc15);background-clip:text;-webkit-background-clip:text;color:transparent}
+.ksindo-footer-bottom{max-width:1240px;margin:22px auto 0;border-top:1px solid #374151;padding-top:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#9ca3af;font-size:11px}
+.ksindo-help-fab{position:fixed;right:16px;bottom:16px;z-index:9990;background:#4f46e5;color:#fff!important;text-decoration:none!important;border-radius:999px;padding:12px 16px;box-shadow:0 8px 25px #11182738;font:700 12px system-ui;display:flex;gap:8px;align-items:center}
+.ksindo-help-fab:hover{background:#3730a3}
+@media(max-width:700px){.ksindo-footer-inner{grid-template-columns:1fr 1fr;gap:20px}.ksindo-footer-inner>div:first-child{grid-column:1/-1}.ksindo-global-footer{padding:28px 20px}.ksindo-help-fab{right:10px;bottom:94px;padding:10px 12px}}
+</style>
+<style>
+/* KSINDO app-like shopping layout */
+.location-strip{display:flex;align-items:center;gap:9px;padding:10px 16px;background:#f0fdf4;border-bottom:1px solid #dcfce7;font-size:12px;color:#14532d}
+.location-strip strong{font-size:13px}.location-strip button{margin-left:auto;border:1px solid #15803d;color:#166534;background:#fff;border-radius:18px;padding:7px 11px;font-weight:700;white-space:nowrap}
+.location-strip .loc-copy{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:700px){body{padding-bottom:68px}.location-strip{padding:9px 12px}.pwa-bottom-banner{left:8px;right:8px;z-index:1100}.pwa-bottom-banner.show{bottom:72px}.pwa-bottom-banner.show ~ .ksindo-help-fab{bottom:160px!important}.ksindo-help-fab{bottom:88px!important}.ksindo-global-footer{padding-bottom:30px}}
+.ksindo-mobile-nav{display:none}
+@media(max-width:700px){.ksindo-mobile-nav{position:fixed;z-index:950;left:0;right:0;bottom:0;display:flex;justify-content:space-around;align-items:center;background:#fff;border-top:1px solid #e5e7eb;box-shadow:0 -4px 16px #0f172a12;padding:7px 3px calc(7px + env(safe-area-inset-bottom));}.ksindo-mobile-nav a{color:#334155;text-decoration:none;font-size:10px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:52px}.ksindo-mobile-nav span{font-size:19px}}
+</style></head>
 <body>
 
     <header>
@@ -486,7 +508,7 @@
                     <li id="menuItemProfile" onclick="window.openProfileModal()" style="display:none;">✏️ Update Profile</li>
 
                     <!-- Seller & Info -->
-                    <li onclick="window.open('https://poddar977.github.io/jaynagarbazar/restaurent.html', '_blank')" style="color:#ea580c; font-weight:bold;">🏪 Become a Seller / Partner</li>
+                    <li onclick="window.open('seller-center.html', '_blank')" style="color:#ea580c; font-weight:bold;">🏪 Become a Seller / Partner</li>
                     <li onclick="window.location.href='about.html'">ℹ️ About ksindo</li>
                     
                     <li id="menuItemLogout" onclick="window.handleLogout()" style="color:#ef4444; display:none;">🚪 Logout</li>
@@ -498,6 +520,8 @@
         </div>
     </header>
 
+
+
     <!-- Support Ticker -->
     <div class="sub-header-clock-bar" id="supportTickerBar">
         <div class="marquee-track" id="marqueeTrack">
@@ -506,6 +530,11 @@
             <span>📞 <strong>Customer Support Helpline:</strong> 8252731656 , 06246451082 (24x7 Order & Delivery Support)</span> &nbsp;&nbsp;&nbsp;&nbsp;
             <span>⚡ Welcome to <strong>ksindo Super App</strong> - Fast Doorstep Delivery!</span>
         </div>
+    </div>
+
+    <div class="location-strip" aria-live="polite">
+      <span style="font-size:20px">📍</span><div class="loc-copy"><strong>Deliver to</strong><br><span id="ksindoLocationLabel">Choose your delivery location</span></div>
+      <button type="button" id="ksindoDetectLocation">Use my location</button><button type="button" id="ksindoManualLocation" style="margin-left:0">Change</button>
     </div>
 
     <!-- Mode Switcher -->
@@ -520,7 +549,7 @@
         <div class="icon-item" onclick="window.filterCategory('fashion', this)"><div class="icon-symbol">👕</div><span class="icon-title">Fashion</span></div>
         <div class="icon-item" onclick="window.filterCategory('beauty', this)"><div class="icon-symbol">💄</div><span class="icon-title">Beauty</span></div>
         <div class="icon-item" onclick="window.filterCategory('grocery', this)"><div class="icon-symbol">🛒</div><span class="icon-title">Grocery</span></div>
-        <div class="icon-item" onclick="window.filterCategory('fresh', this)">
+        <div class="icon-item" role="link" tabindex="0" onclick="window.location.href='fresh.html'" onkeydown="if(event.key==='Enter'||event.key===' ')window.location.href='fresh.html'">
             <div class="icon-symbol">🥦</div>
             <span class="icon-title">24x7 Fresh</span>
         </div>
@@ -898,8 +927,18 @@
         // RENDER FILTERED PRODUCTS WITH AI PERSONALIZATION
         // ==========================================
         function renderFilteredProducts() {
+            var savedLoc = null; try { savedLoc = JSON.parse(localStorage.getItem('ksindo_delivery_location') || 'null'); } catch(e) {}
+            var selectedPin = savedLoc && savedLoc.pincode ? String(savedLoc.pincode) : '';
             var list = allProducts.filter(function(p){
-                return (p.category || '').toLowerCase() !== 'food' && (!p.categories || !p.categories.includes('food'));
+                var notFood = (p.category || '').toLowerCase() !== 'food' && (!p.categories || !p.categories.includes('food'));
+                if (!notFood) return false;
+                if (!selectedPin) return true;
+                var supported = p.servicePincodes || p.servicePinCodes || p.availablePincodes || null;
+                if (typeof supported === 'string') supported = supported.split(/[ ,;]+/).filter(Boolean);
+                var productPin = p.pincode || p.shopPincode || p.sellerPincode || '';
+                if (Array.isArray(supported) && supported.length) return supported.map(String).includes(selectedPin);
+                if (productPin) return String(productPin) === selectedPin;
+                return true; // Products without a service-area field remain globally visible.
             });
 
             if (activeCategory !== 'all') {
@@ -1130,6 +1169,7 @@
                 db.collection("users").doc(user.uid).get().then(function(doc){
                     if (doc.exists) {
                         currentUserProfile = doc.data();
+                        if(currentUserProfile.approvalStatus && currentUserProfile.approvalStatus !== 'approved'){auth.signOut();alert('Your account is pending admin approval.');return;}
                         localStorage.setItem('user_profile', JSON.stringify(currentUserProfile));
                         headerText.innerText = currentUserProfile.fullName || "Customer";
                     }
@@ -1212,11 +1252,8 @@
                 var address = document.getElementById('regAddress').value.trim();
 
                 auth.createUserWithEmailAndPassword(email, password).then(function(cred){
-                    var profile = { fullName: name, phone: phone, pincode: pincode, address: address, userEmail: email, termsAccepted: true };
-                    db.collection("users").doc(cred.user.uid).set(profile);
-                    localStorage.setItem('user_profile', JSON.stringify(profile));
-                    alert("Account successfully create ho gaya!");
-                    window.closeAuthModal();
+                    var profile = { fullName: name, phone: phone, pincode: pincode, address: address, userEmail: email, termsAccepted: true, approvalStatus: 'pending', accountType: 'customer', createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+                    db.collection("users").doc(cred.user.uid).set(profile).then(function(){return auth.signOut();}).then(function(){localStorage.removeItem('user_profile');alert("Registration request submit ho gayi. Admin approval ke baad account activate hoga. Approval ke baad email par password setup/reset link bheja ja sakta hai.");window.closeAuthModal();}).catch(function(err){alert('Request save nahi hui: '+err.message);});
                 }).catch(function(err){ 
                     alert("Registration failed: " + err.message); 
                 }).finally(function(){ 
@@ -1224,9 +1261,8 @@
                     btn.disabled = false; 
                 });
             } else {
-                auth.signInWithEmailAndPassword(email, password).then(function(){
-                    alert("Welcome back! Login successful.");
-                    window.closeAuthModal();
+                auth.signInWithEmailAndPassword(email, password).then(function(cred){
+                    return db.collection('users').doc(cred.user.uid).get().then(function(doc){var profile=doc.exists?doc.data():null;if(!profile || (profile.approvalStatus && profile.approvalStatus !== 'approved')){return auth.signOut().then(function(){throw new Error('Your account is awaiting admin approval. Please try again after approval.');});}alert("Welcome back! Login successful.");window.closeAuthModal();});
                 }).catch(function(err){ 
                     alert("Login failed: " + err.message); 
                 }).finally(function(){ 
@@ -1493,7 +1529,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     deferredPWAEvent = e;
 
     // Agar user ne pehle dismiss nahi kiya hai to popup show karein
-    if (localStorage.getItem('pwa_banner_dismissed') !== 'true') {
+    if (sessionStorage.getItem('pwa_banner_dismissed') !== 'true') {
         setTimeout(() => {
             const banner = document.getElementById('pwaBottomBanner');
             if (banner) banner.classList.add('show');
@@ -1526,21 +1562,21 @@ window.dismissPWABanner = () => {
     const banner = document.getElementById('pwaBottomBanner');
     if (banner) banner.classList.remove('show');
     // Baar-baar pareshan na kare isliye temporarily remember karega
-    localStorage.setItem('pwa_banner_dismissed', 'true');
+    sessionStorage.setItem('pwa_banner_dismissed', 'true');
 };
 
 // Agar app pehle se install ho chuka hai to popup kabhi na dikhaye
 window.addEventListener('appinstalled', () => {
     const banner = document.getElementById('pwaBottomBanner');
     if (banner) banner.classList.remove('show');
-    localStorage.setItem('pwa_banner_dismissed', 'true');
+    sessionStorage.setItem('pwa_banner_dismissed', 'true');
     console.log('ksindo App installed successfully!');
 });
     </script>
     <!-- Bottom PWA Install Popup Banner -->
 <div class="pwa-bottom-banner" id="pwaBottomBanner">
     <div class="pwa-banner-left">
-        <img src="logo.png" alt="ksindo" class="pwa-banner-icon">
+        <img src="ksindo-icon.svg" alt="KSINDO" class="pwa-banner-icon">
         <div class="pwa-banner-text">
             <h4>ksindo App</h4>
             <p>Fast & Light Shopping App</p>
@@ -1551,5 +1587,37 @@ window.addEventListener('appinstalled', () => {
         <button class="btn-pwa-close" onclick="window.dismissPWABanner()">&times;</button>
     </div>
 </div>
+
+    <a href="grievance.html" aria-label="Help and grievance redressal" style="position:fixed;right:14px;bottom:14px;z-index:900;background:#12306b;color:#fff;padding:10px 14px;border-radius:999px;text-decoration:none;font:600 13px system-ui;box-shadow:0 6px 20px #0f172a33">Help & Complaints</a>
+
+
+
+<script id="ksindo-location-engine">
+(function(){
+ const label=document.getElementById('ksindoLocationLabel');
+ const detect=document.getElementById('ksindoDetectLocation');
+ const manual=document.getElementById('ksindoManualLocation');
+ if(!label||!detect||!manual)return;
+ function showSaved(){try{const v=JSON.parse(localStorage.getItem('ksindo_delivery_location')||'null');if(v&&v.label)label.textContent=v.label;}catch(e){}}
+ function saveLocation(value){localStorage.setItem('ksindo_delivery_location',JSON.stringify(value));label.textContent=value.label;window.dispatchEvent(new CustomEvent('ksindo:locationChanged',{detail:value}));}
+ function manualEntry(){const pin=prompt('Enter your 6-digit delivery PIN code:');if(pin===null)return;const clean=pin.trim();if(!/^\d{6}$/.test(clean)){alert('Please enter a valid 6-digit PIN code.');return;}const area=prompt('Enter your area / address (optional):','')||'';saveLocation({type:'pincode',pincode:clean,address:area,label:(area?area+', ':'')+clean});}
+ detect.addEventListener('click',function(){if(!navigator.geolocation){alert('Location is not supported in this browser. Enter your PIN code instead.');manualEntry();return;}detect.disabled=true;detect.textContent='Locating…';navigator.geolocation.getCurrentPosition(async function(pos){const lat=pos.coords.latitude,lon=pos.coords.longitude;let place='Location detected';try{const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+encodeURIComponent(lat)+'&lon='+encodeURIComponent(lon));if(r.ok){const d=await r.json();const a=d.address||{};const postcode=(a.postcode||'').replace(/\s/g,'');place=[a.suburb||a.neighbourhood||a.village||a.town||a.city||a.county,a.state_district||a.state].filter(Boolean).join(', ')||place;if(postcode)saveLocation({type:'gps',latitude:lat,longitude:lon,pincode:postcode,label:place});}}catch(e){}if(!(JSON.parse(localStorage.getItem('ksindo_delivery_location')||'{}').pincode))saveLocation({type:'gps',latitude:lat,longitude:lon,label:place});detect.disabled=false;detect.textContent='Refresh location';},function(err){detect.disabled=false;detect.textContent='Use my location';alert('Could not get location. Allow location permission in your browser, or enter PIN code manually.');manualEntry();},{enableHighAccuracy:true,timeout:12000,maximumAge:60000});});
+ manual.addEventListener('click',manualEntry);showSaved();
+})();
+</script>
+<nav class="ksindo-mobile-nav" aria-label="Quick navigation">
+ <a href="index.html"><span>🏠</span>Home</a><a href="fresh.html"><span>🥦</span>24x7 Fresh</a><a href="fastfood.html"><span>🍔</span>Food</a><a href="javascript:void(0)" onclick="window.toggleCart()"><span>🛒</span>Cart</a><a href="javascript:void(0)" onclick="window.handleUserIconClick()"><span>👤</span>Account</a>
+</nav>
+<footer class="ksindo-global-footer">
+ <div class="ksindo-footer-inner">
+  <div><div class="ksindo-footer-brand">KSINDO™</div><p>Everything. One Place. Discover local shops, food, daily essentials and festive products with KSINDO.</p><p>Jaynagar, Madhubani, Bihar</p></div>
+  <div><h4>Shop</h4><a href="index.html">Home & products</a><a href="fresh.html">Fresh daily needs</a><a href="fastfood.html">Food & restaurants</a><a href="seasonable.html">Festive & seasonal</a></div>
+  <div><h4>Partners</h4><a href="seller-center.html">Seller Centre</a><a href="merchant.html">Existing Partner Portal</a><a href="restaurant.html">Restaurant Partner</a><a href="deliveryboy.html">Delivery Partner</a></div>
+  <div><h4>Help & policies</h4><a href="grievance.html">Grievance Redressal</a><a href="about.html">About KSINDO</a><a href="mailto:ksindo.jyg@gmail.com">ksindo.jyg@gmail.com</a><a href="tel:8252731656">8252731656</a></div>
+ </div>
+ <div class="ksindo-footer-bottom"><span>© <span class="ksindo-year"></span> KSINDO™. All rights reserved.</span><span>Built for local commerce · Customer support and grievance access</span></div>
+</footer>
+<a class="ksindo-help-fab" href="grievance.html" aria-label="Open KSINDO grievance center">☏ Help & Grievance</a>
+<script>(function(){document.querySelectorAll('.ksindo-year').forEach(function(n){n.textContent=new Date().getFullYear()});})();</script>
 </body>
 </html>
