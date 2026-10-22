@@ -121,6 +121,30 @@
             #adminPrintableBill { position:absolute; left:0; top:0; width:80mm; font-family:monospace; color:black; padding:5px; }
         }
     </style>
+
+<style id="ksindo-professional-upgrade">
+.ksindo-global-footer{background:#111827;color:#e5e7eb;padding:34px 5%;margin-top:40px;font:14px/1.6 system-ui,sans-serif}
+.ksindo-footer-inner{max-width:1240px;margin:auto;display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;gap:26px}
+.ksindo-global-footer h3,.ksindo-global-footer h4{margin:0 0 12px;color:#fff}
+.ksindo-global-footer p{color:#aeb8ca;font-size:12px;margin:8px 0}
+.ksindo-global-footer a{display:block;color:#cbd5e1;text-decoration:none;font-size:12px;margin:8px 0}
+.ksindo-global-footer a:hover{color:#fff;text-decoration:underline}
+.ksindo-footer-brand{font-size:22px;font-weight:900;letter-spacing:.5px;background:linear-gradient(90deg,#f472b6,#a78bfa,#22d3ee,#facc15);background-clip:text;-webkit-background-clip:text;color:transparent}
+.ksindo-footer-bottom{max-width:1240px;margin:22px auto 0;border-top:1px solid #374151;padding-top:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#9ca3af;font-size:11px}
+.ksindo-help-fab{position:fixed;right:16px;bottom:16px;z-index:9990;background:#4f46e5;color:#fff!important;text-decoration:none!important;border-radius:999px;padding:12px 16px;box-shadow:0 8px 25px #11182738;font:700 12px system-ui;display:flex;gap:8px;align-items:center}
+.ksindo-help-fab:hover{background:#3730a3}
+.ksindo-multi-banner{max-width:1240px;margin:20px auto 6px;padding:0 20px}
+.ksindo-banner-frame{min-height:210px;position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg,#312e81,#7c3aed 60%,#db2777);color:white;display:flex;align-items:center;padding:32px 38px;box-shadow:0 14px 35px #312e811c}
+.ksindo-banner-copy{position:relative;z-index:2;max-width:58%}.ksindo-banner-kicker{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;opacity:.85}
+.ksindo-banner-copy h2{font-size:clamp(24px,3.4vw,38px);line-height:1.12;margin:10px 0;letter-spacing:-1px}
+.ksindo-banner-copy p{font-size:13px;line-height:1.6;max-width:430px;color:#f1eaff}
+.ksindo-banner-cta{display:inline-block;background:#fff;color:#312e81!important;border-radius:9px;padding:10px 15px;text-decoration:none!important;font-weight:800;font-size:12px;margin-top:8px}
+.ksindo-banner-art{position:absolute;right:8%;top:50%;transform:translateY(-50%);font-size:clamp(64px,10vw,125px);filter:drop-shadow(0 14px 18px #130a3544)}
+.ksindo-banner-dots{display:flex;justify-content:center;gap:7px;padding:12px}
+.ksindo-banner-dot{width:8px;height:8px;border-radius:50%;border:0;background:#d1d5db;padding:0;cursor:pointer}
+.ksindo-banner-dot.active{width:23px;border-radius:20px;background:#6d28d9}
+@media(max-width:700px){.ksindo-footer-inner{grid-template-columns:1fr 1fr;gap:20px}.ksindo-footer-inner>div:first-child{grid-column:1/-1}.ksindo-global-footer{padding:28px 20px}.ksindo-multi-banner{padding:0 12px;margin-top:12px}.ksindo-banner-frame{min-height:230px;padding:24px 20px;align-items:flex-start}.ksindo-banner-copy{max-width:78%}.ksindo-banner-copy h2{font-size:27px}.ksindo-banner-copy p{font-size:12px}.ksindo-banner-art{right:3%;top:auto;bottom:12px;transform:none;font-size:66px;opacity:.8}.ksindo-help-fab{right:10px;bottom:10px;padding:10px 12px}}
+</style>
 </head>
 <body>
 
@@ -155,7 +179,8 @@
             <a onclick="showTab('tab-delivered', this)">📜 Delivered History</a>
             <a onclick="showTab('tab-products', this)">🛍️ Products & Edit</a>
             <a onclick="showTab('tab-users', this)">👥 Customers</a>
-        </nav>
+            <a onclick="showTab('tab-approvals', this)">🛡️ Account Approvals</a>
+        </nav><div style="padding:12px 18px;border-top:1px solid #334155"><a href="seller-center.html" style="display:block;color:#e2e8f0;text-decoration:none;padding:9px 0;font-size:13px">🏪 Seller Centre</a><a href="grievance.html" style="display:block;color:#e2e8f0;text-decoration:none;padding:9px 0;font-size:13px">🛟 Grievance Centre</a></div>
     </aside>
 
     <main>
@@ -260,7 +285,7 @@
             <!-- TAB 5: Ads Manager -->
             <section id="tab-ads" class="tab-section">
                 <div class="card">
-                    <h2>📢 5-Second Advertisement Manager (Photo & Video Upload)</h2>
+                    <h2>📢 Multi-Banner & Advertisement Manager</h2><p style="color:#64748b;font-size:12px;margin:0 0 14px">Create multiple image/video campaign cards. Published records are saved to the existing Firestore <code>ads</code> collection; the customer homepage carousel displays these banners when Firestore access is configured.</p>
                     <form id="createAdForm">
                         <div class="form-grid">
                             <input type="text" id="adTitle" placeholder="Ad Offer Title" required>
@@ -402,6 +427,16 @@
                         <thead><tr><th>Image</th><th>Name</th><th>Categories</th><th>Price</th><th>Variants</th><th>Action</th></tr></thead>
                         <tbody id="productsTableBody"></tbody>
                     </table>
+                </div>
+            </section>
+
+            <!-- TAB 9: Account Approval Queue -->
+            <section id="tab-approvals" class="tab-section">
+                <div class="card">
+                    <h2>🛡️ Account Approval Requests</h2>
+                    <p style="color:#64748b;font-size:13px;line-height:1.6">Customer registrations remain pending until approved here. Approving marks the account active and sends a secure Firebase password-reset/setup link to the registered email (never emails a plain-text password).</p>
+                    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0"><button class="btn-primary" id="refreshAccountRequests">Refresh requests</button><span id="accountRequestStatus" style="font-size:12px;color:#64748b">Loading requests…</span></div>
+                    <div style="overflow:auto"><table><thead><tr><th>Account type</th><th>Name / Business</th><th>Email</th><th>Phone</th><th>PIN</th><th>Status</th><th>Created</th><th>Action</th></tr></thead><tbody id="accountRequestsBody"><tr><td colspan="8">Loading…</td></tr></tbody></table></div>
                 </div>
             </section>
 
@@ -554,7 +589,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, doc, getDocs, onSnapshot, updateDoc, deleteDoc, serverTimestamp, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA7f9PWSyws4XkzKq077sNdlF0J33DSVSo",
@@ -569,10 +604,56 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        async function loadAccountRequests() {
+            const tbody = document.getElementById('accountRequestsBody');
+            const status = document.getElementById('accountRequestStatus');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="8">Loading requests…</td></tr>';
+            try {
+                const snap = await getDocs(collection(db, 'users'));
+                const requests = [];
+                snap.forEach((d) => { const u = d.data() || {}; if (['customer','seller'].includes(u.accountType) && u.approvalStatus !== 'approved' && u.approvalStatus !== 'rejected') requests.push({id:d.id, ...u}); });
+                tbody.innerHTML = '';
+                if (!requests.length) tbody.innerHTML = '<tr><td colspan="8">No pending account requests.</td></tr>';
+                requests.forEach((u) => {
+                    const tr = document.createElement('tr');
+                    const cells = [u.accountType || '—', u.businessName || u.fullName || '—', u.userEmail || '—', u.phone || '—', u.pincode || '—', u.approvalStatus || 'Pending review', u.createdAt && u.createdAt.toDate ? u.createdAt.toDate().toLocaleDateString('en-IN') : '—'];
+                    cells.forEach((value) => { const td=document.createElement('td'); td.textContent=String(value); tr.appendChild(td); });
+                    const action = document.createElement('td');
+                    const approve = document.createElement('button'); approve.className='btn-primary'; approve.textContent='Approve + email link'; approve.style.marginRight='6px'; approve.onclick=()=>approveCustomerAccount(u.id,u.userEmail || '',approve);
+                    const reject = document.createElement('button'); reject.className='btn-danger'; reject.textContent='Reject'; reject.onclick=()=>rejectCustomerAccount(u.id);
+                    action.append(approve,reject); tr.appendChild(action); tbody.appendChild(tr);
+                });
+                status.textContent = requests.length + ' pending / unapproved request(s)';
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="8">Could not load requests. Check Firestore rules and admin permissions.</td></tr>';
+                status.textContent = err.message;
+            }
+        }
+        async function approveCustomerAccount(uid, email, button) {
+            if (!email || !confirm('Approve this account and send a secure password setup/reset link to ' + email + '?')) return;
+            button.disabled = true;
+            try {
+                await updateDoc(doc(db, 'users', uid), {approvalStatus:'approved', approvedAt:serverTimestamp(), approvedBy:auth.currentUser ? auth.currentUser.email : 'admin'});
+                let emailResult = 'Account approved.';
+                try { await sendPasswordResetEmail(auth, email); emailResult += ' Secure password setup/reset email sent.'; }
+                catch (mailErr) { emailResult += ' Email could not be sent automatically (' + mailErr.message + '). Use Firebase Authentication password reset after checking authorized domain/email settings.'; }
+                alert(emailResult); await loadAccountRequests();
+            } catch (err) { alert('Approval failed: ' + err.message); button.disabled = false; }
+        }
+        async function rejectCustomerAccount(uid) {
+            if (!confirm('Reject this account request?')) return;
+            try { await updateDoc(doc(db, 'users', uid), {approvalStatus:'rejected', rejectedAt:serverTimestamp(), rejectedBy:auth.currentUser ? auth.currentUser.email : 'admin'}); await loadAccountRequests(); }
+            catch(err) { alert('Reject failed: ' + err.message); }
+        }
+        document.getElementById('refreshAccountRequests')?.addEventListener('click', loadAccountRequests);
+        document.querySelectorAll('aside nav a').forEach((a) => { if ((a.getAttribute('onclick') || '').includes('tab-approvals')) a.addEventListener('click', loadAccountRequests); });
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('adminLoginScreen').style.display = 'none';
                 document.getElementById('activeAdminEmail').innerText = user.email;
+                loadAccountRequests();
             } else {
                 document.getElementById('adminLoginScreen').style.display = 'flex';
             }
@@ -1214,5 +1295,5 @@
             if (confirm("Delete product?")) await deleteDoc(doc(db, "products", id)); 
         };
     </script>
-</body>
+<a class="ksindo-help-fab" href="grievance.html">☏ Grievance Centre</a></body>
 </html>
