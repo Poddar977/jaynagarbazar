@@ -6,33 +6,33 @@
     <title>Restaurant Portal - ksindo</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background: #f8fafc; color: #1e293b; display: flex; height: 100vh; overflow: hidden; }
+        body { background: #f7f8fa; color: #202124; display: flex; height: 100vh; overflow: hidden; }
         
-        aside { width: 250px; background: #7c2d12; color: white; display: flex; flex-direction: column; flex-shrink: 0; }
-        aside .logo { padding: 20px; font-size: 18px; font-weight: bold; background: #431407; }
+        aside { width: 250px; background: #ffffff; color: #202124; display: flex; flex-direction: column; flex-shrink: 0; border-right:1px solid #e8e8e8; box-shadow:2px 0 12px rgba(0,0,0,.03); }
+        aside .logo { padding: 20px; font-size: 18px; font-weight: 800; background: #fff; color:#fc8019; border-bottom:1px solid #f0f0f0; }
         aside nav { flex: 1; padding: 15px 0; overflow-y: auto; }
-        aside nav a { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; color: #fed7aa; text-decoration: none; font-size: 14px; font-weight: 600; cursor: pointer; }
-        aside nav a:hover, aside nav a.active { background: #ea580c; color: white; }
+        aside nav a { display: flex; align-items: center; justify-content: space-between; padding: 13px 20px; color: #555; text-decoration: none; font-size: 14px; font-weight: 650; cursor: pointer; border-left:3px solid transparent; }
+        aside nav a:hover, aside nav a.active { background: #fff3e8; color: #fc8019; border-left-color:#fc8019; }
 
         main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
-        header { background: white; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
+        header { background: white; padding: 16px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; position:sticky;top:0;z-index:20; }
 
         .content-body { padding: 25px 30px; flex: 1; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: white; padding: 18px; border-radius: 10px; border: 1px solid #e2e8f0; }
+        .stat-card { background: white; padding: 20px; border-radius: 14px; border: 1px solid #f0f0f0; box-shadow:0 3px 14px rgba(0,0,0,.035); }
         .stat-card h3 { font-size: 12px; color: #64748b; margin-bottom: 5px; text-transform: uppercase; }
         .stat-card .val { font-size: 22px; font-weight: bold; color: #0f172a; }
 
         .tab-section { display: none; }
         .tab-section.active { display: block; }
-        .card { background: white; border-radius: 10px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .card { background: white; border-radius: 16px; padding: 22px; border: 1px solid #f0f0f0; margin-bottom: 20px; box-shadow:0 3px 14px rgba(0,0,0,.025); }
         table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
         table th { background: #f8fafc; padding: 10px 12px; border-bottom: 1px solid #e2e8f0; color: #475569; }
         table td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
 
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
         input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; }
-        .btn-primary { background: #ea580c; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-primary { background: #fc8019; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-print { background: #0284c7; color: white; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
         .btn-kitchen { background: #f97316; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
 
@@ -42,6 +42,7 @@
         .login-overlay { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 500; }
         .login-card { background: white; border-radius: 12px; padding: 30px; width: 90%; max-width: 400px; text-align: center; }
 
+        @media(max-width:760px){body{height:auto;min-height:100vh;overflow:auto;display:block}aside{width:100%;height:auto}aside nav{display:flex;overflow-x:auto;padding:6px}aside nav a{white-space:nowrap;padding:10px 12px;border-left:0;border-bottom:3px solid transparent}aside nav a.active{border-bottom-color:#fc8019}aside>div:last-child{padding:8px 12px}main{overflow:visible}.content-body{padding:14px}.content-body .card{overflow-x:auto;padding:14px}header{padding:14px}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stat-card .val{font-size:19px}table{min-width:700px}}
         @media print {
             body * { visibility: hidden; }
             #printableInvoice, #printableInvoice * { visibility: visible; }
@@ -80,7 +81,7 @@
     <main>
         <header>
             <h2 id="topBarShopTitle">ksindo Restaurant Panel</h2>
-            <span id="liveClock" style="font-size: 13px; font-weight: 600; color: #64748b;">Loading...</span>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><button id="shopOpenCloseBtn" class="btn-primary" onclick="toggleShopOpenStatus()">Loading shop status…</button><span id="liveClock" style="font-size: 13px; font-weight: 600; color: #64748b;">Loading...</span></div>
         </header>
 
         <div class="content-body">
@@ -164,14 +165,18 @@
                             <input type="text" id="foodDiscount" placeholder="Discount (Auto Calculated)" readonly style="background:#f1f5f9; font-weight:bold; color:#16a34a;">
                             <select id="foodSubCategory" required>
                                 <option value="fast-food">Fast Food</option>
-                                <option value="daily-need">Daily Need / Milk</option>
                                 <option value="main-course">Main Course</option>
                                 <option value="beverages">Beverages & Shakes</option>
                             </select>
                             <input type="url" id="foodImageLink" placeholder="Option 1: Image Link">
                             <div>
-                                <label style="font-size:12px; font-weight:bold;">Option 2: Upload Photos (1 to 6):</label>
+                                <label style="font-size:12px; font-weight:bold;">Upload Dish Photos (1–6):</label>
                                 <input type="file" id="foodFilePhotos" accept="image/*" multiple onchange="previewFoodFiles(this)">
+                            </div>
+                            <div>
+                                <label style="font-size:12px; font-weight:bold;">Optional 5-second dish video URL:</label>
+                                <input type="url" id="foodVideoUrl" placeholder="https://.../dish-video.mp4">
+                                <small style="color:#64748b;display:block;margin-top:4px">Video URL optional; keep video around 5 seconds. Existing photo upload remains available.</small>
                             </div>
                         </div>
                         <div class="preview-grid" id="foodPhotoPreview"></div>
@@ -186,7 +191,7 @@
                 <div class="card">
                     <h2>📋 Aapki Shop Ka Menu</h2>
                     <table>
-                        <thead><tr><th>Photos</th><th>Title</th><th>Category</th><th>Price (MRP)</th><th>Discount</th><th>Action</th></tr></thead>
+                        <thead><tr><th>Photos</th><th>Title</th><th>Category</th><th>Price (MRP)</th><th>Discount</th><th>Stock Status</th><th>Action</th></tr></thead>
                         <tbody id="menuTableBody"></tbody>
                     </table>
                 </div>
@@ -342,6 +347,7 @@
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('sidebarShopName').innerText = currentShop.shopName || "Kitchen";
             document.getElementById('topBarShopTitle').innerText = "🏪 " + (currentShop.shopName || "Kitchen") + " (PIN: " + (currentShop.pincode || 'Local') + ")";
+            updateShopStatusButton(currentShop.isOpen !== false);
 
             const now = new Date();
             const nowMonthName = now.toLocaleString('en-IN', { month: 'long', year: 'numeric' });
@@ -462,6 +468,7 @@
                                 "<td>" + (p.subCategory || '-') + "</td>" +
                                 "<td>₹" + p.price + " " + origPriceDisplay + "</td>" +
                                 "<td><strong style='color:#16a34a;'>" + (p.discount || '-') + "</strong></td>" +
+                                "<td><button onclick='toggleDishStock(\"" + docSnap.id + "\", " + (p.isAvailable !== false) + ")' style='background:" + (p.isAvailable !== false ? '#16a34a' : '#64748b') + "; color:white; border:none; padding:5px 9px; border-radius:5px; cursor:pointer;'>" + (p.isAvailable !== false ? 'In Stock' : 'Out of Stock') + "</button></td>" +
                                 "<td><button onclick='delDish(\"" + docSnap.id + "\")' style='background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;'>Delete</button></td>" +
                             "</tr>";
                     }
@@ -615,6 +622,33 @@
             } catch(e) {}
         };
 
+        function updateShopStatusButton(isOpen) {
+            const btn = document.getElementById('shopOpenCloseBtn');
+            if (!btn) return;
+            btn.textContent = isOpen ? '🟢 Shop Open — Click to Close' : '🔴 Shop Closed — Click to Open';
+            btn.style.background = isOpen ? '#16a34a' : '#64748b';
+        }
+        window.toggleShopOpenStatus = async function() {
+            if (!currentShop || !currentShop.id) return alert('Restaurant login required.');
+            const next = currentShop.isOpen === false;
+            try {
+                await updateDoc(doc(db, 'shops', currentShop.id), { isOpen: next, shopOpenStatusUpdatedAt: serverTimestamp() });
+                currentShop.isOpen = next;
+                localStorage.setItem('rest_shop_session', JSON.stringify(currentShop));
+                updateShopStatusButton(next);
+                alert(next ? 'Shop is now OPEN.' : 'Shop is now CLOSED.');
+            } catch (e) { alert('Shop status save nahi hua. Firebase rules check karein: ' + e.message); }
+        };
+        window.toggleDishStock = async function(productId, currentlyAvailable) {
+            try {
+                await updateDoc(doc(db, 'products', productId), {
+                    isAvailable: !currentlyAvailable,
+                    stockStatus: !currentlyAvailable ? 'in_stock' : 'out_of_stock',
+                    stockUpdatedAt: serverTimestamp()
+                });
+            } catch (e) { alert('Stock update nahi hua. Firebase rules check karein: ' + e.message); }
+        };
+
         // Add Dish Form
         document.getElementById('addFoodItemForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -625,6 +659,7 @@
             const subCategory = document.getElementById('foodSubCategory').value;
             const desc = document.getElementById('foodDesc').value.trim();
             const link = document.getElementById('foodImageLink').value.trim();
+            const videoUrl = document.getElementById('foodVideoUrl') ? document.getElementById('foodVideoUrl').value.trim() : '';
 
             let photos = [];
             if (foodPhotosArray.length > 0) photos = foodPhotosArray;
@@ -636,8 +671,12 @@
                     name, price, originalPrice, discount, category: "food", subCategory, description: desc,
                     shopName: currentShop.shopName,
                     shopId: currentShop.id,
+                    assignedShopId: currentShop.id,
                     imageUrl: photos[0],
                     images: photos,
+                    videoUrl: videoUrl,
+                    isAvailable: true,
+                    stockStatus: 'in_stock',
                     createdAt: serverTimestamp()
                 });
                 alert("✅ Dish menu me add ho gayi!");
