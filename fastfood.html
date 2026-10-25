@@ -96,6 +96,7 @@
         .restaurant-title { font-size:16px; font-weight:800; color:#0f172a; margin-bottom:4px; }
         .restaurant-sub { font-size:12px; color:#64748b; margin-bottom:8px; }
         .restaurant-badge { background:#ffedd5; color:#ea580c; font-size:11px; font-weight:bold; padding:3px 8px; border-radius:6px; }
+        .review-toggle{border:1px solid #fed7aa;background:#fff7ed;color:#c2410c;padding:6px 9px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;margin-top:9px}.reviews-panel{display:none;background:#fffaf5;border:1px solid #fed7aa;border-radius:10px;padding:10px;margin-top:8px;font-size:12px}.review-line{padding:7px 0;border-bottom:1px solid #ffedd5}.review-form{display:grid;gap:7px;margin-top:8px}.review-form input,.review-form textarea,.review-form select{width:100%;padding:8px;border:1px solid #fdba74;border-radius:7px;font-size:12px}
 
         .product-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:16px; }
         @media(max-width:600px){ .product-grid { grid-template-columns:repeat(auto-fill, minmax(145px, 1fr)); gap:10px; } }
@@ -268,6 +269,8 @@
         var currentUser = null;
         var currentUserProfile = JSON.parse(localStorage.getItem('user_profile') || '{}');
         var userLocationPin = localStorage.getItem('ksindo_user_pin') || '';
+        var userCoordinates = JSON.parse(localStorage.getItem('ksindo_user_coords') || 'null');
+        var userLocationLabel = localStorage.getItem('ksindo_user_location_label') || '';
 
         var allShops = [];
         var allFoodDishes = [];
@@ -289,7 +292,7 @@
             if (userLocationPin && userLocationPin.length === 6) {
                 document.getElementById('locationGatewayModal').style.display = 'none';
                 document.getElementById('foodMainContent').style.display = 'block';
-                document.getElementById('headerLocationText').innerText = "PIN: " + userLocationPin;
+                document.getElementById('headerLocationText').innerText = userLocationLabel || ("PIN: " + userLocationPin);
                 loadFoodData();
             } else {
                 document.getElementById('locationGatewayModal').style.display = 'flex';
@@ -309,22 +312,36 @@
         };
 
         window.fetchGPSLocation = function() {
-            if (!navigator.geolocation) {
-                alert("Aapka browser GPS support nahi karta. Kripya pincode dalein.");
-                return;
-            }
+            if (!navigator.geolocation) { alert("GPS supported nahi hai. Kripya delivery PIN code dalein."); return; }
             var btn = document.querySelector('.btn-gps');
-            btn.innerText = "Locating...";
-            navigator.geolocation.getCurrentPosition(function(pos) {
-                var detectedPin = currentUserProfile.pincode || "847226";
-                userLocationPin = detectedPin;
-                localStorage.setItem('ksindo_user_pin', detectedPin);
-                alert("Location detect ho gayi! (PIN: " + detectedPin + ")");
-                checkLocationStatus();
-            }, function(err) {
-                alert("GPS permission deny ho gaya. Kripya neeche apna 6-digit Pincode dalein.");
+            btn.innerText = "Locating…";
+            navigator.geolocation.getCurrentPosition(async function(pos) {
+                userCoordinates = { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
+                localStorage.setItem('ksindo_user_coords', JSON.stringify(userCoordinates));
+                userLocationLabel = 'Current location selected';
+                try {
+                    const response = await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + encodeURIComponent(pos.coords.latitude) + '&lon=' + encodeURIComponent(pos.coords.longitude));
+                    if (response.ok) {
+                        const data = await response.json();
+                        const a = data.address || {};
+                        const pin = String(a.postcode || '').replace(/\D/g, '').slice(0,6);
+                        userLocationLabel = [a.suburb || a.neighbourhood || a.village || a.town || a.city || a.county, a.state].filter(Boolean).join(', ') || 'Current location selected';
+                        if (pin.length === 6) { userLocationPin = pin; localStorage.setItem('ksindo_user_pin', pin); }
+                    }
+                } catch (e) { /* GPS coordinates still saved; user can add PIN manually for delivery eligibility. */ }
+                localStorage.setItem('ksindo_user_location_label', userLocationLabel);
                 btn.innerHTML = '<span>🎯</span> Use Current GPS Location';
-            });
+                if (!userLocationPin || userLocationPin.length !== 6) {
+                    document.getElementById('locationGatewayModal').style.display = 'flex';
+                    document.getElementById('foodMainContent').style.display = 'none';
+                    document.getElementById('manualPincodeInput').focus();
+                    document.getElementById('headerLocationText').innerText = userLocationLabel;
+                    alert('GPS location saved. Delivery confirm karne ke liye apna 6-digit PIN code bhi enter karein.');
+                } else { checkLocationStatus(); }
+            }, function() {
+                alert("Location permission nahi mili. Browser settings check karein ya PIN code dalein.");
+                btn.innerHTML = '<span>🎯</span> Use Current GPS Location';
+            }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 });
         };
 
         window.reopenLocationGateway = function() {
@@ -336,7 +353,7 @@
                 allShops = [];
                 snap.forEach(function(d) {
                     var s = { id: d.id, ...d.data() };
-                    if (s.pincode === userLocationPin || !s.pincode || (s.address || '').includes(userLocationPin)) {
+                    if (s.isOpen !== false && (s.pincode === userLocationPin || !s.pincode || (s.address || '').includes(userLocationPin))) {
                         allShops.push(s);
                     }
                 });
@@ -348,7 +365,7 @@
                 snap.forEach(function(d) {
                     var p = { id: d.id, ...d.data() };
                     var isFood = (p.category || '').toLowerCase() === 'food' || (p.categories && p.categories.includes('food'));
-                    if (isFood) allFoodDishes.push(p);
+                    if (isFood && p.isAvailable !== false && p.stockStatus !== 'out_of_stock') allFoodDishes.push(p);
                 });
                 if (activeShopId) renderActiveMenu();
             });
@@ -381,15 +398,50 @@
                     '<div class="restaurant-info">' +
                         '<div class="restaurant-title">' + shop.shopName + '</div>' +
                         '<div class="restaurant-sub">📍 ' + (shop.address || 'Local Market') + ' (PIN: ' + (shop.pincode || userLocationPin) + ')</div>' +
+                        '<div style="color:#16a34a;font-size:12px;font-weight:700;margin:5px 0">● OPEN NOW</div>' +
                         '<div style="display:flex; justify-content:space-between; align-items:center;">' +
                             '<span class="restaurant-badge">' + dishCount + ' Dishes Available</span>' +
                             '<strong style="color:#ea580c; font-size:12px;">Order Now →</strong>' +
                         '</div>' +
+                        '<button class="review-toggle" onclick="event.stopPropagation();toggleRestaurantReviews(\'' + shop.id + '\')">⭐ Ratings & Reviews · Show</button>' +
+                        '<div class="reviews-panel" id="reviews-' + shop.id + '"><div id="review-list-' + shop.id + '">Reviews are hidden. Click Show to view.</div>' +
+                        '<form class="review-form" onsubmit="submitRestaurantReview(event,\'' + shop.id + '\',\'' + String(shop.shopName||'').replace(/\\/g,'').replace(/\'/g,'') + '\')" onclick="event.stopPropagation()">' +
+                        '<strong>Share your feedback</strong><select name="rating" required><option value="">Choose rating</option><option value="5">★★★★★ Excellent</option><option value="4">★★★★☆ Good</option><option value="3">★★★☆☆ Average</option><option value="2">★★☆☆☆ Poor</option><option value="1">★☆☆☆☆ Bad</option></select>' +
+                        '<input name="reviewer" placeholder="Your name (optional)"><textarea name="reviewText" rows="2" placeholder="Write your feedback" required></textarea><button class="btn-dish-add" type="submit">Submit Review</button></form></div>' +
                     '</div>' +
                 '</div>';
             });
             container.innerHTML = html;
         }
+
+        window.toggleRestaurantReviews = function(shopId) {
+            var panel = document.getElementById('reviews-' + shopId);
+            if (!panel) return;
+            var opening = panel.style.display !== 'block';
+            panel.style.display = opening ? 'block' : 'none';
+            var btn = panel.parentElement.querySelector('.review-toggle');
+            if (btn) btn.innerText = opening ? '⭐ Ratings & Reviews · Hide' : '⭐ Ratings & Reviews · Show';
+            if (opening) loadRestaurantReviews(shopId);
+        };
+        window.loadRestaurantReviews = function(shopId) {
+            var list = document.getElementById('review-list-' + shopId);
+            if (!list) return;
+            db.collection('restaurantReviews').where('shopId','==',shopId).limit(30).get().then(function(snap) {
+                if (snap.empty) { list.innerHTML = '<div class="review-line">Abhi koi review nahi hai. Pehla review aap dein.</div>'; return; }
+                var rows=[]; var total=0;
+                snap.forEach(function(d){ var r=d.data(); total += Number(r.rating||0); rows.push('<div class="review-line"><strong>' + escapeReview(r.reviewer||'Customer') + '</strong> · ⭐ ' + Number(r.rating||0) + '/5<br>' + escapeReview(r.reviewText||'') + '</div>'); });
+                list.innerHTML='<strong>⭐ ' + (total/rows.length).toFixed(1) + ' / 5 · ' + rows.length + ' reviews</strong>' + rows.join('');
+            }).catch(function(){ list.innerHTML='<div class="review-line">Reviews load nahi ho paaye. Firebase rules check karein.</div>'; });
+        };
+        function escapeReview(v){ return String(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+        window.submitRestaurantReview = function(e, shopId, shopName) {
+            e.preventDefault(); e.stopPropagation();
+            var form=e.currentTarget; var rating=Number(form.rating.value); var reviewText=form.reviewText.value.trim();
+            if (!rating || !reviewText) return alert('Rating aur feedback dono bharein.');
+            db.collection('restaurantReviews').add({shopId:shopId, shopName:shopName, rating:rating, reviewText:reviewText, reviewer:form.reviewer.value.trim()||'Customer', createdAt:firebase.firestore.FieldValue.serverTimestamp()})
+            .then(function(){ form.reset(); loadRestaurantReviews(shopId); alert('Thanks! Aapka review submit ho gaya.'); })
+            .catch(function(err){ alert('Review save nahi hua: ' + err.message); });
+        };
 
         window.openShopMenu = function(shopId) {
             activeShopId = shopId;
@@ -433,6 +485,8 @@
                     '<img src="' + img + '">' +
                     '<div class="dish-title">' + d.name + '</div>' +
                     '<div class="dish-price">₹' + d.price + '</div>' +
+                    '<button class="review-toggle" onclick="event.stopPropagation();toggleDishReviews(\'' + d.id + '\')">⭐ Reviews · Show</button>' +
+                    '<div class="reviews-panel" id="dish-reviews-' + d.id + '"><div id="dish-review-list-' + d.id + '">Reviews hidden</div><form class="review-form" onsubmit="submitDishReview(event,\'' + d.id + '\',\'' + String(d.name||'').replace(/\\/g,'').replace(/\'/g,'') + '\')"><select name="rating" required><option value="">Rating</option><option value="5">5 ★</option><option value="4">4 ★</option><option value="3">3 ★</option><option value="2">2 ★</option><option value="1">1 ★</option></select><input name="reviewer" placeholder="Name (optional)"><textarea name="reviewText" rows="2" placeholder="Write review" required></textarea><button class="btn-dish-add" type="submit">Submit</button></form></div>' +
                     '<div class="card-actions">' +
                         '<button class="btn-dish-add" onclick="addDishToCart(\'' + d.id + '\')">🛒 Add</button>' +
                         '<button class="btn-dish-order" onclick="directOrderDish(\'' + d.id + '\')">⚡ Order</button>' +
@@ -441,6 +495,10 @@
             });
             grid.innerHTML = html;
         }
+
+        window.toggleDishReviews = function(id) { var panel=document.getElementById('dish-reviews-'+id); if(!panel)return; var opening=panel.style.display!=='block'; panel.style.display=opening?'block':'none'; var btn=panel.parentElement.querySelector('.review-toggle'); if(btn)btn.innerText=opening?'⭐ Reviews · Hide':'⭐ Reviews · Show'; if(opening)loadDishReviews(id); };
+        window.loadDishReviews = function(id) { var list=document.getElementById('dish-review-list-'+id); if(!list)return; db.collection('foodReviews').where('dishId','==',id).limit(30).get().then(function(snap){ if(snap.empty){list.innerHTML='Abhi koi review nahi hai.';return;} var total=0, rows=[];snap.forEach(function(d){var r=d.data();total+=Number(r.rating||0);rows.push('<div class="review-line"><b>'+escapeReview(r.reviewer||'Customer')+'</b> · ⭐ '+r.rating+'/5<br>'+escapeReview(r.reviewText||'')+'</div>');});list.innerHTML='<b>⭐ '+(total/rows.length).toFixed(1)+' / 5 · '+rows.length+' reviews</b>'+rows.join('');}).catch(function(){list.innerText='Reviews load nahi ho paaye.';}); };
+        window.submitDishReview = function(e,id,name) { e.preventDefault();e.stopPropagation();var f=e.currentTarget;db.collection('foodReviews').add({dishId:id,dishName:name,rating:Number(f.rating.value),reviewer:f.reviewer.value.trim()||'Customer',reviewText:f.reviewText.value.trim(),createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){f.reset();loadDishReviews(id);alert('Review submit ho gaya.');}).catch(function(err){alert('Review save nahi hua: '+err.message);}); };
 
         // ISOLATED FOOD CART (STORED IN food_cart TO PREVENT INDEX CART CONFLICT)
         function getFoodCart() {
