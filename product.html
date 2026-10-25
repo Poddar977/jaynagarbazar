@@ -210,19 +210,7 @@
         .modal-overlay.active { display: flex; }
         .modal-box { background: white; padding: 25px; border-radius: 16px; width: 92%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; }
         .close-modal { position: absolute; right: 15px; top: 15px; cursor: pointer; font-size: 22px; font-weight: bold; width: 30px; height: 30px; border-radius: 50%; background: #f1f2f6; display: flex; align-items: center; justify-content: center; }
-    .ksindo-global-footer{background:#111827;color:#e5e7eb;padding:34px 5%;margin-top:40px;font:14px/1.6 system-ui,sans-serif}
-.ksindo-footer-inner{max-width:1240px;margin:auto;display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;gap:26px}
-.ksindo-global-footer h3,.ksindo-global-footer h4{margin:0 0 12px;color:#fff}
-.ksindo-global-footer p{color:#aeb8ca;font-size:12px;margin:8px 0}
-.ksindo-global-footer a{display:block;color:#cbd5e1;text-decoration:none;font-size:12px;margin:8px 0}
-.ksindo-global-footer a:hover{color:#fff;text-decoration:underline}
-.ksindo-footer-brand{font-size:22px;font-weight:900;letter-spacing:.5px;background:linear-gradient(90deg,#f472b6,#a78bfa,#22d3ee,#facc15);background-clip:text;-webkit-background-clip:text;color:transparent}
-.ksindo-footer-bottom{max-width:1240px;margin:22px auto 0;border-top:1px solid #374151;padding-top:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#9ca3af;font-size:11px}
-.ksindo-help-fab{position:fixed;right:16px;bottom:16px;z-index:9990;background:#4f46e5;color:#fff!important;text-decoration:none!important;border-radius:999px;padding:12px 16px;box-shadow:0 8px 25px #11182738;font:700 12px system-ui;display:flex;gap:8px;align-items:center}
-.ksindo-help-fab:hover{background:#3730a3}
-@media(max-width:700px){.ksindo-footer-inner{grid-template-columns:1fr 1fr;gap:20px}.ksindo-footer-inner>div:first-child{grid-column:1/-1}.ksindo-global-footer{padding:28px 20px}.ksindo-help-fab{right:10px;bottom:94px;padding:10px 12px}}
-
-</style>
+    </style>
 </head>
 <body>
 
@@ -239,7 +227,11 @@
         <p style="text-align:center; grid-column:1/-1; padding:30px; font-weight:bold; color:#166534;">Product details load ho rahe hain...</p>
     </div>
 
-    <section id="productReviews" style="max-width:1100px;margin:18px auto;background:white;border-radius:14px;padding:20px;box-shadow:0 4px 14px #0f172a0d"><h2 style="color:#166534;margin-bottom:10px">⭐ Customer Ratings & Reviews</h2><div id="reviewSummary" style="color:#64748b;margin-bottom:12px">Reviews load ho rahe hain...</div><form id="reviewForm" style="display:grid;gap:9px;max-width:620px;margin-bottom:18px"><label>Apni rating dein <select id="reviewRating" required style="padding:10px;border:1px solid #cbd5e1;border-radius:8px"><option value="5">★★★★★ - Excellent</option><option value="4">★★★★ - Good</option><option value="3">★★★ - Average</option><option value="2">★★ - Poor</option><option value="1">★ - Bad</option></select></label><input id="reviewName" maxlength="60" placeholder="Your name" required style="padding:10px;border:1px solid #cbd5e1;border-radius:8px"><textarea id="reviewText" maxlength="600" placeholder="Write product feedback..." required style="padding:10px;border:1px solid #cbd5e1;border-radius:8px;min-height:80px"></textarea><button type="submit" style="background:#15803d;color:white;border:0;border-radius:8px;padding:11px;font-weight:bold">Submit Review</button></form><div id="reviewList" style="display:grid;gap:10px"></div></section>
+    <div class="section-block" id="productReviewsBlock" style="max-width:1100px;margin:0 auto 24px;background:white;border:1px solid #e2e8f0;border-radius:16px;padding:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h2 style="font-size:18px">⭐ Customer Reviews & Feedback</h2><button id="productReviewsToggle" type="button" style="background:#15803d;color:white;border:0;border-radius:22px;padding:9px 16px;font-weight:800;cursor:pointer" onclick="toggleProductReviews()">Show Reviews</button></div>
+        <div id="productReviewsContent" style="display:none;margin-top:14px"><div id="productReviewList">Reviews load hone ke liye Show Reviews dabayein.</div>
+        <form id="productReviewForm" style="display:grid;gap:9px;max-width:600px;margin-top:16px"><strong>Apna review dein</strong><select id="reviewRating" required style="padding:10px;border:1px solid #cbd5e1;border-radius:8px"><option value="">Rating choose karein</option><option value="5">★★★★★ Excellent</option><option value="4">★★★★☆ Good</option><option value="3">★★★☆☆ Average</option><option value="2">★★☆☆☆ Poor</option><option value="1">★☆☆☆☆ Bad</option></select><input id="reviewName" placeholder="Your name (optional)" style="padding:10px;border:1px solid #cbd5e1;border-radius:8px"><textarea id="reviewText" rows="3" placeholder="Product ke baare mein feedback likhein" required style="padding:10px;border:1px solid #cbd5e1;border-radius:8px"></textarea><button type="submit" style="background:#15803d;color:white;border:0;border-radius:8px;padding:11px;font-weight:800">Submit Review</button></form></div>
+    </div>
 
     <div class="section-block">
         <div class="section-header">
@@ -281,7 +273,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -464,7 +456,6 @@
             loadedProduct = product;
             const imgList = (product.images && product.images.length > 0) ? product.images : [product.imageUrl || 'https://via.placeholder.com/300'];
             let thumbsHtml = imgList.map((img, i) => `<img src="${img}" class="${i===0?'active':''}" onclick="setMainImage('${img}', this)">`).join('');
-            if (product.videoUrl) thumbsHtml += `<button type="button" style="padding:8px;border:1px solid #16a34a;border-radius:8px;background:#dcfce7;cursor:pointer" onclick="setMainVideo('${product.videoUrl}')">▶ 5s Video</button>`;
 
             let variantsMarkup = '';
             if (product.sizes && product.sizes.length > 0) {
@@ -528,8 +519,24 @@
             }, 10000);
         }
 
-        window.setMainVideo = (src) => { const main=document.getElementById('mainProductImg'); if(!main)return; const v=document.createElement('video');v.id='mainProductVideo';v.src=src;v.controls=true;v.autoplay=true;v.muted=true;v.loop=true;v.playsInline=true;v.style.cssText='width:100%;max-height:380px;object-fit:contain;border-radius:12px;background:#000';main.replaceWith(v);v.play().catch(()=>{}); };
-        window.setMainImage = (src, el) => { const oldVideo=document.getElementById('mainProductVideo'); if(oldVideo){const img=document.createElement('img');img.id='mainProductImg';img.className='main-img';oldVideo.replaceWith(img);} const main=document.getElementById('mainProductImg');if(main)main.src=src;document.querySelectorAll('.thumb-strip img').forEach(i=>i.classList.remove('active'));if(el&&el.classList)el.classList.add('active'); };
+        let productReviewsLoaded = false;
+        window.toggleProductReviews = function() {
+            const panel=document.getElementById('productReviewsContent'); const open=panel.style.display!=='block'; panel.style.display=open?'block':'none'; document.getElementById('productReviewsToggle').textContent=open?'Hide Reviews':'Show Reviews';
+            if(open && loadedProduct && !productReviewsLoaded) loadProductReviews();
+        };
+        async function loadProductReviews() {
+            const list=document.getElementById('productReviewList'); if(!loadedProduct || !list)return;
+            try { const q=query(collection(db,'productReviews'),where('productId','==',productId)); onSnapshot(q,(snap)=>{ if(snap.empty){list.innerHTML='<p style="color:#64748b;padding:10px 0">Abhi koi review nahi hai. Aap pehla review dein.</p>';return;} let total=0; const rows=[]; snap.forEach(d=>{const r=d.data();total+=Number(r.rating||0);rows.push('<div style="padding:12px 0;border-bottom:1px solid #e2e8f0"><b>'+escapeReviewText(r.reviewer||'Customer')+'</b> · ⭐ '+Number(r.rating||0)+'/5<p style="margin-top:5px;color:#475569">'+escapeReviewText(r.reviewText||'')+'</p></div>')});list.innerHTML='<b>⭐ '+(total/rows.length).toFixed(1)+' / 5 · '+rows.length+' reviews</b>'+rows.join(''); }); productReviewsLoaded=true; }
+            catch(err){list.textContent='Reviews load nahi ho paaye. Firebase rules check karein.';}
+        }
+        function escapeReviewText(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+        document.getElementById('productReviewForm').addEventListener('submit',async(e)=>{e.preventDefault();if(!loadedProduct)return;try{await addDoc(collection(db,'productReviews'),{productId:productId,productName:loadedProduct.name||'',rating:Number(document.getElementById('reviewRating').value),reviewer:document.getElementById('reviewName').value.trim()||'Customer',reviewText:document.getElementById('reviewText').value.trim(),createdAt:serverTimestamp()});e.target.reset();alert('Thanks! Review submit ho gaya.');}catch(err){alert('Review save nahi hua: '+err.message);}});
+
+        window.setMainImage = (src, el) => {
+            document.getElementById('mainProductImg').src = src;
+            document.querySelectorAll('.thumb-strip img').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+        };
 
         window.onSelectVariant = (size, price, origPrice, el) => {
             if (loadedProduct && loadedProduct.category) {
@@ -722,21 +729,6 @@
         };
 
         window.closeOrdersModal = () => document.getElementById('orders-modal-overlay').classList.remove('active');
-    
-        function loadProductReviews(){
-            if(!productId)return; getDocs(query(collection(db,'productReviews'),where('productId','==',productId))).then(snap=>{const reviews=[];snap.forEach(d=>reviews.push(d.data()));const avg=reviews.length?reviews.reduce((a,r)=>a+Number(r.rating||0),0)/reviews.length:0;const summary=document.getElementById('reviewSummary');if(summary)summary.textContent=reviews.length?('⭐ '+avg.toFixed(1)+' / 5 from '+reviews.length+' review(s)'):'Abhi tak koi review nahi. Pehla review dein.';const list=document.getElementById('reviewList');if(list)list.innerHTML=reviews.length?reviews.sort((a,b)=>Number(b.createdAtMs||0)-Number(a.createdAtMs||0)).map(r=>'<article style="border:1px solid #e2e8f0;border-radius:10px;padding:12px"><b>'+String(r.name||'Customer').replace(/[<>]/g,'')+'</b> <span style="color:#ca8a04">'+'★'.repeat(Math.max(1,Math.min(5,Number(r.rating||5))))+'</span><p style="margin-top:6px;color:#475569">'+String(r.text||'').replace(/[<>]/g,'')+'</p></article>').join(''):'<p style="color:#64748b">Reviews yahan dikhengi.</p>';}).catch(()=>{const x=document.getElementById('reviewSummary');if(x)x.textContent='Review load nahi ho paye. Firebase permissions check karein.';});
-        }
-        const reviewForm=document.getElementById('reviewForm'); if(reviewForm)reviewForm.addEventListener('submit',async e=>{e.preventDefault();try{await addDoc(collection(db,'productReviews'),{productId:productId,rating:Number(document.getElementById('reviewRating').value),name:document.getElementById('reviewName').value.trim(),text:document.getElementById('reviewText').value.trim(),createdAt:serverTimestamp(),createdAtMs:Date.now()});reviewForm.reset();loadProductReviews();alert('Thank you! Review submit ho gaya.');}catch(err){alert('Review submit nahi hua: '+err.message);}}); loadProductReviews();
-</script>
-
-<footer class="ksindo-global-footer" id="siteFooter">
- <div class="ksindo-footer-inner">
-  <div><div class="ksindo-footer-brand">KSINDO™</div><p>Shop local, save more. Everyday shopping, groceries, food and more at your convenience.</p><p>Customer Support: 8252731656 · 06246451082</p><p>Email: ksindo.jyg@gmail.com</p></div>
-  <div><h4>Shop</h4><a href="index.html">Home & Products</a><a href="fresh.html">24x7 Fresh</a><a href="fastfood.html">Food & Restaurants</a><a href="seasonable.html">Seasonal Offers</a></div>
-  <div><h4>Partners</h4><a href="merchant.html">Seller / Merchant</a><a href="restaurant.html">Restaurant Partner</a><a href="deliveryboy.html">Delivery Partner</a><a href="seller-center.html">Seller Centre</a></div>
-  <div><h4>Help & Policies</h4><a href="about.html">About KSINDO</a><a href="grievance.html">Grievance & Complaints</a><a href="index.html#terms">Terms & Conditions</a><a href="index.html#privacy">Privacy</a></div>
- </div><div class="ksindo-footer-bottom"><span>© <span id="ksindoFooterYear"></span> KSINDO™. All rights reserved.</span><span>Made for convenient local shopping.</span></div>
-</footer>
-<script>document.getElementById("ksindoFooterYear")?.replaceChildren(String(new Date().getFullYear()));</script>
+    </script>
 </body>
 </html>
