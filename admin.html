@@ -313,7 +313,7 @@
                 <div class="card">
                     <h2>Active Live Ads</h2>
                     <table>
-                        <thead><tr><th>Preview</th><th>Title</th><th>Type</th><th>Target Link</th><th>Action</th></tr></thead>
+                        <thead><tr><th>Preview</th><th>Title</th><th>Type</th><th>Target Link</th><th>Customer Display</th><th>Action</th></tr></thead>
                         <tbody id="adsTableBody"></tbody>
                     </table>
                 </div>
@@ -424,7 +424,7 @@
                         </div>
                     </div>
                     <table>
-                        <thead><tr><th>Image</th><th>Name</th><th>Categories</th><th>Price</th><th>Variants</th><th>Action</th></tr></thead>
+                        <thead><tr><th>Image</th><th>Name</th><th>Categories</th><th>Price</th><th>Stock Status</th><th>Variants</th><th>Action</th></tr></thead>
                         <tbody id="productsTableBody"></tbody>
                     </table>
                 </div>
@@ -1065,12 +1065,14 @@
                     ? '<video src="' + ad.mediaUrl + '" style="width:60px; height:35px; object-fit:cover; border-radius:4px;" muted></video>'
                     : '<img src="' + ad.mediaUrl + '" style="width:60px; height:35px; object-fit:cover; border-radius:4px;">';
 
+                const isActive = ad.active !== false;
                 tbody.innerHTML += 
                     '<tr>' +
                         '<td>' + mediaMarkup + '</td>' +
                         '<td><strong>' + (ad.title || 'Special Deal') + '</strong></td>' +
-                        '<td>' + ad.type.toUpperCase() + '</td>' +
+                        '<td>' + (ad.type || 'image').toUpperCase() + '</td>' +
                         '<td><small>' + (ad.targetUrl || 'None') + '</small></td>' +
+                        '<td><button onclick="toggleAdStatus(\'' + ad.id + '\',' + (!isActive) + ')" style="padding:6px 10px;border:0;border-radius:7px;background:' + (isActive ? '#dcfce7;color:#166534' : '#fee2e2;color:#991b1b') + '">' + (isActive ? '🟢 Live' : '⏸ Paused') + '</button></td>' +
                         '<td><button onclick="delAd(\'' + ad.id + '\')" class="btn-danger">Delete</button></td>' +
                     '</tr>';
             });
@@ -1088,7 +1090,7 @@
 
             try {
                 await addDoc(collection(db, "ads"), {
-                    title, type, mediaUrl: finalMedia, targetUrl, createdAt: serverTimestamp()
+                    title, type, mediaUrl: finalMedia, targetUrl, active: true, createdAt: serverTimestamp()
                 });
                 alert("🎉 Ad successfully publish ho gaya! Index me live scroll hoga.");
                 document.getElementById('createAdForm').reset();
@@ -1096,7 +1098,8 @@
                 base64AdMedia = '';
             } catch(err) { alert("Error: " + err.message); }
         });
-        window.delAd = async (id) => { if(confirm("Ad delete karein?")) await deleteDoc(doc(db, "ads", id)); };
+        window.toggleAdStatus = async (id, active) => { try { await updateDoc(doc(db, "ads", id), { active: !!active, updatedAt: serverTimestamp() }); } catch(err) { alert('Ad status update failed: ' + err.message); } };
+        window.delAd = async (id) => { if(confirm("Ad delete karein? Product recommendations will appear in its place if no other ads are live.")) await deleteDoc(doc(db, "ads", id)); };
 
         // Product Edit System
         window.editProduct = function(productId) {
@@ -1242,6 +1245,16 @@
             } catch(err) { alert("Error: " + err.message); }
         });
 
+        window.toggleProductStock = async function(id, currentlyInStock) {
+            try {
+                await updateDoc(doc(db, "products", id), {
+                    stockStatus: currentlyInStock ? "out" : "in",
+                    inStock: !currentlyInStock,
+                    updatedAt: serverTimestamp()
+                });
+            } catch (err) { alert("Stock update failed: " + err.message); }
+        };
+
         // Realtime Products Sync
         onSnapshot(collection(db, "products"), (snapshot) => {
             productsDataCache = {};
@@ -1268,6 +1281,7 @@
                         '<td><strong>' + p.name + '</strong></td>' +
                         '<td><span style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:6px; font-weight:bold; font-size:11px;">' + cats + '</span></td>' +
                         '<td>₹' + p.price + ' ' + origMarkup + '</td>' +
+                        '<td><button onclick="window.toggleProductStock(\'' + p.id + '\', ' + (p.stockStatus !== 'out' && p.inStock !== false) + ')" style="padding:5px 8px;border:0;border-radius:6px;background:' + ((p.stockStatus === 'out' || p.inStock === false) ? '#fee2e2;color:#991b1b' : '#dcfce7;color:#166534') + '">' + ((p.stockStatus === 'out' || p.inStock === false) ? 'Out of Stock' : 'In Stock') + '</button></td>' +
                         '<td><span style="background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:10px; font-weight:bold; font-size:11px;">' + vCount + '</span></td>' +
                         '<td>' +
                             '<button onclick="editProduct(\'' + p.id + '\')" class="btn-edit">✏️ Edit</button>' +
