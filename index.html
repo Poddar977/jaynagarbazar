@@ -87,7 +87,7 @@
         }
         @keyframes fastMarquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        /* JioMart style Location strip */
+        /* Location Strip */
         .location-strip{display:flex;align-items:center;gap:9px;padding:9px 16px;background:#f0fdf4;border-bottom:1px solid #dcfce7;font-size:12px;color:#14532d}
         .location-strip strong{font-size:13px}.location-strip button{margin-left:auto;border:1px solid #15803d;color:#166534;background:#fff;border-radius:18px;padding:6px 11px;font-weight:700;font-size:11px;cursor:pointer;white-space:nowrap}
         .location-strip .loc-copy{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -457,6 +457,42 @@
         
         .ksindo-mobile-nav{display:none}
         @media(max-width:700px){.ksindo-mobile-nav{position:fixed;z-index:950;left:0;right:0;bottom:0;display:flex;justify-content:space-around;align-items:center;background:#fff;border-top:1px solid #e5e7eb;box-shadow:0 -4px 16px #0f172a12;padding:7px 3px calc(7px + env(safe-area-inset-bottom));}.ksindo-mobile-nav a{color:#334155;text-decoration:none;font-size:10px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:52px}.ksindo-mobile-nav span{font-size:19px}}
+
+        /* SKELETON SHIMMER LOADER FOR INSTANT 0ms PAINT */
+        .skeleton-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 13px;
+            border: 1.5px solid #facc15;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(202, 138, 4, 0.08);
+        }
+        .skeleton-box {
+            background: linear-gradient(90deg, #fefce8 25%, #fef08a 50%, #fefce8 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.2s infinite;
+            border-radius: 8px;
+        }
+        .skeleton-img { width: 100%; height: 145px; }
+        .skeleton-text { width: 85%; height: 16px; margin: 4px auto 0; }
+        .skeleton-price { width: 45%; height: 20px; margin: 4px auto; }
+        .skeleton-btn { width: 100%; height: 32px; border-radius: 20px; }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* NATIVE LAZY LOAD IMAGE STYLING */
+        .card-main-img {
+            transition: opacity 0.3s ease-in-out, transform 0.2s;
+            opacity: 0.15;
+            background: #ffffff;
+        }
+        .card-main-img.loaded {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -508,7 +544,7 @@
         </div>
     </div>
 
-    <!-- JioMart Style Delivery Location Bar (Clean, no annoying popup) -->
+    <!-- JioMart Style Delivery Location Bar -->
     <div class="location-strip" aria-live="polite">
       <span style="font-size:20px">📍</span>
       <div class="loc-copy">
@@ -540,8 +576,6 @@
         <div class="icon-item" onclick="window.filterCategory('mobiles', this)"><div class="icon-symbol">📱</div><span class="icon-title">Mobiles</span></div>
         <div class="icon-item" onclick="window.filterCategory('electronics', this)"><div class="icon-symbol">💻</div><span class="icon-title">Electronics</span></div>
     </div>
-
-
 
     <!-- Fashion Sub-Categories Strip -->
     <div class="sub-cat-bar" id="fashionSubCatBar">
@@ -897,6 +931,9 @@
             firebase.initializeApp(firebaseConfig);
         }
         var db = firebase.firestore();
+        try {
+            db.enablePersistence({ synchronizeTabs: true }).catch(function(){});
+        } catch(e){}
         var auth = firebase.auth();
         var deliveryBoyWhatsAppNumber = "919771556448";
 
@@ -906,7 +943,7 @@
 
         var allProducts = [];
         try {
-            allProducts = (JSON.parse(localStorage.getItem('cached_products')) || []).slice(0, 15);
+            allProducts = JSON.parse(localStorage.getItem('cached_products')) || [];
         } catch(e) { allProducts = []; }
 
         var activeCategory = 'all';
@@ -1334,7 +1371,55 @@
             renderProductGridFromList(list);
         };
 
-        // Render Catalog Grid
+        // 1. Shimmer Skeletons Generator for Instant Paint
+        function showProductSkeletons() {
+            var grid = document.getElementById('generalProductGrid');
+            if (!grid) return;
+            var html = '';
+            for (var s = 0; s < 8; s++) {
+                html += '<div class="skeleton-card">' +
+                    '<div class="skeleton-box skeleton-img"></div>' +
+                    '<div class="skeleton-box skeleton-text"></div>' +
+                    '<div class="skeleton-box skeleton-price"></div>' +
+                    '<div style="display:flex; gap:6px;">' +
+                        '<div class="skeleton-box skeleton-btn" style="flex:1;"></div>' +
+                        '<div class="skeleton-box skeleton-btn" style="flex:1;"></div>' +
+                    '</div>' +
+                '</div>';
+            }
+            grid.innerHTML = html;
+        }
+
+        // 2. High-Performance Intersection Observer for Image Lazy Loading
+        function initImageLazyLoading() {
+            if ('IntersectionObserver' in window) {
+                var observer = new IntersectionObserver(function(entries, obs) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            var target = entry.target;
+                            var src = target.getAttribute('data-src');
+                            if (src) {
+                                target.src = src;
+                                target.onload = function() { target.classList.add('loaded'); };
+                                target.onerror = function() { target.src = 'ksindo-icon.svg'; target.classList.add('loaded'); };
+                                target.removeAttribute('data-src');
+                            }
+                            obs.unobserve(target);
+                        }
+                    });
+                }, { rootMargin: '120px 0px' });
+
+                document.querySelectorAll('.card-main-img[data-src]').forEach(function(img) {
+                    observer.observe(img);
+                });
+            } else {
+                document.querySelectorAll('.card-main-img[data-src]').forEach(function(img) {
+                    img.src = img.getAttribute('data-src');
+                    img.classList.add('loaded');
+                });
+            }
+        }
+
         function renderFilteredProducts() {
             var list = allProducts.filter(function(p){
                 return (p.category || '').toLowerCase() !== 'food' && (!p.categories || !p.categories.includes('food'));
@@ -1376,8 +1461,9 @@
 
                 var unavailable = isOutOfStock(p) || !isProductAvailableForPincode(p);
 
+                var placeholderSvg = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"%3E%3C/svg%3E';
                 html += '<div class="product-card ' + (unavailable ? 'stock-unavailable' : '') + '">' +
-                    '<img src="' + img + '" class="card-main-img" loading="lazy" decoding="async" alt="' + p.name + '" onclick="window.openProductDetail(\'' + p.id + '\')">' +
+                    '<img src="' + placeholderSvg + '" data-src="' + img + '" class="card-main-img" loading="lazy" decoding="async" alt="' + (p.name || 'Product') + '" onclick="window.openProductDetail(\'' + p.id + '\')">' +
                     '<div class="product-title" onclick="window.openProductDetail(\'' + p.id + '\')">' + p.name + '</div>' +
                     '<div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">' +
                         '<span style="font-size:18px; font-weight:900; color:#15803d;">₹' + p.price + '</span>' +
@@ -1392,8 +1478,10 @@
                 '</div>';
             }
             grid.innerHTML = html;
+            initImageLazyLoading();
         }
 
+        showProductSkeletons();
         if (allProducts.length > 0) {
             renderFilteredProducts();
         }
@@ -1443,7 +1531,7 @@
             renderFilteredProducts();
         };
 
-        // CHECKOUT OFFER SYSTEM (From index 1.html)
+        // CHECKOUT OFFER SYSTEM
         var activeCheckoutOffer = null, unlockedOffer = null;
         function customerOfferKey(){
             if(currentUser && currentUser.uid) return currentUser.uid;
@@ -1523,10 +1611,11 @@
             var cart = getStoredCart();
             if (cart.length === 0) return alert("Cart khali hai!");
 
-            // Check if any cart item is out of stock
+            // Check if any cart item is actually out of stock
             var hasOut = cart.some(function(i){
-                var p = allProducts.find(x => x.id === i.id) || i;
-                return isOutOfStock(p) || !isProductAvailableForPincode(p);
+                var p = allProducts.find(x => x.id === i.id);
+                if (p) return isOutOfStock(p);
+                return i.isOutOfStock === true;
             });
             if (hasOut) {
                 alert("Cart mein out-of-stock product hai. Order karne se pehle use cart se remove karein!");
@@ -1549,18 +1638,27 @@
             document.getElementById('checkout-overlay').classList.remove('active');
         };
 
-        // CHECKOUT SUBMISSION - COD
+        // CHECKOUT SUBMISSION - COD (Optimized for Mobile)
         document.getElementById('orderForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            var submitBtn = document.getElementById('btnConfirmOrderSubmit');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "Order confirm ho raha hai...";
+            }
 
             var cart = getStoredCart();
+            // Reliable stock check that does not falsely block orders
             var unavailable = cart.filter(function(i){
                 var p = allProducts.find(function(x){ return x.id === i.id; });
-                return !p || isOutOfStock(p) || !isProductAvailableForPincode(p);
+                if (p) {
+                    return isOutOfStock(p);
+                }
+                return i.isOutOfStock === true;
             });
 
             if (unavailable.length > 0) {
-                alert('Cart mein out-of-stock product hai. Order karne se pehle use cart se remove karein!');
+                alert('Cart mein out-of-stock product hai. Kripya use cart se remove karein!');
                 return;
             }
 
@@ -1573,7 +1671,6 @@
             var phone = document.getElementById('custPhone').value.trim();
             var pincode = document.getElementById('custPincode').value.trim();
             if (!/^\d{6}$/.test(pincode)) { alert('Valid 6-digit pincode enter karein.'); return; }
-            
             
             var address = document.getElementById('custAddress').value.trim();
             var subtotalVal = Number(document.getElementById('cart-subtotal').innerText);
@@ -1610,8 +1707,17 @@
                 saveStoredCart([]);
                 appliedCoupon = null;
                 window.closeCheckoutModal();
-                window.open('https://wa.me/' + deliveryBoyWhatsAppNumber + '?text=' + encodeURIComponent('🚚 *Naya Order (ksindo)*\nClient: ' + name + '\nPhone: ' + phone + '\nTotal: ₹' + totalAmount + '\nOTP: ' + deliveryOtp), '_blank');
-            }).catch(function(err){ alert("Error: " + err.message); });
+                try {
+                    window.location.href = 'https://wa.me/' + deliveryBoyWhatsAppNumber + '?text=' + encodeURIComponent('🚚 *Naya Order (ksindo)*\nClient: ' + name + '\nPhone: ' + phone + '\nTotal: ₹' + totalAmount + '\nOTP: ' + deliveryOtp);
+                } catch(e){}
+            }).catch(function(err){ 
+                alert("Order failed: " + err.message); 
+            }).finally(function(){
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Confirm Order";
+                }
+            });
         });
 
         // User Icon & Auth handling
@@ -1967,18 +2073,18 @@
             updateCartUI();
         }
 
-        // Fast Paint: Limit 15 first, then hydrate full catalog
-        db.collection("products").limit(15).onSnapshot(function(firstSnap){
-            applyProductSnapshot(firstSnap);
-            setTimeout(function(){
-                db.collection("products").get().then(function(fullSnap){
-                    applyProductSnapshot(fullSnap);
-                    db.collection("products").onSnapshot(applyProductSnapshot);
-                }).catch(function(e){
-                    console.warn('Full catalog load fallback', e);
-                    db.collection("products").onSnapshot(applyProductSnapshot);
-                });
-            }, 250);
+        // Ultra-Fast Product Loading (Instant Cache + Direct Realtime Sync)
+        db.collection("products").onSnapshot({ includeMetadataChanges: false }, function(snap){
+            applyProductSnapshot(snap);
+        }, function(err){
+            console.warn("Product sync warning:", err);
+            // Fallback to cache if network is slow
+            if (allProducts.length === 0) {
+                try {
+                    allProducts = JSON.parse(localStorage.getItem('cached_products')) || [];
+                    renderFilteredProducts();
+                } catch(e){}
+            }
         });
 
         // Ads Sync
