@@ -20,7 +20,7 @@
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: #f1f2f6; color: #1e293b; overflow-x: hidden; padding-bottom: 50px; }
+        body { background-color: #f1f2f6; color: #1e293b; overflow-x: hidden; padding-bottom: 70px; }
 
         header { 
             background-color: #0f172a; 
@@ -49,8 +49,8 @@
             color: #ff007f; 
         }
 
-        .search-container { display: flex; flex: 1; max-width: 550px; }
-        .search-container input { width: 100%; padding: 10px 18px; border: none; outline: none; border-radius: 25px 0 0 25px; font-size: 14px; }
+        .search-container { display: flex; flex: 1; max-width: 550px; position: relative; }
+        .search-container input { width: 100%; padding: 10px 18px; border: none; outline: none; border-radius: 25px 0 0 25px; font-size: 14px; background: #fff; }
         .search-btn-round { background: white; border: none; border-radius: 0 25px 25px 0; padding: 0 14px; cursor: pointer; color: #16a34a; font-size: 15px; }
 
         .nav-actions { display: flex; gap: 12px; align-items: center; position: relative; }
@@ -87,6 +87,11 @@
         }
         @keyframes fastMarquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
+        /* JioMart style Location strip */
+        .location-strip{display:flex;align-items:center;gap:9px;padding:9px 16px;background:#f0fdf4;border-bottom:1px solid #dcfce7;font-size:12px;color:#14532d}
+        .location-strip strong{font-size:13px}.location-strip button{margin-left:auto;border:1px solid #15803d;color:#166534;background:#fff;border-radius:18px;padding:6px 11px;font-weight:700;font-size:11px;cursor:pointer;white-space:nowrap}
+        .location-strip .loc-copy{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
         .mode-switcher-container { 
             display: flex; 
             justify-content: center; 
@@ -98,11 +103,11 @@
         .mode-btn { 
             flex: 1; 
             max-width: 320px; 
-            padding: 12px 20px; 
+            padding: 11px 20px; 
             border-radius: 30px; 
             border: 2px solid #e2e8f0; 
             background: #f8fafc; 
-            font-size: 14px; 
+            font-size: 13px; 
             font-weight: bold; 
             cursor: pointer; 
             display: flex; 
@@ -200,31 +205,42 @@
         .container { max-width: 1200px; margin: 0 auto; padding: 15px 15px 40px; }
 
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+        .product-size-tools { display: flex; gap: 6px; }
+        .product-size-tools button { border: 1px solid #cbd5e1; background: #fff; border-radius: 18px; padding: 5px 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
+        #generalProductGrid.cards-small { grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 8px; }
+        #generalProductGrid.cards-small .card-main-img { height: 112px; }
+        #generalProductGrid.cards-large { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+        #generalProductGrid.cards-large .card-main-img { height: 190px; }
+        
+        .stock-unavailable { opacity: 0.65; position: relative; }
+        .stock-label { font-size: 10px; color: #dc2626; font-weight: 800; margin: 4px 0; background: #fee2e2; border-radius: 4px; padding: 2px 4px; display: inline-block; }
+
         @media (max-width: 600px) { .product-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 10px; } }
 
         .product-card { 
             background-color: #fffdf0; 
             border-radius: 14px; 
-            padding: 15px; 
+            padding: 13px; 
             text-align: center; 
             display: flex; 
             flex-direction: column; 
             justify-content: space-between; 
-            border: 2px solid #facc15; 
+            border: 1.5px solid #facc15; 
             contain: content; 
             box-shadow: 0 4px 10px rgba(202, 138, 4, 0.08); 
             transition: transform 0.2s;
         }
         .product-card:hover { transform: translateY(-3px); }
-        .card-main-img { width: 100%; height: 150px; object-fit: contain; margin-bottom: 8px; border-radius: 8px; cursor: pointer; background: #ffffff; border: 1px solid #fef08a; }
+        .card-main-img { width: 100%; height: 145px; object-fit: contain; margin-bottom: 8px; border-radius: 8px; cursor: pointer; background: #ffffff; border: 1px solid #fef08a; }
         .product-title { font-size: 13px; font-weight: 700; height: 36px; overflow: hidden; color: #166534; margin-bottom: 6px; cursor: pointer; text-decoration: none; line-height: 1.35; }
         .add-btn-round { background: linear-gradient(135deg, #eab308, #ca8a04); color: white; border: none; padding: 8px 10px; border-radius: 20px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
+        .add-btn-round:disabled, .buy-now-round:disabled { background: #cbd5e1; color: #64748b; cursor: not-allowed; }
         .buy-now-round { background: linear-gradient(135deg, #22c55e, #15803d); color: white; border: none; padding: 8px 10px; border-radius: 20px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
 
         .discount-tag { 
             color: #15803d; 
             font-weight: 800; 
-            font-size: 11px; 
+            font-size: 10px; 
             margin-left: 6px; 
             background: #bbf7d0; 
             padding: 2px 6px; 
@@ -238,6 +254,7 @@
         .modal-box { background: white; padding: 25px; border-radius: 16px; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; }
         .close-modal { position: absolute; right: 15px; top: 15px; cursor: pointer; font-size: 22px; font-weight: bold; width: 30px; height: 30px; border-radius: 50%; background: #f1f2f6; display: flex; align-items: center; justify-content: center; border: none; }
         .btn-submit { background: #16a34a; color: white; border: none; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; padding: 12px; border-radius: 25px; font-size: 14px; }
+        .btn-submit:disabled { background: #cbd5e1; color: #64748b; cursor: not-allowed; }
 
         /* Cart Drawer */
         .cart-modal { 
@@ -258,11 +275,23 @@
         .cart-header { background-color: #0f172a; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         .cart-items { flex: 1; overflow-y: auto; padding: 15px; -webkit-overflow-scrolling: touch; }
         .cart-item { display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #eee; padding: 12px 0; }
+        .cart-item.cart-item-out-of-stock { background: #fee2e2; border-radius: 8px; padding: 8px; border: 1px solid #fecaca; }
         .cart-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
         .qty-controls { display: inline-flex; align-items: center; border: 1px solid #facc15; border-radius: 20px; background: #fefce8; overflow: hidden; margin-top: 5px; }
         .qty-btn { background: #fef08a; border: none; width: 28px; height: 28px; cursor: pointer; font-weight: bold; font-size: 14px; display: flex; align-items: center; justify-content: center; color: #854d0e; }
         .qty-val { min-width: 28px; text-align: center; font-size: 12px; font-weight: bold; }
         .cart-footer { padding: 15px; border-top: 1px solid #eee; background: #fffdf0; }
+
+        .cart-stock-warning {
+            background: #fee2e2;
+            border: 1.5px solid #ef4444;
+            color: #991b1b;
+            padding: 9px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
 
         /* Modern Order Tracker */
         .order-card-modern {
@@ -384,109 +413,58 @@
             font-weight: bold;
             text-decoration: underline;
         }
-        /* Bottom PWA Install Popup Banner */
-.pwa-bottom-banner {
-    position: fixed;
-    bottom: -150px; /* Shuru me chhipa rahega */
-    left: 15px;
-    right: 15px;
-    background: #0f172a;
-    color: white;
-    padding: 12px 16px;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    z-index: 99999;
-    border: 1.5px solid #ca8a04;
-    transition: bottom 0.4s ease-in-out;
-}
-.pwa-bottom-banner.show {
-    bottom: 20px; /* Slide hokar upar aayega */
-}
-.pwa-banner-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-.pwa-banner-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
-    background: #ffffff;
-    object-fit: contain;
-    padding: 2px;
-    border: 1px solid #e2e8f0;
-}
-.pwa-banner-text h4 {
-    font-size: 14px;
-    color: #ffffff;
-    margin: 0;
-    font-weight: 800;
-}
-.pwa-banner-text p {
-    font-size: 11px;
-    color: #94a3b8;
-    margin: 2px 0 0;
-}
-.pwa-banner-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.btn-pwa-install {
-    background: linear-gradient(135deg, #22c55e, #15803d);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 800;
-    cursor: pointer;
-    box-shadow: 0 3px 10px rgba(34, 197, 94, 0.3);
-    white-space: nowrap;
-}
-.btn-pwa-close {
-    background: transparent;
-    color: #94a3b8;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    padding: 0 4px;
-    line-height: 1;
-}
-    </style>
 
-<style id="ksindo-professional-upgrade">
-.ksindo-global-footer{background:#111827;color:#e5e7eb;padding:34px 5%;margin-top:40px;font:14px/1.6 system-ui,sans-serif}
-.ksindo-footer-inner{max-width:1240px;margin:auto;display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;gap:26px}
-.ksindo-global-footer h3,.ksindo-global-footer h4{margin:0 0 12px;color:#fff}
-.ksindo-global-footer p{color:#aeb8ca;font-size:12px;margin:8px 0}
-.ksindo-global-footer a{display:block;color:#cbd5e1;text-decoration:none;font-size:12px;margin:8px 0}
-.ksindo-global-footer a:hover{color:#fff;text-decoration:underline}
-.ksindo-footer-brand{font-size:22px;font-weight:900;letter-spacing:.5px;background:linear-gradient(90deg,#f472b6,#a78bfa,#22d3ee,#facc15);background-clip:text;-webkit-background-clip:text;color:transparent}
-.ksindo-footer-bottom{max-width:1240px;margin:22px auto 0;border-top:1px solid #374151;padding-top:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#9ca3af;font-size:11px}
-.ksindo-help-fab{position:fixed;right:16px;bottom:16px;z-index:9990;background:#4f46e5;color:#fff!important;text-decoration:none!important;border-radius:999px;padding:12px 16px;box-shadow:0 8px 25px #11182738;font:700 12px system-ui;display:flex;gap:8px;align-items:center}
-.ksindo-help-fab:hover{background:#3730a3}
-@media(max-width:700px){.ksindo-footer-inner{grid-template-columns:1fr 1fr;gap:20px}.ksindo-footer-inner>div:first-child{grid-column:1/-1}.ksindo-global-footer{padding:28px 20px}.ksindo-help-fab{right:10px;bottom:94px;padding:10px 12px}}
-</style>
-<style>
-/* KSINDO app-like shopping layout */
-.location-strip{display:flex;align-items:center;gap:9px;padding:10px 16px;background:#f0fdf4;border-bottom:1px solid #dcfce7;font-size:12px;color:#14532d}
-.location-strip strong{font-size:13px}.location-strip button{margin-left:auto;border:1px solid #15803d;color:#166534;background:#fff;border-radius:18px;padding:7px 11px;font-weight:700;white-space:nowrap}
-.location-strip .loc-copy{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-@media(max-width:700px){body{padding-bottom:68px}.location-strip{padding:9px 12px}.pwa-bottom-banner{left:8px;right:8px;z-index:1100}.pwa-bottom-banner.show{bottom:72px}.pwa-bottom-banner.show ~ .ksindo-help-fab{bottom:160px!important}.ksindo-help-fab{bottom:88px!important}.ksindo-global-footer{padding-bottom:30px}}
-.ksindo-mobile-nav{display:none}
-@media(max-width:700px){.ksindo-mobile-nav{position:fixed;z-index:950;left:0;right:0;bottom:0;display:flex;justify-content:space-around;align-items:center;background:#fff;border-top:1px solid #e5e7eb;box-shadow:0 -4px 16px #0f172a12;padding:7px 3px calc(7px + env(safe-area-inset-bottom));}.ksindo-mobile-nav a{color:#334155;text-decoration:none;font-size:10px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:52px}.ksindo-mobile-nav span{font-size:19px}}
-</style></head>
+        /* PWA Bottom Banner */
+        .pwa-bottom-banner {
+            position: fixed;
+            bottom: -150px;
+            left: 15px;
+            right: 15px;
+            background: #0f172a;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            z-index: 99999;
+            border: 1.5px solid #ca8a04;
+            transition: bottom 0.4s ease-in-out;
+        }
+        .pwa-bottom-banner.show { bottom: 20px; }
+        .pwa-banner-left { display: flex; align-items: center; gap: 12px; }
+        .pwa-banner-icon { width: 44px; height: 44px; border-radius: 10px; background: #ffffff; object-fit: contain; padding: 2px; border: 1px solid #e2e8f0; }
+        .pwa-banner-text h4 { font-size: 14px; color: #ffffff; margin: 0; font-weight: 800; }
+        .pwa-banner-text p { font-size: 11px; color: #94a3b8; margin: 2px 0 0; }
+        .pwa-banner-actions { display: flex; align-items: center; gap: 8px; }
+        .btn-pwa-install { background: linear-gradient(135deg, #22c55e, #15803d); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 3px 10px rgba(34, 197, 94, 0.3); white-space: nowrap; }
+        .btn-pwa-close { background: transparent; color: #94a3b8; border: none; font-size: 20px; cursor: pointer; padding: 0 4px; line-height: 1; }
+
+        /* Global Footer & Help */
+        .ksindo-global-footer{background:#111827;color:#e5e7eb;padding:34px 5%;margin-top:40px;font:14px/1.6 system-ui,sans-serif}
+        .ksindo-footer-inner{max-width:1240px;margin:auto;display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;gap:26px}
+        .ksindo-global-footer h3,.ksindo-global-footer h4{margin:0 0 12px;color:#fff}
+        .ksindo-global-footer p{color:#aeb8ca;font-size:12px;margin:8px 0}
+        .ksindo-global-footer a{display:block;color:#cbd5e1;text-decoration:none;font-size:12px;margin:8px 0}
+        .ksindo-global-footer a:hover{color:#fff;text-decoration:underline}
+        .ksindo-footer-brand{font-size:22px;font-weight:900;letter-spacing:.5px;background:linear-gradient(90deg,#f472b6,#a78bfa,#22d3ee,#facc15);background-clip:text;-webkit-background-clip:text;color:transparent}
+        .ksindo-footer-bottom{max-width:1240px;margin:22px auto 0;border-top:1px solid #374151;padding-top:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#9ca3af;font-size:11px}
+        .ksindo-help-fab{position:fixed;right:16px;bottom:16px;z-index:9990;background:#4f46e5;color:#fff!important;text-decoration:none!important;border-radius:999px;padding:11px 16px;box-shadow:0 8px 25px #11182738;font:700 12px system-ui;display:flex;gap:8px;align-items:center}
+        .ksindo-help-fab:hover{background:#3730a3}
+        @media(max-width:700px){.ksindo-footer-inner{grid-template-columns:1fr 1fr;gap:20px}.ksindo-footer-inner>div:first-child{grid-column:1/-1}.ksindo-global-footer{padding:28px 20px}.ksindo-help-fab{right:10px;bottom:88px;padding:9px 12px}}
+        
+        .ksindo-mobile-nav{display:none}
+        @media(max-width:700px){.ksindo-mobile-nav{position:fixed;z-index:950;left:0;right:0;bottom:0;display:flex;justify-content:space-around;align-items:center;background:#fff;border-top:1px solid #e5e7eb;box-shadow:0 -4px 16px #0f172a12;padding:7px 3px calc(7px + env(safe-area-inset-bottom));}.ksindo-mobile-nav a{color:#334155;text-decoration:none;font-size:10px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:52px}.ksindo-mobile-nav span{font-size:19px}}
+    </style>
+</head>
 <body>
 
     <header>
         <div class="logo" onclick="window.location.reload()">ksindo</div>
         <div class="search-container">
-            <input type="text" id="search-input" placeholder="Search products, brands, groceries..." onkeyup="window.handleSearch()">
+            <input type="text" id="search-input" placeholder="Search vegetables, sarees, pooja, food (हिंदी में भी)..." oninput="window.handleSearchDebounced()" onkeyup="if(event.key==='Enter')window.handleSearch()">
             <button class="search-btn-round" onclick="window.handleSearch()">🔍</button>
         </div>
         <div class="nav-actions">
@@ -520,8 +498,6 @@
         </div>
     </header>
 
-
-
     <!-- Support Ticker -->
     <div class="sub-header-clock-bar" id="supportTickerBar">
         <div class="marquee-track" id="marqueeTrack">
@@ -532,9 +508,15 @@
         </div>
     </div>
 
+    <!-- JioMart Style Delivery Location Bar (Clean, no annoying popup) -->
     <div class="location-strip" aria-live="polite">
-      <span style="font-size:20px">📍</span><div class="loc-copy"><strong>Deliver to</strong><br><span id="ksindoLocationLabel">Choose your delivery location</span></div>
-      <button type="button" id="ksindoDetectLocation">Use my location</button><button type="button" id="ksindoManualLocation" style="margin-left:0">Change</button>
+      <span style="font-size:20px">📍</span>
+      <div class="loc-copy">
+          <strong>Deliver to</strong><br>
+          <span id="ksindoLocationLabel">Jainagar Main Bazar, 847226</span>
+      </div>
+      <button type="button" id="ksindoDetectLocation">Use GPS Location</button>
+      <button type="button" id="ksindoManualLocation" style="margin-left:4px">Change Pincode</button>
     </div>
 
     <!-- Mode Switcher -->
@@ -553,10 +535,13 @@
             <div class="icon-symbol">🥦</div>
             <span class="icon-title">24x7 Fresh</span>
         </div>
+        <div class="icon-item" onclick="window.filterCategory('seasonal', this)"><div class="icon-symbol">🪔</div><span class="icon-title">Festive</span></div>
         <div class="icon-item" onclick="window.filterCategory('gift', this)"><div class="icon-symbol">🎁</div><span class="icon-title">Gifts</span></div>
         <div class="icon-item" onclick="window.filterCategory('mobiles', this)"><div class="icon-symbol">📱</div><span class="icon-title">Mobiles</span></div>
         <div class="icon-item" onclick="window.filterCategory('electronics', this)"><div class="icon-symbol">💻</div><span class="icon-title">Electronics</span></div>
     </div>
+
+
 
     <!-- Fashion Sub-Categories Strip -->
     <div class="sub-cat-bar" id="fashionSubCatBar">
@@ -574,17 +559,20 @@
         <button class="sub-cat-btn" onclick="window.filterSubCat('seasonal', this)">🥭 Seasonal Special</button>
     </div>
 
-    <!-- Multi-Ads Section -->
-    <div class="ads-scroll-section">
-        <div class="ads-scroll-track" id="multiAdsTrack">
-            <div class="ad-card"><img src="https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600" alt="Deals"><span class="ad-tag-pill">AD</span></div>
-            <div class="ad-card"><img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600" alt="Sale"><span class="ad-tag-pill">AD</span></div>
-        </div>
+    <!-- Multi-Ads Section (Auto Hides if Empty) -->
+    <div class="ads-scroll-section" id="adsSlot" style="display:none;">
+        <div class="ads-scroll-track" id="multiAdsTrack"></div>
     </div>
 
     <div class="container">
         <section id="sectionGeneralStore">
-            <h2 style="font-size:18px; margin-bottom:15px; color:#15803d; font-weight:800;" id="marketViewTitle">Featured Products</h2>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+              <h2 style="font-size:18px;color:#15803d;font-weight:800;margin:0;" id="marketViewTitle">Featured Products</h2>
+              <div class="product-size-tools" aria-label="Product card size">
+                  <button type="button" onclick="window.setProductCardSize('small')">A− Small</button>
+                  <button type="button" onclick="window.setProductCardSize('large')">A+ Large</button>
+              </div>
+            </div>
             <div class="product-grid" id="generalProductGrid"></div>
         </section>
     </div>
@@ -645,22 +633,53 @@
         </div>
     </div>
 
-    <!-- Cart Modal -->
+    <!-- Cart Drawer with Out-Of-Stock Protection -->
     <div class="cart-modal" id="cart-modal">
         <div class="cart-header">
             <h3>ksindo Shopping Cart</h3>
             <span class="close-modal" style="position:static;" onclick="window.toggleCart()">&times;</span>
         </div>
-        <div class="cart-items" id="cart-items"><p style="text-align:center; padding:20px;">Cart khali hai.</p></div>
+
+        <div class="cart-items" id="cart-items">
+            <p style="text-align:center; padding:20px;">Cart khali hai.</p>
+        </div>
+
         <div class="cart-footer">
-            <div style="font-size:13px; margin-bottom:5px;">Subtotal: ₹<span id="cart-subtotal">0</span></div>
-            <div style="font-size:13px; margin-bottom:5px; color:#c2410c; font-weight:bold;">Delivery Charge: ₹<span id="delivery-charge">0</span></div>
-            <h4>Total: ₹<span id="cart-total">0</span></h4>
-            <button class="btn-submit" onclick="window.openCheckoutModal()">PLACE ORDER</button>
+            <!-- Out of Stock Alert Message in Cart -->
+            <div id="cartOutOfStockBanner" class="cart-stock-warning" style="display:none;">
+                ⚠️ Out of stock items ko remove karne par hi order confirm hoga!
+            </div>
+
+            <!-- Coupon Code Section -->
+            <div style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:10px; padding:8px 10px; margin-bottom:10px;">
+                <div style="display:flex; gap:6px;">
+                    <input type="text" id="cartCouponInput" placeholder="Coupon Code (KSINDO50)" style="flex:1; padding:7px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:11px; text-transform:uppercase; font-weight:bold; outline:none;">
+                    <button type="button" onclick="window.applyCouponCode()" style="background:#16a34a; color:white; border:none; padding:7px 12px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;">Apply</button>
+                </div>
+                <div id="cartCouponMsg" style="font-size:11px; margin-top:4px; font-weight:bold;"></div>
+            </div>
+
+            <div style="font-size:13px; margin-bottom:4px; display:flex; justify-content:space-between;">
+                <span>Subtotal:</span> 
+                <span>₹<span id="cart-subtotal">0</span></span>
+            </div>
+            <div id="cartDiscountRow" style="font-size:13px; margin-bottom:4px; display:none; justify-content:space-between; color:#16a34a; font-weight:bold;">
+                <span>Discount (<span id="appliedCouponCode"></span>):</span> 
+                <span>- ₹<span id="cart-discount">0</span></span>
+            </div>
+            <div style="font-size:13px; margin-bottom:6px; color:#c2410c; font-weight:bold; display:flex; justify-content:space-between;">
+                <span>Delivery Charge:</span> 
+                <span>₹<span id="delivery-charge">0</span></span>
+            </div>
+            <div style="font-size:16px; font-weight:900; color:#0f172a; display:flex; justify-content:space-between; border-top:1px solid #e2e8f0; padding-top:6px;">
+                <span>Total:</span> 
+                <span style="color:#16a34a;">₹<span id="cart-total">0</span></span>
+            </div>
+            <button class="btn-submit" id="btnOpenCheckout" onclick="window.openCheckoutModal()">PLACE ORDER</button>
         </div>
     </div>
 
-    <!-- Checkout Modal (NO Terms & Conditions Checkbox as Requested) -->
+    <!-- Checkout Modal -->
     <div class="modal-overlay" id="checkout-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="window.closeCheckoutModal()">&times;</span>
@@ -668,19 +687,91 @@
             <form id="orderForm">
                 <input type="text" id="custName" placeholder="Full Name" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
                 <input type="tel" id="custPhone" placeholder="10 Digit Phone" maxlength="10" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
-                <input type="text" id="custPincode" placeholder="Pincode" maxlength="6" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
-                <textarea id="custAddress" placeholder="Delivery Address" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;"></textarea>
+                <input type="text" id="custPincode" placeholder="Pincode (6 Digit)" maxlength="6" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
+                <textarea id="custAddress" placeholder="Delivery Address & Landmark" required style="width:100%; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:8px;"></textarea>
                 
+                <div id="checkoutOfferPanel" style="display:none;margin-top:14px;padding:13px;background:#fff7ed;border:1px dashed #f97316;border-radius:10px;">
+                    <h4 style="color:#c2410c;">🎁 Special Checkout Offer</h4>
+                    <div id="checkoutOfferContent" style="font-size:13px;margin:6px 0;"></div>
+                    <button type="button" id="unlockCheckoutOfferBtn" class="btn-submit" style="margin-top:6px;" onclick="window.unlockCheckoutOffer()">Unlock Offer</button>
+                </div>
+
                 <div style="margin-top:15px; padding:14px; background:#f0fdf4; border:1px dashed #16a34a; border-radius:8px; text-align:center;">
                     <h4 style="color:#16a34a; margin:4px 0;">Cash on Delivery / Doorstep UPI</h4>
                     <p style="font-size:12px; color:#64748b;">Delivery partner ke doorstep aane par OTP screen par live show hoga.</p>
                 </div>
 
-                <button type="submit" class="btn-submit">Confirm Order</button>
+                <button type="submit" id="btnConfirmOrderSubmit" class="btn-submit">Confirm Order</button>
             </form>
         </div>
     </div>
 
+    <!-- PWA Install Popup Banner -->
+    <div class="pwa-bottom-banner" id="pwaBottomBanner">
+        <div class="pwa-banner-left">
+            <img src="ksindo-icon.svg" alt="KSINDO" class="pwa-banner-icon">
+            <div class="pwa-banner-text">
+                <h4>ksindo App</h4>
+                <p>Fast & Light Shopping App</p>
+            </div>
+        </div>
+        <div class="pwa-banner-actions">
+            <button class="btn-pwa-install" onclick="window.triggerPWAInstall()">Install</button>
+            <button class="btn-pwa-close" onclick="window.dismissPWABanner()">&times;</button>
+        </div>
+    </div>
+
+    <!-- Floating Help Button -->
+    <a href="grievance.html" class="ksindo-help-fab" aria-label="Open KSINDO grievance center">
+        <span>☏</span> 24x7 Help & Grievance
+    </a>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="ksindo-mobile-nav" aria-label="Quick navigation">
+        <a href="index.html" style="color:#16a34a;"><span>🏠</span>Home</a>
+        <a href="fresh.html"><span>🥦</span>24x7 Fresh</a>
+        <a href="fastfood.html"><span>🍔</span>Food</a>
+        <a href="javascript:void(0)" onclick="window.toggleCart()"><span>🛒</span>Cart</a>
+        <a href="javascript:void(0)" onclick="window.handleUserIconClick()"><span>👤</span>Account</a>
+    </nav>
+
+    <!-- Global Footer -->
+    <footer class="ksindo-global-footer">
+        <div class="ksindo-footer-inner">
+            <div>
+                <div class="ksindo-footer-brand">KSINDO™</div>
+                <p>Everything. One Place. Discover local shops, food, daily essentials and festive products with KSINDO.</p>
+                <p>Jaynagar, Madhubani, Bihar - 847226</p>
+            </div>
+            <div>
+                <h4>Shop</h4>
+                <a href="index.html">Home & Products</a>
+                <a href="fresh.html">Fresh Daily Needs</a>
+                <a href="fastfood.html">Food & Restaurants</a>
+                <a href="seasonable.html">Festive & Seasonal</a>
+            </div>
+            <div>
+                <h4>Partners</h4>
+                <a href="seller-center.html">Seller Centre</a>
+                <a href="merchant.html">Existing Partner Portal</a>
+                <a href="restaurant.html">Restaurant Partner</a>
+                <a href="deliveryboy.html">Delivery Partner</a>
+            </div>
+            <div>
+                <h4>Help & Policies</h4>
+                <a href="grievance.html">Grievance Redressal</a>
+                <a href="about.html">About KSINDO</a>
+                <a href="mailto:ksindo.jyg@gmail.com">ksindo.jyg@gmail.com</a>
+                <a href="tel:8252731656">8252731656</a>
+            </div>
+        </div>
+        <div class="ksindo-footer-bottom">
+            <span>© <span class="ksindo-year"></span> KSINDO™. All rights reserved.</span>
+            <span>Built for local commerce · Customer support and grievance access</span>
+        </div>
+    </footer>
+
+    <!-- LIVE CLOCK & TICKER SCRIPT -->
     <script>
         function updateLiveClock() {
             var now = new Date();
@@ -719,9 +810,80 @@
             adsTrack.addEventListener('touchstart', function() { clearInterval(adsAutoScrollTimer); }, { passive: true });
             adsTrack.addEventListener('touchend', startAdsAutoScroll, { passive: true });
         }
+
+        document.querySelectorAll('.ksindo-year').forEach(function(n){ n.textContent = new Date().getFullYear(); });
     </script>
 
-    <!-- CORE ENGINE WITH REPAIRED SAFE-CACHE, MODERN ORDER TRACKER & AI RANKER -->
+    <!-- LOCATION CONTROLLER SCRIPT (No annoying popup, clean click trigger) -->
+    <script id="ksindo-location-engine">
+    (function(){
+        const label = document.getElementById('ksindoLocationLabel');
+        const detect = document.getElementById('ksindoDetectLocation');
+        const manual = document.getElementById('ksindoManualLocation');
+        if(!label || !detect || !manual) return;
+
+        function showSaved(){
+            try {
+                const v = JSON.parse(localStorage.getItem('ksindo_delivery_location') || 'null');
+                if (v && v.label) label.textContent = v.label;
+            } catch(e) {}
+        }
+
+        function saveLocation(value){
+            localStorage.setItem('ksindo_delivery_location', JSON.stringify(value));
+            label.textContent = value.label;
+            if (typeof renderFilteredProducts === 'function') renderFilteredProducts();
+        }
+
+        function manualEntry(){
+            const pin = prompt('Enter your 6-digit delivery PIN code:', '847226');
+            if(pin === null) return;
+            const clean = pin.trim();
+            if(!/^\d{6}$/.test(clean)){ alert('Please enter a valid 6-digit PIN code.'); return; }
+            const area = prompt('Enter your area / landmark (e.g. Jainagar Main Bazar):', 'Jainagar') || '';
+            saveLocation({ type:'pincode', pincode:clean, address:area, label:(area ? area + ', ' : '') + clean });
+        }
+
+        detect.addEventListener('click', function(){
+            if(!navigator.geolocation){
+                alert('Location is not supported in this browser. Enter your PIN code instead.');
+                manualEntry();
+                return;
+            }
+            detect.disabled = true;
+            detect.textContent = 'Locating…';
+            navigator.geolocation.getCurrentPosition(async function(pos){
+                const lat = pos.coords.latitude, lon = pos.coords.longitude;
+                let place = 'Location detected';
+                try {
+                    const r = await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + encodeURIComponent(lat) + '&lon=' + encodeURIComponent(lon));
+                    if(r.ok){
+                        const d = await r.json();
+                        const a = d.address || {};
+                        const postcode = (a.postcode || '').replace(/\s/g, '');
+                        place = [a.suburb || a.neighbourhood || a.village || a.town || a.city, a.state_district || a.state].filter(Boolean).join(', ') || place;
+                        if(postcode) saveLocation({ type:'gps', latitude:lat, longitude:lon, pincode:postcode, label:place + ' (' + postcode + ')' });
+                    }
+                } catch(e){}
+                if(!(JSON.parse(localStorage.getItem('ksindo_delivery_location') || '{}').pincode)) {
+                    saveLocation({ type:'gps', latitude:lat, longitude:lon, label:place });
+                }
+                detect.disabled = false;
+                detect.textContent = 'Refresh GPS';
+            }, function(err){
+                detect.disabled = false;
+                detect.textContent = 'Use GPS Location';
+                alert('Could not get GPS permission. Entering PIN code manually.');
+                manualEntry();
+            }, { enableHighAccuracy:true, timeout:12000, maximumAge:60000 });
+        });
+
+        manual.addEventListener('click', manualEntry);
+        showSaved();
+    })();
+    </script>
+
+    <!-- CORE ENGINE WITH ADVANCED HINDI/HINGLISH/FUZZY SEARCH & OUT-OF-STOCK PROTECTION -->
     <script>
         var firebaseConfig = {
             apiKey: "AIzaSyA7f9PWSyws4XkzKq077sNdlF0J33DSVSo",
@@ -744,11 +906,55 @@
 
         var allProducts = [];
         try {
-            allProducts = JSON.parse(localStorage.getItem('cached_products')) || [];
+            allProducts = (JSON.parse(localStorage.getItem('cached_products')) || []).slice(0, 15);
         } catch(e) { allProducts = []; }
 
         var activeCategory = 'all';
         var activeSubCategory = 'all';
+
+        // Available Coupons Table
+        var availableCoupons = {
+            "KSINDO50": { type: "flat", discount: 50, minOrder: 199, label: "₹50 OFF" },
+            "WELCOME10": { type: "percent", percent: 10, maxDiscount: 100, minOrder: 149, label: "10% OFF" },
+            "FESTIVE15": { type: "percent", percent: 15, maxDiscount: 150, minOrder: 299, label: "15% OFF" }
+        };
+        var appliedCoupon = null;
+
+        // Stock & Pincode Helpers
+        function isOutOfStock(p) { 
+            return p.inStock === false || p.isOutOfStock === true || p.stockStatus === 'out' || p.stockStatus === 'out-of-stock' || (typeof p.stock === 'number' && p.stock <= 0); 
+        }
+
+        function getCustomerPincode() { 
+            var loc = null;
+            try { loc = JSON.parse(localStorage.getItem('ksindo_delivery_location') || 'null'); } catch(e){}
+            var checkout = document.getElementById('custPincode'); 
+            return (loc && loc.pincode) || (currentUserProfile && currentUserProfile.pincode) || (checkout && checkout.value) || ''; 
+        }
+
+        function isProductAvailableForPincode(p) { 
+            var pins = p.availablePincodes || p.pincodes || []; 
+            if (!Array.isArray(pins) || pins.length === 0) return true; 
+            var pin = getCustomerPincode(); 
+            return !/^\d{6}$/.test(String(pin)) || pins.map(String).includes(String(pin)); 
+        }
+
+        
+        window.clearPincodeFilter = function() {
+            try { localStorage.removeItem('ksindo_delivery_location'); } catch(e){}
+            var lbl = document.getElementById('ksindoLocationLabel');
+            if(lbl) lbl.textContent = 'All Available Areas (Showing All Items)';
+            renderFilteredProducts();
+        };
+
+        window.setProductCardSize = function(size){
+            var grid = document.getElementById('generalProductGrid');
+            if(!grid) return;
+            grid.classList.toggle('cards-small', size === 'small');
+            grid.classList.toggle('cards-large', size === 'large');
+            localStorage.setItem('ksindo_card_size', size);
+        };
+        window.setTimeout(function(){ window.setProductCardSize(localStorage.getItem('ksindo_card_size') || 'small'); }, 0);
 
         function getStoredCart() {
             try {
@@ -765,6 +971,7 @@
 
         window.toggleCart = function() {
             document.getElementById('cart-modal').classList.toggle('open');
+            updateCartUI();
         };
 
         window.openProductDetail = function(id) {
@@ -788,22 +995,81 @@
             return '';
         }
 
+        // Apply Coupon System
+        window.applyCouponCode = function() {
+            var code = (document.getElementById('cartCouponInput').value || '').trim().toUpperCase();
+            var msg = document.getElementById('cartCouponMsg');
+            var cart = getStoredCart();
+            var subtotal = 0;
+            cart.forEach(function(i){
+                var p = allProducts.find(x => x.id === i.id) || i;
+                if(!isOutOfStock(p)) subtotal += (Number(i.price) || 0) * (Number(i.qty) || 1);
+            });
+
+            if(!code) {
+                msg.innerText = "Coupon code enter karein!";
+                msg.style.color = "#dc2626";
+                return;
+            }
+
+            if(!availableCoupons[code]) {
+                msg.innerText = "❌ Invalid Coupon Code!";
+                msg.style.color = "#dc2626";
+                return;
+            }
+
+            var c = availableCoupons[code];
+            if(subtotal < c.minOrder) {
+                msg.innerText = "⚠️ Min order ₹" + c.minOrder + " required!";
+                msg.style.color = "#dc2626";
+                return;
+            }
+
+            var disc = 0;
+            if(c.type === "flat") disc = c.discount;
+            else if(c.type === "percent") {
+                disc = Math.round((subtotal * c.percent) / 100);
+                if(c.maxDiscount && disc > c.maxDiscount) disc = c.maxDiscount;
+            }
+
+            appliedCoupon = { code: code, discount: disc };
+            msg.innerText = "🎉 Coupon '" + code + "' applied! ₹" + disc + " OFF";
+            msg.style.color = "#16a34a";
+            updateCartUI();
+        };
+
+        // Cart UI with Strict Out-Of-Stock Detection
         function updateCartUI() {
             var cart = getStoredCart();
             var totalUnits = 0;
             var subtotal = 0;
+            var hasOutOfStock = false;
 
             cart.forEach(function(item) {
+                var p = allProducts.find(function(x){ return x.id === item.id; }) || item;
+                var out = isOutOfStock(p) || !isProductAvailableForPincode(p);
+                if (out) hasOutOfStock = true;
+
                 var q = Number(item.qty) || 1;
-                var p = Number(item.price) || 0;
+                var pr = Number(item.price) || 0;
                 totalUnits += q;
-                subtotal += (p * q);
+                if (!out) subtotal += (pr * q);
             });
 
             var badge = document.getElementById('cart-count');
             if (badge) badge.innerText = totalUnits;
 
             var container = document.getElementById('cart-items');
+            var outBanner = document.getElementById('cartOutOfStockBanner');
+            var btnCheckout = document.getElementById('btnOpenCheckout');
+
+            if (outBanner) outBanner.style.display = hasOutOfStock ? 'block' : 'none';
+            if (btnCheckout) {
+                btnCheckout.disabled = hasOutOfStock || cart.length === 0;
+                btnCheckout.innerText = hasOutOfStock ? "REMOVE OUT-OF-STOCK TO ORDER" : "PLACE ORDER";
+                btnCheckout.style.background = hasOutOfStock ? "#dc2626" : "#16a34a";
+            }
+
             if (!container) return;
 
             if (cart.length === 0) {
@@ -811,20 +1077,24 @@
                 document.getElementById('cart-subtotal').innerText = '0';
                 document.getElementById('delivery-charge').innerText = '0';
                 document.getElementById('cart-total').innerText = '0';
+                if(document.getElementById('cartDiscountRow')) document.getElementById('cartDiscountRow').style.display = 'none';
                 return;
             }
 
             var html = '';
             cart.forEach(function(item, i) {
+                var p = allProducts.find(function(x){ return x.id === item.id; }) || item;
                 var itemQty = Number(item.qty) || 1;
                 var itemPrice = Number(item.price) || 0;
                 var itemTotal = itemPrice * itemQty;
                 var displayImg = (item.images && item.images.length > 0) ? item.images[0] : (item.imageUrl || 'https://via.placeholder.com/50');
-                
-                html += '<div class="cart-item">' +
+                var out = isOutOfStock(p) || !isProductAvailableForPincode(p);
+
+                html += '<div class="cart-item ' + (out ? 'cart-item-out-of-stock' : '') + '">' +
                     '<img src="' + displayImg + '">' +
                     '<div style="flex:1;">' +
                         '<strong style="font-size:13px; color:#166534;">' + item.name + '</strong><br>' +
+                        (out ? '<span style="color:#dc2626; font-size:11px; font-weight:800; display:block;">❌ OUT OF STOCK (Please remove)</span>' : '') +
                         '<small style="color:#64748b;">₹' + itemPrice + (item.selectedSize ? ' (' + item.selectedSize + ')' : '') + '</small><br>' +
                         '<div class="qty-controls">' +
                             '<button type="button" class="qty-btn" onclick="window.changeCartQty(' + i + ', -1)">−</button>' +
@@ -833,15 +1103,30 @@
                         '</div>' +
                         '<span style="font-size:12px; font-weight:bold; margin-left:8px; color:#15803d;">= ₹' + itemTotal + '</span>' +
                     '</div>' +
-                    '<button onclick="window.removeFromCart(' + i + ')" style="background:none; border:none; color:red; font-size:16px; font-weight:bold; cursor:pointer;">✕</button>' +
+                    '<button onclick="window.removeFromCart(' + i + ')" style="background:#fee2e2; border:1px solid #fecaca; color:#dc2626; font-size:12px; font-weight:bold; cursor:pointer; padding:5px 8px; border-radius:6px;">Remove</button>' +
                 '</div>';
             });
 
             container.innerHTML = html;
             var del = (subtotal > 0 && subtotal < 100) ? 20 : 0;
+            var discAmt = appliedCoupon ? appliedCoupon.discount : 0;
+            if (discAmt > subtotal) discAmt = subtotal;
+
+            var discRow = document.getElementById('cartDiscountRow');
+            if (discRow) {
+                if (discAmt > 0) {
+                    discRow.style.display = 'flex';
+                    document.getElementById('appliedCouponCode').innerText = appliedCoupon.code;
+                    document.getElementById('cart-discount').innerText = discAmt;
+                } else {
+                    discRow.style.display = 'none';
+                }
+            }
+
+            var finalTotal = Math.max(0, subtotal - discAmt) + del;
             document.getElementById('cart-subtotal').innerText = subtotal;
             document.getElementById('delivery-charge').innerText = del;
-            document.getElementById('cart-total').innerText = (subtotal + del);
+            document.getElementById('cart-total').innerText = finalTotal;
         }
 
         window.changeCartQty = function(index, delta) {
@@ -861,6 +1146,10 @@
         window.addToCart = function(prodId) {
             var p = allProducts.find(function(x){ return x.id === prodId; });
             if (!p) return;
+            if (isOutOfStock(p) || !isProductAvailableForPincode(p)) { 
+                alert('यह product अभी Out of Stock है। Order नहीं किया जा सकता।'); 
+                return; 
+            }
 
             var cart = getStoredCart();
             var existing = cart.find(function(i){ return i.id === prodId && !i.selectedSize; });
@@ -887,58 +1176,168 @@
         };
 
         // ==========================================
-        // FLIPKART-STYLE AI/ML PREFERENCE RANKER
+        // SMART HINDI, HINGLISH & FUZZY SEARCH ENGINE
         // ==========================================
-        function getRankedProducts(productsList) {
-            var profile = JSON.parse(localStorage.getItem('ksindo_user_dna') || '{}');
-            var now = Date.now();
-            var decayWindow = 7 * 24 * 60 * 60 * 1000;
+        var HINDI_SYNONYM_DICT = {
+            'आलू': ['aloo', 'potato', 'aalu', 'alu', 'allu'],
+            'टमाटर': ['tamatar', 'tomato', 'tamator', 'tamatr'],
+            'प्याज': ['pyaj', 'onion', 'pyaaj', 'kanda', 'pyaz'],
+            'कांदा': ['pyaj', 'onion', 'kanda'],
+            'लहसुन': ['lahsun', 'garlic', 'lehsun'],
+            'अदरक': ['adrak', 'ginger'],
+            'मिर्च': ['mirchi', 'chilli', 'chili', 'mirch'],
+            'धनिया': ['dhaniya', 'coriander'],
+            'सेब': ['apple', 'seb', 'saeb'],
+            'केला': ['banana', 'kela', 'kelaa'],
+            'आम': ['mango', 'aam'],
+            'संतरा': ['orange', 'santra'],
+            'अनार': ['pomegranate', 'anaar', 'anar'],
+            'दूध': ['milk', 'doodh', 'dudh'],
+            'दही': ['curd', 'dahi'],
+            'पनीर': ['paneer', 'cheese', 'panir'],
+            'मक्खन': ['butter', 'makhan'],
+            'घी': ['ghee', 'ghi'],
+            'अंडा': ['egg', 'anda', 'ande'],
+            'अंडे': ['egg', 'anda', 'ande'],
+            'साड़ी': ['saree', 'sari', 'shari', 'saari'],
+            'साड़ी': ['saree', 'sari', 'saari'],
+            'कुर्ती': ['kurti', 'kurta', 'kurtiya'],
+            'सूट': ['suit', 'salwar'],
+            'चुनरी': ['chunri', 'chunari', 'chunar', 'mata', 'pooja', 'shringar'],
+            'श्रृंगार': ['shringar', 'beauty', 'makeup', 'cosmetics'],
+            'शृंगार': ['shringar', 'beauty', 'makeup'],
+            'पूजा': ['pooja', 'puja', 'hawan', 'agarbatti', 'dhoop'],
+            'अगरबत्ती': ['agarbatti', 'dhoop', 'incense'],
+            'तेल': ['oil', 'tel', 'mustard'],
+            'चावल': ['rice', 'chawal'],
+            'दाल': ['dal', 'daal', 'pulses'],
+            'आटा': ['atta', 'aata', 'flour'],
+            'चीनी': ['sugar', 'cheeni', 'shakkar'],
+            'नमक': ['salt', 'namak'],
+            'मसाला': ['masala', 'spices'],
+            'चाय': ['tea', 'chai', 'patti'],
+            'कॉफी': ['coffee', 'koffee'],
+            'बिस्कुट': ['biscuit', 'cookies', 'biscut'],
+            'नमकीन': ['namkeen', 'bhujia', 'sev'],
+            'चिप्स': ['chips', 'wafers'],
+            'बर्गर': ['burger', 'fastfood', 'food'],
+            'बरगर': ['burger', 'fastfood', 'food'],
+            'चाउमीन': ['chowmein', 'noodles', 'chow', 'chaumin'],
+            'पिज्जा': ['pizza', 'pija'],
+            'रोल': ['roll', 'kathi'],
+            'मोमोज': ['momos', 'dumpling'],
+            'मिठाई': ['sweet', 'mithai', 'laddu', 'rasgulla', 'gulab'],
+            'कपड़ा': ['cloth', 'fashion', 'kapda', 'dress'],
+            'कपड़े': ['clothes', 'fashion', 'kapde'],
+            'जींस': ['jeans', 'denim', 'pant'],
+            'पैंट': ['pant', 'trousers'],
+            'टीशर्ट': ['tshirt', 't-shirt', 'tee'],
+            'शर्ट': ['shirt'],
+            'जूता': ['shoes', 'shoe', 'footwear'],
+            'चप्पल': ['chappal', 'slipper', 'sandals'],
+            'लिपस्टिक': ['lipstick', 'beauty', 'makeup'],
+            'क्रीम': ['cream', 'lotion', 'skincare'],
+            'साबुन': ['soap', 'bath'],
+            'शैम्पू': ['shampoo', 'haircare'],
+            'मोबाइल': ['mobile', 'phone', 'smartphone'],
+            'कवर': ['cover', 'case']
+        };
 
-            var weights = {};
-            for (var cat in profile) {
-                var elapsed = now - (profile[cat].lastActive || now);
-                var decayFactor = Math.max(0.2, 1 - (elapsed / decayWindow)); 
-                var finalScore = (profile[cat].score || 0) * decayFactor;
+        // Clean & Normalize text (compress duplicate letters e.g. 'alloo' -> 'alu', 'saari' -> 'sari')
+        function normalizeSearchText(txt) {
+            if(!txt) return '';
+            return txt.toLowerCase()
+                .replace(/([a-z]) +/g, '$1') // e.g. aloo -> alo, saree -> sare
+                .replace(/[^a-z0-9ऀ-ॿ\s]/gi, ' ')
+                .trim();
+        }
 
-                if (finalScore >= 5) {
-                    weights[cat] = finalScore;
+        // Levenshtein distance for typo tolerance
+        function editDistance(s1, s2) {
+            if (s1.length < s2.length) return editDistance(s2, s1);
+            if (s2.length === 0) return s1.length;
+            var prev = [];
+            for (var i = 0; i <= s2.length; i++) prev[i] = i;
+            for (var j = 0; j < s1.length; j++) {
+                var curr = [j + 1];
+                for (var k = 0; k < s2.length; k++) {
+                    var cost = (s1[j] === s2[k]) ? 0 : 1;
+                    curr[k + 1] = Math.min(curr[k] + 1, prev[k + 1] + 1, prev[k] + cost);
+                }
+                prev = curr;
+            }
+            return prev[s2.length];
+        }
+
+        // Match single query token against text
+        function isFuzzyTokenMatch(queryToken, targetText) {
+            if (!queryToken || !targetText) return false;
+            var tLow = targetText.toLowerCase();
+            if (tLow.includes(queryToken)) return true;
+
+            var qNorm = normalizeSearchText(queryToken);
+            var tNorm = normalizeSearchText(targetText);
+            if (tNorm.includes(qNorm)) return true;
+
+            // Check Hindi dictionary translation
+            for (var hindiWord in HINDI_SYNONYM_DICT) {
+                if (queryToken.includes(hindiWord)) {
+                    var synList = HINDI_SYNONYM_DICT[hindiWord];
+                    for (var s = 0; s < synList.length; s++) {
+                        if (tLow.includes(synList[s])) return true;
+                    }
                 }
             }
 
-            return productsList.map(function(item) {
-                var itemCat = (item.category || '').toLowerCase().trim();
-                var catWeight = weights[itemCat] || 0;
-
-                var discountBoost = 0;
-                if (item.originalPrice && Number(item.originalPrice) > Number(item.price)) {
-                    discountBoost = ((Number(item.originalPrice) - Number(item.price)) / Number(item.originalPrice)) * 2;
+            // Word-level edit distance for typos (e.g. 'tamator' vs 'tamatar', 'potatto' vs 'potato')
+            if (queryToken.length >= 4) {
+                var words = tLow.split(/\s+/);
+                for (var w = 0; w < words.length; w++) {
+                    var wd = words[w];
+                    if (wd.length >= 4 && Math.abs(wd.length - queryToken.length) <= 2) {
+                        var dist = editDistance(queryToken, wd);
+                        if (dist <= 2) return true;
+                    }
                 }
+            }
 
-                var rankScore = (catWeight * 10) + discountBoost;
-                return { product: item, rank: rankScore };
-            }).sort(function(a, b) {
-                return b.rank - a.rank;
-            }).map(function(wrapper) {
-                return wrapper.product;
-            });
+            return false;
         }
 
-        // ==========================================
-        // RENDER FILTERED PRODUCTS WITH AI PERSONALIZATION
-        // ==========================================
-        function renderFilteredProducts() {
-            var savedLoc = null; try { savedLoc = JSON.parse(localStorage.getItem('ksindo_delivery_location') || 'null'); } catch(e) {}
-            var selectedPin = savedLoc && savedLoc.pincode ? String(savedLoc.pincode) : '';
+        var searchDebounceTimer = null;
+        window.handleSearchDebounced = function() {
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(window.handleSearch, 150);
+        };
+
+        window.handleSearch = function() {
+            var rawQuery = (document.getElementById('search-input').value || '').trim();
+            if (!rawQuery) {
+                renderFilteredProducts();
+                return;
+            }
+
+            var tokens = rawQuery.toLowerCase().split(/\s+/).filter(Boolean);
             var list = allProducts.filter(function(p){
-                var notFood = (p.category || '').toLowerCase() !== 'food' && (!p.categories || !p.categories.includes('food'));
-                if (!notFood) return false;
-                if (!selectedPin) return true;
-                var supported = p.servicePincodes || p.servicePinCodes || p.availablePincodes || null;
-                if (typeof supported === 'string') supported = supported.split(/[ ,;]+/).filter(Boolean);
-                var productPin = p.pincode || p.shopPincode || p.sellerPincode || '';
-                if (Array.isArray(supported) && supported.length) return supported.map(String).includes(selectedPin);
-                if (productPin) return String(productPin) === selectedPin;
-                return true; // Products without a service-area field remain globally visible.
+                var isFood = (p.category || '').toLowerCase() === 'food' || (p.categories && p.categories.includes('food'));
+                if (isFood) return false;
+
+                var pTarget = (p.name || '') + ' ' + (p.category || '') + ' ' + (p.subCategory || '') + ' ' + (p.description || '') + ' ' + (p.festivalTag || '');
+
+                // Product matches if EVERY query token has at least one fuzzy/synonym match
+                return tokens.every(function(tok){
+                    return isFuzzyTokenMatch(tok, pTarget);
+                });
+            });
+
+            list = list.filter(isProductAvailableForPincode);
+            renderProductGridFromList(list);
+        };
+
+        // Render Catalog Grid
+        function renderFilteredProducts() {
+            var list = allProducts.filter(function(p){
+                return (p.category || '').toLowerCase() !== 'food' && (!p.categories || !p.categories.includes('food'));
             });
 
             if (activeCategory !== 'all') {
@@ -950,15 +1349,20 @@
                 if (activeSubCategory !== 'all') {
                     list = list.filter(function(p){ return (p.subCategory || '').toLowerCase() === activeSubCategory; });
                 }
-            } else {
-                list = getRankedProducts(list);
             }
 
+            list = list.filter(isProductAvailableForPincode);
+            renderProductGridFromList(list);
+        }
+
+        function renderProductGridFromList(list) {
             var grid = document.getElementById('generalProductGrid');
             if (!grid) return;
 
             if (list.length === 0) {
-                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:30px; color:#64748b;">Is category me koi product nahi mila.</p>';
+                var currentPin = getCustomerPincode();
+                var pinNotice = currentPin ? '<br><small style="color:#eab308; display:block; margin-top:8px;">Pincode (' + currentPin + ') par products available nahi hain. Sabhi products dekhne ke liye <button onclick="window.clearPincodeFilter()" style="background:#16a34a; color:white; border:none; padding:4px 10px; border-radius:6px; cursor:pointer; font-weight:bold; margin-left:6px;">View All Items</button></small>' : '';
+                grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px 15px; color:#64748b;"><p style="font-weight:700; font-size:14px;">Koi product nahi mila.</p>' + pinNotice + '</div>';
                 return;
             }
 
@@ -970,7 +1374,9 @@
                 var origVal = p.originalPrice || (p.sizes && p.sizes[0]?.originalPrice) || '';
                 var origMarkup = (origVal && Number(origVal) > Number(p.price)) ? '<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:6px;">₹' + origVal + '</span>' : '';
 
-                html += '<div class="product-card">' +
+                var unavailable = isOutOfStock(p) || !isProductAvailableForPincode(p);
+
+                html += '<div class="product-card ' + (unavailable ? 'stock-unavailable' : '') + '">' +
                     '<img src="' + img + '" class="card-main-img" loading="lazy" decoding="async" alt="' + p.name + '" onclick="window.openProductDetail(\'' + p.id + '\')">' +
                     '<div class="product-title" onclick="window.openProductDetail(\'' + p.id + '\')">' + p.name + '</div>' +
                     '<div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">' +
@@ -978,9 +1384,10 @@
                         origMarkup +
                         discBadge +
                     '</div>' +
+                    (unavailable ? '<div class="stock-label">OUT OF STOCK</div>' : '') +
                     '<div style="display:flex; gap:6px;">' +
-                        '<button class="add-btn-round" onclick="window.addToCart(\'' + p.id + '\')">🛒 Add</button>' +
-                        '<button class="buy-now-round" onclick="window.buyNow(\'' + p.id + '\')">⚡ Buy</button>' +
+                        '<button class="add-btn-round" ' + (unavailable ? 'disabled' : '') + ' onclick="window.addToCart(\'' + p.id + '\')">' + (unavailable ? 'Sold Out' : '🛒 Add') + '</button>' +
+                        '<button class="buy-now-round" ' + (unavailable ? 'disabled' : '') + ' onclick="window.buyNow(\'' + p.id + '\')">⚡ Buy</button>' +
                     '</div>' +
                 '</div>';
             }
@@ -991,9 +1398,7 @@
             renderFilteredProducts();
         }
 
-        // ==========================================
-        // DYNAMIC CATEGORY & SUB-CATEGORY CONTROLLER
-        // ==========================================
+        // Category & Subcategory handlers
         window.filterCategory = function(cat, el) {
             document.querySelectorAll('.icon-item').forEach(function(b){ b.classList.remove('active'); });
             if (el) el.classList.add('active');
@@ -1038,52 +1443,106 @@
             renderFilteredProducts();
         };
 
-        window.handleSearch = function() {
-            var q = (document.getElementById('search-input').value || '').toLowerCase().trim();
-            var list = allProducts.filter(function(p){
-                var isFood = (p.category || '').toLowerCase() === 'food' || (p.categories && p.categories.includes('food'));
-                if (isFood) return false;
-                return (p.name || '').toLowerCase().includes(q) || (p.subCategory || '').toLowerCase().includes(q);
-            });
-            var grid = document.getElementById('generalProductGrid');
-            if (list.length === 0) {
-                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:30px; color:#64748b;">Koi item nahi mila.</p>';
-                return;
+        // CHECKOUT OFFER SYSTEM (From index 1.html)
+        var activeCheckoutOffer = null, unlockedOffer = null;
+        function customerOfferKey(){
+            if(currentUser && currentUser.uid) return currentUser.uid;
+            var guest = localStorage.getItem('ksindo_guest_id');
+            if(!guest){
+                guest = 'guest_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+                localStorage.setItem('ksindo_guest_id', guest);
             }
-            var html = '';
-            list.forEach(function(p){
-                var img = (p.images && p.images.length > 0) ? p.images[0] : (p.imageUrl || 'https://via.placeholder.com/200');
-                var discBadge = getDiscountMarkup(p);
-                var origVal = p.originalPrice || '';
-                var origMarkup = (origVal && Number(origVal) > Number(p.price)) ? '<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:6px;">₹' + origVal + '</span>' : '';
+            return ((currentUserProfile && currentUserProfile.userEmail) || guest).replace(/[^a-zA-Z0-9_-]/g,'_');
+        }
 
-                html += '<div class="product-card">' +
-                    '<img src="' + img + '" class="card-main-img" loading="lazy" alt="' + p.name + '" onclick="window.openProductDetail(\'' + p.id + '\')">' +
-                    '<div class="product-title" onclick="window.openProductDetail(\'' + p.id + '\')">' + p.name + '</div>' +
-                    '<div style="margin:6px 0; display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">' +
-                        '<span style="font-size:18px; font-weight:900; color:#15803d;">₹' + p.price + '</span>' +
-                        origMarkup +
-                        discBadge +
-                    '</div>' +
-                    '<div style="display:flex; gap:6px;">' +
-                        '<button class="add-btn-round" onclick="window.addToCart(\'' + p.id + '\')">🛒 Add</button>' +
-                        '<button class="buy-now-round" onclick="window.buyNow(\'' + p.id + '\')">⚡ Buy</button>' +
-                    '</div>' +
-                '</div>';
-            });
-            grid.innerHTML = html;
+        async function loadCheckoutOffer(){
+            var panel = document.getElementById('checkoutOfferPanel'); 
+            if(!panel) return;
+            try {
+                var snap = await db.collection('checkoutOffers').where('active','==',true).limit(1).get(); 
+                if(snap.empty){ panel.style.display='none'; activeCheckoutOffer=null; return; }
+                
+                var d = snap.docs[0];
+                activeCheckoutOffer = { id: d.id, ...d.data() };
+                var cart = getStoredCart();
+                var subtotal = cart.reduce((a,i)=>a+(Number(i.price)||0)*(Number(i.qty)||1),0);
+                var min = Number(activeCheckoutOffer.minimumAmount || activeCheckoutOffer.unlockAmount || 0);
+
+                panel.style.display = 'block';
+                document.getElementById('checkoutOfferContent').textContent = (activeCheckoutOffer.name || 'Special gift') + ' — unlock at ₹' + min + '. ' + (subtotal >= min ? 'You are eligible!' : 'Add ₹' + Math.max(0, min - subtotal).toFixed(0) + ' more to unlock.');
+                
+                var key = customerOfferKey();
+                var countDoc = await db.collection('checkoutOfferUsage').doc(key + '_' + d.id).get();
+                var count = countDoc.exists ? Number(countDoc.data().count || 0) : 0;
+                var max = Math.min(3, Math.max(1, Number(activeCheckoutOffer.maxPerCustomer || 3)));
+                var btn = document.getElementById('unlockCheckoutOfferBtn');
+                btn.disabled = subtotal < min || count >= max;
+                btn.textContent = count >= max ? 'Offer limit reached' : (subtotal < min ? 'Add more to unlock' : 'Unlock Offer');
+            } catch(e) {
+                panel.style.display = 'none';
+                console.warn('Offer load error:', e.message);
+            }
+        }
+
+        window.unlockCheckoutOffer = async function(){
+            if(!activeCheckoutOffer) return;
+            var key = customerOfferKey();
+            var cart = getStoredCart();
+            var subtotal = cart.reduce((a,i)=>a+(Number(i.price)||0)*(Number(i.qty)||1),0);
+            var min = Number(activeCheckoutOffer.minimumAmount || activeCheckoutOffer.unlockAmount || 0);
+            if(subtotal < min) return alert('Offer unlock amount complete karein.');
+
+            try {
+                var usageRef = db.collection('checkoutOfferUsage').doc(key + '_' + activeCheckoutOffer.id);
+                await db.runTransaction(async tx => {
+                    var ds = await tx.get(usageRef);
+                    var n = ds.exists ? Number(ds.data().count || 0) : 0;
+                    var max = Math.min(3, Math.max(1, Number(activeCheckoutOffer.maxPerCustomer || 3)));
+                    if(n >= max) throw new Error('Is customer ID se maximum 3 unlock hi allowed hain.');
+                    tx.set(usageRef, { count: n + 1, customerKey: key, offerId: activeCheckoutOffer.id, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+                });
+
+                unlockedOffer = { 
+                    id: activeCheckoutOffer.id, 
+                    name: activeCheckoutOffer.name || 'Offer Item', 
+                    price: Number(activeCheckoutOffer.offerPrice || 0), 
+                    imageUrl: activeCheckoutOffer.imageUrl || '', 
+                    qty: 1, 
+                    isOfferItem: true 
+                };
+
+                document.getElementById('checkoutOfferContent').textContent = 'Unlocked: ' + unlockedOffer.name + ' (₹' + unlockedOffer.price + ')';
+                document.getElementById('unlockCheckoutOfferBtn').disabled = true;
+                document.getElementById('unlockCheckoutOfferBtn').textContent = 'Unlocked';
+            } catch(e) {
+                alert(e.message || 'Offer unlock nahi ho saka.');
+            }
         };
 
         window.openCheckoutModal = function() {
             var cart = getStoredCart();
             if (cart.length === 0) return alert("Cart khali hai!");
+
+            // Check if any cart item is out of stock
+            var hasOut = cart.some(function(i){
+                var p = allProducts.find(x => x.id === i.id) || i;
+                return isOutOfStock(p) || !isProductAvailableForPincode(p);
+            });
+            if (hasOut) {
+                alert("Cart mein out-of-stock product hai. Order karne se pehle use cart se remove karein!");
+                window.toggleCart();
+                return;
+            }
+
             var profile = currentUserProfile || JSON.parse(localStorage.getItem('user_profile') || '{}');
             document.getElementById('custName').value = profile.fullName || '';
             document.getElementById('custPhone').value = profile.phone || '';
-            document.getElementById('custPincode').value = profile.pincode || '';
+            document.getElementById('custPincode').value = profile.pincode || getCustomerPincode() || '847226';
             document.getElementById('custAddress').value = profile.address || '';
             document.getElementById('cart-modal').classList.remove('open');
             document.getElementById('checkout-overlay').classList.add('active');
+            unlockedOffer = null; 
+            loadCheckoutOffer();
         };
 
         window.closeCheckoutModal = function() {
@@ -1095,16 +1554,38 @@
             e.preventDefault();
 
             var cart = getStoredCart();
+            var unavailable = cart.filter(function(i){
+                var p = allProducts.find(function(x){ return x.id === i.id; });
+                return !p || isOutOfStock(p) || !isProductAvailableForPincode(p);
+            });
+
+            if (unavailable.length > 0) {
+                alert('Cart mein out-of-stock product hai. Order karne se pehle use cart se remove karein!');
+                return;
+            }
+
+            if (unlockedOffer) cart = cart.concat([unlockedOffer]);
+
             var profile = currentUserProfile || JSON.parse(localStorage.getItem('user_profile') || '{}');
             var email = currentUser ? currentUser.email : (profile.userEmail || 'customer@ksindo.local');
 
             var name = document.getElementById('custName').value.trim();
             var phone = document.getElementById('custPhone').value.trim();
             var pincode = document.getElementById('custPincode').value.trim();
+            if (!/^\d{6}$/.test(pincode)) { alert('Valid 6-digit pincode enter karein.'); return; }
+            
+            
             var address = document.getElementById('custAddress').value.trim();
             var subtotalVal = Number(document.getElementById('cart-subtotal').innerText);
             var deliveryChargeVal = Number(document.getElementById('delivery-charge').innerText);
             var totalAmount = document.getElementById('cart-total').innerText;
+            var discAmt = appliedCoupon ? appliedCoupon.discount : 0;
+
+            if (unlockedOffer) {
+                subtotalVal += Number(unlockedOffer.price) || 0;
+                totalAmount = String((Number(totalAmount) || 0) + (Number(unlockedOffer.price) || 0));
+            }
+
             var deliveryOtp = Math.floor(1000 + Math.random() * 9000).toString();
 
             db.collection("orders").add({
@@ -1117,6 +1598,8 @@
                 items: cart,
                 subtotal: subtotalVal,
                 deliveryCharge: deliveryChargeVal,
+                discount: discAmt,
+                couponCode: appliedCoupon ? appliedCoupon.code : null,
                 totalAmount: totalAmount,
                 status: "Placed",
                 deliveryOtp: deliveryOtp,
@@ -1125,12 +1608,13 @@
             }).then(function(){
                 alert("🎉 Order Confirm ho gaya!\n\nOTP: " + deliveryOtp + "\nPayment: COD / UPI");
                 saveStoredCart([]);
+                appliedCoupon = null;
                 window.closeCheckoutModal();
                 window.open('https://wa.me/' + deliveryBoyWhatsAppNumber + '?text=' + encodeURIComponent('🚚 *Naya Order (ksindo)*\nClient: ' + name + '\nPhone: ' + phone + '\nTotal: ₹' + totalAmount + '\nOTP: ' + deliveryOtp), '_blank');
             }).catch(function(err){ alert("Error: " + err.message); });
         });
 
-        // Toggle User Menu Dropdown
+        // User Icon & Auth handling
         window.handleUserIconClick = function() {
             document.getElementById('userMenuDropdown').classList.toggle('show');
         };
@@ -1169,7 +1653,6 @@
                 db.collection("users").doc(user.uid).get().then(function(doc){
                     if (doc.exists) {
                         currentUserProfile = doc.data();
-                        if(currentUserProfile.approvalStatus && currentUserProfile.approvalStatus !== 'approved'){auth.signOut();alert('Your account is pending admin approval.');return;}
                         localStorage.setItem('user_profile', JSON.stringify(currentUserProfile));
                         headerText.innerText = currentUserProfile.fullName || "Customer";
                     }
@@ -1252,8 +1735,11 @@
                 var address = document.getElementById('regAddress').value.trim();
 
                 auth.createUserWithEmailAndPassword(email, password).then(function(cred){
-                    var profile = { fullName: name, phone: phone, pincode: pincode, address: address, userEmail: email, termsAccepted: true, approvalStatus: 'pending', accountType: 'customer', createdAt: firebase.firestore.FieldValue.serverTimestamp() };
-                    db.collection("users").doc(cred.user.uid).set(profile).then(function(){return auth.signOut();}).then(function(){localStorage.removeItem('user_profile');alert("Registration request submit ho gayi. Admin approval ke baad account activate hoga. Approval ke baad email par password setup/reset link bheja ja sakta hai.");window.closeAuthModal();}).catch(function(err){alert('Request save nahi hui: '+err.message);});
+                    var profile = { fullName: name, phone: phone, pincode: pincode, address: address, userEmail: email, termsAccepted: true };
+                    db.collection("users").doc(cred.user.uid).set(profile);
+                    localStorage.setItem('user_profile', JSON.stringify(profile));
+                    alert("Account successfully create ho gaya!");
+                    window.closeAuthModal();
                 }).catch(function(err){ 
                     alert("Registration failed: " + err.message); 
                 }).finally(function(){ 
@@ -1261,8 +1747,9 @@
                     btn.disabled = false; 
                 });
             } else {
-                auth.signInWithEmailAndPassword(email, password).then(function(cred){
-                    return db.collection('users').doc(cred.user.uid).get().then(function(doc){var profile=doc.exists?doc.data():null;if(!profile || (profile.approvalStatus && profile.approvalStatus !== 'approved')){return auth.signOut().then(function(){throw new Error('Your account is awaiting admin approval. Please try again after approval.');});}alert("Welcome back! Login successful.");window.closeAuthModal();});
+                auth.signInWithEmailAndPassword(email, password).then(function(){
+                    alert("Welcome back! Login successful.");
+                    window.closeAuthModal();
                 }).catch(function(err){ 
                     alert("Login failed: " + err.message); 
                 }).finally(function(){ 
@@ -1305,7 +1792,7 @@
             }).catch(function(err){ alert(err.message); });
         });
 
-        // HELPER: MODERN STEP TRACKER BAR GENERATOR
+        // Step Tracker Bar Helper
         function getModernStepBar(status) {
             var st = (status || 'Placed').toLowerCase();
             if (st === 'cancelled') {
@@ -1327,7 +1814,7 @@
             '</div>';
         }
 
-        // MODERN ORDERS & HISTORY TRACKER
+        // Live Orders & History Tracker
         window.openOrdersTab = function(type) {
             document.getElementById('userMenuDropdown').classList.remove('show');
             var email = currentUser ? currentUser.email : null;
@@ -1433,7 +1920,6 @@
             });
         };
 
-        // DELETE ORDER FROM HISTORY
         window.deleteOrderHistory = function(orderId) {
             if (!orderId) return;
             if (confirm("Kya aap is order ko history se permanently hatana chahte hain?")) {
@@ -1449,16 +1935,14 @@
             document.getElementById('orders-modal-overlay').classList.remove('active');
         };
 
-        // SAFE REALTIME DATA SYNC WITH LEAN PAYLOAD (PREVENTS QuotaExceededError)
-        db.collection("products").onSnapshot(function(snap) {
-            allProducts = [];
+        // FAST FIRST-PAINT PRODUCT LOADER
+        function applyProductSnapshot(snap) {
+            allProducts = []; 
             var leanPayload = [];
-
-            snap.forEach(function(d){ 
+            snap.forEach(function(d){
                 var data = d.data();
                 var item = { id: d.id, ...data };
                 allProducts.push(item);
-
                 leanPayload.push({
                     id: d.id,
                     name: data.name || '',
@@ -1467,26 +1951,45 @@
                     category: data.category || '',
                     subCategory: data.subCategory || '',
                     categories: data.categories || [],
-                    imageUrl: data.imageUrl || (data.images && data.images[0]) || ''
+                    imageUrl: data.imageUrl || (data.images && data.images[0]) || '',
+                    inStock: data.inStock,
+                    stockStatus: data.stockStatus,
+                    stock: data.stock,
+                    availablePincodes: data.availablePincodes || data.pincodes || []
                 });
             });
 
             try {
                 localStorage.setItem('cached_products', JSON.stringify(leanPayload));
-            } catch(e) {
-                console.warn("Storage quota warning, clearing old cache...");
-                try {
-                    localStorage.removeItem('cached_products');
-                    localStorage.setItem('cached_products', JSON.stringify(leanPayload.slice(0, 40)));
-                } catch(err) {}
-            }
+            } catch(e) {}
 
             renderFilteredProducts();
+            updateCartUI();
+        }
+
+        // Fast Paint: Limit 15 first, then hydrate full catalog
+        db.collection("products").limit(15).onSnapshot(function(firstSnap){
+            applyProductSnapshot(firstSnap);
+            setTimeout(function(){
+                db.collection("products").get().then(function(fullSnap){
+                    applyProductSnapshot(fullSnap);
+                    db.collection("products").onSnapshot(applyProductSnapshot);
+                }).catch(function(e){
+                    console.warn('Full catalog load fallback', e);
+                    db.collection("products").onSnapshot(applyProductSnapshot);
+                });
+            }, 250);
         });
 
+        // Ads Sync
         db.collection("ads").onSnapshot(function(snap) {
             var track = document.getElementById('multiAdsTrack');
-            if (snap.empty) return;
+            var slot = document.getElementById('adsSlot');
+            if (snap.empty) { 
+                if(slot) slot.style.display = 'none'; 
+                if(track) track.innerHTML = ''; 
+                return; 
+            }
             var html = '';
             snap.forEach(function(d){
                 var ad = d.data();
@@ -1498,16 +2001,18 @@
                 }
             });
             track.innerHTML = html;
+            if(slot) slot.style.display = html.trim() ? 'block' : 'none';
         });
 
-        // Direct Checkout Handshake from product.html Buy Now
         window.addEventListener('DOMContentLoaded', function() {
             updateCartUI();
+            // Seamless location-based catalog update on load
+            if (typeof renderFilteredProducts === 'function') {
+                renderFilteredProducts();
+            }
             if (localStorage.getItem('open_checkout_direct') === 'true') {
                 localStorage.removeItem('open_checkout_direct');
-                setTimeout(function(){
-                    window.openCheckoutModal();
-                }, 250);
+                setTimeout(function(){ window.openCheckoutModal(); }, 250);
             }
         });
 
@@ -1520,104 +2025,44 @@
             });
         }
 
-       // PWA Custom Bottom Popup Controller
-let deferredPWAEvent = null;
+        // PWA Bottom Banner Controller
+        let deferredPWAEvent = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPWAEvent = e;
+            if (localStorage.getItem('pwa_banner_dismissed') !== 'true') {
+                setTimeout(() => {
+                    const banner = document.getElementById('pwaBottomBanner');
+                    if (banner) banner.classList.add('show');
+                }, 1500);
+            }
+        });
 
-window.addEventListener('beforeinstallprompt', (e) => {
-    // Default mini-infobar ko rok kar apna popup dikhayenge
-    e.preventDefault();
-    deferredPWAEvent = e;
-
-    // Agar user ne pehle dismiss nahi kiya hai to popup show karein
-    if (sessionStorage.getItem('pwa_banner_dismissed') !== 'true') {
-        setTimeout(() => {
+        window.triggerPWAInstall = async () => {
             const banner = document.getElementById('pwaBottomBanner');
-            if (banner) banner.classList.add('show');
-        }, 1500); // 1.5 second baad smooth animation se khulega
-    }
-});
+            if (!deferredPWAEvent) {
+                alert("Mobile menu (3-dots ⋮) par click karke 'Install App' ya 'Add to Home screen' chunein.");
+                return;
+            }
+            deferredPWAEvent.prompt();
+            const { outcome } = await deferredPWAEvent.userChoice;
+            if (outcome === 'accepted') {
+                if (banner) banner.classList.remove('show');
+            }
+            deferredPWAEvent = null;
+        };
 
-// Install Button Click Handler
-window.triggerPWAInstall = async () => {
-    const banner = document.getElementById('pwaBottomBanner');
-    if (!deferredPWAEvent) {
-        // Agar prompt trigger nahi ho saka to chrome menu guide karein
-        alert("Mobile menu (3-dots ⋮) par click karke 'Install App' ya 'Add to Home screen' chunein.");
-        return;
-    }
+        window.dismissPWABanner = () => {
+            const banner = document.getElementById('pwaBottomBanner');
+            if (banner) banner.classList.remove('show');
+            localStorage.setItem('pwa_banner_dismissed', 'true');
+        };
 
-    // Browser ka native install popup open hoga
-    deferredPWAEvent.prompt();
-    const { outcome } = await deferredPWAEvent.userChoice;
-    
-    if (outcome === 'accepted') {
-        console.log('User ne app install kar liya');
-        if (banner) banner.classList.remove('show');
-    }
-    deferredPWAEvent = null;
-};
-
-// Cross (X) Close Button Handler
-window.dismissPWABanner = () => {
-    const banner = document.getElementById('pwaBottomBanner');
-    if (banner) banner.classList.remove('show');
-    // Baar-baar pareshan na kare isliye temporarily remember karega
-    sessionStorage.setItem('pwa_banner_dismissed', 'true');
-};
-
-// Agar app pehle se install ho chuka hai to popup kabhi na dikhaye
-window.addEventListener('appinstalled', () => {
-    const banner = document.getElementById('pwaBottomBanner');
-    if (banner) banner.classList.remove('show');
-    sessionStorage.setItem('pwa_banner_dismissed', 'true');
-    console.log('ksindo App installed successfully!');
-});
+        window.addEventListener('appinstalled', () => {
+            const banner = document.getElementById('pwaBottomBanner');
+            if (banner) banner.classList.remove('show');
+            localStorage.setItem('pwa_banner_dismissed', 'true');
+        });
     </script>
-    <!-- Bottom PWA Install Popup Banner -->
-<div class="pwa-bottom-banner" id="pwaBottomBanner">
-    <div class="pwa-banner-left">
-        <img src="ksindo-icon.svg" alt="KSINDO" class="pwa-banner-icon">
-        <div class="pwa-banner-text">
-            <h4>ksindo App</h4>
-            <p>Fast & Light Shopping App</p>
-        </div>
-    </div>
-    <div class="pwa-banner-actions">
-        <button class="btn-pwa-install" onclick="window.triggerPWAInstall()">Install</button>
-        <button class="btn-pwa-close" onclick="window.dismissPWABanner()">&times;</button>
-    </div>
-</div>
-
-    <a href="grievance.html" aria-label="Help and grievance redressal" style="position:fixed;right:14px;bottom:14px;z-index:900;background:#12306b;color:#fff;padding:10px 14px;border-radius:999px;text-decoration:none;font:600 13px system-ui;box-shadow:0 6px 20px #0f172a33">Help & Complaints</a>
-
-
-
-<script id="ksindo-location-engine">
-(function(){
- const label=document.getElementById('ksindoLocationLabel');
- const detect=document.getElementById('ksindoDetectLocation');
- const manual=document.getElementById('ksindoManualLocation');
- if(!label||!detect||!manual)return;
- function showSaved(){try{const v=JSON.parse(localStorage.getItem('ksindo_delivery_location')||'null');if(v&&v.label)label.textContent=v.label;}catch(e){}}
- function saveLocation(value){localStorage.setItem('ksindo_delivery_location',JSON.stringify(value));label.textContent=value.label;window.dispatchEvent(new CustomEvent('ksindo:locationChanged',{detail:value}));}
- function manualEntry(){const pin=prompt('Enter your 6-digit delivery PIN code:');if(pin===null)return;const clean=pin.trim();if(!/^\d{6}$/.test(clean)){alert('Please enter a valid 6-digit PIN code.');return;}const area=prompt('Enter your area / address (optional):','')||'';saveLocation({type:'pincode',pincode:clean,address:area,label:(area?area+', ':'')+clean});}
- detect.addEventListener('click',function(){if(!navigator.geolocation){alert('Location is not supported in this browser. Enter your PIN code instead.');manualEntry();return;}detect.disabled=true;detect.textContent='Locating…';navigator.geolocation.getCurrentPosition(async function(pos){const lat=pos.coords.latitude,lon=pos.coords.longitude;let place='Location detected';try{const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+encodeURIComponent(lat)+'&lon='+encodeURIComponent(lon));if(r.ok){const d=await r.json();const a=d.address||{};const postcode=(a.postcode||'').replace(/\s/g,'');place=[a.suburb||a.neighbourhood||a.village||a.town||a.city||a.county,a.state_district||a.state].filter(Boolean).join(', ')||place;if(postcode)saveLocation({type:'gps',latitude:lat,longitude:lon,pincode:postcode,label:place});}}catch(e){}if(!(JSON.parse(localStorage.getItem('ksindo_delivery_location')||'{}').pincode))saveLocation({type:'gps',latitude:lat,longitude:lon,label:place});detect.disabled=false;detect.textContent='Refresh location';},function(err){detect.disabled=false;detect.textContent='Use my location';alert('Could not get location. Allow location permission in your browser, or enter PIN code manually.');manualEntry();},{enableHighAccuracy:true,timeout:12000,maximumAge:60000});});
- manual.addEventListener('click',manualEntry);showSaved();
-})();
-</script>
-<nav class="ksindo-mobile-nav" aria-label="Quick navigation">
- <a href="index.html"><span>🏠</span>Home</a><a href="fresh.html"><span>🥦</span>24x7 Fresh</a><a href="fastfood.html"><span>🍔</span>Food</a><a href="javascript:void(0)" onclick="window.toggleCart()"><span>🛒</span>Cart</a><a href="javascript:void(0)" onclick="window.handleUserIconClick()"><span>👤</span>Account</a>
-</nav>
-<footer class="ksindo-global-footer">
- <div class="ksindo-footer-inner">
-  <div><div class="ksindo-footer-brand">KSINDO™</div><p>Everything. One Place. Discover local shops, food, daily essentials and festive products with KSINDO.</p><p>Jaynagar, Madhubani, Bihar</p></div>
-  <div><h4>Shop</h4><a href="index.html">Home & products</a><a href="fresh.html">Fresh daily needs</a><a href="fastfood.html">Food & restaurants</a><a href="seasonable.html">Festive & seasonal</a></div>
-  <div><h4>Partners</h4><a href="seller-center.html">Seller Centre</a><a href="merchant.html">Existing Partner Portal</a><a href="restaurant.html">Restaurant Partner</a><a href="deliveryboy.html">Delivery Partner</a></div>
-  <div><h4>Help & policies</h4><a href="grievance.html">Grievance Redressal</a><a href="about.html">About KSINDO</a><a href="mailto:ksindo.jyg@gmail.com">ksindo.jyg@gmail.com</a><a href="tel:8252731656">8252731656</a></div>
- </div>
- <div class="ksindo-footer-bottom"><span>© <span class="ksindo-year"></span> KSINDO™. All rights reserved.</span><span>Built for local commerce · Customer support and grievance access</span></div>
-</footer>
-<a class="ksindo-help-fab" href="grievance.html" aria-label="Open KSINDO grievance center">☏ Help & Grievance</a>
-<script>(function(){document.querySelectorAll('.ksindo-year').forEach(function(n){n.textContent=new Date().getFullYear()});})();</script>
 </body>
 </html>
