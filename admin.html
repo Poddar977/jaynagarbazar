@@ -250,7 +250,7 @@
                 </div>
             </section>
 
-            <!-- MODULE 1: CREATE SHOP (MultiVendor, Restaurant, Pincode Base, Product List, Stock) -->
+            <!-- MODULE 1: CREATE SHOP -->
             <section id="tab-shops" class="tab-section">
                 <div class="card">
                     <h2>🏪 1. Create Shop & MultiVendor Management</h2>
@@ -284,9 +284,8 @@
                 </div>
             </section>
 
-            <!-- MODULE 2: USER MANAGEMENT & PORTAL CREDENTIALS GENERATOR (Id Password provided by Admin) -->
+            <!-- MODULE 2: USER MANAGEMENT & PORTAL CREDENTIALS GENERATOR -->
             <section id="tab-users" class="tab-section">
-                <!-- Portal ID & Password Issuer -->
                 <div class="card" style="border:1.5px solid #0284c7;">
                     <h2>🔑 Portal Login Credentials Generator (Admin Dwara ID & Password)</h2>
                     <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">
@@ -309,7 +308,6 @@
                     </form>
                 </div>
 
-                <!-- Issued Portal Logins Table -->
                 <div class="card">
                     <h2>Authorized Portal Logins Directory</h2>
                     <table>
@@ -320,7 +318,6 @@
                     </table>
                 </div>
 
-                <!-- Customers List -->
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                         <h2>👥 Registered Customer Accounts</h2>
@@ -333,9 +330,8 @@
                 </div>
             </section>
 
-            <!-- MODULE 3: ORDER MANAGEMENT (All Orders, Invoice, Refund/Cancel, COD/Online, Delivered History) -->
+            <!-- MODULE 3: ORDER MANAGEMENT -->
             <section id="tab-orders" class="tab-section">
-                <!-- General Live -->
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
                         <h2>📦 3. General Live Orders Queue</h2>
@@ -352,7 +348,6 @@
                     </table>
                 </div>
 
-                <!-- Food Live -->
                 <div class="card" style="border-left:5px solid #ea580c;">
                     <h2>🍕 Live Restaurant & Food Orders (Kitchen Queue)</h2>
                     <table>
@@ -363,7 +358,6 @@
                     </table>
                 </div>
 
-                <!-- Delivered & History -->
                 <div class="card">
                     <h2>📜 Order Delivered History & Refund / Cancellation Audit</h2>
                     <table>
@@ -373,7 +367,7 @@
                 </div>
             </section>
 
-            <!-- MODULE 4: PAYMENT & COMMISSION (Vendor Payout, Admin Commission, Payment Gateway, Coupons) -->
+            <!-- MODULE 4: PAYMENT & COMMISSION -->
             <section id="tab-payment" class="tab-section">
                 <div class="card">
                     <h2>💳 4. Payment, Commission & Vendor Settlements</h2>
@@ -389,67 +383,84 @@
                     </table>
                 </div>
 
-                <!-- Checkout Offer Coupons -->
-                <div class="card">
-                    <h2>🎁 Checkout Discount Offers & Wallet Coupons</h2>
-                    <form id="checkoutOfferForm" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
-                        <input id="offerName" placeholder="Offer Title / Code" required>
-                        <input id="offerImage" type="url" placeholder="Offer Image URL">
-                        <input id="offerPrice" type="number" min="0" step="0.01" placeholder="Offer Item Price (₹)" value="0">
-                        <input id="offerMinAmount" type="number" min="1" placeholder="Minimum Cart Amount (₹)" required>
-                        <select id="offerMaxPerCustomer">
-                            <option value="1">Limit: 1 time per user</option>
-                            <option value="2">Limit: 2 times per user</option>
-                            <option value="3" selected>Limit: 3 times (Maximum)</option>
-                        </select>
-                        <button class="btn-primary" type="submit">+ Save / Publish Offer</button>
-                    </form>
-                    <div id="offerAdminStatus" style="margin-top:10px; font-size:12px; color:#22c55e;"></div>
-                </div>
-
-                <!-- DYNAMIC DISCOUNT & COUPON CODE MANAGER -->
-                <div class="card" style="margin-top:20px; border: 1.5px solid #16a34a;">
-                    <h2>🎁 Discount Coupon Code Manager (Create & Manage Coupons)</h2>
+                <!-- CARD 1: DYNAMIC DISCOUNT COUPONS -->
+                <div class="card" style="border: 1.5px solid #16a34a; margin-top: 20px;">
+                    <h2>🎟️ 1. Discount Coupon Code Manager (Cart Discount)</h2>
                     <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">
-                        Yahan se live discount coupon codes create karein jo customer checkout ke dauran lagayenge.
+                        Yahan create kiye gaye coupons customer ke cart drawer me turant apply honge.
                     </p>
                     <form id="createCouponForm">
                         <div class="form-grid">
-                            <input type="text" id="couponCodeInput" placeholder="Coupon Code (e.g. KSINDO50, WELCOME10)" required style="text-transform:uppercase; font-weight:bold;">
+                            <input type="text" id="couponCodeInput" placeholder="Coupon Code (e.g. KSINDO50, FLAT10)" required style="text-transform:uppercase; font-weight:bold;">
                             <select id="couponTypeSelect" required style="font-weight:bold;">
                                 <option value="flat">Flat Cash Discount (₹ OFF)</option>
                                 <option value="percent">Percentage Discount (% OFF)</option>
                             </select>
-                            <input type="number" id="couponDiscountVal" placeholder="Discount Value (₹ ya %)" min="1" required>
-                            <input type="number" id="couponMinOrder" placeholder="Minimum Order Amount (₹)" min="0" value="149" required>
-                            <input type="number" id="couponMaxDiscount" placeholder="Max Discount Cap (For % only, e.g. 150)">
+                            <input type="number" id="couponDiscountVal" placeholder="Discount Amount (₹ ya %)" min="1" required>
+                            <input type="number" id="couponMinOrder" placeholder="Minimum Cart Total (₹)" min="0" value="149" required>
+                            <input type="number" id="couponMaxDiscount" placeholder="Max Cap (For % only, e.g. 150)">
                         </div>
                         <button type="submit" class="btn-primary" style="margin-top:12px; background:#16a34a;">+ Publish Coupon Code</button>
                     </form>
 
                     <div style="margin-top:20px;">
-                        <h3 style="font-size:13px; color:#38bdf8; margin-bottom:10px;">Active Discount Coupons</h3>
+                        <h3 style="font-size:13px; color:#38bdf8; margin-bottom:10px;">Active Live Coupons</h3>
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Coupon Code</th>
+                                    <th>Coupon</th>
                                     <th>Type</th>
                                     <th>Discount</th>
                                     <th>Min Order</th>
-                                    <th>Max Cap</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="couponsTableBody">
-                                <tr><td colspan="7" style="text-align:center; color:#94a3b8;">Loading coupons...</td></tr>
+                                <tr><td colspan="6" style="text-align:center; color:#94a3b8;">Loading coupons...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
+
+                <!-- CARD 2: CHECKOUT SPECIAL OFFERS -->
+                <div class="card" style="border: 1.5px solid #ea580c; margin-top: 20px;">
+                    <h2>🎁 2. Checkout Discount Offers & Special Freebies</h2>
+                    <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">
+                        Yeh item checkout screen par customer ko target cart value par unlock hoga. File upload ya Image URL dono supported hain.
+                    </p>
+                    <form id="checkoutOfferForm">
+                        <div class="form-grid">
+                            <input id="offerName" placeholder="Offer Product Name (e.g. Free Pooja Samagri Kit)" required>
+                            <input id="offerPrice" type="number" min="0" step="0.01" placeholder="Offer Item Price (₹, 0 for free)" value="0" required>
+                            <input id="offerMinAmount" type="number" min="1" placeholder="Min Cart Amount to Unlock (₹)" required>
+                            <input id="offerTargetUrl" placeholder="Product Link (e.g. product.html?id=... ya fresh.html)">
+                            
+                            <div>
+                                <label style="font-size:11px; font-weight:bold; color:#cbd5e1;">Option 1: Upload Offer Photo:</label>
+                                <input type="file" id="offerFileInput" accept="image/*" onchange="previewOfferUpload(this)">
+                            </div>
+                            <div>
+                                <label style="font-size:11px; font-weight:bold; color:#cbd5e1;">Option 2: Direct Image URL:</label>
+                                <input id="offerImage" type="url" placeholder="https://...">
+                            </div>
+
+                            <select id="offerMaxPerCustomer">
+                                <option value="1">Limit: 1 time per user</option>
+                                <option value="2">Limit: 2 times per user</option>
+                                <option value="3" selected>Limit: 3 times (Standard)</option>
+                            </select>
+                        </div>
+
+                        <div id="offerPhotoPreview" style="margin-top:10px;"></div>
+
+                        <button class="btn-primary" type="submit" style="margin-top:12px; background:#ea580c;">+ Save / Publish Checkout Offer</button>
+                    </form>
+                    <div id="offerAdminStatus" style="margin-top:10px; font-size:12px; color:#22c55e; font-weight:bold;"></div>
+                </div>
             </section>
 
-            <!-- MODULE 5: DELIVERY & LOGISTICS (Pincode/Zone Management, Delivery Charges, Live Boy Audit) -->
+            <!-- MODULE 5: DELIVERY & LOGISTICS -->
             <section id="tab-logistics" class="tab-section">
                 <div class="card">
                     <h2>🚚 5. Delivery Boy Fleet & Cash Collection Audit</h2>
@@ -472,7 +483,7 @@
                 </div>
             </section>
 
-            <!-- MODULE 6: PRODUCT & CATEGORY MANAGEMENT (Categories, Stock In/Out, Multi-Variants) -->
+            <!-- MODULE 6: PRODUCT & CATEGORY MANAGEMENT -->
             <section id="tab-products" class="tab-section">
                 <div class="card">
                     <h2 id="productFormHeader">🏷️ 6. Product & Category Management — Add / Edit</h2>
@@ -512,7 +523,6 @@
                             </div>
                         </div>
 
-                        <!-- Multi-Category Select Checkboxes -->
                         <div style="margin-top:14px;">
                             <label style="font-size:12px; font-weight:bold; display:block; margin-bottom:6px;">Categories (Multi-Select Supported):</label>
                             <div class="cat-checkbox-group">
@@ -528,7 +538,6 @@
 
                         <div class="preview-grid" id="photoPreviewContainer"></div>
 
-                        <!-- Dynamic Variants Builder -->
                         <div style="margin-top:16px; padding:15px; background:#0f172a; border:1px dashed #16a34a; border-radius:8px;">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                                 <div>
@@ -583,7 +592,7 @@
                 </div>
             </section>
 
-            <!-- MODULE 7: REPORTS & ANALYTICS (Daily/Monthly Sales, GST, Vendor Reports, CSV Export) -->
+            <!-- MODULE 7: REPORTS & ANALYTICS -->
             <section id="tab-reports" class="tab-section">
                 <div class="card">
                     <h2>📈 7. Reports & Analytics — Daily & Monthly Business</h2>
@@ -622,7 +631,7 @@
                 </div>
             </section>
 
-            <!-- MODULE 9: MARKETING & CONTENT (5-Second Ads, Banners, Push Ads) -->
+            <!-- MODULE 9: MARKETING & CONTENT -->
             <section id="tab-ads" class="tab-section">
                 <div class="card">
                     <h2>📢 9. Marketing & Content — 5-Second Video / Banner Ads</h2>
@@ -659,7 +668,7 @@
                 </div>
             </section>
 
-            <!-- MODULE 10: SETTINGS (Website Settings, App Settings, Maintenance Mode) -->
+            <!-- MODULE 10: MASTER SETTINGS -->
             <section id="tab-settings" class="tab-section">
                 <div class="card">
                     <h2>⚙️ 10. Master Settings & System Maintenance Mode</h2>
@@ -697,7 +706,7 @@
         </div>
     </div>
 
-    <!-- UTILITY JAVASCRIPT LOGIC (Audio, Variants, Image Compression Preview) -->
+    <!-- UTILITY JAVASCRIPT LOGIC -->
     <script>
         let isAudioAlarmMuted = false;
         function toggleAudioAlarm() {
@@ -787,7 +796,6 @@
         });
 
         let base64PhotosArray = [];
-        // Canvas-based Client-Side Image Compressor (Max width 800px, 70% quality)
         function compressImageFile(file, maxWidth, quality) {
             return new Promise(function(resolve) {
                 var reader = new FileReader();
@@ -844,6 +852,16 @@
                 container.appendChild(img);
             });
         }
+
+        let base64OfferPhoto = '';
+        window.previewOfferUpload = async function(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const container = document.getElementById('offerPhotoPreview');
+            container.innerHTML = '<span style="font-size:11px; color:#38bdf8;">Compressing...</span>';
+            base64OfferPhoto = await compressImageFile(file, 600, 0.7);
+            container.innerHTML = '<img src="' + base64OfferPhoto + '" style="width:70px; height:70px; object-fit:cover; border-radius:8px; border:2px solid #ea580c;">';
+        };
 
         let base64AdMedia = '';
         window.previewAdDirectFile = function(input) {
@@ -984,7 +1002,7 @@
             document.getElementById('liveClock').innerText = new Date().toLocaleString('en-IN');
         }, 1000);
 
-        // 1. PORTAL CREDENTIALS GENERATOR (Admin Dwara ID/Password)
+        // 1. Portal Generator
         document.getElementById('portalCredentialsForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const role = document.getElementById('portalRoleSelect').value;
@@ -1024,7 +1042,6 @@
             }
         });
 
-        // Realtime Portal Logins Directory Listener
         onSnapshot(collection(db, "portal_users"), (snapshot) => {
             const tbody = document.getElementById('portalLoginsTableBody');
             tbody.innerHTML = '';
@@ -1063,7 +1080,7 @@
             }
         };
 
-        // 2. Realtime Orders Queue & Settlements
+        // 2. Realtime Orders Queue
         onSnapshot(collection(db, "orders"), async (snapshot) => {
             let totalRevenue = 0, totalCash = 0;
             let foodCount = 0, generalCount = 0;
@@ -1375,7 +1392,7 @@
 
         window.closeCustomerAudit = () => document.getElementById('customerAuditModal').classList.remove('active');
 
-        // Manage Shops with Merchant support
+        // Manage Shops
         document.getElementById('addShopForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const shopName = document.getElementById('shopNameInput').value.trim();
@@ -1395,7 +1412,6 @@
                     createdAt: serverTimestamp()
                 });
 
-                // Also sync to portal_users directory
                 await addDoc(collection(db, "portal_users"), {
                     fullName: shopName,
                     role: 'vendor',
@@ -1442,7 +1458,7 @@
         });
         window.deleteShop = async (id) => { if (confirm("Delete shop?")) await deleteDoc(doc(db, "shops", id)); };
 
-        // 3. 5-Second Ads Management
+        // 3. Marketing Ads
         onSnapshot(collection(db, "ads"), (snap) => {
             const tbody = document.getElementById('adsTableBody');
             tbody.innerHTML = '';
@@ -1486,7 +1502,7 @@
         });
         window.delAd = async (id) => { if(confirm("Ad delete karein?")) await deleteDoc(doc(db, "ads", id)); };
 
-        // 4. Product Edit System
+        // 4. Products Management
         window.editProduct = function(productId) {
             const p = productsDataCache[productId];
             if (!p) return alert("Product data load nahi ho paya!");
@@ -1635,7 +1651,6 @@
             } catch(err) { alert("Error: " + err.message); }
         });
 
-        // Realtime Products Sync
         onSnapshot(collection(db, "products"), (snapshot) => {
             productsDataCache = {};
             snapshot.forEach(docSnap => {
@@ -1691,7 +1706,7 @@
             if (confirm("Delete product?")) await deleteDoc(doc(db, "products", id)); 
         };
 
-        // 5. Customer Complaints & Grievance Tickets Listener
+        // 5. Customer Complaints
         onSnapshot(collection(db, "grievances"), (snapshot) => {
             const tbody = document.getElementById('grievanceTicketsTableBody');
             tbody.innerHTML = '';
@@ -1733,7 +1748,7 @@
             alert("✅ Complaint ticket resolved!");
         };
 
-        // Monthly statement CSV export
+        // Monthly statement CSV
         window.downloadMonthlyStatement = function(){
           const now=new Date();const month=now.getMonth(),year=now.getFullYear();
           const rows=[['Order ID','Date','Customer','Phone','Pincode','Status','Subtotal','Delivery','Total','Items']];
@@ -1758,10 +1773,10 @@
                     isActive: true,
                     createdAt: serverTimestamp()
                 });
-                alert("🎉 Coupon '" + code + "' published successfully!");
+                alert("🎉 Coupon '" + code + "' live activate ho gaya!");
                 document.getElementById('createCouponForm').reset();
             } catch(err) {
-                alert("Coupon create error: " + err.message);
+                alert("Coupon error: " + err.message);
             }
         });
 
@@ -1769,36 +1784,70 @@
             const tbody = document.getElementById('couponsTableBody');
             if (!tbody) return;
             tbody.innerHTML = '';
-
             if (snapshot.empty) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#94a3b8;">Koi coupon active nahi hai.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#94a3b8;">Koi coupon active nahi hai.</td></tr>';
                 return;
             }
-
             snapshot.forEach(docSnap => {
                 const c = { id: docSnap.id, ...docSnap.data() };
                 const discText = c.type === 'flat' ? ('₹' + c.discount + ' OFF') : (c.discount + '% OFF');
-
-                tbody.innerHTML += 
-                    '<tr>' +
-                        '<td><strong style="color:#22c55e; font-size:13px; letter-spacing:0.5px;">' + c.code + '</strong></td>' +
-                        '<td><span style="text-transform:uppercase; font-size:11px;">' + c.type + '</span></td>' +
-                        '<td><b style="color:#38bdf8;">' + discText + '</b></td>' +
-                        '<td>₹' + c.minOrder + '</td>' +
-                        '<td>' + (c.maxDiscount ? ('₹' + c.maxDiscount) : 'None') + '</td>' +
-                        '<td><span class="status-pill" style="background:#16a34a20; color:#4ade80;">Active</span></td>' +
-                        '<td><button class="btn-danger" onclick="deleteCouponItem(\'' + c.id + '\')">Delete</button></td>' +
-                    '</tr>';
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong style="color:#22c55e;">${c.code}</strong></td>
+                        <td><span style="text-transform:uppercase; font-size:11px;">${c.type}</span></td>
+                        <td><b style="color:#38bdf8;">${discText}</b></td>
+                        <td>₹${c.minOrder}</td>
+                        <td><span class="status-pill" style="background:#16a34a20; color:#4ade80;">Active</span></td>
+                        <td><button class="btn-danger" onclick="deleteCouponItem('${c.id}')">Delete</button></td>
+                    </tr>
+                `;
             });
         });
 
         window.deleteCouponItem = async (id) => {
-            if (confirm("Is coupon code ko delete karna chahte hain?")) {
-                await deleteDoc(doc(db, "coupons", id));
-            }
+            if (confirm("Coupon delete karein?")) await deleteDoc(doc(db, "coupons", id));
         };
 
-        document.getElementById('checkoutOfferForm').addEventListener('submit',async e=>{e.preventDefault();try{const payload={name:document.getElementById('offerName').value.trim(),imageUrl:document.getElementById('offerImage').value.trim(),offerPrice:Number(document.getElementById('offerPrice').value||0),minimumAmount:Number(document.getElementById('offerMinAmount').value),maxPerCustomer:Math.min(3,Math.max(1,Number(document.getElementById('offerMaxPerCustomer').value||3))),active:true,updatedAt:serverTimestamp()};const active=await getDocs(query(collection(db,'checkoutOffers'),where('active','==',true)));if(!active.empty){await updateDoc(doc(db,'checkoutOffers',active.docs[0].id),payload);}else{payload.createdAt=serverTimestamp();await addDoc(collection(db,'checkoutOffers'),payload);}document.getElementById('offerAdminStatus').textContent='Offer saved. Checkout par active hoga.';e.target.reset();document.getElementById('offerMaxPerCustomer').value='3';}catch(err){alert('Offer save error: '+err.message);}});
+        // Checkout Offer with Image & Product Link
+        document.getElementById('checkoutOfferForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('offerName').value.trim();
+            const offerPrice = Number(document.getElementById('offerPrice').value || 0);
+            const minAmount = Number(document.getElementById('offerMinAmount').value);
+            const targetUrl = document.getElementById('offerTargetUrl').value.trim();
+            const directUrl = document.getElementById('offerImage').value.trim();
+            const finalImage = base64OfferPhoto || directUrl || '';
+            const maxPerCustomer = Number(document.getElementById('offerMaxPerCustomer').value || 3);
+
+            try {
+                const payload = {
+                    name,
+                    offerPrice,
+                    minimumAmount: minAmount,
+                    unlockAmount: minAmount,
+                    targetUrl: targetUrl || '',
+                    imageUrl: finalImage,
+                    maxPerCustomer,
+                    active: true,
+                    updatedAt: serverTimestamp()
+                };
+
+                const activeSnap = await getDocs(query(collection(db, 'checkoutOffers'), where('active', '==', true)));
+                if (!activeSnap.empty) {
+                    await updateDoc(doc(db, 'checkoutOffers', activeSnap.docs[0].id), payload);
+                } else {
+                    payload.createdAt = serverTimestamp();
+                    await addDoc(collection(db, 'checkoutOffers'), payload);
+                }
+
+                document.getElementById('offerAdminStatus').textContent = '✅ Offer save ho gaya! Image aur Link live ho gaye.';
+                base64OfferPhoto = '';
+                document.getElementById('offerPhotoPreview').innerHTML = '';
+                document.getElementById('checkoutOfferForm').reset();
+            } catch(err) {
+                alert("Offer save error: " + err.message);
+            }
+        });
     </script>
 </body>
 </html>
