@@ -232,8 +232,8 @@
         }
         .product-card:hover { transform: translateY(-3px); }
         .card-main-img { width: 100%; height: 145px; object-fit: contain; margin-bottom: 8px; border-radius: 8px; cursor: pointer; background: #ffffff; border: 1px solid #fef08a; }
-        .product-title { font-size: 13px; font-weight: 700; height: 36px; overflow: hidden; color: #166534; margin-bottom: 6px; cursor: pointer; text-decoration: none; line-height: 1.35; }
-        .add-btn-round { background: linear-gradient(135deg, #eab308, #ca8a04); color: white; border: none; padding: 8px 10px; border-radius: 20px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
+/* ✅ Sahi Code */
+.product-title { font-size: 13px; font-weight: 700; height: 36px; overflow: hidden; color: #166534; margin-bottom: 6px; cursor: pointer; text-decoration: none; line-height: 1.35; }        .add-btn-round { background: linear-gradient(135deg, #eab308, #ca8a04); color: white; border: none; padding: 8px 10px; border-radius: 20px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
         .add-btn-round:disabled, .buy-now-round:disabled { background: #cbd5e1; color: #64748b; cursor: not-allowed; }
         .buy-now-round { background: linear-gradient(135deg, #22c55e, #15803d); color: white; border: none; padding: 8px 10px; border-radius: 20px; font-weight: bold; cursor: pointer; flex: 1; font-size: 11px; }
 
@@ -687,7 +687,7 @@
             <!-- Coupon Code Section -->
             <div style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:10px; padding:8px 10px; margin-bottom:10px;">
                 <div style="display:flex; gap:6px;">
-                    <input type="text" id="cartCouponInput" placeholder="Coupon Code (KSINDO50)" style="flex:1; padding:7px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:11px; text-transform:uppercase; font-weight:bold; outline:none;">
+                    <input type="text" id="cartCouponInput" placeholder=" Enter Coupon Code " style="flex:1; padding:7px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:11px; text-transform:uppercase; font-weight:bold; outline:none;">
                     <button type="button" onclick="window.applyCouponCode()" style="background:#16a34a; color:white; border:none; padding:7px 12px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;">Apply</button>
                 </div>
                 <div id="cartCouponMsg" style="font-size:11px; margin-top:4px; font-weight:bold;"></div>
@@ -949,7 +949,7 @@
         var activeCategory = 'all';
         var activeSubCategory = 'all';
 
-        // Available Coupons Table
+        // Available Coupons Table (Fallback)
         var availableCoupons = {
             "KSINDO50": { type: "flat", discount: 50, minOrder: 199, label: "₹50 OFF" },
             "WELCOME10": { type: "percent", percent: 10, maxDiscount: 100, minOrder: 149, label: "10% OFF" },
@@ -976,7 +976,6 @@
             return !/^\d{6}$/.test(String(pin)) || pins.map(String).includes(String(pin)); 
         }
 
-        
         window.clearPincodeFilter = function() {
             try { localStorage.removeItem('ksindo_delivery_location'); } catch(e){}
             var lbl = document.getElementById('ksindoLocationLabel');
@@ -1032,47 +1031,79 @@
             return '';
         }
 
-        // Apply Coupon System
-        window.applyCouponCode = function() {
+        // Realtime Firestore Coupon Verification & Apply System
+        window.applyCouponCode = async function() {
             var code = (document.getElementById('cartCouponInput').value || '').trim().toUpperCase();
             var msg = document.getElementById('cartCouponMsg');
-            var cart = getStoredCart();
-            var subtotal = 0;
-            cart.forEach(function(i){
-                var p = allProducts.find(x => x.id === i.id) || i;
-                if(!isOutOfStock(p)) subtotal += (Number(i.price) || 0) * (Number(i.qty) || 1);
-            });
-
-            if(!code) {
+            if (!code) {
                 msg.innerText = "Coupon code enter karein!";
                 msg.style.color = "#dc2626";
                 return;
             }
 
-            if(!availableCoupons[code]) {
-                msg.innerText = "❌ Invalid Coupon Code!";
+            var cart = getStoredCart();
+            var subtotal = 0;
+            cart.forEach(function(i) {
+                var p = allProducts.find(x => x.id === i.id) || i;
+                if (!isOutOfStock(p)) subtotal += (Number(i.price) || 0) * (Number(i.qty) || 1);
+            });
+
+            msg.innerText = "Checking coupon...";
+            msg.style.color = "#38bdf8";
+
+            try {
+                var q = await db.collection("coupons").where("code", "==", code).where("isActive", "==", true).limit(1).get();
+                if (q.empty) {
+                    if (availableCoupons && availableCoupons[code]) {
+                        var cLocal = availableCoupons[code];
+                        if (subtotal < Number(cLocal.minOrder || 0)) {
+                            msg.innerText = "⚠️ Minimum cart amount ₹" + cLocal.minOrder + " hona chahiye!";
+                            msg.style.color = "#dc2626";
+                            return;
+                        }
+                        var discLocal = 0;
+                        if (cLocal.type === "flat") discLocal = Number(cLocal.discount);
+                        else if (cLocal.type === "percent") {
+                            discLocal = Math.round((subtotal * Number(cLocal.percent)) / 100);
+                            if (cLocal.maxDiscount && discLocal > Number(cLocal.maxDiscount)) discLocal = Number(cLocal.maxDiscount);
+                        }
+                        appliedCoupon = { code: code, discount: discLocal };
+                        msg.innerText = "🎉 Coupon '" + code + "' applied! ₹" + discLocal + " OFF";
+                        msg.style.color = "#16a34a";
+                        updateCartUI();
+                        return;
+                    }
+                    msg.innerText = "❌ Invalid ya Expired Coupon!";
+                    msg.style.color = "#dc2626";
+                    return;
+                }
+
+                var c = q.docs[0].data();
+                if (subtotal < Number(c.minOrder || 0)) {
+                    msg.innerText = "⚠️ Minimum cart amount ₹" + c.minOrder + " hona chahiye!";
+                    msg.style.color = "#dc2626";
+                    return;
+                }
+
+                var disc = 0;
+                if (c.type === "flat") {
+                    disc = Number(c.discount);
+                } else if (c.type === "percent") {
+                    disc = Math.round((subtotal * Number(c.discount)) / 100);
+                    if (c.maxDiscount && disc > Number(c.maxDiscount)) {
+                        disc = Number(c.maxDiscount);
+                    }
+                }
+
+                appliedCoupon = { code: code, discount: disc };
+                msg.innerText = "🎉 Coupon '" + code + "' applied! ₹" + disc + " OFF";
+                msg.style.color = "#16a34a";
+                updateCartUI();
+            } catch(err) {
+                console.warn("Coupon check error:", err);
+                msg.innerText = "Coupon error: " + err.message;
                 msg.style.color = "#dc2626";
-                return;
             }
-
-            var c = availableCoupons[code];
-            if(subtotal < c.minOrder) {
-                msg.innerText = "⚠️ Min order ₹" + c.minOrder + " required!";
-                msg.style.color = "#dc2626";
-                return;
-            }
-
-            var disc = 0;
-            if(c.type === "flat") disc = c.discount;
-            else if(c.type === "percent") {
-                disc = Math.round((subtotal * c.percent) / 100);
-                if(c.maxDiscount && disc > c.maxDiscount) disc = c.maxDiscount;
-            }
-
-            appliedCoupon = { code: code, discount: disc };
-            msg.innerText = "🎉 Coupon '" + code + "' applied! ₹" + disc + " OFF";
-            msg.style.color = "#16a34a";
-            updateCartUI();
         };
 
         // Cart UI with Strict Out-Of-Stock Detection
@@ -1280,16 +1311,14 @@
             'कवर': ['cover', 'case']
         };
 
-        // Clean & Normalize text (compress duplicate letters e.g. 'alloo' -> 'alu', 'saari' -> 'sari')
         function normalizeSearchText(txt) {
             if(!txt) return '';
             return txt.toLowerCase()
-                .replace(/([a-z]) +/g, '$1') // e.g. aloo -> alo, saree -> sare
+                .replace(/([a-z]) +/g, '$1')
                 .replace(/[^a-z0-9ऀ-ॿ\s]/gi, ' ')
                 .trim();
         }
 
-        // Levenshtein distance for typo tolerance
         function editDistance(s1, s2) {
             if (s1.length < s2.length) return editDistance(s2, s1);
             if (s2.length === 0) return s1.length;
@@ -1306,7 +1335,6 @@
             return prev[s2.length];
         }
 
-        // Match single query token against text
         function isFuzzyTokenMatch(queryToken, targetText) {
             if (!queryToken || !targetText) return false;
             var tLow = targetText.toLowerCase();
@@ -1316,7 +1344,6 @@
             var tNorm = normalizeSearchText(targetText);
             if (tNorm.includes(qNorm)) return true;
 
-            // Check Hindi dictionary translation
             for (var hindiWord in HINDI_SYNONYM_DICT) {
                 if (queryToken.includes(hindiWord)) {
                     var synList = HINDI_SYNONYM_DICT[hindiWord];
@@ -1326,7 +1353,6 @@
                 }
             }
 
-            // Word-level edit distance for typos (e.g. 'tamator' vs 'tamatar', 'potatto' vs 'potato')
             if (queryToken.length >= 4) {
                 var words = tLow.split(/\s+/);
                 for (var w = 0; w < words.length; w++) {
@@ -1361,7 +1387,6 @@
 
                 var pTarget = (p.name || '') + ' ' + (p.category || '') + ' ' + (p.subCategory || '') + ' ' + (p.description || '') + ' ' + (p.festivalTag || '');
 
-                // Product matches if EVERY query token has at least one fuzzy/synonym match
                 return tokens.every(function(tok){
                     return isFuzzyTokenMatch(tok, pTarget);
                 });
@@ -1611,7 +1636,6 @@
             var cart = getStoredCart();
             if (cart.length === 0) return alert("Cart khali hai!");
 
-            // Check if any cart item is actually out of stock
             var hasOut = cart.some(function(i){
                 var p = allProducts.find(x => x.id === i.id);
                 if (p) return isOutOfStock(p);
@@ -1648,7 +1672,6 @@
             }
 
             var cart = getStoredCart();
-            // Reliable stock check that does not falsely block orders
             var unavailable = cart.filter(function(i){
                 var p = allProducts.find(function(x){ return x.id === i.id; });
                 if (p) {
@@ -2078,7 +2101,6 @@
             applyProductSnapshot(snap);
         }, function(err){
             console.warn("Product sync warning:", err);
-            // Fallback to cache if network is slow
             if (allProducts.length === 0) {
                 try {
                     allProducts = JSON.parse(localStorage.getItem('cached_products')) || [];
@@ -2112,7 +2134,6 @@
 
         window.addEventListener('DOMContentLoaded', function() {
             updateCartUI();
-            // Seamless location-based catalog update on load
             if (typeof renderFilteredProducts === 'function') {
                 renderFilteredProducts();
             }
