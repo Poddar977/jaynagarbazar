@@ -2,12 +2,12 @@
 <html lang="hi">
 <head>
     <!-- PWA Settings -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f172a">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="ksindo">
-<link rel="apple-touch-icon" href="https://poddar977.github.io/jaynagarbazar/logo.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ea580c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ksindo">
+    <link rel="apple-touch-icon" href="https://poddar977.github.io/jaynagarbazar/logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ksindo Fast Food & Kitchens</title>
@@ -85,18 +85,58 @@
         .container { max-width:1150px; margin:20px auto; padding:0 15px; }
         .page-title { font-size:18px; font-weight:800; color:#c2410c; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; }
         
-        .restaurant-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:18px; }
+        .restaurant-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:18px; }
+        
+        /* RESTAURANT CARD & RATING BADGE */
         .restaurant-card {
             background:white; border-radius:16px; overflow:hidden; border:1.5px solid #fed7aa;
-            cursor:pointer; transition:0.2s; box-shadow:0 4px 12px rgba(234, 88, 12, 0.06);
+            cursor:pointer; transition:transform 0.2s ease, box-shadow 0.2s ease; box-shadow:0 4px 12px rgba(234, 88, 12, 0.06);
+            display:flex; flex-direction:column; justify-content:space-between; position:relative;
         }
-        .restaurant-card:hover { transform:translateY(-4px); box-shadow:0 8px 20px rgba(234, 88, 12, 0.15); }
-        .restaurant-img { width:100%; height:140px; object-fit:cover; background:#fed7aa; }
+        .restaurant-card:hover { transform:translateY(-4px); box-shadow:0 8px 22px rgba(234, 88, 12, 0.18); }
+        
+        .restaurant-img-wrap {
+            width:100%; height:150px; position:relative; background:#ffedd5; overflow:hidden;
+        }
+        .restaurant-img { 
+            width:100%; height:100%; object-fit:cover; opacity:0.2; transition:opacity 0.3s ease-in-out; 
+        }
+        .restaurant-img.loaded { opacity:1; }
+
+        /* RATING PILL BADGE */
+        .rating-pill-badge {
+            position:absolute; bottom:10px; left:10px;
+            background:#16a34a; color:#ffffff; font-size:11px; font-weight:800;
+            padding:3px 8px; border-radius:6px; display:flex; align-items:center; gap:3px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.35);
+        }
+        .rating-reviews-count { font-size:10px; color:#f1f5f9; font-weight:600; margin-left:2px; }
+
         .restaurant-info { padding:14px; }
         .restaurant-title { font-size:16px; font-weight:800; color:#0f172a; margin-bottom:4px; }
         .restaurant-sub { font-size:12px; color:#64748b; margin-bottom:8px; }
         .restaurant-badge { background:#ffedd5; color:#ea580c; font-size:11px; font-weight:bold; padding:3px 8px; border-radius:6px; }
         .review-toggle{border:1px solid #fed7aa;background:#fff7ed;color:#c2410c;padding:6px 9px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;margin-top:9px}.reviews-panel{display:none;background:#fffaf5;border:1px solid #fed7aa;border-radius:10px;padding:10px;margin-top:8px;font-size:12px}.review-line{padding:7px 0;border-bottom:1px solid #ffedd5}.review-form{display:grid;gap:7px;margin-top:8px}.review-form input,.review-form textarea,.review-form select{width:100%;padding:8px;border:1px solid #fdba74;border-radius:7px;font-size:12px}
+
+        /* SHIMMER SKELETON FOR FASTFOOD */
+        .skeleton-rest-card {
+            background:white; border-radius:16px; padding:12px; border:1.5px solid #fed7aa;
+            display:flex; flex-direction:column; gap:8px;
+        }
+        .skeleton-rest-img {
+            width:100%; height:140px; border-radius:10px;
+            background:linear-gradient(90deg, #fff7ed 25%, #ffedd5 50%, #fff7ed 75%);
+            background-size:200% 100%; animation:shimmerFast 1.2s infinite;
+        }
+        .skeleton-text-bar {
+            height:14px; border-radius:4px;
+            background:linear-gradient(90deg, #fff7ed 25%, #ffedd5 50%, #fff7ed 75%);
+            background-size:200% 100%; animation:shimmerFast 1.2s infinite;
+        }
+        @keyframes shimmerFast {
+            0% { background-position:200% 0; }
+            100% { background-position:-200% 0; }
+        }
 
         .product-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:16px; }
         @media(max-width:600px){ .product-grid { grid-template-columns:repeat(auto-fill, minmax(145px, 1fr)); gap:10px; } }
@@ -328,7 +368,7 @@
                         userLocationLabel = [a.suburb || a.neighbourhood || a.village || a.town || a.city || a.county, a.state].filter(Boolean).join(', ') || 'Current location selected';
                         if (pin.length === 6) { userLocationPin = pin; localStorage.setItem('ksindo_user_pin', pin); }
                     }
-                } catch (e) { /* GPS coordinates still saved; user can add PIN manually for delivery eligibility. */ }
+                } catch (e) { }
                 localStorage.setItem('ksindo_user_location_label', userLocationLabel);
                 btn.innerHTML = '<span>🎯</span> Use Current GPS Location';
                 if (!userLocationPin || userLocationPin.length !== 6) {
@@ -348,13 +388,62 @@
             document.getElementById('locationGatewayModal').style.display = 'flex';
         };
 
+        // LAZY LOAD OBSERVER FOR RESTAURANT & DISH IMAGES
+        function initFastfoodLazyLoading() {
+            if ('IntersectionObserver' in window) {
+                var observer = new IntersectionObserver(function(entries, obs) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            var img = entry.target;
+                            var src = img.getAttribute('data-src');
+                            if (src) {
+                                img.src = src;
+                                img.onload = function() { img.classList.add('loaded'); };
+                                img.onerror = function() { img.src = 'ksindo-icon.svg'; img.classList.add('loaded'); };
+                                img.removeAttribute('data-src');
+                            }
+                            obs.unobserve(img);
+                        }
+                    });
+                }, { rootMargin: '120px 0px' });
+
+                document.querySelectorAll('.restaurant-img[data-src], .dish-card img[data-src]').forEach(function(img) {
+                    observer.observe(img);
+                });
+            } else {
+                document.querySelectorAll('.restaurant-img[data-src], .dish-card img[data-src]').forEach(function(img) {
+                    img.src = img.getAttribute('data-src');
+                    img.classList.add('loaded');
+                });
+            }
+        }
+
+        function showFastfoodSkeletons() {
+            var container = document.getElementById('restaurantsContainer');
+            if (!container) return;
+            var html = '';
+            for (var i = 0; i < 6; i++) {
+                html += '<div class="skeleton-rest-card">' +
+                    '<div class="skeleton-rest-img"></div>' +
+                    '<div class="skeleton-text-bar" style="width:75%; margin-top:4px;"></div>' +
+                    '<div class="skeleton-text-bar" style="width:45%; margin-top:4px;"></div>' +
+                '</div>';
+            }
+            container.innerHTML = html;
+        }
+
         function loadFoodData() {
+            showFastfoodSkeletons();
+
             db.collection("shops").onSnapshot(function(snap) {
                 allShops = [];
                 snap.forEach(function(d) {
                     var s = { id: d.id, ...d.data() };
-                    if (s.isOpen !== false && (s.pincode === userLocationPin || !s.pincode || (s.address || '').includes(userLocationPin))) {
-                        allShops.push(s);
+                    var isFoodShop = (s.shopType === 'restaurant' || s.shopType === 'fastfood' || (s.cuisine && s.cuisine.length > 0));
+                    if (s.isOpen !== false && (isFoodShop || !s.shopType)) {
+                        if (s.pincode === userLocationPin || !s.pincode || (s.address || '').includes(userLocationPin)) {
+                            allShops.push(s);
+                        }
                     }
                 });
                 renderShopsList();
@@ -385,16 +474,25 @@
                 return;
             }
 
+            var placeholderSvg = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"%3E%3C/svg%3E';
             var html = '';
             allShops.forEach(function(shop) {
                 var dishCount = allFoodDishes.filter(function(d) {
                     return (d.assignedShopId === shop.id || d.shopName === shop.shopName);
                 }).length;
 
-                var banner = shop.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500';
+                var banner = shop.imageUrl || shop.restaurantPhoto || shop.shopBanner || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500';
+                var ratingVal = Number(shop.rating || shop.avgRating || 4.5).toFixed(1);
+                var totalReviews = Number(shop.totalReviews || shop.reviewsCount || 120);
 
                 html += '<div class="restaurant-card" onclick="openShopMenu(\'' + shop.id + '\')">' +
-                    '<img src="' + banner + '" class="restaurant-img">' +
+                    '<div class="restaurant-img-wrap">' +
+                        '<img src="' + placeholderSvg + '" data-src="' + banner + '" class="restaurant-img" loading="lazy" alt="' + (shop.shopName || 'Restaurant') + '">' +
+                        '<div class="rating-pill-badge">' +
+                            '★ ' + ratingVal + 
+                            '<span class="rating-reviews-count">(' + totalReviews + '+)</span>' +
+                        '</div>' +
+                    '</div>' +
                     '<div class="restaurant-info">' +
                         '<div class="restaurant-title">' + shop.shopName + '</div>' +
                         '<div class="restaurant-sub">📍 ' + (shop.address || 'Local Market') + ' (PIN: ' + (shop.pincode || userLocationPin) + ')</div>' +
@@ -412,6 +510,7 @@
                 '</div>';
             });
             container.innerHTML = html;
+            initFastfoodLazyLoading();
         }
 
         window.toggleRestaurantReviews = function(shopId) {
@@ -478,11 +577,12 @@
                 return;
             }
 
+            var placeholderSvg = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"%3E%3C/svg%3E';
             var html = '';
             dishes.forEach(function(d) {
                 var img = (d.images && d.images.length > 0) ? d.images[0] : (d.imageUrl || 'https://via.placeholder.com/150');
                 html += '<div class="dish-card">' +
-                    '<img src="' + img + '">' +
+                    '<img src="' + placeholderSvg + '" data-src="' + img + '" loading="lazy" alt="' + d.name + '">' +
                     '<div class="dish-title">' + d.name + '</div>' +
                     '<div class="dish-price">₹' + d.price + '</div>' +
                     '<button class="review-toggle" onclick="event.stopPropagation();toggleDishReviews(\'' + d.id + '\')">⭐ Reviews · Show</button>' +
@@ -494,13 +594,14 @@
                 '</div>';
             });
             grid.innerHTML = html;
+            initFastfoodLazyLoading();
         }
 
         window.toggleDishReviews = function(id) { var panel=document.getElementById('dish-reviews-'+id); if(!panel)return; var opening=panel.style.display!=='block'; panel.style.display=opening?'block':'none'; var btn=panel.parentElement.querySelector('.review-toggle'); if(btn)btn.innerText=opening?'⭐ Reviews · Hide':'⭐ Reviews · Show'; if(opening)loadDishReviews(id); };
         window.loadDishReviews = function(id) { var list=document.getElementById('dish-review-list-'+id); if(!list)return; db.collection('foodReviews').where('dishId','==',id).limit(30).get().then(function(snap){ if(snap.empty){list.innerHTML='Abhi koi review nahi hai.';return;} var total=0, rows=[];snap.forEach(function(d){var r=d.data();total+=Number(r.rating||0);rows.push('<div class="review-line"><b>'+escapeReview(r.reviewer||'Customer')+'</b> · ⭐ '+r.rating+'/5<br>'+escapeReview(r.reviewText||'')+'</div>');});list.innerHTML='<b>⭐ '+(total/rows.length).toFixed(1)+' / 5 · '+rows.length+' reviews</b>'+rows.join('');}).catch(function(){list.innerText='Reviews load nahi ho paaye.';}); };
         window.submitDishReview = function(e,id,name) { e.preventDefault();e.stopPropagation();var f=e.currentTarget;db.collection('foodReviews').add({dishId:id,dishName:name,rating:Number(f.rating.value),reviewer:f.reviewer.value.trim()||'Customer',reviewText:f.reviewText.value.trim(),createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){f.reset();loadDishReviews(id);alert('Review submit ho gaya.');}).catch(function(err){alert('Review save nahi hua: '+err.message);}); };
 
-        // ISOLATED FOOD CART (STORED IN food_cart TO PREVENT INDEX CART CONFLICT)
+        // ISOLATED FOOD CART
         function getFoodCart() {
             try {
                 var c = JSON.parse(localStorage.getItem('food_cart')) || [];
@@ -521,20 +622,17 @@
             updateCartUI();
         };
 
-        // CONDITION: ONLY ONE RESTAURANT ALLOWED AT A TIME
         window.addDishToCart = function(dishId) {
             var dish = allFoodDishes.find(function(x){ return x.id === dishId; });
             var shop = allShops.find(function(s){ return s.id === activeShopId; });
             if (!dish || !shop) return;
 
             var cart = getFoodCart();
-            
-            // Check if cart already has items from another restaurant
             var existingOtherShop = cart.find(function(i){ return i.assignedShopId && i.assignedShopId !== shop.id; });
             if (existingOtherShop) {
                 var change = confirm('Aapke cart me pehle se "' + existingOtherShop.assignedShopName + '" ka khana add hai.\n\nNaye restaurant (' + shop.shopName + ') se order karne par purana cart replace ho jayega. Continue karein?');
                 if (!change) return;
-                cart = []; // Clear previous restaurant
+                cart = [];
             }
 
             var item = cart.find(function(i){ return i.id === dishId; });
