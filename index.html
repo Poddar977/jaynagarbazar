@@ -415,7 +415,7 @@
             text-decoration: underline;
         }
 
-        /* Global Footer & Help */
+        /* Global Footer */
         .ksindo-global-footer{background:#111827;color:#e5e7eb;padding:34px 5%;margin-top:40px;font:14px/1.6 system-ui,sans-serif}
         .ksindo-footer-inner{max-width:1240px;margin:auto;display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;gap:26px}
         .ksindo-global-footer h3,.ksindo-global-footer h4{margin:0 0 12px;color:#fff}
@@ -424,14 +424,12 @@
         .ksindo-global-footer a:hover{color:#fff;text-decoration:underline}
         .ksindo-footer-brand{font-size:22px;font-weight:900;letter-spacing:.5px;background:linear-gradient(90deg,#f472b6,#a78bfa,#22d3ee,#facc15);background-clip:text;-webkit-background-clip:text;color:transparent}
         .ksindo-footer-bottom{max-width:1240px;margin:22px auto 0;border-top:1px solid #374151;padding-top:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#9ca3af;font-size:11px}
-        .ksindo-help-fab{position:fixed;right:16px;bottom:16px;z-index:9990;background:#4f46e5;color:#fff!important;text-decoration:none!important;border-radius:999px;padding:11px 16px;box-shadow:0 8px 25px #11182738;font:700 12px system-ui;display:flex;gap:8px;align-items:center}
-        .ksindo-help-fab:hover{background:#3730a3}
-        @media(max-width:700px){.ksindo-footer-inner{grid-template-columns:1fr 1fr;gap:20px}.ksindo-footer-inner>div:first-child{grid-column:1/-1}.ksindo-global-footer{padding:28px 20px}.ksindo-help-fab{right:10px;bottom:88px;padding:9px 12px}}
+        @media(max-width:700px){.ksindo-footer-inner{grid-template-columns:1fr 1fr;gap:20px}.ksindo-footer-inner>div:first-child{grid-column:1/-1}.ksindo-global-footer{padding:28px 20px}}
         
         .ksindo-mobile-nav{display:none}
         @media(max-width:700px){.ksindo-mobile-nav{position:fixed;z-index:950;left:0;right:0;bottom:0;display:flex;justify-content:space-around;align-items:center;background:#fff;border-top:1px solid #e5e7eb;box-shadow:0 -4px 16px #0f172a12;padding:7px 3px calc(7px + env(safe-area-inset-bottom));}.ksindo-mobile-nav a{color:#334155;text-decoration:none;font-size:10px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:52px}.ksindo-mobile-nav span{font-size:19px}}
 
-        /* SKELETON SHIMMER LOADER FOR INSTANT 0ms PAINT */
+        /* SKELETON SHIMMER LOADER */
         .skeleton-card {
             background: #ffffff;
             border-radius: 14px;
@@ -482,6 +480,22 @@
             align-items: center;
             gap: 6px;
         }
+
+        .btn-load-more-products {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+            transition: background 0.2s;
+        }
+        .btn-load-more-products:hover {
+            background: #15803d;
+        }
     </style>
 </head>
 <body>
@@ -493,7 +507,7 @@
             <button class="search-btn-round" onclick="window.handleSearch()">🔍</button>
         </div>
         <div class="nav-actions">
-            <!-- 4. NOTIFICATION ICON WITH SOUND & LOCKSCREEN PUSH -->
+            <!-- NOTIFICATION BELL -->
             <button class="nav-round-btn" id="notifBellBtn" onclick="requestNotificationAccess()" title="Enable Notification & Ring">
                 🔔
             </button>
@@ -514,7 +528,7 @@
                     <li id="menuItemDelivered" onclick="window.openOrdersTab('history')" style="display:none;">📜 Order History (Delivered & Cancelled)</li>
                     <li id="menuItemProfile" onclick="window.openProfileModal()" style="display:none;">✏️ Update Profile</li>
 
-                    <!-- 3. GRIEVANCE LINK IN PROFILE MENU -->
+                    <!-- Grievance Link in Menu -->
                     <li onclick="window.location.href='grievance.html'" style="color:#4f46e5; font-weight:bold;">💬 24x7 Customer Grievance / Help</li>
 
                     <!-- Seller & Info -->
@@ -595,7 +609,7 @@
     </div>
 
     <div class="container">
-        <!-- 5. AI/ML Smart Interest Banner -->
+        <!-- AI/ML Smart Interest Banner -->
         <div class="ai-rec-banner" id="aiSmartBanner">
             <span>✨ AI Feed:</span> <span id="aiSmartBannerText">Personalized recommendation for you</span>
         </div>
@@ -608,11 +622,12 @@
                   <button type="button" onclick="window.setProductCardSize('large')">A+ Large</button>
               </div>
             </div>
+            <!-- Initial Product Grid -->
             <div class="product-grid" id="generalProductGrid"></div>
         </section>
     </div>
 
-    <!-- PHONE AUTH MODAL WITH RATE LIMIT & FORGOT PASSWORD -->
+    <!-- AUTH MODAL (OTP LIMIT & RECAPTCHA SAFE RESET) -->
     <div class="modal-overlay" id="auth-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="window.closeAuthModal()">&times;</span>
@@ -621,7 +636,7 @@
                 <button type="button" class="auth-tab-btn" id="tabBtnSignup" onclick="switchAuthTab('signup')">Register Account</button>
             </div>
 
-            <!-- 1. LOGIN FORM (Mobile & Password) -->
+            <!-- 1. LOGIN FORM -->
             <div id="authLoginFormContainer">
                 <form id="phoneLoginForm">
                     <label style="font-size:12px; font-weight:bold; color:#475569;">Mobile Number:</label>
@@ -629,7 +644,6 @@
                     
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <label style="font-size:12px; font-weight:bold; color:#475569;">Password:</label>
-                        <!-- 2. FORGOT PASSWORD BUTTON -->
                         <a href="javascript:void(0)" onclick="openForgotPasswordFlow()" style="font-size:11px; color:#ea580c; font-weight:bold; text-decoration:none;">Forgot Password?</a>
                     </div>
                     <input type="password" id="loginPasswordInput" placeholder="Enter Password" required style="width:100%; margin:6px 0 15px; padding:11px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:14px;">
@@ -659,10 +673,10 @@
                 </form>
             </div>
 
-            <!-- 2. FORGOT PASSWORD FORM (Enter Mobile to send OTP) -->
+            <!-- 3. FORGOT PASSWORD FORM -->
             <div id="authForgotFormContainer" style="display:none;">
                 <h3 style="color:#ea580c; font-size:16px; margin-bottom:8px;">Reset Password</h3>
-                <p style="font-size:12px; color:#64748b; margin-bottom:12px;">Apna registered 10-digit mobile number dalein. Hum password reset OTP bhejenge.</p>
+                <p style="font-size:12px; color:#64748b; margin-bottom:12px;">Apna registered 10-digit mobile number dalein. Password reset OTP bheja jayega.</p>
                 <input type="tel" id="forgotPhoneInput" placeholder="10 Digit Mobile Number" maxlength="10" style="width:100%; padding:11px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:14px; font-weight:bold; margin-bottom:12px;">
                 <button type="button" class="btn-submit" onclick="submitForgotPasswordPhone()" style="background:#ea580c;">Send Reset OTP</button>
                 <div style="text-align:center; margin-top:12px;"><a href="javascript:void(0)" onclick="switchAuthTab('login')" style="font-size:12px; color:#64748b;">Back to Login</a></div>
@@ -675,7 +689,6 @@
                 <div id="otpAttemptNotice" style="font-size:11px; color:#ea580c; font-weight:bold; margin-bottom:10px;"></div>
                 <input type="tel" id="smsOtpInput" placeholder="• • • • • •" maxlength="6" style="width:180px; letter-spacing:6px; font-size:22px; font-weight:900; text-align:center; padding:10px; border:2px solid #16a34a; border-radius:10px; outline:none;">
                 
-                <!-- Extra field for Forgot Password New Password -->
                 <div id="newPasswordWrapper" style="display:none; margin-top:12px;">
                     <input type="password" id="resetNewPasswordInput" placeholder="Enter New Password" style="width:100%; padding:10px; border:1.5px solid #cbd5e1; border-radius:8px;">
                 </div>
@@ -684,12 +697,12 @@
                 <div style="margin-top:10px;"><a href="javascript:void(0)" onclick="cancelOTPStep()" style="font-size:12px; color:#64748b; text-decoration:underline;">Cancel</a></div>
             </div>
 
-            <!-- Invisible Recaptcha Container -->
+            <!-- Invisible Recaptcha Clean Container -->
             <div id="recaptcha-verifier-container"></div>
         </div>
     </div>
 
-    <!-- Modern Live Orders & History Modal -->
+    <!-- Live Orders Modal -->
     <div class="modal-overlay" id="orders-modal-overlay">
         <div class="modal-box" style="max-width:650px;">
             <span class="close-modal" onclick="window.closeOrdersModal()">&times;</span>
@@ -698,7 +711,7 @@
         </div>
     </div>
 
-    <!-- 3. PROFILE MODAL WITH DIRECT GRIEVANCE BUTTON -->
+    <!-- Profile Modal with Grievance Hub Button -->
     <div class="modal-overlay" id="profile-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="window.closeProfileModal()">&times;</span>
@@ -773,18 +786,13 @@
 
                 <div style="margin-top:15px; padding:14px; background:#f0fdf4; border:1px dashed #16a34a; border-radius:8px; text-align:center;">
                     <h4 style="color:#16a34a; margin:4px 0;">Cash on Delivery / Doorstep UPI</h4>
-                    <p style="font-size:12px; color:#64748b;">Delivery boy ke aane par OTP share karein.</p>
+                    <p style="font-size:12px; color:#64748b;">Delivery partner ke aane par OTP share karein.</p>
                 </div>
 
                 <button type="submit" id="btnConfirmOrderSubmit" class="btn-submit">Confirm Order</button>
             </form>
         </div>
     </div>
-
-    <!-- Floating Help Button -->
-    <a href="grievance.html" class="ksindo-help-fab" aria-label="Open KSINDO grievance center">
-        <span>☏</span> 24x7 Help & Grievance
-    </a>
 
     <!-- Mobile Bottom Navigation Bar -->
     <nav class="ksindo-mobile-nav" aria-label="Quick navigation">
@@ -936,7 +944,7 @@
     })();
     </script>
 
-    <!-- CORE ENGINE WITH ALL 5 FEATURES -->
+    <!-- CORE ENGINE WITH RECAPTCHA FIX & LAZY BALANCE LOAD -->
     <script>
         var firebaseConfig = {
             apiKey: "AIzaSyA7f9PWSyws4XkzKq077sNdlF0J33DSVSo",
@@ -966,6 +974,10 @@
         var activeCategory = 'all';
         var activeSubCategory = 'all';
 
+        // Lazy Load Balance Tracker
+        var visibleProductCount = 10;
+        var currentRenderedList = [];
+
         var availableCoupons = {
             "KSINDO50": { type: "flat", discount: 50, minOrder: 199, label: "₹50 OFF" },
             "WELCOME10": { type: "percent", percent: 10, maxDiscount: 100, minOrder: 149, label: "10% OFF" },
@@ -973,9 +985,7 @@
         };
         var appliedCoupon = null;
 
-        // =========================================================================
-        // 5. AI / ML SMART RECOMMENDATION ENGINE (3-Clicks Tracking & Preference)
-        // =========================================================================
+        // AI / ML 3-Clicks Tracking & Preference
         function trackCategoryInterestAI(category) {
             if (!category || category === 'all') return;
             var cat = category.toLowerCase();
@@ -983,7 +993,6 @@
             clicks[cat] = (clicks[cat] || 0) + 1;
             localStorage.setItem('ksindo_ai_clicks', JSON.stringify(clicks));
 
-            // If checked 3 times, promote this category
             if (clicks[cat] >= 3) {
                 localStorage.setItem('ksindo_ai_favorite_category', cat);
                 updateAIBanner(cat);
@@ -1003,9 +1012,7 @@
             }
         }
 
-        // =========================================================================
-        // 4. WEB PUSH NOTIFICATION & LOCK SCREEN SOUND TRIGGER
-        // =========================================================================
+        // Push Notifications Hook
         let messaging = null;
         try {
             if (firebase.messaging.isSupported()) {
@@ -1022,11 +1029,8 @@
                 const permission = await Notification.requestPermission();
                 if (permission === 'granted') {
                     if (messaging) {
-                        // Register background service worker
                         const reg = await navigator.serviceWorker.register('firebase-messaging-sw.js');
-                        const token = await messaging.getToken({
-                            serviceWorkerRegistration: reg
-                        });
+                        const token = await messaging.getToken({ serviceWorkerRegistration: reg });
 
                         if (token) {
                             var phoneKey = currentUserProfile ? currentUserProfile.phone : 'guest_' + Date.now();
@@ -1035,11 +1039,10 @@
                                 phone: phoneKey,
                                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                             });
-                            alert("🔔 Notifications ON ho gaye! Ab phone lock hone par bhi sound aur popup aayega.");
+                            alert("🔔 Notifications ON ho gaye! Ab lock screen par bhi update aayega.");
                             document.getElementById('notifBellBtn').innerText = "🔕";
                         }
                     } else {
-                        // Direct local notification test
                         new Notification("ksindo Super App", {
                             body: "Notifications successfully enable ho gaye hain!",
                             icon: "ksindo-icon.svg"
@@ -1130,7 +1133,7 @@
             return '';
         }
 
-        // Realtime Firestore Coupon
+        // Coupon Logic
         window.applyCouponCode = async function() {
             var code = (document.getElementById('cartCouponInput').value || '').trim().toUpperCase();
             var msg = document.getElementById('cartCouponMsg');
@@ -1337,7 +1340,6 @@
             document.getElementById('cart-modal').classList.add('open');
         };
 
-        // STRICT BUY NOW CHECK: Require phone login first!
         window.buyNow = function(prodId) {
             if (!currentUserProfile || !currentUserProfile.phone) {
                 alert("⚠️ Order karne ke liye pehle apna Mobile Number login karein!\n(Guest order allowed nahi hai)");
@@ -1348,7 +1350,7 @@
             window.openCheckoutModal();
         };
 
-        // SEARCH ENGINE
+        // Fuzzy Hindi / Hinglish Search
         var HINDI_SYNONYM_DICT = {
             'आलू': ['aloo', 'potato', 'aalu', 'alu', 'allu'],
             'टमाटर': ['tamatar', 'tomato', 'tamator', 'tamatr'],
@@ -1416,6 +1418,7 @@
             });
 
             list = list.filter(isProductAvailableForPincode);
+            visibleProductCount = 10;
             renderProductGridFromList(list);
         };
 
@@ -1466,7 +1469,7 @@
             }
         }
 
-        // 5. AI SORTED PRODUCT RENDERER
+        // INITIAL 10 PRODUCTS + LAZY BALANCE LOAD
         function renderFilteredProducts() {
             var list = allProducts.filter(function(p){
                 return (p.category || '').toLowerCase() !== 'food' && (!p.categories || !p.categories.includes('food'));
@@ -1482,11 +1485,9 @@
                     list = list.filter(function(p){ return (p.subCategory || '').toLowerCase() === activeSubCategory; });
                 }
             } else {
-                // If on home ("all"), check AI preference
                 var aiFav = getAIFavoriteCategory();
                 if (aiFav) {
                     updateAIBanner(aiFav);
-                    // Sort items matching AI favorite to the top!
                     list.sort(function(a, b) {
                         var aMatch = ((a.category || '').toLowerCase() === aiFav || (a.categories && a.categories.map(c=>c.toLowerCase()).includes(aiFav)));
                         var bMatch = ((b.category || '').toLowerCase() === aiFav || (b.categories && b.categories.map(c=>c.toLowerCase()).includes(aiFav)));
@@ -1502,6 +1503,7 @@
         function renderProductGridFromList(list) {
             var grid = document.getElementById('generalProductGrid');
             if (!grid) return;
+            currentRenderedList = list;
 
             if (list.length === 0) {
                 var currentPin = getCustomerPincode();
@@ -1510,8 +1512,10 @@
                 return;
             }
 
+            var limit = Math.min(visibleProductCount, list.length);
             var html = '';
-            for (var j = 0; j < list.length; j++) {
+
+            for (var j = 0; j < limit; j++) {
                 var p = list[j];
                 var img = (p.images && p.images.length > 0) ? p.images[0] : (p.imageUrl || 'https://via.placeholder.com/200');
                 var discBadge = getDiscountMarkup(p);
@@ -1519,8 +1523,8 @@
                 var origMarkup = (origVal && Number(origVal) > Number(p.price)) ? '<span style="text-decoration:line-through; font-size:12px; color:#888; margin-left:6px;">₹' + origVal + '</span>' : '';
 
                 var unavailable = isOutOfStock(p) || !isProductAvailableForPincode(p);
-
                 var placeholderSvg = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"%3E%3C/svg%3E';
+
                 html += '<div class="product-card ' + (unavailable ? 'stock-unavailable' : '') + '">' +
                     '<img src="' + placeholderSvg + '" data-src="' + img + '" class="card-main-img" loading="lazy" decoding="async" alt="' + (p.name || 'Product') + '" onclick="window.openProductDetail(\'' + p.id + '\')">' +
                     '<div class="product-title" onclick="window.openProductDetail(\'' + p.id + '\')">' + p.name + '</div>' +
@@ -1536,9 +1540,25 @@
                     '</div>' +
                 '</div>';
             }
+
+            // Show Load More Button for Remaining Products
+            if (visibleProductCount < list.length) {
+                var remaining = list.length - visibleProductCount;
+                html += '<div style="grid-column:1/-1; text-align:center; margin:25px 0 10px;">' +
+                    '<button type="button" class="btn-load-more-products" onclick="window.loadMoreProducts()">' +
+                        '⚡ Load More Products (' + remaining + ' more available)' +
+                    '</button>' +
+                '</div>';
+            }
+
             grid.innerHTML = html;
             initImageLazyLoading();
         }
+
+        window.loadMoreProducts = function() {
+            visibleProductCount += 10;
+            renderProductGridFromList(currentRenderedList);
+        };
 
         showProductSkeletons();
         if (allProducts.length > 0) {
@@ -1550,6 +1570,7 @@
             if (el) el.classList.add('active');
             activeCategory = cat;
             activeSubCategory = 'all';
+            visibleProductCount = 10; // Reset balance view to first 10
 
             trackCategoryInterestAI(cat);
 
@@ -1569,10 +1590,11 @@
             }
             if (el) el.classList.add('active');
             activeSubCategory = subCat;
+            visibleProductCount = 10;
             renderFilteredProducts();
         };
 
-        // CHECKOUT OFFER SYSTEM
+        // Checkout Offers
         var activeCheckoutOffer = null, unlockedOffer = null;
         function customerOfferKey(){
             if(currentUserProfile && currentUserProfile.phone) return currentUserProfile.phone;
@@ -1642,7 +1664,7 @@
             }
         };
 
-        // STRICT CHECKOUT PROTECTION: GUEST ORDER NOT ALLOWED!
+        // Strict Checkout
         window.openCheckoutModal = function() {
             if (!currentUserProfile || !currentUserProfile.phone) {
                 alert("🔒 Order karne ke liye pehle apna Mobile Number login karein!\n(Bina login order create nahi ho sakta)");
@@ -1678,7 +1700,7 @@
             document.getElementById('checkout-overlay').classList.remove('active');
         };
 
-        // CHECKOUT SUBMISSION - COD
+        // Confirm Order
         document.getElementById('orderForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -1762,9 +1784,9 @@
             });
         });
 
-        // =========================================================================
-        // 1 & 2. OTP ENGINE (MAX 5 TIMES PER DAY LIMIT + FORGOT PASSWORD RESET)
-        // =========================================================================
+        // ==========================================
+        // DYNAMIC RECAPTCHA & OTP VERIFICATION FIX
+        // ==========================================
         var confirmationResult = null;
         var pendingRegistrationData = null;
         var authMode = 'login'; 
@@ -1773,17 +1795,29 @@
         var activeResetPhone = '';
 
         function initRecaptcha() {
-            if (!window.recaptchaVerifier) {
-                window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-verifier-container', {
-                    'size': 'invisible',
-                    'callback': function(response) {}
-                });
+            var container = document.getElementById('recaptcha-verifier-container');
+            if (window.recaptchaVerifier) {
+                try { window.recaptchaVerifier.clear(); } catch (e) {}
+                window.recaptchaVerifier = null;
             }
+            if (container) {
+                container.innerHTML = '';
+            }
+
+            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-verifier-container', {
+                'size': 'invisible',
+                'callback': function(response) {},
+                'expired-callback': function() {
+                    if (window.recaptchaVerifier) {
+                        try { window.recaptchaVerifier.clear(); } catch(e){}
+                        window.recaptchaVerifier = null;
+                    }
+                }
+            });
         }
 
-        // 1. CHECK DAILY 5 TIMES OTP RATE LIMIT
         function checkAndIncrementOTPLimit(phone) {
-            var todayKey = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+            var todayKey = new Date().toISOString().slice(0, 10);
             var storageKey = 'ksindo_otp_tracker_' + phone;
             var data = JSON.parse(localStorage.getItem(storageKey) || '{"date":"","count":0}');
 
@@ -1838,7 +1872,6 @@
             }
         };
 
-        // 2. FORGOT PASSWORD FLOW
         window.openForgotPasswordFlow = function() {
             isForgotPasswordFlow = true;
             document.getElementById('authTabBar').style.display = 'none';
@@ -1862,7 +1895,6 @@
             sendSMSVerificationCode(phone, true);
         };
 
-        // LOGIN WITH PASSWORD
         document.getElementById('phoneLoginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             var phone = document.getElementById('loginPhoneInput').value.trim();
@@ -1898,7 +1930,6 @@
             }
         });
 
-        // DIRECT OTP LOGIN
         window.loginViaOTPDirect = async function() {
             var phone = document.getElementById('loginPhoneInput').value.trim();
             if (phone.length !== 10 || isNaN(phone)) return alert("10-digit mobile number enter karein!");
@@ -1915,7 +1946,6 @@
             sendSMSVerificationCode(phone, false);
         };
 
-        // SIGNUP WITH OTP
         document.getElementById('phoneSignupForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             var name = document.getElementById('regFullName').value.trim();
@@ -1960,14 +1990,14 @@
             }
         });
 
-        // SEND FIREBASE REAL SMS OTP (With 5 Times Limit)
         function sendSMSVerificationCode(phone, isReset) {
-            // 1. Check Rate Limit
             if (!checkAndIncrementOTPLimit(phone)) {
                 return;
             }
 
+            // Fresh Dynamic reCAPTCHA
             initRecaptcha();
+
             var fullPhoneNumber = "+91" + phone;
             var appVerifier = window.recaptchaVerifier;
 
@@ -1988,13 +2018,16 @@
                 alert("📲 OTP sent! 6-digit ka code enter karein.");
             }).catch(function(err) {
                 alert("OTP bhejne me error: " + err.message);
-                if (window.recaptchaVerifier) window.recaptchaVerifier.clear();
-                window.recaptchaVerifier = null;
+                if (window.recaptchaVerifier) {
+                    try { window.recaptchaVerifier.clear(); } catch(e){}
+                    window.recaptchaVerifier = null;
+                }
+                var c = document.getElementById('recaptcha-verifier-container');
+                if (c) c.innerHTML = '';
                 cancelOTPStep();
             });
         }
 
-        // VERIFY OTP (Registration, Login & Reset Password)
         window.verifyReceivedOTP = function() {
             var otp = document.getElementById('smsOtpInput').value.trim();
             if (otp.length !== 6 || isNaN(otp)) return alert("Sahi 6-digit OTP dalein!");
@@ -2007,24 +2040,19 @@
 
             confirmationResult.confirm(otp).then(async function(result) {
                 if (isForgotPasswordFlow) {
-                    // 2. FORGOT PASSWORD UPDATE
                     var newPass = document.getElementById('resetNewPasswordInput').value.trim();
                     if (newPass.length < 4) return alert("Naya password kam se kam 4 characters ka dalein!");
 
-                    await db.collection("users").doc(activeResetPhone).update({
-                        password: newPass
-                    });
+                    await db.collection("users").doc(activeResetPhone).update({ password: newPass });
                     var userSnap = await db.collection("users").doc(activeResetPhone).get();
                     setCustomerSession(userSnap.data());
                     alert("✅ Password successfully change ho gaya! Aap login ho chuke hain.");
                 } else if (isOTPDirectLogin) {
-                    // Direct OTP Login
                     var phone = document.getElementById('loginPhoneInput').value.trim();
                     var userSnap = await db.collection("users").doc(phone).get();
                     setCustomerSession(userSnap.data());
                     alert("🎉 Phone verified! Login successful.");
                 } else {
-                    // Complete Registration
                     await db.collection("users").doc(pendingRegistrationData.phone).set(pendingRegistrationData);
                     setCustomerSession(pendingRegistrationData);
                     alert("🎉 Mubarak ho! Aapka account ban gaya aur verify ho chuka hai.");
@@ -2134,7 +2162,7 @@
             }).catch(function(err){ alert(err.message); });
         });
 
-        // Order Tracker
+        // Step Tracker
         function getModernStepBar(status) {
             var st = (status || 'Placed').toLowerCase();
             if (st === 'cancelled') {
