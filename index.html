@@ -481,20 +481,30 @@
             gap: 6px;
         }
 
-        .btn-load-more-products {
-            background: #16a34a;
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 25px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
-            transition: background 0.2s;
+        /* AUTO-LOAD INFINITE SPINNER */
+        .auto-loader-status {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 18px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #16a34a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .btn-load-more-products:hover {
-            background: #15803d;
+        .auto-loader-spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #bbf7d0;
+            border-top: 2px solid #16a34a;
+            border-radius: 50%;
+            animation: spinAuto 0.7s linear infinite;
+        }
+        @keyframes spinAuto {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -627,7 +637,7 @@
         </section>
     </div>
 
-    <!-- AUTH MODAL (OTP LIMIT & RECAPTCHA SAFE RESET) -->
+    <!-- AUTH MODAL -->
     <div class="modal-overlay" id="auth-overlay">
         <div class="modal-box">
             <span class="close-modal" onclick="window.closeAuthModal()">&times;</span>
@@ -944,7 +954,7 @@
     })();
     </script>
 
-    <!-- CORE ENGINE WITH RECAPTCHA FIX & LAZY BALANCE LOAD -->
+    <!-- CORE ENGINE WITH RECAPTCHA SAFE RESET & AUTO-LOAD ON SCROLL -->
     <script>
         var firebaseConfig = {
             apiKey: "AIzaSyA7f9PWSyws4XkzKq077sNdlF0J33DSVSo",
@@ -974,9 +984,10 @@
         var activeCategory = 'all';
         var activeSubCategory = 'all';
 
-        // Lazy Load Balance Tracker
+        // Auto-Load Balance Tracker
         var visibleProductCount = 10;
         var currentRenderedList = [];
+        var isAutoLoading = false;
 
         var availableCoupons = {
             "KSINDO50": { type: "flat", discount: 50, minOrder: 199, label: "₹50 OFF" },
@@ -1350,7 +1361,7 @@
             window.openCheckoutModal();
         };
 
-        // Fuzzy Hindi / Hinglish Search
+        // Fuzzy Search
         var HINDI_SYNONYM_DICT = {
             'आलू': ['aloo', 'potato', 'aalu', 'alu', 'allu'],
             'टमाटर': ['tamatar', 'tomato', 'tamator', 'tamatr'],
@@ -1469,7 +1480,7 @@
             }
         }
 
-        // INITIAL 10 PRODUCTS + LAZY BALANCE LOAD
+        // INITIAL 10 PRODUCTS + AUTO LOAD ON SCROLL
         function renderFilteredProducts() {
             var list = allProducts.filter(function(p){
                 return (p.category || '').toLowerCase() !== 'food' && (!p.categories || !p.categories.includes('food'));
@@ -1541,13 +1552,11 @@
                 '</div>';
             }
 
-            // Show Load More Button for Remaining Products
+            // AUTO-LOAD STATUS INDICATOR (Jab aur products bache hon)
             if (visibleProductCount < list.length) {
-                var remaining = list.length - visibleProductCount;
-                html += '<div style="grid-column:1/-1; text-align:center; margin:25px 0 10px;">' +
-                    '<button type="button" class="btn-load-more-products" onclick="window.loadMoreProducts()">' +
-                        '⚡ Load More Products (' + remaining + ' more available)' +
-                    '</button>' +
+                html += '<div id="autoLoadSentinel" class="auto-loader-status">' +
+                    '<div class="auto-loader-spinner"></div>' +
+                    '<span>Loading more products...</span>' +
                 '</div>';
             }
 
@@ -1555,10 +1564,19 @@
             initImageLazyLoading();
         }
 
-        window.loadMoreProducts = function() {
-            visibleProductCount += 10;
-            renderProductGridFromList(currentRenderedList);
-        };
+        // AUTO-LOAD INFINITE SCROLL LISTENER (Mobile & Desktop)
+        window.addEventListener('scroll', function() {
+            if ((window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 350)) {
+                if (!isAutoLoading && currentRenderedList && visibleProductCount < currentRenderedList.length) {
+                    isAutoLoading = true;
+                    visibleProductCount += 10;
+                    renderProductGridFromList(currentRenderedList);
+                    setTimeout(function() {
+                        isAutoLoading = false;
+                    }, 250);
+                }
+            }
+        }, { passive: true });
 
         showProductSkeletons();
         if (allProducts.length > 0) {
@@ -1570,7 +1588,7 @@
             if (el) el.classList.add('active');
             activeCategory = cat;
             activeSubCategory = 'all';
-            visibleProductCount = 10; // Reset balance view to first 10
+            visibleProductCount = 10; // Reset back to first 10 on filter change
 
             trackCategoryInterestAI(cat);
 
@@ -1700,7 +1718,7 @@
             document.getElementById('checkout-overlay').classList.remove('active');
         };
 
-        // Confirm Order
+        // Confirm Order (COD / UPI)
         document.getElementById('orderForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
