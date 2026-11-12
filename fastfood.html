@@ -116,7 +116,11 @@
         .restaurant-title { font-size:16px; font-weight:800; color:#0f172a; margin-bottom:4px; }
         .restaurant-sub { font-size:12px; color:#64748b; margin-bottom:8px; }
         .restaurant-badge { background:#ffedd5; color:#ea580c; font-size:11px; font-weight:bold; padding:3px 8px; border-radius:6px; }
-        .review-toggle{border:1px solid #fed7aa;background:#fff7ed;color:#c2410c;padding:6px 9px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;margin-top:9px}.reviews-panel{display:none;background:#fffaf5;border:1px solid #fed7aa;border-radius:10px;padding:10px;margin-top:8px;font-size:12px}.review-line{padding:7px 0;border-bottom:1px solid #ffedd5}.review-form{display:grid;gap:7px;margin-top:8px}.review-form input,.review-form textarea,.review-form select{width:100%;padding:8px;border:1px solid #fdba74;border-radius:7px;font-size:12px}
+        .review-toggle{border:1px solid #fed7aa;background:#fff7ed;color:#c2410c;padding:6px 9px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;margin-top:9px}
+        .reviews-panel{display:none;background:#fffaf5;border:1px solid #fed7aa;border-radius:10px;padding:10px;margin-top:8px;font-size:12px}
+        .review-line{padding:7px 0;border-bottom:1px solid #ffedd5}
+        .review-form{display:grid;gap:7px;margin-top:8px}
+        .review-form input,.review-form textarea,.review-form select{width:100%;padding:8px;border:1px solid #fdba74;border-radius:7px;font-size:12px}
 
         /* SHIMMER SKELETON FOR FASTFOOD */
         .skeleton-rest-card {
@@ -656,6 +660,12 @@
         };
 
         window.directOrderDish = function(dishId) {
+            // पहले चेक करें कि यूज़र लॉगिन है या नहीं
+            if (!currentUser && !auth.currentUser) {
+                alert("ऑर्डर करने के लिए कृपया पहले लॉगिन करें!");
+                window.location.href = "index.html"; // अगर आपका लॉगिन पेज अलग है (जैसे login.html), तो यहाँ नाम बदल दें
+                return;
+            }
             addDishToCart(dishId);
             openCheckoutModal();
         };
@@ -718,11 +728,19 @@
         };
 
         window.openCheckoutModal = function() {
+            // चेकआउट मॉडल खुलने से पहले ही लॉगिन चेक करें
+            var activeUser = currentUser || auth.currentUser;
+            if (!activeUser) {
+                alert("ऑर्डर करने के लिए कृपया पहले लॉगिन करें!");
+                window.location.href = "index.html"; // ज़रूरत पड़ने पर अपने लॉगिन पेज का URL डालें
+                return;
+            }
+
             var cart = getFoodCart();
             if (cart.length === 0) return alert("Cart khali hai!");
 
             document.getElementById('custName').value = currentUserProfile.fullName || '';
-            document.getElementById('custPhone').value = currentUserProfile.phone || '';
+            document.getElementById('custPhone').value = currentUserProfile.phone || activeUser.phoneNumber || '';
             document.getElementById('custAddress').value = currentUserProfile.address || '';
             document.getElementById('custPincode').value = userLocationPin;
 
@@ -736,7 +754,20 @@
 
         document.getElementById('foodCheckoutForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            
+            var activeUser = currentUser || auth.currentUser;
+            if (!activeUser) {
+                alert("ऑर्डर करने के लिए कृपया पहले लॉगिन करें!");
+                window.location.href = "index.html";
+                return;
+            }
+
             var cart = getFoodCart();
+            if (cart.length === 0) {
+                alert("Aapka cart khali hai!");
+                return;
+            }
+
             var btn = document.getElementById('btnPlaceFoodOrder');
             btn.innerText = "Sending Order...";
             btn.disabled = true;
@@ -754,6 +785,7 @@
             var shopName = firstItem.assignedShopName || 'Kitchen';
 
             db.collection("orders").add({
+                userId: activeUser.uid,
                 customerName: name,
                 customerPhone: phone,
                 customerAddress: address,
@@ -767,7 +799,7 @@
                 deliveryOtp: deliveryOtp,
                 assignedShopId: shopId,
                 assignedShopName: shopName,
-                userEmail: currentUser ? currentUser.email : (currentUserProfile.userEmail || "guest@ksindo.com"),
+                userEmail: activeUser.email || currentUserProfile.userEmail || "",
                 orderDateFormatted: new Date().toLocaleString('en-IN'),
                 orderDate: firebase.firestore.FieldValue.serverTimestamp()
             }).then(function() {
@@ -783,6 +815,7 @@
             });
         });
 
+        updateCartUI();
         checkLocationStatus();
     </script>
 </body>
