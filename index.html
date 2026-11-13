@@ -507,6 +507,69 @@
             100% { transform: rotate(360deg); }
         }
     </style>
+
+<style id="ksindo-app-redesign">
+:root{--ks-blue:#087eae;--ks-ink:#17212b;--ks-muted:#69737d;--ks-line:#e9edf0;--ks-bg:#fff}
+html{scroll-behavior:smooth}
+body{background:#fff!important;color:var(--ks-ink)!important;padding-bottom:82px!important}
+header{background:#fff!important;color:#20252b!important;box-shadow:0 2px 12px rgba(0,0,0,.06)!important;padding:12px 18px!important;gap:12px!important}
+.logo{background:none!important;-webkit-text-fill-color:var(--ks-blue)!important;color:var(--ks-blue)!important;font-style:normal!important;font-size:25px!important;letter-spacing:-.7px!important}
+.search-container{background:#f7f8fa!important;border:1px solid #e6e9ec!important;border-radius:28px!important;box-shadow:0 2px 8px rgba(0,0,0,.04)!important;overflow:hidden}
+.search-container input{background:transparent!important;color:#222!important}
+.search-btn-round{background:transparent!important;color:#222!important}
+.nav-round-btn{background:#f4f7f9!important;color:#27313a!important;border:1px solid #e9edf0!important}
+.sub-header-clock-bar{background:#f6fbfd!important;color:#53616a!important}
+.location-strip{background:#fff!important;border-bottom:1px solid var(--ks-line)!important;color:#303c45!important;padding:10px 18px!important}
+.location-strip button{border-color:#b6ddec!important;color:var(--ks-blue)!important}
+.mode-switcher-container{padding:9px 14px!important;gap:9px!important;border-bottom:1px solid var(--ks-line)!important}
+.mode-btn{border-radius:12px!important;padding:10px 12px!important}
+.mode-btn.active{background:var(--ks-blue)!important;border-color:var(--ks-blue)!important}
+.mode-btn.food-mode{background:#fff7ed!important}
+.clean-icon-bar{gap:25px!important;padding:13px 18px!important;border-bottom:1px solid var(--ks-line)!important}
+.icon-symbol{background:#fff!important;border:0!important;font-size:25px!important}
+.icon-item.active .icon-symbol{background:#e8f6fb!important}
+.icon-title{font-size:11px!important;font-weight:600!important}
+.ks-app-hero{margin:0;background:linear-gradient(112deg,#ffd34d 0%,#ffad16 54%,#f28a08 100%);min-height:174px;padding:24px 22px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;color:#5a3300}
+.ks-hero-copy{max-width:65%;position:relative;z-index:1}.ks-hero-copy span{font-size:10px;font-weight:900;letter-spacing:1.5px}.ks-hero-copy h1{font-size:clamp(24px,5vw,38px);line-height:1.08;margin:9px 0;font-weight:950}.ks-hero-copy p{font-size:12px;max-width:270px;font-weight:600}.ks-hero-art{font-size:clamp(42px,9vw,76px);filter:drop-shadow(0 5px 5px #9b5b2440)}
+.ks-quick-categories{display:flex;gap:10px;overflow-x:auto;padding:15px 14px 17px;background:#fff;scrollbar-width:none}.ks-quick-categories::-webkit-scrollbar{display:none}.ks-quick-categories a{flex:0 0 118px;min-height:118px;border:1.5px solid #dcecf2;border-radius:17px;background:linear-gradient(145deg,#fff,#f4fbfd);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;text-decoration:none;color:#26343c;box-shadow:0 3px 9px #0d52610b}.ks-quick-categories a span{font-size:35px}.ks-quick-categories a b{font-size:12px;line-height:1.25}
+.ks-promo-ribbon{margin:0 15px 18px;padding:13px 15px;border-radius:14px;background:linear-gradient(100deg,#e8f6fb,#f4fbfd);display:flex;align-items:center;gap:12px;color:#087eae}.ks-promo-ribbon>span:first-child{font-size:24px}.ks-promo-ribbon div{display:flex;flex-direction:column;gap:3px;flex:1}.ks-promo-ribbon strong{font-size:14px}.ks-promo-ribbon small{font-size:11px;color:#52636c}.ks-promo-arrow{font-size:26px}
+.container{max-width:1240px!important;padding:12px 15px 35px!important}
+#sectionGeneralStore>div:first-child{margin:8px 0 14px!important}#marketViewTitle{color:#111!important;font-size:20px!important;font-weight:850!important}
+.product-size-tools button{border-color:#dce5e9!important;color:#52616a!important;background:#fff!important}
+.product-grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))!important;gap:14px!important}
+.product-card{background:#fff!important;border:1px solid #e9edf0!important;border-radius:15px!important;padding:10px!important;box-shadow:0 2px 10px rgba(0,0,0,.045)!important;text-align:left!important;min-width:0}
+.card-main-img{height:175px!important;border:0!important;background:#fff!important;object-fit:contain!important}
+.product-title{color:#17212b!important;font-size:13px!important;height:38px!important;text-align:left!important}
+.add-btn-round{background:#fff!important;color:var(--ks-blue)!important;border:1.5px solid var(--ks-blue)!important;border-radius:12px!important;font-size:12px!important}
+.buy-now-round{background:var(--ks-blue)!important;border-radius:12px!important}
+.discount-tag{color:#0b9b59!important}
+#generalProductGrid .product-card .price{font-weight:900}
+.ks-app-bottom-nav{display:none}
+footer,.ksindo-footer-inner{max-width:100%}
+@media(max-width:700px){
+ body{padding-bottom:76px!important}
+ header{display:grid!important;grid-template-columns:auto 1fr!important;grid-template-areas:"logo actions" "search search"!important;padding:9px 14px 11px!important;gap:8px!important}
+ header>.logo{grid-area:logo}.search-container{grid-area:search;width:100%!important;min-width:0!important;min-height:44px}.nav-actions{grid-area:actions;justify-self:end;gap:6px!important}
+ .nav-round-btn{width:36px!important;height:36px!important}
+ .sub-header-clock-bar{font-size:10px!important}
+ .location-strip{padding:8px 12px!important;gap:7px!important}.location-strip button{font-size:10px!important;padding:6px 8px!important}
+ .mode-switcher-container{padding:8px 10px!important}.mode-btn{font-size:11px!important;padding:9px 8px!important}
+ .clean-icon-bar{gap:22px!important;padding:12px 14px!important}
+ .ks-app-hero{min-height:155px;padding:20px 17px}.ks-hero-copy{max-width:72%}.ks-hero-art{font-size:44px}
+ .ks-quick-categories a{flex-basis:104px;min-height:112px}
+ .container{padding:8px 12px 25px!important}
+ .product-grid,#generalProductGrid,#generalProductGrid.cards-small,#generalProductGrid.cards-large{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important}
+ .product-card{padding:6px!important;border-radius:12px!important}
+ .card-main-img,#generalProductGrid.cards-small .card-main-img,#generalProductGrid.cards-large .card-main-img{height:clamp(88px,25vw,135px)!important}
+ .product-title{font-size:12px!important;line-height:1.3!important}
+ .add-btn-round,.buy-now-round{padding:8px 7px!important;font-size:11px!important}
+ .ks-app-bottom-nav{position:fixed;z-index:1500;bottom:0;left:0;right:0;height:64px;background:#fff;border-top:1px solid #e8edf0;display:flex;justify-content:space-around;align-items:center;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -3px 14px #0000000b}
+ .ks-app-bottom-nav a{color:#5c6870;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:650;min-width:56px}
+ .ks-app-bottom-nav a span{font-size:20px;line-height:1.1}.ks-app-bottom-nav a.active{color:var(--ks-blue)}
+}
+@media(min-width:701px){.ks-app-hero,.ks-quick-categories,.ks-promo-ribbon{max-width:1240px;margin-left:auto;margin-right:auto}}
+</style>
+
 </head>
 <body>
 
@@ -596,6 +659,21 @@
         <div class="icon-item" onclick="window.filterCategory('mobiles', this)"><div class="icon-symbol">📱</div><span class="icon-title">Mobiles</span></div>
         <div class="icon-item" onclick="window.filterCategory('electronics', this)"><div class="icon-symbol">💻</div><span class="icon-title">Electronics</span></div>
     </div>
+
+
+    <!-- KSINDO App-style home experience -->
+    <section class="ks-app-hero" aria-label="KSINDO shopping highlights">
+      <div class="ks-hero-copy"><span>EVERYTHING. ONE PLACE.</span><h1>Celebrate Every Moment</h1><p>Daily needs, fresh food & local favourites at your doorstep</p></div>
+      <div class="ks-hero-art" aria-hidden="true">🛍️　🥭　🪔</div>
+    </section>
+    <section class="ks-quick-categories" aria-label="Shop by collection">
+      <a href="seasonable.html"><span>🪔</span><b>Festival<br>Special</b></a>
+      <a href="fresh.html"><span>🍎</span><b>Fruits &<br>Vegetables</b></a>
+      <a href="fastfood.html"><span>🍕</span><b>Food &<br>Restaurants</b></a>
+      <a href="#generalProductGrid"><span>🛒</span><b>Daily<br>Essentials</b></a>
+      <a href="seller-center.html"><span>🏪</span><b>Become a<br>Seller</b></a>
+    </section>
+    <div class="ks-promo-ribbon"><span>✨</span><div><strong>Shop local with KSINDO</strong><small>Discover products and restaurants around you</small></div><span class="ks-promo-arrow">›</span></div>
 
     <!-- Fashion Sub-Categories Strip -->
     <div class="sub-cat-bar" id="fashionSubCatBar">
@@ -2357,5 +2435,13 @@
             }
         });
     </script>
+
+<nav class="ks-app-bottom-nav" aria-label="App navigation">
+ <a class="active" href="index (1).html"><span>⌂</span>Home</a>
+ <a href="fresh.html"><span>🥬</span>Fresh</a>
+ <a href="fastfood.html"><span>🍔</span>Food</a>
+ <a href="javascript:void(0)" onclick="window.toggleCart()"><span>🛒</span>Cart</a>
+ <a href="javascript:void(0)" onclick="window.handleUserIconClick()"><span>👤</span>Account</a>
+</nav>
 </body>
 </html>
