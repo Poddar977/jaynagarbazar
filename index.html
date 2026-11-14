@@ -572,6 +572,37 @@ footer,.ksindo-footer-inner{max-width:100%}
 
 </head>
 <body>
+    <!-- App Launch Countdown Overlay -->
+<div id="appLaunchOverlay" style="position:fixed; inset:0; background:linear-gradient(135deg, #ea580c, #9a3412); color:white; z-index:999999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; font-family:'Segoe UI', sans-serif;">
+    <img src="https://poddar977.github.io/jaynagarbazar/logo.png" alt="ksindo" style="width:85px; height:85px; border-radius:20px; margin-bottom:16px; box-shadow:0 10px 25px rgba(0,0,0,0.3); background:white; padding:6px;">
+    <h1 style="font-size:26px; font-weight:900; margin-bottom:6px; letter-spacing:0.5px;">ksindo Live होने जा रहा है!</h1>
+    <p style="font-size:14px; opacity:0.9; max-width:340px; margin-bottom:24px;">16 नवंबर 2026, सुबह 10:00 बजे से आपका अपना लोकल शॉपिंग और फ़ूड ऐप खुल जाएगा।</p>
+    
+    <!-- Countdown Boxes -->
+    <div style="display:flex; gap:10px; justify-content:center; margin-bottom:24px;">
+        <div style="background:rgba(255,255,255,0.18); backdrop-filter:blur(6px); padding:12px 14px; border-radius:14px; min-width:68px; border:1px solid rgba(255,255,255,0.3);">
+            <div id="cd-days" style="font-size:24px; font-weight:900;">00</div>
+            <div style="font-size:11px; text-transform:uppercase; opacity:0.85;">Days</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.18); backdrop-filter:blur(6px); padding:12px 14px; border-radius:14px; min-width:68px; border:1px solid rgba(255,255,255,0.3);">
+            <div id="cd-hours" style="font-size:24px; font-weight:900;">00</div>
+            <div style="font-size:11px; text-transform:uppercase; opacity:0.85;">Hours</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.18); backdrop-filter:blur(6px); padding:12px 14px; border-radius:14px; min-width:68px; border:1px solid rgba(255,255,255,0.3);">
+            <div id="cd-mins" style="font-size:24px; font-weight:900;">00</div>
+            <div style="font-size:11px; text-transform:uppercase; opacity:0.85;">Mins</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.18); backdrop-filter:blur(6px); padding:12px 14px; border-radius:14px; min-width:68px; border:1px solid rgba(255,255,255,0.3);">
+            <div id="cd-secs" style="font-size:24px; font-weight:900;">00</div>
+            <div style="font-size:11px; text-transform:uppercase; opacity:0.85;">Secs</div>
+        </div>
+    </div>
+
+    <div style="background:rgba(0,0,0,0.25); padding:8px 18px; border-radius:20px; font-size:12px; font-weight:600;">
+        🚀 Grand Opening: 16 Nov 2026 • 10:00 AM
+    </div>
+</div>
+    
 
     <header>
         <div class="logo" onclick="window.location.reload()">ksindo</div>
@@ -2434,6 +2465,37 @@ footer,.ksindo-footer-inner{max-width:100%}
                 renderFilteredProducts();
             }
         });
+(function() {
+    // 16 नवंबर 2026, सुबह 10:00:00 AM (IST) का टारगेट समय
+    const launchTime = new Date("2026-11-16T10:00:00+05:30").getTime();
+    const overlay = document.getElementById("appLaunchOverlay");
+
+    function updateLaunchTimer() {
+        const now = new Date().getTime();
+        const distance = launchTime - now;
+
+        // जैसे ही 10:00 AM बजेंगे, ओवरले अपने आप हट जाएगा और ऐप खुल जाएगा
+        if (distance <= 0) {
+            if (overlay) overlay.style.display = "none";
+            clearInterval(timerInterval);
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById("cd-days").innerText = String(days).padStart(2, '0');
+        document.getElementById("cd-hours").innerText = String(hours).padStart(2, '0');
+        document.getElementById("cd-mins").innerText = String(minutes).padStart(2, '0');
+        document.getElementById("cd-secs").innerText = String(seconds).padStart(2, '0');
+    }
+
+    updateLaunchTimer();
+    const timerInterval = setInterval(updateLaunchTimer, 1000);
+})();
+    
     </script>
 
 <nav class="ks-app-bottom-nav" aria-label="App navigation">
