@@ -273,6 +273,7 @@
             flex-direction: column; 
         }
         .cart-modal.open { right: 0 !important; }
+        .ks-cart-toast{position:fixed;left:50%;bottom:86px;transform:translate(-50%,16px);background:#0f172a;color:#fff;padding:11px 16px;border-radius:24px;font-size:13px;font-weight:600;box-shadow:0 8px 24px #0003;z-index:99999;opacity:0;pointer-events:none;transition:.22s;white-space:nowrap}.ks-cart-toast.show{opacity:1;transform:translate(-50%,0)}
         .cart-header { background-color: #0f172a; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         .cart-items { flex: 1; overflow-y: auto; padding: 15px; -webkit-overflow-scrolling: touch; }
         .cart-item { display: flex; gap: 10px; align-items: center; border-bottom: 1px solid #eee; padding: 12px 0; }
@@ -570,9 +571,12 @@ footer,.ksindo-footer-inner{max-width:100%}
 @media(min-width:701px){.ks-app-hero,.ks-quick-categories,.ks-promo-ribbon{max-width:1240px;margin-left:auto;margin-right:auto}}
 </style>
 
+    <link rel="stylesheet" href="ksindo-marketplace.css">
+    <script src="firebase-config.js"></script>
 </head>
+    
 <body>
-    <!-- App Launch Countdown Overlay -->
+<!-- App Launch Countdown Overlay -->
 <div id="appLaunchOverlay" style="position:fixed; inset:0; background:linear-gradient(135deg, #ea580c, #9a3412); color:white; z-index:999999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; font-family:'Segoe UI', sans-serif;">
     <img src="https://poddar977.github.io/jaynagarbazar/logo.png" alt="ksindo" style="width:85px; height:85px; border-radius:20px; margin-bottom:16px; box-shadow:0 10px 25px rgba(0,0,0,0.3); background:white; padding:6px;">
     <h1 style="font-size:26px; font-weight:900; margin-bottom:6px; letter-spacing:0.5px;">ksindo Live होने जा रहा है!</h1>
@@ -602,8 +606,6 @@ footer,.ksindo-footer-inner{max-width:100%}
         🚀 Grand Opening: 16 Nov 2026 • 10:00 AM
     </div>
 </div>
-    
-
     <header>
         <div class="logo" onclick="window.location.reload()">ksindo</div>
         <div class="search-container">
@@ -745,6 +747,8 @@ footer,.ksindo-footer-inner{max-width:100%}
             <div class="product-grid" id="generalProductGrid"></div>
         </section>
     </div>
+
+    <div id="ks-cart-toast" class="ks-cart-toast" role="status" aria-live="polite">Added to cart</div>
 
     <!-- AUTH MODAL -->
     <div class="modal-overlay" id="auth-overlay">
@@ -1065,14 +1069,7 @@ footer,.ksindo-footer-inner{max-width:100%}
 
     <!-- CORE ENGINE WITH RECAPTCHA SAFE RESET & AUTO-LOAD ON SCROLL -->
     <script>
-        var firebaseConfig = {
-            apiKey: "AIzaSyA7f9PWSyws4XkzKq077sNdlF0J33DSVSo",
-            authDomain: "jaynagar-srote.firebaseapp.com",
-            projectId: "jaynagar-srote",
-            storageBucket: "jaynagar-srote.firebasestorage.app",
-            messagingSenderId: "820632565818",
-            appId: "1:820632565818:web:0b2f4676cecd799a801d03"
-        };
+        var firebaseConfig = window.KSINDO_FIREBASE_CONFIG;
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
@@ -1431,6 +1428,15 @@ footer,.ksindo-footer-inner{max-width:100%}
             saveStoredCart(cart);
         };
 
+        window.showCartAddedToast = function(message) {
+            var toast = document.getElementById('ks-cart-toast');
+            if (!toast) return;
+            toast.textContent = message || 'कार्ट में जोड़ दिया गया · देखने के लिए 🛒 Cart दबाएँ';
+            toast.classList.add('show');
+            clearTimeout(window.__ksCartToastTimer);
+            window.__ksCartToastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2100);
+        };
+
         window.addToCart = function(prodId) {
             var p = allProducts.find(function(x){ return x.id === prodId; });
             if (!p) return;
@@ -1457,7 +1463,9 @@ footer,.ksindo-footer-inner{max-width:100%}
             }
 
             saveStoredCart(cart);
-            document.getElementById('cart-modal').classList.add('open');
+            // Keep the cart drawer closed; customer can open it from the cart icon.
+            document.getElementById('cart-modal').classList.remove('open');
+            window.showCartAddedToast('कार्ट में जोड़ दिया गया · देखने के लिए 🛒 Cart दबाएँ');
         };
 
         window.buyNow = function(prodId) {
@@ -2465,6 +2473,17 @@ footer,.ksindo-footer-inner{max-width:100%}
                 renderFilteredProducts();
             }
         });
+    </script>
+
+<nav class="ks-app-bottom-nav" aria-label="App navigation">
+ <a class="active" href="index (1).html"><span>⌂</span>Home</a>
+ <a href="fresh.html"><span>🥬</span>Fresh</a>
+ <a href="fastfood.html"><span>🍔</span>Food</a>
+ <a href="javascript:void(0)" onclick="window.toggleCart()"><span>🛒</span>Cart</a>
+ <a href="javascript:void(0)" onclick="window.handleUserIconClick()"><span>👤</span>Account</a>
+</nav>
+    <script src="ksindo-app-shell.js"></script>
+    <script>
 (function() {
     // 16 नवंबर 2026, सुबह 10:00:00 AM (IST) का टारगेट समय
     const launchTime = new Date("2026-11-16T10:00:00+05:30").getTime();
@@ -2495,15 +2514,6 @@ footer,.ksindo-footer-inner{max-width:100%}
     updateLaunchTimer();
     const timerInterval = setInterval(updateLaunchTimer, 1000);
 })();
-    
-    </script>
-
-<nav class="ks-app-bottom-nav" aria-label="App navigation">
- <a class="active" href="index (1).html"><span>⌂</span>Home</a>
- <a href="fresh.html"><span>🥬</span>Fresh</a>
- <a href="fastfood.html"><span>🍔</span>Food</a>
- <a href="javascript:void(0)" onclick="window.toggleCart()"><span>🛒</span>Cart</a>
- <a href="javascript:void(0)" onclick="window.handleUserIconClick()"><span>👤</span>Account</a>
-</nav>
+</script>
 </body>
 </html>
