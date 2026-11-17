@@ -9,9 +9,9 @@
     <meta name="apple-mobile-web-app-title" content="KSINDO Merchant">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://poddar977.github.io/jaynagarbazar/logo.png">
-    <title>KSINDO Merchant & Partner Portal</title>
+    <title>KSINDO Merchant & Store Control Panel</title>
 
-    <!-- Firebase Compat SDKs + External Config File (No API Key hardcoded inside HTML) -->
+    <!-- Firebase Compat SDKs + External Config File -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -19,7 +19,7 @@
 
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color:transparent; }
-        body { background:#f1f5f9; color:#0f172a; padding-bottom:75px; }
+        body { background:#f1f5f9; color:#0f172a; padding-bottom:80px; }
 
         /* HEADER */
         header {
@@ -27,9 +27,8 @@
             padding:14px 16px; display:flex; justify-content:space-between; align-items:center;
             position:sticky; top:0; z-index:1000; box-shadow:0 3px 12px rgba(234,88,12,0.28);
         }
-        .brand { display:flex; align-items:center; gap:10px; }
         .brand h1 { font-size:18px; font-weight:900; letter-spacing:0.5px; }
-        .brand small { display:block; font-size:11px; opacity:0.9; font-weight:600; }
+        .brand small { display:block; font-size:11px; opacity:0.92; font-weight:600; }
         .header-btns { display:flex; gap:8px; align-items:center; }
         .btn-pill {
             background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.45);
@@ -54,7 +53,7 @@
         .form-group label { display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px; }
         .req { color:#dc2626; }
         .form-group input, .form-group select, .form-group textarea {
-            width:100%; padding:11px 12px; border:1.5px solid #cbd5e1; border-radius:10px;
+            width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:10px;
             font-size:13px; outline:none; background:#fff; transition:0.2s;
         }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:#ea580c; }
@@ -84,11 +83,10 @@
             margin-bottom:14px; line-height:1.4;
         }
         .status-banner.pending { display:block; background:#fef3c7; color:#92400e; border:1px solid #f59e0b; }
-        .status-banner.success { display:block; background:#dcfce7; color:#166534; border:1px solid #22c55e; }
         .status-banner.error { display:block; background:#fee2e2; color:#991b1b; border:1px solid #ef4444; }
 
         /* MERCHANT DASHBOARD */
-        #merchantDashboard { display:none; max-width:960px; margin:16px auto; padding:0 14px; }
+        #merchantDashboard { display:none; max-width:1020px; margin:16px auto; padding:0 14px; }
         .shop-summary-bar {
             background:white; border-radius:16px; padding:14px 16px; margin-bottom:14px;
             border:1.5px solid #fed7aa; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
@@ -97,11 +95,12 @@
         .badge { font-size:11px; font-weight:800; padding:3px 9px; border-radius:12px; }
         .badge-pin { background:#ffedd5; color:#c2410c; }
         .badge-cat { background:#e0f2fe; color:#0369a1; }
+        .badge-ksindo { background:#fef3c7; color:#b45309; border:1px solid #f59e0b; }
         .badge-live { background:#dcfce7; color:#15803d; }
 
         .alert-bar {
             background:#0f172a; color:white; padding:10px 14px; border-radius:12px;
-            margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; font-size:12px;
+            margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; font-size:12px; gap:10px;
         }
 
         /* DASHBOARD TABS */
@@ -127,33 +126,43 @@
             padding:8px 12px; border:none; border-radius:8px; font-size:11px; font-weight:800; cursor:pointer; color:white;
         }
 
-        /* PRODUCT MANAGEMENT */
-        .prod-form-card { background:white; border-radius:16px; padding:16px; border:1px solid #e2e8f0; margin-bottom:16px; }
-        .variant-box {
-            background:#fff7ed; border:1px dashed #fdba74; padding:10px; border-radius:10px; margin-bottom:12px;
+        /* ADMIN-STYLE PRODUCT CATALOG FORM */
+        .prod-form-card { background:white; border-radius:16px; padding:18px; border:1px solid #cbd5e1; margin-bottom:16px; }
+        .form-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:12px; }
+        .cat-checkbox-group {
+            display:flex; gap:10px; flex-wrap:wrap; background:#f8fafc;
+            padding:10px 12px; border-radius:10px; border:1.5px solid #cbd5e1;
         }
-        .variant-row { display:grid; grid-template-columns:1.2fr 1fr 0.8fr auto; gap:6px; margin-bottom:6px; }
-        .variant-row input { padding:8px; font-size:12px; }
+        .cat-checkbox-group label {
+            display:flex; align-items:center; gap:5px; font-size:12px; font-weight:700;
+            cursor:pointer; color:#1e293b; margin:0;
+        }
+        .cat-checkbox-group input { width:auto; }
+        .preview-grid { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+        .preview-box { width:60px; height:60px; border-radius:8px; border:2px solid #16a34a; object-fit:cover; }
 
-        .prod-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:12px; }
+        .variant-box {
+            margin-top:14px; padding:14px; background:#fff7ed;
+            border:1.5px dashed #ea580c; border-radius:12px;
+        }
+        .variant-row {
+            display:grid; grid-template-columns:1.2fr 1fr 1fr 0.9fr auto;
+            gap:6px; align-items:center; margin-bottom:8px; background:white;
+            padding:7px; border-radius:8px; border:1px solid #fed7aa;
+        }
+        .variant-row input { padding:7px 9px; font-size:12px; border:1px solid #cbd5e1; border-radius:6px; width:100%; }
+
+        .prod-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(270px, 1fr)); gap:12px; }
         .prod-item-card {
             background:white; border-radius:14px; padding:12px; border:1px solid #e2e8f0;
             display:flex; gap:10px; align-items:center;
         }
-        .prod-item-card img { width:68px; height:68px; object-fit:cover; border-radius:10px; background:#f8fafc; }
+        .prod-item-card img { width:70px; height:70px; object-fit:cover; border-radius:10px; background:#f8fafc; }
         .stock-pill {
             display:inline-block; font-size:10px; font-weight:800; padding:2px 8px; border-radius:10px; margin-top:4px;
         }
         .in-stock { background:#dcfce7; color:#15803d; }
         .out-stock { background:#fee2e2; color:#b91c1c; }
-
-        /* EDIT MODAL */
-        .modal-overlay {
-            position:fixed; inset:0; background:rgba(15,23,42,0.7); display:none;
-            justify-content:center; align-items:center; z-index:9999; padding:16px;
-        }
-        .modal-overlay.active { display:flex; }
-        .modal-box { background:white; border-radius:18px; padding:20px; width:100%; max-width:460px; max-height:90vh; overflow-y:auto; }
     </style>
 </head>
 <body>
@@ -162,7 +171,7 @@
         <div class="brand">
             <div>
                 <h1>KSINDO Merchant</h1>
-                <small>Partner & Store Control Panel</small>
+                <small>Partner & KSINDO Store Control</small>
             </div>
         </div>
         <div class="header-btns">
@@ -194,11 +203,11 @@
                 <button type="submit" class="btn-primary" id="btnLoginSubmit">Login to Merchant Portal</button>
             </form>
 
-            <!-- CREATE ACCOUNT FORM (1 TO 8 ALL COMPULSORY, GST OPTIONAL, PHONE WITH OTP) -->
+            <!-- CREATE ACCOUNT FORM -->
             <form id="merchantRegisterForm" style="display:none;">
                 <div class="form-group">
                     <label>1. Full Name <span class="req">*</span></label>
-                    <input type="text" id="regName" placeholder="Owner ka pura naam" required>
+                    <input type="text" id="regName" placeholder="Owner / Operator ka pura naam" required>
                 </div>
 
                 <div class="form-group">
@@ -211,7 +220,7 @@
                     <select id="regVendorType" onchange="handleVendorOptionChange()" required>
                         <option value="">-- Vendor Type Chunein --</option>
                         <option value="SHOP">Shop Name (Apni Dukan / Restaurant)</option>
-                        <option value="KSINDO_STORE">KSINDO Store</option>
+                        <option value="KSINDO_STORE">KSINDO Store (KSINDO Official Branch)</option>
                     </select>
                 </div>
 
@@ -251,7 +260,7 @@
 
                 <div class="form-group">
                     <label>7. Create User ID <span class="req">*</span></label>
-                    <input type="text" id="regUserId" placeholder="Unique User ID banayein (e.g. aman_shop)" required>
+                    <input type="text" id="regUserId" placeholder="Unique User ID banayein (e.g. ksindo_847226)" required>
                 </div>
 
                 <div class="form-group">
@@ -292,7 +301,8 @@
                 <div class="shop-badges">
                     <span class="badge badge-pin" id="dashPincodeBadge">PIN: 000000</span>
                     <span class="badge badge-cat" id="dashCategoryBadge">Category</span>
-                    <span class="badge badge-live">● Live Store</span>
+                    <span class="badge badge-ksindo" id="dashKsindoTag" style="display:none;">⚡ Official KSINDO Store</span>
+                    <span class="badge badge-live">● Live</span>
                 </div>
             </div>
             <button class="btn-sm" style="background:#0f172a;" onclick="testOrderAlertSound()">🔊 Test Alert & Lock Notification</button>
@@ -305,65 +315,119 @@
 
         <div class="dash-nav">
             <button class="dash-tab-btn active" id="navOrders" onclick="switchDashTab('orders')">📦 Live Orders (<span id="liveOrderCount">0</span>)</button>
-            <button class="dash-tab-btn" id="navAddProd" onclick="switchDashTab('addProd')">➕ Add Product</button>
-            <button class="dash-tab-btn" id="navMyProds" onclick="switchDashTab('myProds')">🏪 Products & Stock</button>
+            <button class="dash-tab-btn" id="navAddProd" onclick="switchDashTab('addProd')">➕ Add / Edit Product</button>
+            <button class="dash-tab-btn" id="navMyProds" onclick="switchDashTab('myProds')">🏪 Catalog & Stock</button>
         </div>
 
         <!-- TAB 1: AREA & SHOP SPECIFIC ORDERS -->
         <div id="sectionOrders">
             <div id="merchantOrdersList">
-                <p style="text-align:center; padding:30px; color:#64748b;">Aapke Pincode aur Shop ke orders load ho rahe hain...</p>
+                <p style="text-align:center; padding:30px; color:#64748b;">Orders load ho rahe hain...</p>
             </div>
         </div>
 
-        <!-- TAB 2: ADD PRODUCT WITH PHOTO & VARIANTS -->
+        <!-- TAB 2: ADMIN-STYLE PRODUCT & CATEGORY MANAGEMENT -->
         <div id="sectionAddProd" style="display:none;">
             <div class="prod-form-card">
-                <h3 style="font-size:16px; color:#ea580c; margin-bottom:12px;">➕ Naya Product / Dish Upload Karein</h3>
-                <form id="addProductForm">
-                    <div class="form-group">
-                        <label>Product / Dish Name <span class="req">*</span></label>
-                        <input type="text" id="prodName" placeholder="e.g. Kurkure Momo / Samsung Charger / Cotton Shirt" required>
-                    </div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <h3 id="productFormHeader" style="font-size:16px; color:#ea580c; margin-bottom:14px;">🏷️ Add / Edit Product (Admin Catalog System)</h3>
+                <form id="merchantProductForm">
+                    <input type="hidden" id="editProductId" value="">
+
+                    <div class="form-grid">
                         <div class="form-group">
-                            <label>Base Selling Price (₹) <span class="req">*</span></label>
-                            <input type="number" id="prodPrice" placeholder="150" required>
+                            <label>Product Title / Name <span class="req">*</span></label>
+                            <input type="text" id="prodName" placeholder="Product Title / Name" required>
                         </div>
+
                         <div class="form-group">
-                            <label>MRP (₹) <span class="req">*</span></label>
-                            <input type="number" id="prodMrp" placeholder="180" required>
+                            <label>Sub-Category <span class="req">*</span></label>
+                            <select id="prodSubCategory" onchange="checkSeasonalInput(this.value)">
+                                <option value="none">Sub-Category: Normal / General</option>
+                                <option value="daily vegetables">24x7 Fresh: Daily vegetables (सब्जियां)</option>
+                                <option value="fresh fruits">24x7 Fresh: Fresh fruits (फल)</option>
+                                <option value="dairy">24x7 Fresh: Milk & Dairy (दूध, पनीर)</option>
+                                <option value="eggs">24x7 Fresh: Eggs (अंडे)</option>
+                                <option value="dryfruits">24x7 Fresh: Dry Fruits (काजू, बादाम)</option>
+                                <option value="shringar">Seasonal: Chunri & Shringar (चुनरी, श्रृंगार)</option>
+                                <option value="pooja">Seasonal: Pooja & Hawan Samagri</option>
+                                <option value="seasonal special">Seasonal: Festival Special (Durga Puja, Diwali, Chhath, Eid)</option>
+                                <option value="lingerie">Fashion: Lingerie / Innerwear</option>
+                                <option value="women">Fashion: Women Dresses</option>
+                                <option value="men">Fashion: Men Wear</option>
+                                <option value="cosmetics">Beauty: Cosmetics & Makeup</option>
+                                <option value="skincare">Beauty: Skin & Hair Care</option>
+                                <option value="daily-need">Grocery: Daily Needs / Packets</option>
+                                <option value="gift-combo">Gift: Hamper / Combo Box</option>
+                            </select>
                         </div>
-                    </div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                        <div class="form-group">
-                            <label>Stock Quantity <span class="req">*</span></label>
-                            <input type="number" id="prodStockQty" value="20" min="0" required>
+
+                        <div class="form-group" id="festivalTagContainer" style="display:none;">
+                            <label>Festival Tag</label>
+                            <input type="text" id="prodFestivalTag" placeholder="e.g. durga-puja, diwali, chhath, eid">
                         </div>
+
                         <div class="form-group">
-                            <label>Default Unit / Size <span class="req">*</span></label>
-                            <input type="text" id="prodUnit" placeholder="e.g. 1 Plate / 1 Pc / Size L" required>
+                            <label>Option 1: Image URL Link</label>
+                            <input type="url" id="prodImageLink" placeholder="https://...">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Option 2: Upload Photos (Max 6)</label>
+                            <input type="file" id="prodFilePhotos" accept="image/*" multiple onchange="previewSelectedFiles(this)">
                         </div>
                     </div>
 
-                    <!-- PHOTO UPLOAD (FILE OR URL) -->
+                    <!-- MULTI-SELECT CATEGORIES (LIKE ADMIN) -->
                     <div class="form-group">
-                        <label>Product Photo Upload <span class="req">*</span></label>
-                        <input type="file" id="prodPhotoFile" accept="image/*" onchange="previewAndEncodeImage(this, 'prodImgPreview')">
-                        <input type="text" id="prodPhotoUrl" placeholder="Ya direct Image URL paste karein" style="margin-top:6px;">
-                        <img id="prodImgPreview" style="display:none; width:90px; height:90px; object-fit:cover; border-radius:10px; margin-top:8px; border:1px solid #cbd5e1;">
+                        <label>Categories (Multi-Select Supported) <span class="req">*</span></label>
+                        <div class="cat-checkbox-group">
+                            <label><input type="checkbox" name="productCats" value="fashion"> 👗 Fashion</label>
+                            <label><input type="checkbox" name="productCats" value="beauty"> 💄 Beauty</label>
+                            <label><input type="checkbox" name="productCats" value="grocery"> 🛒 Grocery</label>
+                            <label><input type="checkbox" name="productCats" value="fresh"> 🥦 24x7 Fresh</label>
+                            <label><input type="checkbox" name="productCats" value="seasonal"> 🪔 Seasonal / Festive</label>
+                            <label><input type="checkbox" name="productCats" value="gift"> 🎁 Gift</label>
+                            <label><input type="checkbox" name="productCats" value="food"> 🍔 Food</label>
+                        </div>
                     </div>
 
-                    <!-- VARIANTS SECTION -->
+                    <div class="preview-grid" id="photoPreviewContainer"></div>
+
+                    <!-- SIZE / WEIGHT VARIANTS WITH AUTO DISCOUNT % (LIKE ADMIN) -->
                     <div class="variant-box">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                            <strong style="font-size:12px; color:#9a3412;">Product Variants (Size / Plate / Color)</strong>
-                            <button type="button" class="btn-sm" style="background:#ea580c;" onclick="addVariantRow('variantContainer')">+ Add Variant</button>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <div>
+                                <strong style="font-size:13px; color:#9a3412;">📏 Size / Weight Variants:</strong>
+                                <p style="font-size:11px; color:#7c2d12; margin-top:2px;">Size, Selling Price aur MRP dalne par discount % automatic calculate hoga.</p>
+                            </div>
+                            <button type="button" onclick="addVariantRow()" class="btn-sm" style="background:#16a34a;">+ Add Size Variant</button>
                         </div>
-                        <div id="variantContainer"></div>
+                        <div id="variantsContainer"></div>
                     </div>
 
-                    <button type="submit" class="btn-primary" id="btnUploadProd">Publish Product to Store</button>
+                    <div class="form-grid" style="margin-top:12px;">
+                        <div class="form-group">
+                            <label>Stock Status</label>
+                            <select id="prodStockStatus">
+                                <option value="in">In Stock (Available)</option>
+                                <option value="out">Out of Stock (Block Orders)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Available Pincodes (Default: Aapka Area PIN)</label>
+                            <input type="text" id="prodPincodes" placeholder="e.g. 847226">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Product Description</label>
+                        <textarea id="prodDesc" placeholder="Product ki details likhein..." style="height:65px;"></textarea>
+                    </div>
+
+                    <div style="display:flex; gap:10px;">
+                        <button type="submit" class="btn-primary" id="productSubmitBtn">Publish Product</button>
+                        <button type="button" id="cancelEditBtn" onclick="resetProductForm()" style="display:none; background:#ef4444; color:white; border:none; padding:13px 18px; border-radius:12px; font-weight:800; cursor:pointer; margin-top:6px;">Cancel Edit</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -374,55 +438,8 @@
         </div>
     </div>
 
-    <!-- EDIT PRODUCT MODAL -->
-    <div class="modal-overlay" id="editProductModal">
-        <div class="modal-box">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h3 style="font-size:16px; color:#ea580c;">✏️ Edit Product, Stock & Variants</h3>
-                <button onclick="closeEditModal()" style="border:none; background:#f1f5f9; width:28px; height:28px; border-radius:50%; font-weight:bold; cursor:pointer;">&times;</button>
-            </div>
-            <form id="editProductForm">
-                <input type="hidden" id="editProdId">
-                <div class="form-group">
-                    <label>Product Name</label>
-                    <input type="text" id="editProdName" required>
-                </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                    <div class="form-group">
-                        <label>Selling Price (₹)</label>
-                        <input type="number" id="editProdPrice" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Stock Quantity</label>
-                        <input type="number" id="editProdStock" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Stock Status</label>
-                    <select id="editProdStatus">
-                        <option value="in_stock">In Stock (Available)</option>
-                        <option value="out_of_stock">Out of Stock (Hide/Unavailable)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Change Photo (Optional)</label>
-                    <input type="file" id="editProdPhotoFile" accept="image/*" onchange="previewAndEncodeImage(this, 'editProdImgPreview')">
-                    <img id="editProdImgPreview" style="width:75px; height:75px; object-fit:cover; border-radius:8px; margin-top:6px;">
-                </div>
-                <div class="variant-box">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                        <strong style="font-size:12px; color:#9a3412;">Edit Variants</strong>
-                        <button type="button" class="btn-sm" style="background:#ea580c;" onclick="addVariantRow('editVariantContainer')">+ Add</button>
-                    </div>
-                    <div id="editVariantContainer"></div>
-                </div>
-                <button type="submit" class="btn-primary">Save Changes</button>
-            </form>
-        </div>
-    </div>
-
     <script>
-        // Initialize Firebase using external firebase-config.js (window.KSINDO_FIREBASE_CONFIG)
+        // Initialize Firebase using external firebase-config.js
         if (!window.KSINDO_FIREBASE_CONFIG) {
             alert("Error: firebase-config.js load nahi hui!");
         } else if (!firebase.apps.length) {
@@ -439,6 +456,8 @@
         let knownOrderIds = new Set();
         let isInitialOrderLoad = true;
         let merchantProductsCache = [];
+        let allShopsMap = {};
+        let base64PhotosArray = [];
         let deferredPrompt = null;
 
         // ==================== PWA SERVICE WORKER & INSTALL ====================
@@ -562,7 +581,7 @@
             b.innerText = msg;
         }
 
-        // ==================== PHONE OTP VERIFICATION (WITH SMART FALLBACK) ====================
+        // ==================== PHONE OTP VERIFICATION ====================
         function sendPhoneOtp() {
             const phone = document.getElementById('regPhone').value.trim();
             if (!/^\d{10}$/.test(phone)) {
@@ -590,10 +609,7 @@
                         btn.innerText = "OTP Sent";
                         alert("OTP aapke mobile number +91" + phone + " par bhej diya gaya hai.");
                     })
-                    .catch(err => {
-                        // Agar Firebase Spark plan par SMS billing off hai to instant verification code generate karein
-                        activateFallbackOtp(phone, btn, hintBox);
-                    });
+                    .catch(() => activateFallbackOtp(phone, btn, hintBox));
             } catch (e) {
                 activateFallbackOtp(phone, btn, hintBox);
             }
@@ -619,12 +635,11 @@
             btn.innerText = "Verifying...";
 
             if (fallbackOtpCode) {
-                if (code === fallbackOtpCode) {
-                    completeOtpSuccess(btn);
-                } else {
+                if (code === fallbackOtpCode) completeOtpSuccess(btn);
+                else {
                     btn.disabled = false;
                     btn.innerText = "Verify OTP";
-                    alert("Galat Verification Code! Kripya sahi 6-digit code dalein.");
+                    alert("Galat Verification Code!");
                 }
                 return;
             }
@@ -666,7 +681,6 @@
             const password = document.getElementById('regPassword').value.trim();
             const phone = document.getElementById('regPhone').value.trim();
 
-            // 1 to 8 Compulsory Validation (GSTIN optional)
             if (!name || !email || !vendorType || !shopCategory || !shopName || !address || !/^\d{6}$/.test(pincode) || !userId || !password) {
                 alert("1 se 8 tak sabhi details bharna compulsory hai (sirf GSTIN optional hai)!");
                 return;
@@ -726,7 +740,7 @@
             }
         });
 
-        // ==================== MERCHANT LOGIN (CHECK ADMIN APPROVAL) ====================
+        // ==================== MERCHANT LOGIN ====================
         document.getElementById('merchantLoginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const userId = document.getElementById('loginUserId').value.trim().toLowerCase();
@@ -737,7 +751,6 @@
             btn.innerText = "Checking Approval...";
 
             try {
-                // 1. Check Approved Shops Collection
                 const shopSnap = await db.collection("shops")
                     .where("userId", "==", userId)
                     .where("password", "==", password)
@@ -751,7 +764,6 @@
                     return;
                 }
 
-                // 2. Check if still pending in merchant_requests
                 const reqSnap = await db.collection("merchant_requests")
                     .where("userId", "==", userId)
                     .where("password", "==", password)
@@ -802,21 +814,44 @@
             window.location.reload();
         }
 
+        // Helper: Check if logged-in merchant is KSINDO Store
+        function isKsindoOfficialStore(merchant) {
+            if (!merchant) return false;
+            return merchant.vendorType === 'KSINDO_STORE' ||
+                   (merchant.shopCategory || '').toLowerCase() === 'ksindo store' ||
+                   (merchant.shopName || '').toLowerCase().includes('ksindo store');
+        }
+
         // ==================== DASHBOARD INITIALIZATION ====================
         function openMerchantDashboard() {
             document.getElementById('authSection').style.display = 'none';
             document.getElementById('merchantDashboard').style.display = 'block';
             document.getElementById('logoutBtn').style.display = 'inline-block';
 
+            const isKsindo = isKsindoOfficialStore(activeMerchant);
             document.getElementById('dashShopName').innerText = activeMerchant.shopName;
             document.getElementById('dashPincodeBadge').innerText = "PIN: " + activeMerchant.pincode;
             document.getElementById('dashCategoryBadge').innerText = activeMerchant.shopCategory || activeMerchant.vendorType;
+            document.getElementById('dashKsindoTag').style.display = isKsindo ? 'inline-block' : 'none';
+            document.getElementById('prodPincodes').value = activeMerchant.pincode || '';
+
+            if (document.getElementById('variantsContainer').children.length === 0) {
+                addVariantRow();
+            }
 
             if ("Notification" in window && Notification.permission === "default") {
                 Notification.requestPermission();
             }
 
-            listenToShopSpecificOrders();
+            // Load all shops first to distinguish other shops vs KSINDO Store in the same pincode
+            db.collection("shops").onSnapshot(snap => {
+                allShopsMap = {};
+                snap.forEach(d => {
+                    allShopsMap[d.id] = { id: d.id, ...d.data() };
+                });
+                listenToIsolatedOrders();
+            });
+
             listenToMerchantProducts();
         }
 
@@ -830,42 +865,80 @@
             document.getElementById('navMyProds').classList.toggle('active', tab === 'myProds');
         }
 
-        // ==================== SHOP & PINCODE ISOLATED ORDERS + SOUND/LOCK ALERT ====================
-        function listenToShopSpecificOrders() {
+        // ==================== STRICT ORDER ISOLATION (KSINDO STORE vs OTHER SHOPS) ====================
+        function listenToIsolatedOrders() {
+            const myPin = String(activeMerchant.pincode || '').trim();
+            const amIKsindoStore = isKsindoOfficialStore(activeMerchant);
+
             db.collection("orders")
-                .where("customerPincode", "==", String(activeMerchant.pincode))
+                .where("customerPincode", "==", myPin)
                 .onSnapshot(snap => {
-                    const myOrders = [];
+                    const visibleOrders = [];
 
                     snap.forEach(doc => {
                         const o = { id: doc.id, ...doc.data() };
-                        const directMatch = (o.assignedShopId === activeMerchant.id) ||
-                                            (o.assignedShopName && o.assignedShopName.toLowerCase() === activeMerchant.shopName.toLowerCase());
-                        const itemMatch = Array.isArray(o.items) && o.items.some(item =>
-                            item.assignedShopId === activeMerchant.id ||
-                            (item.assignedShopName && item.assignedShopName.toLowerCase() === activeMerchant.shopName.toLowerCase())
-                        );
+                        const items = Array.isArray(o.items) ? o.items : [];
 
-                        if (directMatch || itemMatch) {
-                            const myItems = Array.isArray(o.items)
-                                ? o.items.filter(item => !item.assignedShopId || item.assignedShopId === activeMerchant.id || item.assignedShopName === activeMerchant.shopName)
-                                : [];
-                            myOrders.push({ ...o, filteredItems: myItems });
+                        if (amIKsindoStore) {
+                            // KSINDO Store Logic:
+                            // Admin me aane wale is pincode ke sabhi KSINDO Store / General (unassigned) orders live honge,
+                            // LEKIN is area ke kisi doosre registered shop/restaurant ke orders show NAHI honge.
+                            const isOtherShopOrder = (() => {
+                                if (o.assignedShopId && o.assignedShopId !== activeMerchant.id) {
+                                    const targetShop = allShopsMap[o.assignedShopId];
+                                    if (!targetShop || !isKsindoOfficialStore(targetShop)) return true;
+                                }
+                                if (o.assignedShopName && !o.assignedShopName.toLowerCase().includes('ksindo') && o.assignedShopName.toLowerCase() !== 'kitchen') {
+                                    return true;
+                                }
+                                return false;
+                            })();
 
-                            if (!isInitialOrderLoad && !knownOrderIds.has(doc.id) && o.status === "Placed") {
-                                triggerLockScreenNotification(
-                                    "🛎️ Naya Order: " + activeMerchant.shopName,
-                                    "Customer: " + (o.customerName || "Buyer") + " • PIN: " + o.customerPincode + " • ₹" + o.totalAmount
-                                );
+                            // Filter items so other shops' items are excluded even in mixed carts
+                            const ksindoItems = items.filter(item => {
+                                if (!item.assignedShopId && !item.shopId) return true; // General Admin/KSINDO item
+                                const itemShopId = item.assignedShopId || item.shopId;
+                                if (itemShopId === activeMerchant.id) return true;
+                                const sObj = allShopsMap[itemShopId];
+                                return sObj ? isKsindoOfficialStore(sObj) : false;
+                            });
+
+                            if (!isOtherShopOrder && (ksindoItems.length > 0 || items.length === 0)) {
+                                visibleOrders.push({ ...o, filteredItems: ksindoItems.length > 0 ? ksindoItems : items });
+                                checkAndTriggerAlert(doc.id, o);
                             }
-                            knownOrderIds.add(doc.id);
+                        } else {
+                            // Normal Shop / Restaurant Logic:
+                            // Sirf isi shop ke products ka order show hoga, kisi doosre ka nahi.
+                            const directMatch = (o.assignedShopId === activeMerchant.id) ||
+                                                (o.assignedShopName && o.assignedShopName.toLowerCase() === activeMerchant.shopName.toLowerCase());
+                            const myItems = items.filter(item =>
+                                item.assignedShopId === activeMerchant.id ||
+                                item.shopId === activeMerchant.id ||
+                                (item.assignedShopName && item.assignedShopName.toLowerCase() === activeMerchant.shopName.toLowerCase())
+                            );
+
+                            if (directMatch || myItems.length > 0) {
+                                visibleOrders.push({ ...o, filteredItems: myItems.length > 0 ? myItems : items });
+                                checkAndTriggerAlert(doc.id, o);
+                            }
                         }
                     });
 
                     isInitialOrderLoad = false;
-                    myOrders.sort((a, b) => (b.orderDate?.seconds || 0) - (a.orderDate?.seconds || 0));
-                    renderMerchantOrders(myOrders);
+                    visibleOrders.sort((a, b) => (b.orderDate?.seconds || 0) - (a.orderDate?.seconds || 0));
+                    renderMerchantOrders(visibleOrders);
                 });
+        }
+
+        function checkAndTriggerAlert(orderId, orderObj) {
+            if (!isInitialOrderLoad && !knownOrderIds.has(orderId) && (orderObj.status || 'Placed') === "Placed") {
+                triggerLockScreenNotification(
+                    "🛎️ Naya Order: " + activeMerchant.shopName,
+                    "Customer: " + (orderObj.customerName || "Buyer") + " • PIN: " + orderObj.customerPincode + " • ₹" + orderObj.totalAmount
+                );
+            }
+            knownOrderIds.add(orderId);
         }
 
         function renderMerchantOrders(orders) {
@@ -873,13 +946,15 @@
             document.getElementById('liveOrderCount').innerText = orders.length;
 
             if (orders.length === 0) {
-                container.innerHTML = '<div style="background:white; padding:30px; border-radius:16px; text-align:center; color:#64748b;">Aapki shop (' + activeMerchant.shopName + ' - PIN ' + activeMerchant.pincode + ') par abhi koi order nahi hai.</div>';
+                container.innerHTML = '<div style="background:white; padding:30px; border-radius:16px; text-align:center; color:#64748b;">' +
+                    activeMerchant.shopName + ' (PIN: ' + activeMerchant.pincode + ') ke liye abhi koi live order nahi hai.' +
+                '</div>';
                 return;
             }
 
             container.innerHTML = orders.map(o => {
                 const itemsHtml = o.filteredItems.map(i =>
-                    `<div>• <b>${i.name}</b> ${i.variant ? '(' + i.variant + ')' : ''} × ${i.qty} — ₹${i.price * i.qty}</div>`
+                    `<div>• <b>${i.name}</b> ${i.size || i.variant ? '(' + (i.size || i.variant) + ')' : ''} × ${i.qty || 1} — ₹${Number(i.price) * Number(i.qty || 1)}</div>`
                 ).join('');
 
                 return `
@@ -893,13 +968,15 @@
                         </div>
                         <div style="font-size:12px; line-height:1.5;">
                             <b>Customer:</b> ${o.customerName} (${o.customerPhone})<br>
-                            <b>Address:</b> ${o.customerAddress} — <b>PIN: ${o.customerPincode}</b>
+                            <b>Address:</b> ${o.customerAddress} — <b>PIN: ${o.customerPincode}</b><br>
+                            ${o.deliveryOtp ? `<b>Delivery OTP:</b> <span style="background:#fef3c7; padding:1px 6px; border-radius:4px;">${o.deliveryOtp}</span>` : ''}
                         </div>
                         <div class="order-items-list">${itemsHtml}</div>
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                             <strong style="color:#ea580c; font-size:14px;">Total: ₹${o.totalAmount} (${o.paymentMethod || 'COD'})</strong>
                             <div class="order-actions">
-                                <button class="btn-sm" style="background:#0284c7;" onclick="updateOrderStatus('${o.id}', 'Preparing / Packed')">Accept & Pack</button>
+                                <button class="btn-sm" style="background:#0284c7;" onclick="updateOrderStatus('${o.id}', 'Confirmed')">Accept</button>
+                                <button class="btn-sm" style="background:#f59e0b; color:#0f172a;" onclick="updateOrderStatus('${o.id}', 'Packed')">Pack</button>
                                 <button class="btn-sm" style="background:#ea580c;" onclick="updateOrderStatus('${o.id}', 'Out for Delivery')">Dispatch</button>
                                 <button class="btn-sm" style="background:#16a34a;" onclick="updateOrderStatus('${o.id}', 'Delivered')">Delivered</button>
                             </div>
@@ -910,121 +987,249 @@
         }
 
         function updateOrderStatus(orderId, newStatus) {
-            db.collection("orders").doc(orderId).update({ status: newStatus })
-                .then(() => alert("Order status updated: " + newStatus))
+            const payload = { status: newStatus };
+            if (newStatus === 'Delivered') payload.deliveredAt = new Date().toISOString();
+            db.collection("orders").doc(orderId).update(payload)
+                .then(() => alert("✅ Order status updated: " + newStatus))
                 .catch(err => alert("Error: " + err.message));
         }
 
-        // ==================== PRODUCT UPLOAD, PHOTO, VARIANTS & STOCK ====================
-        function addVariantRow(containerId, vName = '', vPrice = '', vStock = '') {
-            const box = document.getElementById(containerId);
+        // ==================== ADMIN-STYLE PRODUCT UPLOAD, VARIANTS & STOCK ====================
+        function checkSeasonalInput(val) {
+            const container = document.getElementById('festivalTagContainer');
+            container.style.display = (val === 'seasonal special' || val === 'shringar' || val === 'pooja') ? 'block' : 'none';
+        }
+
+        function calculateRowDiscount(row) {
+            const price = parseFloat(row.querySelector('.v-price').value);
+            const orig = parseFloat(row.querySelector('.v-orig-price').value);
+            const discPill = row.querySelector('.v-discount-pill');
+
+            if (!isNaN(price) && !isNaN(orig) && orig > price && price > 0) {
+                discPill.value = Math.round(((orig - price) / orig) * 100) + "% OFF";
+            } else {
+                discPill.value = '';
+            }
+        }
+
+        function addVariantRow(valName = '', valPrice = '', valOrigPrice = '', valDisc = '') {
+            const container = document.getElementById('variantsContainer');
             const row = document.createElement('div');
             row.className = 'variant-row';
             row.innerHTML = `
-                <input type="text" class="v-name" placeholder="Variant (e.g. Full / XL / 1kg)" value="${vName}">
-                <input type="number" class="v-price" placeholder="Price ₹" value="${vPrice}">
-                <input type="number" class="v-stock" placeholder="Stock" value="${vStock}">
-                <button type="button" onclick="this.parentElement.remove()" style="background:#fee2e2; color:#dc2626; border:none; border-radius:6px; padding:0 8px; font-weight:bold; cursor:pointer;">✕</button>
+                <input type="text" placeholder="Size (e.g. 1kg, XL, Full)" value="${valName}" class="v-name" required>
+                <input type="number" placeholder="Price (₹)" value="${valPrice}" class="v-price" required>
+                <input type="number" placeholder="MRP (₹)" value="${valOrigPrice}" class="v-orig-price">
+                <input type="text" placeholder="Discount" value="${valDisc}" class="v-discount-pill" readonly style="background:#dcfce7; color:#15803d; font-weight:bold;">
+                <button type="button" onclick="this.parentElement.remove()" style="background:#ef4444; color:white; border:none; padding:7px 10px; border-radius:6px; cursor:pointer; font-weight:bold;">✕</button>
             `;
-            box.appendChild(row);
+            row.querySelector('.v-price').addEventListener('input', () => calculateRowDiscount(row));
+            row.querySelector('.v-orig-price').addEventListener('input', () => calculateRowDiscount(row));
+            container.appendChild(row);
+            if (valPrice && valOrigPrice) calculateRowDiscount(row);
         }
 
-        function collectVariants(containerId) {
-            const rows = document.querySelectorAll('#' + containerId + ' .variant-row');
-            const list = [];
-            rows.forEach(r => {
-                const name = r.querySelector('.v-name').value.trim();
-                const price = Number(r.querySelector('.v-price').value);
-                const stock = Number(r.querySelector('.v-stock').value || 0);
-                if (name && price > 0) list.push({ name, price, stock });
-            });
-            return list;
-        }
-
-        function previewAndEncodeImage(input, previewId) {
-            const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const maxW = 500;
-                    const scale = Math.min(1, maxW / img.width);
-                    canvas.width = img.width * scale;
-                    canvas.height = img.height * scale;
-                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.78);
-                    const prev = document.getElementById(previewId);
-                    prev.src = compressedDataUrl;
-                    prev.style.display = 'block';
-                    prev.dataset.encoded = compressedDataUrl;
+        function compressImageFile(file, maxWidth, quality) {
+            return new Promise(resolve => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = event => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width, h = img.height;
+                        if (w > maxWidth) {
+                            h = Math.round((h * maxWidth) / w);
+                            w = maxWidth;
+                        }
+                        canvas.width = w;
+                        canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
                 };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+            });
         }
 
-        document.getElementById('addProductForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const name = document.getElementById('prodName').value.trim();
-            const price = Number(document.getElementById('prodPrice').value);
-            const mrp = Number(document.getElementById('prodMrp').value);
-            const stockQty = Number(document.getElementById('prodStockQty').value);
-            const unit = document.getElementById('prodUnit').value.trim();
-            const prevImg = document.getElementById('prodImgPreview').dataset.encoded || '';
-            const urlImg = document.getElementById('prodPhotoUrl').value.trim();
-            const finalImage = prevImg || urlImg;
+        async function previewSelectedFiles(input) {
+            const container = document.getElementById('photoPreviewContainer');
+            container.innerHTML = '<span style="font-size:12px; color:#ea580c; font-weight:bold;">⚡ Compressing images...</span>';
+            base64PhotosArray = [];
 
-            if (!finalImage) {
-                alert("Kripya product ki photo upload karein ya URL dalein.");
+            if (input.files.length > 6) {
+                alert("Maximum 6 photos allowed hain!");
+                input.value = '';
+                container.innerHTML = '';
                 return;
             }
 
-            const variants = collectVariants('variantContainer');
-            const isRestaurant = (activeMerchant.shopCategory || '').toLowerCase().includes('restaurant');
-            const btn = document.getElementById('btnUploadProd');
+            for (let f of Array.from(input.files)) {
+                const compressed = await compressImageFile(f, 800, 0.72);
+                base64PhotosArray.push(compressed);
+            }
+
+            container.innerHTML = '';
+            base64PhotosArray.forEach(src => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.className = 'preview-box';
+                container.appendChild(img);
+            });
+        }
+
+        document.getElementById('merchantProductForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editProductId').value;
+            const name = document.getElementById('prodName').value.trim();
+            const subCategory = document.getElementById('prodSubCategory').value;
+            const festivalTag = document.getElementById('prodFestivalTag').value.trim().toLowerCase().replace(/\s+/g, '-');
+            const desc = document.getElementById('prodDesc').value.trim();
+            const imgLink = document.getElementById('prodImageLink').value.trim();
+
+            const selectedCats = Array.from(document.querySelectorAll('input[name="productCats"]:checked')).map(cb => cb.value);
+            if (selectedCats.length === 0) return alert("Kam se kam ek Category select karein!");
+
+            const vNames = document.querySelectorAll('#variantsContainer .v-name');
+            const vPrices = document.querySelectorAll('#variantsContainer .v-price');
+            const vOrigPrices = document.querySelectorAll('#variantsContainer .v-orig-price');
+            let variantsList = [];
+
+            vNames.forEach((nEl, idx) => {
+                const vName = nEl.value.trim();
+                const vPrice = Number(vPrices[idx].value);
+                const vOrig = Number(vOrigPrices[idx].value) || '';
+                if (vName && !isNaN(vPrice) && vPrice > 0) {
+                    let vDisc = (vOrig && vOrig > vPrice) ? Math.round(((vOrig - vPrice) / vOrig) * 100) + '% OFF' : '';
+                    variantsList.push({ size: vName, price: vPrice, originalPrice: vOrig, discount: vDisc });
+                }
+            });
+
+            if (variantsList.length === 0) return alert("Kam se kam 1 Size/Variant add karein!");
+
+            const existingProd = editId ? merchantProductsCache.find(x => x.id === editId) : null;
+            let photos = [];
+            if (base64PhotosArray.length > 0) photos = base64PhotosArray;
+            else if (imgLink) photos = [imgLink];
+            else if (existingProd) photos = existingProd.images || [existingProd.imageUrl];
+            else return alert("Photo link dalein ya 1-6 photos upload karein!");
+
+            const pinList = document.getElementById('prodPincodes').value
+                .split(',').map(x => x.trim()).filter(x => /^\d{6}$/.test(x));
+            if (pinList.length === 0 && activeMerchant.pincode) {
+                pinList.push(String(activeMerchant.pincode));
+            }
+
+            const stockVal = document.getElementById('prodStockStatus').value;
+            const isInStock = stockVal !== 'out';
+            const btn = document.getElementById('productSubmitBtn');
             btn.disabled = true;
-            btn.innerText = "Uploading...";
+            btn.innerText = "Saving...";
 
             try {
-                await db.collection("products").add({
-                    name: name,
-                    price: price,
-                    mrp: mrp,
-                    originalPrice: mrp,
-                    stockQty: stockQty,
-                    stockStatus: stockQty > 0 ? 'in_stock' : 'out_of_stock',
-                    inStock: stockQty > 0,
-                    isAvailable: stockQty > 0,
-                    unit: unit,
-                    weight: unit,
-                    imageUrl: finalImage,
-                    images: [finalImage],
-                    variants: variants,
-                    category: isRestaurant ? 'food' : (activeMerchant.shopCategory || 'general'),
-                    categories: [isRestaurant ? 'food' : 'grocery'],
+                const productData = {
+                    name,
+                    price: variantsList[0].price,
+                    originalPrice: variantsList[0].originalPrice || '',
+                    discount: variantsList[0].discount || '',
+                    categories: selectedCats,
+                    category: selectedCats[0],
+                    subCategory,
+                    festivalTag: festivalTag || '',
+                    description: desc,
+                    inStock: isInStock,
+                    isAvailable: isInStock,
+                    stockStatus: isInStock ? 'in' : 'out',
+                    availablePincodes: pinList,
+                    pincode: String(activeMerchant.pincode),
+                    imageUrl: photos[0],
+                    images: photos,
+                    hasVariants: true,
+                    sizes: variantsList,
+                    unit: variantsList[0].size,
+                    weight: variantsList[0].size,
                     assignedShopId: activeMerchant.id,
                     assignedShopName: activeMerchant.shopName,
                     shopName: activeMerchant.shopName,
-                    pincode: activeMerchant.pincode,
-                    availablePincodes: [String(activeMerchant.pincode)],
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                    isKsindoStore: isKsindoOfficialStore(activeMerchant)
+                };
 
-                alert("✅ Product successfully upload ho gaya!");
-                document.getElementById('addProductForm').reset();
-                document.getElementById('prodImgPreview').style.display = 'none';
-                document.getElementById('prodImgPreview').dataset.encoded = '';
-                document.getElementById('variantContainer').innerHTML = '';
+                if (editId) {
+                    await db.collection("products").doc(editId).update({
+                        ...productData,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    alert("✅ Product update ho gaya!");
+                } else {
+                    await db.collection("products").add({
+                        ...productData,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    alert("✅ Product publish ho gaya!");
+                }
+
+                resetProductForm();
                 switchDashTab('myProds');
             } catch (err) {
-                alert("Upload Error: " + err.message);
+                alert("Error: " + err.message);
             } finally {
                 btn.disabled = false;
-                btn.innerText = "Publish Product to Store";
+                btn.innerText = "Publish Product";
             }
         });
+
+        function editMerchantProduct(prodId) {
+            const p = merchantProductsCache.find(item => item.id === prodId);
+            if (!p) return;
+
+            document.getElementById('editProductId').value = prodId;
+            document.getElementById('prodName').value = p.name || '';
+            document.getElementById('prodSubCategory').value = p.subCategory || 'none';
+            document.getElementById('prodImageLink').value = p.imageUrl || '';
+            document.getElementById('prodDesc').value = p.description || '';
+            document.getElementById('prodStockStatus').value = (p.inStock === false || p.stockStatus === 'out' || p.stockStatus === 'out_of_stock') ? 'out' : 'in';
+            document.getElementById('prodPincodes').value = (p.availablePincodes || [activeMerchant.pincode]).join(', ');
+
+            if (p.festivalTag) {
+                document.getElementById('festivalTagContainer').style.display = 'block';
+                document.getElementById('prodFestivalTag').value = p.festivalTag;
+            } else {
+                document.getElementById('festivalTagContainer').style.display = 'none';
+            }
+
+            const selectedCats = p.categories || [p.category];
+            document.querySelectorAll('input[name="productCats"]').forEach(cb => {
+                cb.checked = selectedCats.includes(cb.value);
+            });
+
+            const container = document.getElementById('variantsContainer');
+            container.innerHTML = '';
+            if (p.sizes && p.sizes.length > 0) {
+                p.sizes.forEach(v => addVariantRow(v.size, v.price, v.originalPrice, v.discount || ''));
+            } else {
+                addVariantRow(p.unit || 'Default', p.price, p.originalPrice || '', p.discount || '');
+            }
+
+            document.getElementById('productFormHeader').innerText = '✏️ Edit Product: ' + p.name;
+            document.getElementById('productSubmitBtn').innerText = 'Update Product';
+            document.getElementById('cancelEditBtn').style.display = 'inline-block';
+
+            switchDashTab('addProd');
+        }
+
+        function resetProductForm() {
+            document.getElementById('merchantProductForm').reset();
+            document.getElementById('editProductId').value = '';
+            document.getElementById('productFormHeader').innerText = '🏷️ Add / Edit Product (Admin Catalog System)';
+            document.getElementById('productSubmitBtn').innerText = 'Publish Product';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+            document.getElementById('photoPreviewContainer').innerHTML = '';
+            document.getElementById('variantsContainer').innerHTML = '';
+            document.getElementById('festivalTagContainer').style.display = 'none';
+            document.getElementById('prodPincodes').value = activeMerchant ? activeMerchant.pincode : '';
+            base64PhotosArray = [];
+            addVariantRow();
+        }
 
         function listenToMerchantProducts() {
             db.collection("products")
@@ -1044,23 +1249,21 @@
             }
 
             grid.innerHTML = merchantProductsCache.map(p => {
-                const inStock = p.stockStatus !== 'out_of_stock' && p.inStock !== false && (p.stockQty === undefined || p.stockQty > 0);
-                const variantCount = Array.isArray(p.variants) ? p.variants.length : 0;
+                const inStock = p.inStock !== false && p.stockStatus !== 'out' && p.stockStatus !== 'out_of_stock';
+                const vCount = Array.isArray(p.sizes) ? p.sizes.length : 1;
                 return `
                     <div class="prod-item-card">
                         <img src="${p.imageUrl || 'https://via.placeholder.com/80'}" alt="${p.name}">
                         <div style="flex:1;">
                             <strong style="font-size:13px; display:block;">${p.name}</strong>
                             <span style="color:#ea580c; font-weight:900; font-size:14px;">₹${p.price}</span>
-                            <small style="color:#64748b;"> (${p.unit || ''})</small><br>
-                            <span class="stock-pill ${inStock ? 'in-stock' : 'out-stock'}">
-                                ${inStock ? 'In Stock: ' + (p.stockQty ?? 'Yes') : 'Out of Stock'}
-                            </span>
-                            ${variantCount > 0 ? `<span class="stock-pill" style="background:#e0f2fe; color:#0369a1;">${variantCount} Variants</span>` : ''}
-                            <div style="margin-top:8px; display:flex; gap:6px;">
-                                <button class="btn-sm" style="background:#0f172a; padding:5px 10px;" onclick="openEditProductModal('${p.id}')">✏️ Edit / Stock</button>
-                                <button class="btn-sm" style="background:${inStock ? '#dc2626' : '#16a34a'}; padding:5px 10px;" onclick="quickToggleStock('${p.id}', ${inStock})">
-                                    ${inStock ? 'Mark Out' : 'Restock'}
+                            ${p.originalPrice ? `<small style="text-decoration:line-through; color:#94a3b8;">₹${p.originalPrice}</small>` : ''}<br>
+                            <span class="stock-pill ${inStock ? 'in-stock' : 'out-stock'}">${inStock ? 'In Stock' : 'Out of Stock'}</span>
+                            <span class="stock-pill" style="background:#e0f2fe; color:#0369a1;">${vCount} Variants</span>
+                            <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+                                <button class="btn-sm" style="background:#0284c7; padding:5px 9px;" onclick="editMerchantProduct('${p.id}')">✏️ Edit</button>
+                                <button class="btn-sm" style="background:${inStock ? '#dc2626' : '#16a34a'}; padding:5px 9px;" onclick="quickToggleStock('${p.id}', ${inStock})">
+                                    ${inStock ? 'Out of Stock' : 'In Stock'}
                                 </button>
                             </div>
                         </div>
@@ -1071,69 +1274,11 @@
 
         function quickToggleStock(prodId, currentlyInStock) {
             db.collection("products").doc(prodId).update({
-                stockStatus: currentlyInStock ? 'out_of_stock' : 'in_stock',
                 inStock: !currentlyInStock,
                 isAvailable: !currentlyInStock,
-                stockQty: currentlyInStock ? 0 : 10
+                stockStatus: currentlyInStock ? 'out' : 'in'
             });
         }
-
-        function openEditProductModal(prodId) {
-            const p = merchantProductsCache.find(item => item.id === prodId);
-            if (!p) return;
-
-            document.getElementById('editProdId').value = p.id;
-            document.getElementById('editProdName').value = p.name;
-            document.getElementById('editProdPrice').value = p.price;
-            document.getElementById('editProdStock').value = p.stockQty ?? 10;
-            document.getElementById('editProdStatus').value = p.stockStatus || 'in_stock';
-
-            const prev = document.getElementById('editProdImgPreview');
-            prev.src = p.imageUrl || '';
-            prev.dataset.encoded = '';
-
-            const vBox = document.getElementById('editVariantContainer');
-            vBox.innerHTML = '';
-            if (Array.isArray(p.variants)) {
-                p.variants.forEach(v => addVariantRow('editVariantContainer', v.name, v.price, v.stock));
-            }
-
-            document.getElementById('editProductModal').classList.add('active');
-        }
-
-        function closeEditModal() {
-            document.getElementById('editProductModal').classList.remove('active');
-        }
-
-        document.getElementById('editProductForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('editProdId').value;
-            const name = document.getElementById('editProdName').value.trim();
-            const price = Number(document.getElementById('editProdPrice').value);
-            const stockQty = Number(document.getElementById('editProdStock').value);
-            const status = document.getElementById('editProdStatus').value;
-            const newEncodedImg = document.getElementById('editProdImgPreview').dataset.encoded;
-            const variants = collectVariants('editVariantContainer');
-
-            const isAvail = stockQty > 0 && status === 'in_stock';
-            const updateData = {
-                name: name,
-                price: price,
-                stockQty: stockQty,
-                stockStatus: isAvail ? 'in_stock' : 'out_of_stock',
-                inStock: isAvail,
-                isAvailable: isAvail,
-                variants: variants
-            };
-            if (newEncodedImg) {
-                updateData.imageUrl = newEncodedImg;
-                updateData.images = [newEncodedImg];
-            }
-
-            await db.collection("products").doc(id).update(updateData);
-            closeEditModal();
-            alert("✅ Product details aur stock update ho gaye!");
-        });
 
         // Auto-open dashboard if already logged in
         if (activeMerchant && activeMerchant.id) {
