@@ -6,6 +6,8 @@
     <title>ksindo - Admin Master Control & Multi-Vendor Hub</title>
     <link rel="preconnect" href="https://firestore.googleapis.com">
     <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
+    <!-- External Firebase Config File (No API Key hardcoded in HTML) -->
+    <script src="firebase-config.js"></script>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Roboto, sans-serif; }
         body { background:#0f172a; color:#f8fafc; display:flex; height:100vh; overflow:hidden; }
@@ -159,6 +161,10 @@
             <a onclick="showTab('tab-overview', this)" class="active">
                 <span>📊 Dashboard Overview</span>
             </a>
+            <a onclick="showTab('tab-merchant-approvals', this)">
+                <span>✅ Merchant Approvals</span>
+                <span class="nav-count" id="badgePendingMerchants" style="background:#ef4444; display:none;">0</span>
+            </a>
             <a onclick="showTab('tab-shops', this)">
                 <span>🏪 1. Create Shop</span>
             </a>
@@ -231,6 +237,7 @@
                         <div style="background:#0f172a; padding:15px; border-radius:10px; border:1px solid #334155;">
                             <strong style="color:#38bdf8; font-size:13px; display:block; margin-bottom:5px;">⚡ Quick Actions:</strong>
                             <div style="display:flex; flex-direction:column; gap:6px;">
+                                <button onclick="showTab('tab-merchant-approvals')" class="btn-primary" style="background:#f59e0b; color:#0f172a; text-align:left; font-size:11px;">✅ Review Pending Merchant Requests</button>
                                 <button onclick="showTab('tab-shops')" class="btn-primary" style="text-align:left; font-size:11px;">+ 1. Onboard Nayi Shop / Merchant</button>
                                 <button onclick="showTab('tab-users')" class="btn-primary" style="background:#0284c7; text-align:left; font-size:11px;">🔑 2. Generate Portal ID / Password</button>
                                 <button onclick="showTab('tab-products')" class="btn-primary" style="background:#ea580c; text-align:left; font-size:11px;">📦 6. Add / Edit Catalog Products</button>
@@ -241,12 +248,41 @@
                             <strong style="color:#22c55e; font-size:13px; display:block; margin-bottom:5px;">📈 System Health:</strong>
                             <p style="font-size:12px; color:#cbd5e1; line-height:1.6;">
                                 • Firebase Realtime DB: <b>Connected (jaynagar-srote)</b><br>
+                                • Config Source: <b>External firebase-config.js</b><br>
                                 • Order Verification: <b>4-digit OTP Mandatory</b><br>
                                 • Emergency Status: <b id="overviewStatusText" style="color:#22c55e;">ONLINE (Active)</b><br>
                                 • Portal Roles Active: <b id="overviewPortalCount">0 Logins Issued</b>
                             </p>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            <!-- NEW MODULE: MERCHANT SIGNUP APPROVALS (FROM merchant.html) -->
+            <section id="tab-merchant-approvals" class="tab-section">
+                <div class="card" style="border:1.5px solid #f59e0b;">
+                    <h2>✅ Pending Merchant & Store Applications (OTP Verified)</h2>
+                    <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">
+                        Merchant portal (`merchant.html`) se OTP verify karke aaye hue naye registration requests. Approve karte hi inki shop aur User ID live ho jayegi.
+                    </p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Owner & Email</th>
+                                <th>Vendor / Shop Name</th>
+                                <th>Category</th>
+                                <th>GSTIN</th>
+                                <th>Address & PIN</th>
+                                <th>User ID & Pass</th>
+                                <th>Verified Phone</th>
+                                <th>Status</th>
+                                <th>Admin Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="merchantRequestsTableBody">
+                            <tr><td colspan="9" style="text-align:center; color:#94a3b8;">Loading merchant requests...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </section>
 
@@ -892,22 +928,19 @@
         };
     </script>
 
-    <!-- FIREBASE MODULE & REALTIME LISTENERS -->
+    <!-- FIREBASE MODULE & REALTIME LISTENERS (USING EXTERNAL firebase-config.js) -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, doc, getDocs, onSnapshot, updateDoc, deleteDoc, serverTimestamp, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyA7f9PWSyws4XkzKq077sNdlF0J33DSVSo",
-            authDomain: "jaynagar-srote.firebaseapp.com",
-            projectId: "jaynagar-srote",
-            storageBucket: "jaynagar-srote.firebasestorage.app",
-            messagingSenderId: "820632565818",
-            appId: "1:820632565818:web:0b2f4676cecd799a801d03"
-        };
+        const firebaseConfig = window.KSINDO_FIREBASE_CONFIG;
+        if (!firebaseConfig) {
+            alert("Critical Error: firebase-config.js file load nahi hui! Kripya check karein ki firebase-config.js same folder me maujood hai.");
+            throw new Error("Missing window.KSINDO_FIREBASE_CONFIG");
+        }
 
-        const app = initializeApp(firebaseConfig);
+        const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
@@ -952,6 +985,7 @@
         let productsDataCache = {};
         let shopsDataCache = {};
         let portalUsersCache = {};
+        let merchantRequestsCache = {};
 
         function playBellAlarm() {
             if (isAudioAlarmMuted) return;
@@ -982,6 +1016,7 @@
 
             const sectionTitles = {
                 'tab-overview': 'Dashboard Overview',
+                'tab-merchant-approvals': 'Merchant Signup Approvals',
                 'tab-shops': '1. Create Shop & MultiVendor',
                 'tab-users': '2. User Management & Portal Logins',
                 'tab-orders': '3. Order Management Queue',
@@ -1001,6 +1036,130 @@
         setInterval(() => {
             document.getElementById('liveClock').innerText = new Date().toLocaleString('en-IN');
         }, 1000);
+
+        // ==================== 0. MERCHANT APPROVAL QUEUE (merchant_requests) ====================
+        onSnapshot(collection(db, "merchant_requests"), (snapshot) => {
+            const tbody = document.getElementById('merchantRequestsTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            merchantRequestsCache = {};
+            let pendingCount = 0;
+
+            if (snapshot.empty) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:#94a3b8;">Abhi koi merchant application nahi aaya hai.</td></tr>';
+            }
+
+            snapshot.forEach(docSnap => {
+                const req = { id: docSnap.id, ...docSnap.data() };
+                merchantRequestsCache[req.id] = req;
+                const status = (req.approvalStatus || 'pending').toLowerCase();
+                if (status === 'pending') pendingCount++;
+
+                let statusBadge = '<span style="background:#f59e0b20; color:#fbbf24; border:1px solid #f59e0b50; padding:3px 8px; border-radius:8px; font-size:10px; font-weight:bold;">PENDING</span>';
+                if (status === 'approved') statusBadge = '<span style="background:#16a34a20; color:#4ade80; border:1px solid #16a34a50; padding:3px 8px; border-radius:8px; font-size:10px; font-weight:bold;">APPROVED</span>';
+                if (status === 'rejected') statusBadge = '<span style="background:#ef444420; color:#f87171; border:1px solid #ef444450; padding:3px 8px; border-radius:8px; font-size:10px; font-weight:bold;">REJECTED</span>';
+
+                let actionBtns = '';
+                if (status === 'pending') {
+                    actionBtns = `
+                        <button class="btn-primary" style="padding:5px 9px; font-size:11px; margin-bottom:4px;" onclick="approveMerchantRequest('${req.id}')">✅ Approve</button>
+                        <button class="btn-danger" style="padding:5px 9px; font-size:11px;" onclick="rejectMerchantRequest('${req.id}')">❌ Reject</button>
+                    `;
+                } else {
+                    actionBtns = `<button class="btn-danger" style="padding:4px 8px; font-size:10px;" onclick="deleteMerchantRequest('${req.id}')">Delete Record</button>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${req.ownerName || ''}</strong><br><small style="color:#94a3b8;">${req.email || ''}</small></td>
+                        <td><strong style="color:#38bdf8;">${req.shopName || ''}</strong><br><small>${req.vendorType || ''}</small></td>
+                        <td><span class="status-pill">${req.shopCategory || '-'}</span></td>
+                        <td><small>${req.gstin || 'N/A'}</small></td>
+                        <td><small>${req.address || ''}</small><br><b>PIN: ${req.pincode || ''}</b></td>
+                        <td><code style="color:#22c55e;">${req.userId}</code><br><small style="color:#94a3b8;">Pass: ${req.password}</small></td>
+                        <td>📞 ${req.phone} ${req.phoneVerified ? '✅' : ''}</td>
+                        <td>${statusBadge}</td>
+                        <td>${actionBtns}</td>
+                    </tr>
+                `;
+            });
+
+            const badge = document.getElementById('badgePendingMerchants');
+            if (badge) {
+                if (pendingCount > 0) {
+                    badge.innerText = pendingCount;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        });
+
+        window.approveMerchantRequest = async (reqId) => {
+            const req = merchantRequestsCache[reqId];
+            if (!req) return;
+            if (!confirm(`Kya aap "${req.shopName}" (${req.ownerName}) ko approve karke live karna chahte hain?`)) return;
+
+            try {
+                const catLower = (req.shopCategory || '').toLowerCase();
+                let mappedShopType = 'mart';
+                if (catLower.includes('restaurant')) mappedShopType = 'restaurant';
+                else if (catLower.includes('kapada') || catLower.includes('shoes')) mappedShopType = 'fashion';
+
+                await addDoc(collection(db, "shops"), {
+                    ownerName: req.ownerName,
+                    email: req.email,
+                    vendorType: req.vendorType,
+                    shopCategory: req.shopCategory,
+                    shopType: mappedShopType,
+                    shopName: req.shopName,
+                    gstin: req.gstin || "",
+                    address: req.address,
+                    pincode: req.pincode,
+                    userId: req.userId,
+                    username: req.userId,
+                    password: req.password,
+                    phone: req.phone,
+                    isOpen: true,
+                    approvedAt: serverTimestamp(),
+                    createdAt: serverTimestamp()
+                });
+
+                await addDoc(collection(db, "portal_users"), {
+                    fullName: req.shopName,
+                    role: 'vendor',
+                    phone: req.phone,
+                    loginId: req.userId,
+                    password: req.password,
+                    area: `${req.address} (PIN: ${req.pincode})`,
+                    isActive: true,
+                    createdAt: serverTimestamp()
+                });
+
+                await updateDoc(doc(db, "merchant_requests", reqId), {
+                    approvalStatus: "approved",
+                    approvedAt: serverTimestamp()
+                });
+
+                alert(`🎉 "${req.shopName}" approve ho gaya hai! Ab merchant apne User ID (${req.userId}) se login kar sakta hai.`);
+            } catch (err) {
+                alert("Approval Error: " + err.message);
+            }
+        };
+
+        window.rejectMerchantRequest = async (reqId) => {
+            if (!confirm("Is merchant request ko reject karein?")) return;
+            await updateDoc(doc(db, "merchant_requests", reqId), {
+                approvalStatus: "rejected",
+                rejectedAt: serverTimestamp()
+            });
+            alert("Merchant request rejected.");
+        };
+
+        window.deleteMerchantRequest = async (reqId) => {
+            if (!confirm("Is request record ko delete karein?")) return;
+            await deleteDoc(doc(db, "merchant_requests", reqId));
+        };
 
         // 1. Portal Generator
         document.getElementById('portalCredentialsForm').addEventListener('submit', async (e) => {
@@ -1027,10 +1186,12 @@
                         shopType: 'mart',
                         ownerName: fullName,
                         phone: phone,
+                        userId: loginId,
                         username: loginId,
                         email: loginId,
                         password: password,
                         address: area || 'Jainagar',
+                        isOpen: true,
                         createdAt: serverTimestamp()
                     });
                 }
@@ -1408,7 +1569,8 @@
             try {
                 await addDoc(collection(db, "shops"), {
                     shopName, shopType, ownerName, phone, gstin, pincode, address, 
-                    username, email: username, password,
+                    userId: username, username, email: username, password,
+                    isOpen: true,
                     createdAt: serverTimestamp()
                 });
 
@@ -1419,6 +1581,7 @@
                     loginId: username,
                     password: password,
                     area: address,
+                    isActive: true,
                     createdAt: serverTimestamp()
                 });
 
@@ -1441,6 +1604,7 @@
                 if (s.shopType === 'fresh') typeBadge = '<span style="background:#16a34a20; color:#4ade80; border:1px solid #16a34a40; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">🥦 24x7 Fresh</span>';
                 else if (s.shopType === 'seasonal') typeBadge = '<span style="background:#eab30820; color:#facc15; border:1px solid #eab30840; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">🪔 Seasonal</span>';
                 else if (s.shopType === 'mart') typeBadge = '<span style="background:#0284c720; color:#38bdf8; border:1px solid #0284c740; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">⚡ Quick Mart</span>';
+                else if (s.shopType === 'fashion') typeBadge = '<span style="background:#a855f720; color:#c084fc; border:1px solid #a855f740; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">👗 Fashion / Retail</span>';
 
                 tbody.innerHTML += 
                     '<tr>' +
@@ -1450,7 +1614,7 @@
                         '<td>' + s.ownerName + '</td>' +
                         '<td>' + s.phone + '</td>' +
                         '<td>' + (s.pincode || '-') + '</td>' +
-                        '<td><code>' + (s.username || s.email) + '</code></td>' +
+                        '<td><code>' + (s.userId || s.username || s.email) + '</code></td>' +
                         '<td><button class="btn-danger" onclick="deleteShop(\'' + docSnap.id + '\')">Delete</button></td>' +
                     '</tr>';
             });
