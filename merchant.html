@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#ea580c">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="KSINDO Merchant">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://poddar977.github.io/jaynagarbazar/logo.png">
+    <title>KSINDO Merchant & Partner Portal</title>
+
+    <!-- Firebase Compat SDKs + External Config File (No API Key inside HTML) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="firebase-config.js"></script>
+
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color:transparent; }
+        body { background:#f1f5f9; color:#0f172a; padding-bottom:75px; }
+
+        /* HEADER */
+        header {
+            background:linear-gradient(135deg, #ea580c, #c2410c); color:white;
+            padding:14px 16px; display:flex; justify-content:space-between; align-items:center;
+            position:sticky; top:0; z-index:1000; box-shadow:0 3px 12px rgba(234,88,12,0.28);
+        }
+        .brand { display:flex; align-items:center; gap:10px; }
+        .brand h1 { font-size:18px; font-weight:900; letter-spacing:0.5px; }
+        .brand small { display:block; font-size:11px; opacity:0.9; font-weight:600; }
+        .header-btns { display:flex; gap:8px; align-items:center; }
+        .btn-pill {
+            background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.45);
+            color:white; padding:6px 12px; border-radius:20px; font-size:11px; font-weight:800; cursor:pointer;
+        }
+        .btn-pill.white { background:white; color:#ea580c; border:none; }
+
+        /* AUTH SCREEN */
+        .auth-wrapper { max-width:480px; margin:20px auto; padding:0 14px; }
+        .auth-card {
+            background:white; border-radius:20px; padding:22px 18px;
+            box-shadow:0 10px 30px rgba(15,23,42,0.08); border:1.5px solid #fed7aa;
+        }
+        .auth-tabs { display:grid; grid-template-columns:1fr 1fr; background:#fff7ed; padding:4px; border-radius:12px; margin-bottom:18px; }
+        .auth-tab {
+            padding:10px; text-align:center; font-size:13px; font-weight:800;
+            border-radius:10px; cursor:pointer; color:#9a3412; transition:0.2s;
+        }
+        .auth-tab.active { background:#ea580c; color:white; box-shadow:0 2px 8px rgba(234,88,12,0.3); }
+
+        .form-group { margin-bottom:12px; }
+        .form-group label { display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px; }
+        .req { color:#dc2626; }
+        .form-group input, .form-group select, .form-group textarea {
+            width:100%; padding:11px 12px; border:1.5px solid #cbd5e1; border-radius:10px;
+            font-size:13px; outline:none; background:#fff; transition:0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:#ea580c; }
+
+        .otp-row { display:flex; gap:8px; }
+        .otp-row input { flex:1; }
+        .btn-otp {
+            background:#0f172a; color:white; border:none; padding:0 14px;
+            border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap;
+        }
+        .btn-otp:disabled { background:#94a3b8; cursor:not-allowed; }
+
+        .btn-primary {
+            width:100%; background:#ea580c; color:white; border:none; padding:13px;
+            border-radius:12px; font-size:14px; font-weight:800; cursor:pointer; margin-top:6px;
+            box-shadow:0 4px 12px rgba(234,88,12,0.3);
+        }
+        .btn-primary:disabled { background:#cbd5e1; box-shadow:none; cursor:not-allowed; }
+
+        .status-banner {
+            display:none; padding:12px; border-radius:12px; font-size:12px; font-weight:700;
+            margin-bottom:14px; line-height:1.4;
+        }
+        .status-banner.pending { display:block; background:#fef3c7; color:#92400e; border:1px solid #f59e0b; }
+        .status-banner.success { display:block; background:#dcfce7; color:#166534; border:1px solid #22c55e; }
+        .status-banner.error { display:block; background:#fee2e2; color:#991b1b; border:1px solid #ef4444; }
+
+        /* MERCHANT DASHBOARD */
+        #merchantDashboard { display:none; max-width:960px; margin:16px auto; padding:0 14px; }
+        .shop-summary-bar {
+            background:white; border-radius:16px; padding:14px 16px; margin-bottom:14px;
+            border:1.5px solid #fed7aa; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+        }
+        .shop-badges { display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
+        .badge { font-size:11px; font-weight:800; padding:3px 9px; border-radius:12px; }
+        .badge-pin { background:#ffedd5; color:#c2410c; }
+        .badge-cat { background:#e0f2fe; color:#0369a1; }
+        .badge-live { background:#dcfce7; color:#15803d; }
+
+        .alert-bar {
+            background:#0f172a; color:white; padding:10px 14px; border-radius:12px;
+            margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; font-size:12px;
+        }
+
+        /* DASHBOARD TABS */
+        .dash-nav {
+            display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:16px;
+        }
+        .dash-tab-btn {
+            background:white; border:1.5px solid #e2e8f0; padding:11px 6px; border-radius:12px;
+            font-size:12px; font-weight:800; color:#475569; cursor:pointer; text-align:center;
+        }
+        .dash-tab-btn.active { background:#ea580c; color:white; border-color:#ea580c; }
+
+        /* ORDER CARDS */
+        .order-card {
+            background:white; border-radius:16px; padding:15px; margin-bottom:12px;
+            border-left:5px solid #ea580c; box-shadow:0 3px 10px rgba(0,0,0,0.05);
+        }
+        .order-top { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f1f5f9; padding-bottom:8px; margin-bottom:8px; }
+        .order-status { font-size:11px; font-weight:800; padding:3px 10px; border-radius:12px; background:#ffedd5; color:#c2410c; }
+        .order-items-list { background:#f8fafc; padding:8px 10px; border-radius:10px; font-size:12px; margin:8px 0; }
+        .order-actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+        .btn-sm {
+            padding:8px 12px; border:none; border-radius:8px; font-size:11px; font-weight:800; cursor:pointer; color:white;
+        }
+
+        /* PRODUCT MANAGEMENT */
+        .prod-form-card { background:white; border-radius:16px; padding:16px; border:1px solid #e2e8f0; margin-bottom:16px; }
+        .variant-box {
+            background:#fff7ed; border:1px dashed #fdba74; padding:10px; border-radius:10px; margin-bottom:12px;
+        }
+        .variant-row { display:grid; grid-template-columns:1.2fr 1fr 0.8fr auto; gap:6px; margin-bottom:6px; }
+        .variant-row input { padding:8px; font-size:12px; }
+
+        .prod-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:12px; }
+        .prod-item-card {
+            background:white; border-radius:14px; padding:12px; border:1px solid #e2e8f0;
+            display:flex; gap:10px; align-items:center;
+        }
+        .prod-item-card img { width:68px; height:68px; object-fit:cover; border-radius:10px; background:#f8fafc; }
+        .stock-pill {
+            display:inline-block; font-size:10px; font-weight:800; padding:2px 8px; border-radius:10px; margin-top:4px;
+        }
+        .in-stock { background:#dcfce7; color:#15803d; }
+        .out-stock { background:#fee2e2; color:#b91c1c; }
+
+        /* EDIT MODAL */
+        .modal-overlay {
+            position:fixed; inset:0; background:rgba(15,23,42,0.7); display:none;
+            justify-content:center; align-items:center; z-index:9999; padding:16px;
+        }
+        .modal-overlay.active { display:flex; }
+        .modal-box { background:white; border-radius:18px; padding:20px; width:100%; max-width:460px; max-height:90vh; overflow-y:auto; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <div>
+                <h1>KSINDO Merchant</h1>
+                <small>Partner & Store Control Panel</small>
+            </div>
+        </div>
+        <div class="header-btns">
+            <button class="btn-pill" id="installPwaBtn" style="display:none;" onclick="installMerchantPWA()">📲 Install App</button>
+            <button class="btn-pill white" id="logoutBtn" style="display:none;" onclick="merchantLogout()">Logout</button>
+        </div>
+    </header>
+
+    <!-- ==================== 1. LOGIN & REGISTRATION SCREEN ==================== -->
+    <div class="auth-wrapper" id="authSection">
+        <div class="auth-card">
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Merchant Login</div>
+                <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Create Account</div>
+            </div>
+
+            <div id="authStatusBanner" class="status-banner"></div>
+
+            <!-- LOGIN FORM -->
+            <form id="merchantLoginForm">
+                <div class="form-group">
+                    <label>User ID <span class="req">*</span></label>
+                    <input type="text" id="loginUserId" placeholder="Apna created User ID dalein" required>
+                </div>
+                <div class="form-group">
+                    <label>Password <span class="req">*</span></label>
+                    <input type="password" id="loginPassword" placeholder="Password dalein" required>
+                </div>
+                <button type="submit" class="btn-primary" id="btnLoginSubmit">Login to Merchant Portal</button>
+            </form>
+
+            <!-- CREATE ACCOUNT FORM (1 TO 8 ALL COMPULSORY, GST OPTIONAL, PHONE WITH OTP) -->
+            <form id="merchantRegisterForm" style="display:none;">
+                <div class="form-group">
+                    <label>1. Full Name <span class="req">*</span></label>
+                    <input type="text" id="regName" placeholder="Owner ka pura naam" required>
+                </div>
+
+                <div class="form-group">
+                    <label>2. Email ID <span class="req">*</span></label>
+                    <input type="email" id="regEmail" placeholder="example@gmail.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label>3. Vendor Option <span class="req">*</span></label>
+                    <select id="regVendorType" onchange="handleVendorOptionChange()" required>
+                        <option value="">-- Vendor Type Chunein --</option>
+                        <option value="SHOP">Shop Name (Apni Dukan / Restaurant)</option>
+                        <option value="KSINDO_STORE">KSINDO Store</option>
+                    </select>
+                </div>
+
+                <!-- Sub-options if SHOP is chosen -->
+                <div id="shopDetailsWrap" style="display:none; background:#fff7ed; padding:10px; border-radius:12px; border:1px solid #fed7aa; margin-bottom:12px;">
+                    <div class="form-group">
+                        <label>Shop Category (Sub-Option) <span class="req">*</span></label>
+                        <select id="regShopCategory">
+                            <option value="">-- Category Chunein --</option>
+                            <option value="Electronic Shop">Electronic Shop</option>
+                            <option value="Mobile Shop">Mobile Shop</option>
+                            <option value="Restaurant">Restaurant</option>
+                            <option value="Kapada Dukan">Kapada Dukan</option>
+                            <option value="Shoes Shop">Shoes Shop</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Shop / Restaurant Name <span class="req">*</span></label>
+                        <input type="text" id="regShopName" placeholder="Apni dukan ya restaurant ka naam">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>4. GSTIN (If Available - Optional)</label>
+                    <input type="text" id="regGstin" placeholder="15-digit GST Number (Optional)" maxlength="15" style="text-transform:uppercase;">
+                </div>
+
+                <div class="form-group">
+                    <label>5. Full Shop Address <span class="req">*</span></label>
+                    <input type="text" id="regAddress" placeholder="Ward, Market, Landmark, City" required>
+                </div>
+
+                <div class="form-group">
+                    <label>6. Area Pincode <span class="req">*</span></label>
+                    <input type="text" id="regPincode" placeholder="6-Digit Pincode (e.g. 847226)" maxlength="6" pattern="\d{6}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>7. Create User ID <span class="req">*</span></label>
+                    <input type="text" id="regUserId" placeholder="Unique User ID banayein (e.g. aman_shop)" required>
+                </div>
+
+                <div class="form-group">
+                    <label>8. Create Password <span class="req">*</span></label>
+                    <input type="password" id="regPassword" placeholder="Strong Password banayein" minlength="4" required>
+                </div>
+
+                <!-- 9. PHONE NUMBER WITH OTP -->
+                <div class="form-group">
+                    <label>9. Phone Number with OTP Verification <span class="req">*</span></label>
+                    <div class="otp-row">
+                        <input type="tel" id="regPhone" placeholder="10-digit Mobile Number" maxlength="10" required>
+                        <button type="button" class="btn-otp" id="btnSendOtp" onclick="sendPhoneOtp()">Send OTP</button>
+                    </div>
+                    <div id="recaptcha-container" style="margin-top:6px;"></div>
+                </div>
+
+                <div class="form-group" id="otpVerifyBox" style="display:none;">
+                    <label>Enter 6-Digit OTP <span class="req">*</span></label>
+                    <div class="otp-row">
+                        <input type="text" id="regOtpCode" placeholder="OTP dalein" maxlength="6">
+                        <button type="button" class="btn-otp" style="background:#16a34a;" id="btnVerifyOtp" onclick="verifyPhoneOtp()">Verify OTP</button>
+                    </div>
+                    <small id="otpVerifiedTag" style="display:none; color:#16a34a; font-weight:800; margin-top:4px;">✅ Mobile Number Verified</small>
+                </div>
+
+                <button type="submit" class="btn-primary" id="btnRegisterSubmit" disabled>Submit for Admin Approval</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== 2. MERCHANT PORTAL DASHBOARD ==================== -->
+    <div id="merchantDashboard">
+        <div class="shop-summary-bar">
+            <div>
+                <h2 id="dashShopName" style="font-size:18px; font-weight:900; color:#0f172a;">Shop Name</h2>
+                <div class="shop-badges">
+                    <span class="badge badge-pin" id="dashPincodeBadge">PIN: 000000</span>
+                    <span class="badge badge-cat" id="dashCategoryBadge">Category</span>
+                    <span class="badge badge-live">● Live Store</span>
+                </div>
+            </div>
+            <button class="btn-sm" style="background:#0f172a;" onclick="testOrderAlertSound()">🔊 Test Alert & Lock Notification</button>
+        </div>
+
+        <div class="alert-bar">
+            <span>🔔 Lock-Screen & Sound Order Alert Active</span>
+            <button class="btn-sm" style="background:#ea580c;" onclick="requestSystemNotificationPermission()">Enable Lock Screen Alert</button>
+        </div>
+
+        <div class="dash-nav">
+            <button class="dash-tab-btn active" id="navOrders" onclick="switchDashTab('orders')">📦 Live Orders (<span id="liveOrderCount">0</span>)</button>
+            <button class="dash-tab-btn" id="navAddProd" onclick="switchDashTab('addProd')">➕ Add Product</button>
+            <button class="dash-tab-btn" id="navMyProds" onclick="switchDashTab('myProds')">🏪 Products & Stock</button>
+        </div>
+
+        <!-- TAB 1: AREA & SHOP SPECIFIC ORDERS -->
+        <div id="sectionOrders">
+            <div id="merchantOrdersList">
+                <p style="text-align:center; padding:30px; color:#64748b;">Aapke Pincode aur Shop ke orders load ho rahe hain...</p>
+            </div>
+        </div>
+
+        <!-- TAB 2: ADD PRODUCT WITH PHOTO & VARIANTS -->
+        <div id="sectionAddProd" style="display:none;">
+            <div class="prod-form-card">
+                <h3 style="font-size:16px; color:#ea580c; margin-bottom:12px;">➕ Naya Product / Dish Upload Karein</h3>
+                <form id="addProductForm">
+                    <div class="form-group">
+                        <label>Product / Dish Name <span class="req">*</span></label>
+                        <input type="text" id="prodName" placeholder="e.g. Kurkure Momo / Samsung Charger / Cotton Shirt" required>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <div class="form-group">
+                            <label>Base Selling Price (₹) <span class="req">*</span></label>
+                            <input type="number" id="prodPrice" placeholder="150" required>
+                        </div>
+                        <div class="form-group">
+                            <label>MRP (₹) <span class="req">*</span></label>
+                            <input type="number" id="prodMrp" placeholder="180" required>
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <div class="form-group">
+                            <label>Stock Quantity <span class="req">*</span></label>
+                            <input type="number" id="prodStockQty" value="20" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Default Unit / Size <span class="req">*</span></label>
+                            <input type="text" id="prodUnit" placeholder="e.g. 1 Plate / 1 Pc / Size L" required>
+                        </div>
+                    </div>
+
+                    <!-- PHOTO UPLOAD (FILE OR URL) -->
+                    <div class="form-group">
+                        <label>Product Photo Upload <span class="req">*</span></label>
+                        <input type="file" id="prodPhotoFile" accept="image/*" onchange="previewAndEncodeImage(this, 'prodImgPreview')">
+                        <input type="text" id="prodPhotoUrl" placeholder="Ya direct Image URL paste karein" style="margin-top:6px;">
+                        <img id="prodImgPreview" style="display:none; width:90px; height:90px; object-fit:cover; border-radius:10px; margin-top:8px; border:1px solid #cbd5e1;">
+                    </div>
+
+                    <!-- VARIANTS SECTION -->
+                    <div class="variant-box">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <strong style="font-size:12px; color:#9a3412;">Product Variants (Size / Plate / Color)</strong>
+                            <button type="button" class="btn-sm" style="background:#ea580c;" onclick="addVariantRow('variantContainer')">+ Add Variant</button>
+                        </div>
+                        <div id="variantContainer"></div>
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="btnUploadProd">Publish Product to Store</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- TAB 3: STOCK UPDATE & EDIT PRODUCTS -->
+        <div id="sectionMyProds" style="display:none;">
+            <div class="prod-grid" id="merchantProductsGrid"></div>
+        </div>
+    </div>
+
+    <!-- EDIT PRODUCT MODAL -->
+    <div class="modal-overlay" id="editProductModal">
+        <div class="modal-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h3 style="font-size:16px; color:#ea580c;">✏️ Edit Product, Stock & Variants</h3>
+                <button onclick="closeEditModal()" style="border:none; background:#f1f5f9; width:28px; height:28px; border-radius:50%; font-weight:bold; cursor:pointer;">&times;</button>
+            </div>
+            <form id="editProductForm">
+                <input type="hidden" id="editProdId">
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" id="editProdName" required>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                    <div class="form-group">
+                        <label>Selling Price (₹)</label>
+                        <input type="number" id="editProdPrice" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Stock Quantity</label>
+                        <input type="number" id="editProdStock" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Stock Status</label>
+                    <select id="editProdStatus">
+                        <option value="in_stock">In Stock (Available)</option>
+                        <option value="out_of_stock">Out of Stock (Hide/Unavailable)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Change Photo (Optional)</label>
+                    <input type="file" id="editProdPhotoFile" accept="image/*" onchange="previewAndEncodeImage(this, 'editProdImgPreview')">
+                    <img id="editProdImgPreview" style="width:75px; height:75px; object-fit:cover; border-radius:8px; margin-top:6px;">
+                </div>
+                <div class="variant-box">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <strong style="font-size:12px; color:#9a3412;">Edit Variants</strong>
+                        <button type="button" class="btn-sm" style="background:#ea580c;" onclick="addVariantRow('editVariantContainer')">+ Add</button>
+                    </div>
+                    <div id="editVariantContainer"></div>
+                </div>
+                <button type="submit" class="btn-primary">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let confirmationResultGlobal = null;
+        let isPhoneOtpVerified = false;
+        let activeMerchant = JSON.parse(localStorage.getItem('ksindo_merchant_session') || 'null');
+        let knownOrderIds = new Set();
+        let isInitialOrderLoad = true;
+        let merchantProductsCache = [];
+        let deferredPrompt = null;
+
+        // ==================== PWA SERVICE WORKER & INSTALL ====================
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installPwaBtn').style.display = 'inline-block';
+        });
+        function installMerchantPWA() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+        }
+
+        // ==================== LOCK-SCREEN & SOUND NOTIFICATION ENGINE ====================
+        function requestSystemNotificationPermission() {
+            if (!("Notification" in window)) {
+                alert("Is browser me system notification supported nahi hai.");
+                return;
+            }
+            Notification.requestPermission().then(perm => {
+                if (perm === "granted") {
+                    testOrderAlertSound();
+                    alert("✅ Lock-Screen aur Sound Notification Enable ho gaya!");
+                } else {
+                    alert("Please browser settings se Notification permission Allow karein.");
+                }
+            });
+        }
+
+        function playAlertTone() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                const ctx = new AudioCtx();
+                const notes = [880, 1100, 880, 1320];
+                notes.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.18);
+                    gain.gain.setValueAtTime(0.35, ctx.currentTime + idx * 0.18);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (idx + 1) * 0.18);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime + idx * 0.18);
+                    osc.stop(ctx.currentTime + (idx + 1) * 0.18);
+                });
+                if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 500]);
+            } catch (e) {}
+        }
+
+        function triggerLockScreenNotification(title, bodyText) {
+            playAlertTone();
+            if ("Notification" in window && Notification.permission === "granted") {
+                if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.ready.then(reg => {
+                        reg.showNotification(title, {
+                            body: bodyText,
+                            icon: 'https://poddar977.github.io/jaynagarbazar/logo.png',
+                            badge: 'https://poddar977.github.io/jaynagarbazar/logo.png',
+                            vibrate: [300, 150, 300],
+                            requireInteraction: true,
+                            tag: 'ksindo-merchant-order'
+                        });
+                    });
+                } else {
+                    new Notification(title, {
+                        body: bodyText,
+                        icon: 'https://poddar977.github.io/jaynagarbazar/logo.png'
+                    });
+                }
+            }
+        }
+
+        function testOrderAlertSound() {
+            triggerLockScreenNotification(
+                "🔔 KSINDO Test Order Alert",
+                "Naya order aane par aapke phone ke lock screen par aisa alert aur sound bajega!"
+            );
+        }
+
+        // ==================== AUTH TABS & VENDOR SUB-OPTIONS ====================
+        function switchAuthTab(tab) {
+            document.getElementById('authStatusBanner').className = 'status-banner';
+            if (tab === 'login') {
+                document.getElementById('tabLogin').classList.add('active');
+                document.getElementById('tabRegister').classList.remove('active');
+                document.getElementById('merchantLoginForm').style.display = 'block';
+                document.getElementById('merchantRegisterForm').style.display = 'none';
+            } else {
+                document.getElementById('tabRegister').classList.add('active');
+                document.getElementById('tabLogin').classList.remove('active');
+                document.getElementById('merchantRegisterForm').style.display = 'block';
+                document.getElementById('merchantLoginForm').style.display = 'none';
+            }
+        }
+
+        function handleVendorOptionChange() {
+            const val = document.getElementById('regVendorType').value;
+            const wrap = document.getElementById('shopDetailsWrap');
+            const subCat = document.getElementById('regShopCategory');
+            const sName = document.getElementById('regShopName');
+
+            if (val === 'SHOP') {
+                wrap.style.display = 'block';
+                subCat.required = true;
+                sName.required = true;
+            } else {
+                wrap.style.display = 'none';
+                subCat.required = false;
+                sName.required = false;
+            }
+        }
+
+        function showBanner(type, msg) {
+            const b = document.getElementById('authStatusBanner');
+            b.className = 'status-banner ' + type;
+            b.innerText = msg;
+        }
+
+        // ==================== PHONE OTP VERIFICATION ====================
+        function sendPhoneOtp() {
+            const phone = document.getElementById('regPhone').value.trim();
+            if (!/^\d{10}$/.test(phone)) {
+                alert("Kripya sahi 10-digit mobile number dalein.");
+                return;
+            }
+            const btn = document.getElementById('btnSendOtp');
+            btn.disabled = true;
+            btn.innerText = "Sending...";
+
+            if (!window.recaptchaVerifier) {
+                window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                    size: 'invisible'
+                });
+            }
+
+            auth.signInWithPhoneNumber("+91" + phone, window.recaptchaVerifier)
+                .then(confirmationResult => {
+                    confirmationResultGlobal = confirmationResult;
+                    document.getElementById('otpVerifyBox').style.display = 'block';
+                    btn.innerText = "OTP Sent";
+                    alert("OTP aapke mobile number +91" + phone + " par bhej diya gaya hai.");
+                })
+                .catch(err => {
+                    btn.disabled = false;
+                    btn.innerText = "Send OTP";
+                    alert("OTP Error: " + err.message);
+                });
+        }
+
+        function verifyPhoneOtp() {
+            const code = document.getElementById('regOtpCode').value.trim();
+            if (!confirmationResultGlobal || code.length !== 6) {
+                alert("Kripya 6-digit OTP dalein.");
+                return;
+            }
+            const btn = document.getElementById('btnVerifyOtp');
+            btn.disabled = true;
+            btn.innerText = "Verifying...";
+
+            confirmationResultGlobal.confirm(code)
+                .then(() => {
+                    isPhoneOtpVerified = true;
+                    document.getElementById('otpVerifiedTag').style.display = 'block';
+                    document.getElementById('regPhone').readOnly = true;
+                    document.getElementById('regOtpCode').readOnly = true;
+                    document.getElementById('btnRegisterSubmit').disabled = false;
+                    btn.innerText = "Verified";
+                })
+                .catch(() => {
+                    btn.disabled = false;
+                    btn.innerText = "Verify OTP";
+                    alert("Galat OTP! Kripya dobara check karein.");
+                });
+        }
+
+        // ==================== REGISTRATION -> ADMIN APPROVAL QUEUE ====================
+        document.getElementById('merchantRegisterForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const vendorType = document.getElementById('regVendorType').value;
+            const shopCategory = vendorType === 'SHOP' ? document.getElementById('regShopCategory').value : 'KSINDO Store';
+            const shopName = vendorType === 'SHOP' ? document.getElementById('regShopName').value.trim() : 'KSINDO Store';
+            const gstin = document.getElementById('regGstin').value.trim().toUpperCase();
+            const address = document.getElementById('regAddress').value.trim();
+            const pincode = document.getElementById('regPincode').value.trim();
+            const userId = document.getElementById('regUserId').value.trim().toLowerCase();
+            const password = document.getElementById('regPassword').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+
+            // 1 to 8 Compulsory Validation (GSTIN optional)
+            if (!name || !email || !vendorType || !shopCategory || !shopName || !address || !/^\d{6}$/.test(pincode) || !userId || !password) {
+                alert("1 se 8 tak sabhi details bharna compulsory hai (sirf GSTIN optional hai)!");
+                return;
+            }
+            if (!isPhoneOtpVerified) {
+                alert("Pehle Mobile Number ka OTP verify karein!");
+                return;
+            }
+
+            const submitBtn = document.getElementById('btnRegisterSubmit');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting to Admin...";
+
+            try {
+                // Check if User ID already exists in requests or approved shops
+                const existingReq = await db.collection("merchant_requests").where("userId", "==", userId).get();
+                const existingShop = await db.collection("shops").where("userId", "==", userId).get();
+                if (!existingReq.empty || !existingShop.empty) {
+                    alert("Ye User ID pehle se li ja chuki hai. Koi doosra User ID banayein.");
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Submit for Admin Approval";
+                    return;
+                }
+
+                await db.collection("merchant_requests").add({
+                    ownerName: name,
+                    email: email,
+                    vendorType: vendorType,
+                    shopCategory: shopCategory,
+                    shopName: shopName,
+                    gstin: gstin || "",
+                    address: address,
+                    pincode: pincode,
+                    userId: userId,
+                    password: password,
+                    phone: phone,
+                    phoneVerified: true,
+                    approvalStatus: "pending", // Admin approval ke baad 'approved' hoga
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                document.getElementById('merchantRegisterForm').reset();
+                switchAuthTab('login');
+                showBanner('pending', '✅ Aapka application Admin Approval ke liye bhej diya gaya hai! Admin approve karne ke baad aap apne User ID aur Password se login kar sakenge.');
+            } catch (err) {
+                alert("Registration Error: " + err.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit for Admin Approval";
+            }
+        });
+
+        // ==================== MERCHANT LOGIN (CHECK ADMIN APPROVAL) ====================
+        document.getElementById('merchantLoginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const userId = document.getElementById('loginUserId').value.trim().toLowerCase();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            const btn = document.getElementById('btnLoginSubmit');
+            btn.disabled = true;
+            btn.innerText = "Checking Approval...";
+
+            try {
+                // 1. Check Approved Shops Collection
+                const shopSnap = await db.collection("shops")
+                    .where("userId", "==", userId)
+                    .where("password", "==", password)
+                    .get();
+
+                if (!shopSnap.empty) {
+                    const doc = shopSnap.docs[0];
+                    activeMerchant = { id: doc.id, ...doc.data() };
+                    localStorage.setItem('ksindo_merchant_session', JSON.stringify(activeMerchant));
+                    openMerchantDashboard();
+                    return;
+                }
+
+                // 2. Check if still pending in merchant_requests
+                const reqSnap = await db.collection("merchant_requests")
+                    .where("userId", "==", userId)
+                    .where("password", "==", password)
+                    .get();
+
+                if (!reqSnap.empty) {
+                    const reqData = reqSnap.docs[0].data();
+                    if (reqData.approvalStatus === "approved") {
+                        // Auto-provision into shops collection if admin marked approved in requests
+                        const newShopRef = await db.collection("shops").add({
+                            ownerName: reqData.ownerName,
+                            email: reqData.email,
+                            vendorType: reqData.vendorType,
+                            shopCategory: reqData.shopCategory,
+                            shopType: reqData.shopCategory.toLowerCase().includes('restaurant') ? 'restaurant' : 'retail',
+                            shopName: reqData.shopName,
+                            gstin: reqData.gstin || "",
+                            address: reqData.address,
+                            pincode: reqData.pincode,
+                            userId: reqData.userId,
+                            password: reqData.password,
+                            phone: reqData.phone,
+                            isOpen: true,
+                            approvedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        activeMerchant = { id: newShopRef.id, ...reqData };
+                        localStorage.setItem('ksindo_merchant_session', JSON.stringify(activeMerchant));
+                        openMerchantDashboard();
+                    } else if (reqData.approvalStatus === "rejected") {
+                        showBanner('error', '❌ Aapka Merchant application Admin dwara reject kar diya gaya hai.');
+                    } else {
+                        showBanner('pending', '⏳ Aapka account abhi Admin Approval ke liye pending hai. Approval milte hi aapka ID active ho jayega.');
+                    }
+                } else {
+                    showBanner('error', '❌ Galat User ID ya Password!');
+                }
+            } catch (err) {
+                alert("Login Error: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Login to Merchant Portal";
+            }
+        });
+
+        function merchantLogout() {
+            localStorage.removeItem('ksindo_merchant_session');
+            activeMerchant = null;
+            window.location.reload();
+        }
+
+        // ==================== DASHBOARD INITIALIZATION ====================
+        function openMerchantDashboard() {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('merchantDashboard').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'inline-block';
+
+            document.getElementById('dashShopName').innerText = activeMerchant.shopName;
+            document.getElementById('dashPincodeBadge').innerText = "PIN: " + activeMerchant.pincode;
+            document.getElementById('dashCategoryBadge').innerText = activeMerchant.shopCategory || activeMerchant.vendorType;
+
+            if ("Notification" in window && Notification.permission === "default") {
+                Notification.requestPermission();
+            }
+
+            listenToShopSpecificOrders();
+            listenToMerchantProducts();
+        }
+
+        function switchDashTab(tab) {
+            document.getElementById('sectionOrders').style.display = tab === 'orders' ? 'block' : 'none';
+            document.getElementById('sectionAddProd').style.display = tab === 'addProd' ? 'block' : 'none';
+            document.getElementById('sectionMyProds').style.display = tab === 'myProds' ? 'block' : 'none';
+
+            document.getElementById('navOrders').classList.toggle('active', tab === 'orders');
+            document.getElementById('navAddProd').classList.toggle('active', tab === 'addProd');
+            document.getElementById('navMyProds').classList.toggle('active', tab === 'myProds');
+        }
+
+        // ==================== SHOP & PINCODE ISOLATED ORDERS + SOUND/LOCK ALERT ====================
+        function listenToShopSpecificOrders() {
+            // Sirf is merchant ke Pincode par aaye hue orders track karein
+            db.collection("orders")
+                .where("customerPincode", "==", String(activeMerchant.pincode))
+                .onSnapshot(snap => {
+                    const myOrders = [];
+
+                    snap.forEach(doc => {
+                        const o = { id: doc.id, ...doc.data() };
+                        // Strict isolation: Sirf isi shop/restaurant ke products ka order show hoga, kisi doosre ka nahi
+                        const directMatch = (o.assignedShopId === activeMerchant.id) ||
+                                            (o.assignedShopName && o.assignedShopName.toLowerCase() === activeMerchant.shopName.toLowerCase());
+                        const itemMatch = Array.isArray(o.items) && o.items.some(item =>
+                            item.assignedShopId === activeMerchant.id ||
+                            (item.assignedShopName && item.assignedShopName.toLowerCase() === activeMerchant.shopName.toLowerCase())
+                        );
+
+                        if (directMatch || itemMatch) {
+                            // Agar multi-vendor cart order ho, to sirf is merchant ke items filter karke dikhayein
+                            const myItems = Array.isArray(o.items)
+                                ? o.items.filter(item => !item.assignedShopId || item.assignedShopId === activeMerchant.id || item.assignedShopName === activeMerchant.shopName)
+                                : [];
+                            myOrders.push({ ...o, filteredItems: myItems });
+
+                            // New Order Detection -> Lock Screen + Sound Alert
+                            if (!isInitialOrderLoad && !knownOrderIds.has(doc.id) && o.status === "Placed") {
+                                triggerLockScreenNotification(
+                                    "🛎️ Naya Order: " + activeMerchant.shopName,
+                                    "Customer: " + (o.customerName || "Buyer") + " • PIN: " + o.customerPincode + " • ₹" + o.totalAmount
+                                );
+                            }
+                            knownOrderIds.add(doc.id);
+                        }
+                    });
+
+                    isInitialOrderLoad = false;
+                    // Sort newest first
+                    myOrders.sort((a, b) => (b.orderDate?.seconds || 0) - (a.orderDate?.seconds || 0));
+                    renderMerchantOrders(myOrders);
+                });
+        }
+
+        function renderMerchantOrders(orders) {
+            const container = document.getElementById('merchantOrdersList');
+            document.getElementById('liveOrderCount').innerText = orders.length;
+
+            if (orders.length === 0) {
+                container.innerHTML = '<div style="background:white; padding:30px; border-radius:16px; text-align:center; color:#64748b;">Aapki shop (' + activeMerchant.shopName + ' - PIN ' + activeMerchant.pincode + ') par abhi koi order nahi hai.</div>';
+                return;
+            }
+
+            container.innerHTML = orders.map(o => {
+                const itemsHtml = o.filteredItems.map(i =>
+                    `<div>• <b>${i.name}</b> ${i.variant ? '(' + i.variant + ')' : ''} × ${i.qty} — ₹${i.price * i.qty}</div>`
+                ).join('');
+
+                return `
+                    <div class="order-card">
+                        <div class="order-top">
+                            <div>
+                                <strong style="font-size:14px;">Order #${o.id.slice(-6).toUpperCase()}</strong>
+                                <div style="font-size:11px; color:#64748b;">${o.orderDateFormatted || ''}</div>
+                            </div>
+                            <span class="order-status">${o.status || 'Placed'}</span>
+                        </div>
+                        <div style="font-size:12px; line-height:1.5;">
+                            <b>Customer:</b> ${o.customerName} (${o.customerPhone})<br>
+                            <b>Address:</b> ${o.customerAddress} — <b>PIN: ${o.customerPincode}</b>
+                        </div>
+                        <div class="order-items-list">${itemsHtml}</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <strong style="color:#ea580c; font-size:14px;">Total: ₹${o.totalAmount} (${o.paymentMethod || 'COD'})</strong>
+                            <div class="order-actions">
+                                <button class="btn-sm" style="background:#0284c7;" onclick="updateOrderStatus('${o.id}', 'Preparing / Packed')">Accept & Pack</button>
+                                <button class="btn-sm" style="background:#ea580c;" onclick="updateOrderStatus('${o.id}', 'Out for Delivery')">Dispatch</button>
+                                <button class="btn-sm" style="background:#16a34a;" onclick="updateOrderStatus('${o.id}', 'Delivered')">Delivered</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            db.collection("orders").doc(orderId).update({ status: newStatus })
+                .then(() => alert("Order status updated: " + newStatus))
+                .catch(err => alert("Error: " + err.message));
+        }
+
+        // ==================== PRODUCT UPLOAD, PHOTO, VARIANTS & STOCK ====================
+        function addVariantRow(containerId, vName = '', vPrice = '', vStock = '') {
+            const box = document.getElementById(containerId);
+            const row = document.createElement('div');
+            row.className = 'variant-row';
+            row.innerHTML = `
+                <input type="text" class="v-name" placeholder="Variant (e.g. Full / XL / 1kg)" value="${vName}">
+                <input type="number" class="v-price" placeholder="Price ₹" value="${vPrice}">
+                <input type="number" class="v-stock" placeholder="Stock" value="${vStock}">
+                <button type="button" onclick="this.parentElement.remove()" style="background:#fee2e2; color:#dc2626; border:none; border-radius:6px; padding:0 8px; font-weight:bold; cursor:pointer;">✕</button>
+            `;
+            box.appendChild(row);
+        }
+
+        function collectVariants(containerId) {
+            const rows = document.querySelectorAll('#' + containerId + ' .variant-row');
+            const list = [];
+            rows.forEach(r => {
+                const name = r.querySelector('.v-name').value.trim();
+                const price = Number(r.querySelector('.v-price').value);
+                const stock = Number(r.querySelector('.v-stock').value || 0);
+                if (name && price > 0) list.push({ name, price, stock });
+            });
+            return list;
+        }
+
+        function previewAndEncodeImage(input, previewId) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // Compress image for fast Firestore storage
+                    const canvas = document.createElement('canvas');
+                    const maxW = 500;
+                    const scale = Math.min(1, maxW / img.width);
+                    canvas.width = img.width * scale;
+                    canvas.height = img.height * scale;
+                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.78);
+                    const prev = document.getElementById(previewId);
+                    prev.src = compressedDataUrl;
+                    prev.style.display = 'block';
+                    prev.dataset.encoded = compressedDataUrl;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        document.getElementById('addProductForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('prodName').value.trim();
+            const price = Number(document.getElementById('prodPrice').value);
+            const mrp = Number(document.getElementById('prodMrp').value);
+            const stockQty = Number(document.getElementById('prodStockQty').value);
+            const unit = document.getElementById('prodUnit').value.trim();
+            const prevImg = document.getElementById('prodImgPreview').dataset.encoded || '';
+            const urlImg = document.getElementById('prodPhotoUrl').value.trim();
+            const finalImage = prevImg || urlImg;
+
+            if (!finalImage) {
+                alert("Kripya product ki photo upload karein ya URL dalein.");
+                return;
+            }
+
+            const variants = collectVariants('variantContainer');
+            const isRestaurant = (activeMerchant.shopCategory || '').toLowerCase().includes('restaurant');
+            const btn = document.getElementById('btnUploadProd');
+            btn.disabled = true;
+            btn.innerText = "Uploading...";
+
+            try {
+                await db.collection("products").add({
+                    name: name,
+                    price: price,
+                    mrp: mrp,
+                    stockQty: stockQty,
+                    stockStatus: stockQty > 0 ? 'in_stock' : 'out_of_stock',
+                    isAvailable: stockQty > 0,
+                    unit: unit,
+                    weight: unit,
+                    imageUrl: finalImage,
+                    images: [finalImage],
+                    variants: variants,
+                    category: isRestaurant ? 'food' : (activeMerchant.shopCategory || 'general'),
+                    assignedShopId: activeMerchant.id,
+                    assignedShopName: activeMerchant.shopName,
+                    shopName: activeMerchant.shopName,
+                    pincode: activeMerchant.pincode,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                alert("✅ Product successfully upload ho gaya!");
+                document.getElementById('addProductForm').reset();
+                document.getElementById('prodImgPreview').style.display = 'none';
+                document.getElementById('prodImgPreview').dataset.encoded = '';
+                document.getElementById('variantContainer').innerHTML = '';
+                switchDashTab('myProds');
+            } catch (err) {
+                alert("Upload Error: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Publish Product to Store";
+            }
+        });
+
+        function listenToMerchantProducts() {
+            db.collection("products")
+                .where("assignedShopId", "==", activeMerchant.id)
+                .onSnapshot(snap => {
+                    merchantProductsCache = [];
+                    snap.forEach(doc => merchantProductsCache.push({ id: doc.id, ...doc.data() }));
+                    renderMerchantProducts();
+                });
+        }
+
+        function renderMerchantProducts() {
+            const grid = document.getElementById('merchantProductsGrid');
+            if (merchantProductsCache.length === 0) {
+                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:25px; background:white; border-radius:14px; color:#64748b;">Abhi tak koi product upload nahi kiya gaya hai.</p>';
+                return;
+            }
+
+            grid.innerHTML = merchantProductsCache.map(p => {
+                const inStock = p.stockStatus !== 'out_of_stock' && (p.stockQty === undefined || p.stockQty > 0);
+                const variantCount = Array.isArray(p.variants) ? p.variants.length : 0;
+                return `
+                    <div class="prod-item-card">
+                        <img src="${p.imageUrl || 'https://via.placeholder.com/80'}" alt="${p.name}">
+                        <div style="flex:1;">
+                            <strong style="font-size:13px; display:block;">${p.name}</strong>
+                            <span style="color:#ea580c; font-weight:900; font-size:14px;">₹${p.price}</span>
+                            <small style="color:#64748b;"> (${p.unit || ''})</small><br>
+                            <span class="stock-pill ${inStock ? 'in-stock' : 'out-stock'}">
+                                ${inStock ? 'In Stock: ' + (p.stockQty ?? 'Yes') : 'Out of Stock'}
+                            </span>
+                            ${variantCount > 0 ? `<span class="stock-pill" style="background:#e0f2fe; color:#0369a1;">${variantCount} Variants</span>` : ''}
+                            <div style="margin-top:8px; display:flex; gap:6px;">
+                                <button class="btn-sm" style="background:#0f172a; padding:5px 10px;" onclick="openEditProductModal('${p.id}')">✏️ Edit / Stock</button>
+                                <button class="btn-sm" style="background:${inStock ? '#dc2626' : '#16a34a'}; padding:5px 10px;" onclick="quickToggleStock('${p.id}', ${inStock})">
+                                    ${inStock ? 'Mark Out' : 'Restock'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function quickToggleStock(prodId, currentlyInStock) {
+            db.collection("products").doc(prodId).update({
+                stockStatus: currentlyInStock ? 'out_of_stock' : 'in_stock',
+                isAvailable: !currentlyInStock,
+                stockQty: currentlyInStock ? 0 : 10
+            });
+        }
+
+        function openEditProductModal(prodId) {
+            const p = merchantProductsCache.find(item => item.id === prodId);
+            if (!p) return;
+
+            document.getElementById('editProdId').value = p.id;
+            document.getElementById('editProdName').value = p.name;
+            document.getElementById('editProdPrice').value = p.price;
+            document.getElementById('editProdStock').value = p.stockQty ?? 10;
+            document.getElementById('editProdStatus').value = p.stockStatus || 'in_stock';
+
+            const prev = document.getElementById('editProdImgPreview');
+            prev.src = p.imageUrl || '';
+            prev.dataset.encoded = '';
+
+            const vBox = document.getElementById('editVariantContainer');
+            vBox.innerHTML = '';
+            if (Array.isArray(p.variants)) {
+                p.variants.forEach(v => addVariantRow('editVariantContainer', v.name, v.price, v.stock));
+            }
+
+            document.getElementById('editProductModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editProductModal').classList.remove('active');
+        }
+
+        document.getElementById('editProductForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('editProdId').value;
+            const name = document.getElementById('editProdName').value.trim();
+            const price = Number(document.getElementById('editProdPrice').value);
+            const stockQty = Number(document.getElementById('editProdStock').value);
+            const status = document.getElementById('editProdStatus').value;
+            const newEncodedImg = document.getElementById('editProdImgPreview').dataset.encoded;
+            const variants = collectVariants('editVariantContainer');
+
+            const updateData = {
+                name: name,
+                price: price,
+                stockQty: stockQty,
+                stockStatus: stockQty <= 0 ? 'out_of_stock' : status,
+                isAvailable: stockQty > 0 && status === 'in_stock',
+                variants: variants
+            };
+            if (newEncodedImg) {
+                updateData.imageUrl = newEncodedImg;
+                updateData.images = [newEncodedImg];
+            }
+
+            await db.collection("products").doc(id).update(updateData);
+            closeEditModal();
+            alert("✅ Product details aur stock update ho gaye!");
+        });
+
+        // Auto-open dashboard if already logged in
+        if (activeMerchant && activeMerchant.id) {
+            openMerchantDashboard();
+        }
+    </script>
+</body>
+</html>
