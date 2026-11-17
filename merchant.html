@@ -6,10 +6,11 @@
     <meta name="theme-color" content="#ea580c">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="KSINDO Merchant">
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" id="dynamicMerchantManifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://poddar977.github.io/jaynagarbazar/logo.png">
-    <title>KSINDO Merchant & Store Control Panel</title>
+    <title>KSINDO Merchant & Store Partner App</title>
 
     <!-- Firebase Compat SDKs + External Config File -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -19,19 +20,19 @@
 
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color:transparent; }
-        body { background:#f1f5f9; color:#0f172a; padding-bottom:80px; }
+        body { background:#f1f5f9; color:#0f172a; padding-bottom:85px; }
 
         /* HEADER */
         header {
             background:linear-gradient(135deg, #ea580c, #c2410c); color:white;
-            padding:14px 16px; display:flex; justify-content:space-between; align-items:center;
+            padding:13px 16px; display:flex; justify-content:space-between; align-items:center;
             position:sticky; top:0; z-index:1000; box-shadow:0 3px 12px rgba(234,88,12,0.28);
         }
         .brand h1 { font-size:18px; font-weight:900; letter-spacing:0.5px; }
         .brand small { display:block; font-size:11px; opacity:0.92; font-weight:600; }
         .header-btns { display:flex; gap:8px; align-items:center; }
         .btn-pill {
-            background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.45);
+            background:rgba(255,255,255,0.22); border:1px solid rgba(255,255,255,0.5);
             color:white; padding:6px 12px; border-radius:20px; font-size:11px; font-weight:800; cursor:pointer;
         }
         .btn-pill.white { background:white; color:#ea580c; border:none; }
@@ -100,7 +101,7 @@
 
         .alert-bar {
             background:#0f172a; color:white; padding:10px 14px; border-radius:12px;
-            margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; font-size:12px; gap:10px;
+            margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; font-size:12px; gap:10px; flex-wrap:wrap;
         }
 
         /* DASHBOARD TABS */
@@ -115,15 +116,33 @@
 
         /* ORDER CARDS */
         .order-card {
-            background:white; border-radius:16px; padding:15px; margin-bottom:12px;
-            border-left:5px solid #ea580c; box-shadow:0 3px 10px rgba(0,0,0,0.05);
+            background:white; border-radius:16px; padding:15px; margin-bottom:14px;
+            border-left:5px solid #ea580c; box-shadow:0 3px 10px rgba(0,0,0,0.06);
         }
         .order-top { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f1f5f9; padding-bottom:8px; margin-bottom:8px; }
         .order-status { font-size:11px; font-weight:800; padding:3px 10px; border-radius:12px; background:#ffedd5; color:#c2410c; }
-        .order-items-list { background:#f8fafc; padding:8px 10px; border-radius:10px; font-size:12px; margin:8px 0; }
-        .order-actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+        .order-items-preview {
+            display:flex; gap:8px; overflow-x:auto; padding:8px 0; margin:6px 0;
+        }
+        .mini-item-chip {
+            display:flex; align-items:center; gap:8px; background:#f8fafc; border:1px solid #e2e8f0;
+            padding:6px 10px; border-radius:10px; min-width:170px; flex-shrink:0;
+        }
+        .mini-item-chip img { width:40px; height:40px; border-radius:6px; object-fit:cover; background:white; }
+
+        /* DELIVERY BOY ASSIGN BAR */
+        .assign-boy-box {
+            display:flex; gap:6px; align-items:center; background:#eff6ff;
+            border:1px solid #bfdbfe; padding:8px 10px; border-radius:10px; margin:10px 0; flex-wrap:wrap;
+        }
+        .assign-boy-box input, .assign-boy-box select {
+            padding:7px 10px; border:1px solid #93c5fd; border-radius:8px; font-size:12px; background:white; outline:none;
+        }
+
+        .order-actions { display:flex; gap:7px; margin-top:10px; flex-wrap:wrap; }
         .btn-sm {
-            padding:8px 12px; border:none; border-radius:8px; font-size:11px; font-weight:800; cursor:pointer; color:white;
+            padding:8px 11px; border:none; border-radius:8px; font-size:11px; font-weight:800; cursor:pointer; color:white;
+            display:inline-flex; align-items:center; gap:4px;
         }
 
         /* ADMIN-STYLE PRODUCT CATALOG FORM */
@@ -163,6 +182,41 @@
         }
         .in-stock { background:#dcfce7; color:#15803d; }
         .out-stock { background:#fee2e2; color:#b91c1c; }
+
+        /* VIEW ORDER ITEMS MODAL */
+        .modal-overlay {
+            position:fixed; inset:0; background:rgba(15,23,42,0.75); display:none;
+            justify-content:center; align-items:center; z-index:9999; padding:16px;
+        }
+        .modal-overlay.active { display:flex; }
+        .modal-box {
+            background:white; border-radius:18px; padding:20px; width:100%; max-width:500px;
+            max-height:88vh; overflow-y:auto; box-shadow:0 15px 35px rgba(0,0,0,0.35);
+        }
+        .view-prod-row {
+            display:flex; gap:12px; align-items:center; padding:10px; border:1px solid #e2e8f0;
+            border-radius:12px; margin-bottom:10px; background:#f8fafc;
+        }
+        .view-prod-row img {
+            width:68px; height:68px; object-fit:cover; border-radius:10px; border:1px solid #cbd5e1; background:white;
+        }
+
+        /* FLOATING PWA DOWNLOAD BAR */
+        .pwa-download-banner {
+            position:fixed; bottom:0; left:0; right:0; background:#0f172a; color:white;
+            padding:10px 16px; display:flex; justify-content:space-between; align-items:center;
+            z-index:999; border-top:2px solid #ea580c; font-size:12px;
+        }
+
+        /* PRINTABLE RECEIPT (NO OTP SHOWN) */
+        @media print {
+            body * { visibility:hidden; }
+            #merchantPrintableBill, #merchantPrintableBill * { visibility:visible; }
+            #merchantPrintableBill {
+                position:absolute; left:0; top:0; width:76mm; font-family:monospace;
+                color:black; padding:6px; background:white;
+            }
+        }
     </style>
 </head>
 <body>
@@ -171,11 +225,11 @@
         <div class="brand">
             <div>
                 <h1>KSINDO Merchant</h1>
-                <small>Partner & KSINDO Store Control</small>
+                <small>Partner & KSINDO Store App</small>
             </div>
         </div>
         <div class="header-btns">
-            <button class="btn-pill" id="installPwaBtn" style="display:none;" onclick="installMerchantPWA()">📲 Install App</button>
+            <button class="btn-pill" id="installPwaBtn" onclick="installMerchantPWA()">📲 Download App</button>
             <button class="btn-pill white" id="logoutBtn" style="display:none;" onclick="merchantLogout()">Logout</button>
         </div>
     </header>
@@ -377,7 +431,7 @@
                         </div>
                     </div>
 
-                    <!-- MULTI-SELECT CATEGORIES (LIKE ADMIN) -->
+                    <!-- MULTI-SELECT CATEGORIES -->
                     <div class="form-group">
                         <label>Categories (Multi-Select Supported) <span class="req">*</span></label>
                         <div class="cat-checkbox-group">
@@ -393,7 +447,7 @@
 
                     <div class="preview-grid" id="photoPreviewContainer"></div>
 
-                    <!-- SIZE / WEIGHT VARIANTS WITH AUTO DISCOUNT % (LIKE ADMIN) -->
+                    <!-- SIZE / WEIGHT VARIANTS WITH AUTO DISCOUNT % -->
                     <div class="variant-box">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                             <div>
@@ -438,7 +492,64 @@
         </div>
     </div>
 
+    <!-- VIEW ORDERED PRODUCTS WITH IMAGE MODAL -->
+    <div class="modal-overlay" id="viewOrderItemsModal">
+        <div class="modal-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:10px; margin-bottom:12px;">
+                <div>
+                    <h3 style="font-size:16px; color:#ea580c;" id="modalOrderTitle">Order Items Details</h3>
+                    <small style="color:#64748b;" id="modalOrderCustInfo"></small>
+                </div>
+                <button onclick="closeViewOrderModal()" style="border:none; background:#f1f5f9; width:30px; height:30px; border-radius:50%; font-size:18px; font-weight:bold; cursor:pointer;">&times;</button>
+            </div>
+            <div id="modalOrderItemsContainer"></div>
+            <div style="background:#fff7ed; padding:10px 12px; border-radius:10px; border:1px dashed #ea580c; display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                <span style="font-size:12px; font-weight:700;">Total Payable Bill:</span>
+                <strong style="font-size:16px; color:#ea580c;" id="modalOrderTotalText">₹0</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRINTABLE RECEIPT CONTAINER (NO OTP) -->
+    <div id="merchantPrintableBill" style="display:none;"></div>
+
+    <!-- FLOATING PWA APP INSTALL BANNER -->
+    <div class="pwa-download-banner" id="pwaBottomBanner">
+        <div>
+            <strong>📲 KSINDO Merchant App</strong>
+            <div style="font-size:10px; color:#cbd5e1;">Phone me app install karein fast order alert ke liye</div>
+        </div>
+        <button class="btn-sm" style="background:#ea580c;" onclick="installMerchantPWA()">Install App</button>
+    </div>
+
     <script>
+        // ==================== DYNAMIC PWA MANIFEST FOR STANDALONE APP INSTALL ====================
+        (function setupMerchantManifest() {
+            const manifestObj = {
+                name: "KSINDO Merchant & Store App",
+                short_name: "KSINDO Partner",
+                start_url: window.location.href,
+                display: "standalone",
+                background_color: "#ffffff",
+                theme_color: "#ea580c",
+                icons: [
+                    {
+                        src: "https://poddar977.github.io/jaynagarbazar/logo.png",
+                        sizes: "192x192",
+                        type: "image/png"
+                    },
+                    {
+                        src: "https://poddar977.github.io/jaynagarbazar/logo.png",
+                        sizes: "512x512",
+                        type: "image/png"
+                    }
+                ]
+            };
+            const blob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+            const manifestLink = document.getElementById('dynamicMerchantManifest');
+            if (manifestLink) manifestLink.href = URL.createObjectURL(blob);
+        })();
+
         // Initialize Firebase using external firebase-config.js
         if (!window.KSINDO_FIREBASE_CONFIG) {
             alert("Error: firebase-config.js load nahi hui!");
@@ -457,6 +568,8 @@
         let isInitialOrderLoad = true;
         let merchantProductsCache = [];
         let allShopsMap = {};
+        let deliveryBoysList = [];
+        let visibleOrdersCache = {};
         let base64PhotosArray = [];
         let deferredPrompt = null;
 
@@ -467,12 +580,28 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            document.getElementById('installPwaBtn').style.display = 'inline-block';
         });
+        window.addEventListener('appinstalled', () => {
+            const banner = document.getElementById('pwaBottomBanner');
+            if (banner) banner.style.display = 'none';
+        });
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            const banner = document.getElementById('pwaBottomBanner');
+            if (banner) banner.style.display = 'none';
+        }
+
         function installMerchantPWA() {
-            if (!deferredPrompt) return;
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+            } else {
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                if (isIOS) {
+                    alert("📲 iPhone me App install karne ke liye:\n1. Niche 'Share' icon (⬆️) par tap karein.\n2. 'Add to Home Screen' par click karein.");
+                } else {
+                    alert("📲 Phone me App install karne ke liye:\n1. Browser ke upar right side 3-dots (⋮) par click karein.\n2. 'Install App' ya 'Add to Home Screen' par tap karein.");
+                }
+            }
         }
 
         // ==================== LOCK-SCREEN & SOUND NOTIFICATION ENGINE ====================
@@ -814,7 +943,6 @@
             window.location.reload();
         }
 
-        // Helper: Check if logged-in merchant is KSINDO Store
         function isKsindoOfficialStore(merchant) {
             if (!merchant) return false;
             return merchant.vendorType === 'KSINDO_STORE' ||
@@ -843,7 +971,13 @@
                 Notification.requestPermission();
             }
 
-            // Load all shops first to distinguish other shops vs KSINDO Store in the same pincode
+            // Load Delivery Boys list from portal_users for quick assignment dropdown
+            db.collection("portal_users").where("role", "==", "delivery").onSnapshot(snap => {
+                deliveryBoysList = [];
+                snap.forEach(d => deliveryBoysList.push({ id: d.id, ...d.data() }));
+            });
+
+            // Load all shops to isolate KSINDO Store vs Other Shops
             db.collection("shops").onSnapshot(snap => {
                 allShopsMap = {};
                 snap.forEach(d => {
@@ -865,7 +999,7 @@
             document.getElementById('navMyProds').classList.toggle('active', tab === 'myProds');
         }
 
-        // ==================== STRICT ORDER ISOLATION (KSINDO STORE vs OTHER SHOPS) ====================
+        // ==================== STRICT ORDER ISOLATION (NO OTP DISPLAYED) ====================
         function listenToIsolatedOrders() {
             const myPin = String(activeMerchant.pincode || '').trim();
             const amIKsindoStore = isKsindoOfficialStore(activeMerchant);
@@ -874,15 +1008,13 @@
                 .where("customerPincode", "==", myPin)
                 .onSnapshot(snap => {
                     const visibleOrders = [];
+                    visibleOrdersCache = {};
 
                     snap.forEach(doc => {
                         const o = { id: doc.id, ...doc.data() };
                         const items = Array.isArray(o.items) ? o.items : [];
 
                         if (amIKsindoStore) {
-                            // KSINDO Store Logic:
-                            // Admin me aane wale is pincode ke sabhi KSINDO Store / General (unassigned) orders live honge,
-                            // LEKIN is area ke kisi doosre registered shop/restaurant ke orders show NAHI honge.
                             const isOtherShopOrder = (() => {
                                 if (o.assignedShopId && o.assignedShopId !== activeMerchant.id) {
                                     const targetShop = allShopsMap[o.assignedShopId];
@@ -894,9 +1026,8 @@
                                 return false;
                             })();
 
-                            // Filter items so other shops' items are excluded even in mixed carts
                             const ksindoItems = items.filter(item => {
-                                if (!item.assignedShopId && !item.shopId) return true; // General Admin/KSINDO item
+                                if (!item.assignedShopId && !item.shopId) return true;
                                 const itemShopId = item.assignedShopId || item.shopId;
                                 if (itemShopId === activeMerchant.id) return true;
                                 const sObj = allShopsMap[itemShopId];
@@ -904,12 +1035,12 @@
                             });
 
                             if (!isOtherShopOrder && (ksindoItems.length > 0 || items.length === 0)) {
-                                visibleOrders.push({ ...o, filteredItems: ksindoItems.length > 0 ? ksindoItems : items });
+                                const orderObj = { ...o, filteredItems: ksindoItems.length > 0 ? ksindoItems : items };
+                                visibleOrders.push(orderObj);
+                                visibleOrdersCache[o.id] = orderObj;
                                 checkAndTriggerAlert(doc.id, o);
                             }
                         } else {
-                            // Normal Shop / Restaurant Logic:
-                            // Sirf isi shop ke products ka order show hoga, kisi doosre ka nahi.
                             const directMatch = (o.assignedShopId === activeMerchant.id) ||
                                                 (o.assignedShopName && o.assignedShopName.toLowerCase() === activeMerchant.shopName.toLowerCase());
                             const myItems = items.filter(item =>
@@ -919,7 +1050,9 @@
                             );
 
                             if (directMatch || myItems.length > 0) {
-                                visibleOrders.push({ ...o, filteredItems: myItems.length > 0 ? myItems : items });
+                                const orderObj = { ...o, filteredItems: myItems.length > 0 ? myItems : items };
+                                visibleOrders.push(orderObj);
+                                visibleOrdersCache[o.id] = orderObj;
                                 checkAndTriggerAlert(doc.id, o);
                             }
                         }
@@ -952,33 +1085,75 @@
                 return;
             }
 
+            const boyDropdownOptions = deliveryBoysList.map(b =>
+                `<option value="${b.phone}">${b.fullName} (${b.phone})</option>`
+            ).join('');
+
             container.innerHTML = orders.map(o => {
-                const itemsHtml = o.filteredItems.map(i =>
-                    `<div>• <b>${i.name}</b> ${i.size || i.variant ? '(' + (i.size || i.variant) + ')' : ''} × ${i.qty || 1} — ₹${Number(i.price) * Number(i.qty || 1)}</div>`
-                ).join('');
+                const stLower = (o.status || 'Placed').toLowerCase();
+                const isClosed = stLower === 'delivered' || stLower === 'cancelled';
+
+                const itemsPreviewHtml = o.filteredItems.map(i => {
+                    const img = i.imageUrl || (i.images && i.images[0]) || 'https://via.placeholder.com/60';
+                    const variantText = i.size || i.variant || '';
+                    return `
+                        <div class="mini-item-chip" onclick="openViewOrderModal('${o.id}')" style="cursor:pointer;">
+                            <img src="${img}" alt="${i.name}">
+                            <div>
+                                <div style="font-size:11px; font-weight:800; color:#0f172a;">${i.name}</div>
+                                <div style="font-size:10px; color:#64748b;">${variantText ? variantText + ' • ' : ''}Qty: ${i.qty || 1} • ₹${Number(i.price) * Number(i.qty || 1)}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
 
                 return `
-                    <div class="order-card">
+                    <div class="order-card" style="border-left-color:${stLower === 'cancelled' ? '#ef4444' : (stLower === 'delivered' ? '#16a34a' : '#ea580c')};">
                         <div class="order-top">
                             <div>
                                 <strong style="font-size:14px;">Order #${o.id.slice(-6).toUpperCase()}</strong>
                                 <div style="font-size:11px; color:#64748b;">${o.orderDateFormatted || ''}</div>
                             </div>
-                            <span class="order-status">${o.status || 'Placed'}</span>
+                            <span class="order-status" style="background:${stLower === 'cancelled' ? '#fee2e2' : '#ffedd5'}; color:${stLower === 'cancelled' ? '#b91c1c' : '#c2410c'};">
+                                ${o.status || 'Placed'}
+                            </span>
                         </div>
-                        <div style="font-size:12px; line-height:1.5;">
-                            <b>Customer:</b> ${o.customerName} (${o.customerPhone})<br>
-                            <b>Address:</b> ${o.customerAddress} — <b>PIN: ${o.customerPincode}</b><br>
-                            ${o.deliveryOtp ? `<b>Delivery OTP:</b> <span style="background:#fef3c7; padding:1px 6px; border-radius:4px;">${o.deliveryOtp}</span>` : ''}
+
+                        <!-- Customer Details (NOTE: OTP IS COMPLETELY HIDDEN FROM MERCHANT) -->
+                        <div style="font-size:12px; line-height:1.55; color:#1e293b;">
+                            <b>Customer:</b> ${o.customerName} (<a href="tel:${o.customerPhone}" style="color:#0284c7; text-decoration:none; font-weight:700;">📞 ${o.customerPhone}</a>)<br>
+                            <b>Address:</b> ${o.customerAddress} — <b>PIN: ${o.customerPincode}</b>
+                            ${o.assignedBoyPhone ? `<br><b>🚴 Assigned Boy:</b> <span style="color:#15803d; font-weight:800;">${o.assignedBoyPhone}</span>` : ''}
                         </div>
-                        <div class="order-items-list">${itemsHtml}</div>
-                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+
+                        <!-- Ordered Products Preview with Images -->
+                        <div class="order-items-preview">${itemsPreviewHtml}</div>
+
+                        <!-- Delivery Boy Assign Box (Available for all Shops & KSINDO Store) -->
+                        ${!isClosed ? `
+                        <div class="assign-boy-box">
+                            <span style="font-size:11px; font-weight:800; color:#1e40af;">🚴 Assign Boy:</span>
+                            ${deliveryBoysList.length > 0 ? `
+                                <select onchange="document.getElementById('boyInp_${o.id}').value = this.value" style="max-width:155px;">
+                                    <option value="">-- Select Boy --</option>
+                                    ${boyDropdownOptions}
+                                </select>
+                            ` : ''}
+                            <input type="tel" id="boyInp_${o.id}" placeholder="10-digit Boy Phone" maxlength="10" value="${o.assignedBoyPhone || ''}" style="width:135px;">
+                            <button type="button" class="btn-sm" style="background:#1d4ed8;" onclick="assignDeliveryBoyToOrder('${o.id}')">Assign</button>
+                        </div>
+                        ` : ''}
+
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-top:8px;">
                             <strong style="color:#ea580c; font-size:14px;">Total: ₹${o.totalAmount} (${o.paymentMethod || 'COD'})</strong>
                             <div class="order-actions">
-                                <button class="btn-sm" style="background:#0284c7;" onclick="updateOrderStatus('${o.id}', 'Confirmed')">Accept</button>
-                                <button class="btn-sm" style="background:#f59e0b; color:#0f172a;" onclick="updateOrderStatus('${o.id}', 'Packed')">Pack</button>
-                                <button class="btn-sm" style="background:#ea580c;" onclick="updateOrderStatus('${o.id}', 'Out for Delivery')">Dispatch</button>
-                                <button class="btn-sm" style="background:#16a34a;" onclick="updateOrderStatus('${o.id}', 'Delivered')">Delivered</button>
+                                <button type="button" class="btn-sm" style="background:#0f172a;" onclick="openViewOrderModal('${o.id}')">👁️ View Items</button>
+                                <button type="button" class="btn-sm" style="background:#0284c7;" onclick="printMerchantBill('${o.id}')">🖨️ Print Bill</button>
+                                ${!isClosed ? `
+                                    <button type="button" class="btn-sm" style="background:#f59e0b; color:#0f172a;" onclick="updateOrderStatus('${o.id}', 'Packed')">📦 Pack</button>
+                                    <button type="button" class="btn-sm" style="background:#16a34a;" onclick="updateOrderStatus('${o.id}', 'Delivered')">✅ Delivered</button>
+                                    <button type="button" class="btn-sm" style="background:#dc2626;" onclick="cancelMerchantOrder('${o.id}')">❌ Cancel</button>
+                                ` : ''}
                             </div>
                         </div>
                     </div>
@@ -986,12 +1161,148 @@
             }).join('');
         }
 
+        // ==================== VIEW ORDERED ITEMS WITH PHOTO MODAL ====================
+        function openViewOrderModal(orderId) {
+            const o = visibleOrdersCache[orderId];
+            if (!o) return;
+
+            document.getElementById('modalOrderTitle').innerText = "Order #" + o.id.slice(-6).toUpperCase() + " — Ordered Products";
+            document.getElementById('modalOrderCustInfo').innerText = o.customerName + " • " + o.customerPhone + " • PIN: " + o.customerPincode;
+            document.getElementById('modalOrderTotalText').innerText = "₹" + o.totalAmount + " (" + (o.paymentMethod || 'COD') + ")";
+
+            const container = document.getElementById('modalOrderItemsContainer');
+            container.innerHTML = o.filteredItems.map(item => {
+                const img = item.imageUrl || (item.images && item.images[0]) || 'https://via.placeholder.com/80';
+                const variant = item.size || item.variant || 'Standard';
+                const qty = Number(item.qty || 1);
+                const price = Number(item.price || 0);
+
+                return `
+                    <div class="view-prod-row">
+                        <img src="${img}" alt="${item.name}">
+                        <div style="flex:1;">
+                            <strong style="font-size:13px; color:#0f172a; display:block;">${item.name}</strong>
+                            <span style="font-size:11px; color:#475569;">Variant / Size: <b>${variant}</b></span><br>
+                            <span style="font-size:12px; color:#ea580c; font-weight:800;">₹${price} × ${qty} = ₹${price * qty}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('viewOrderItemsModal').classList.add('active');
+        }
+
+        function closeViewOrderModal() {
+            document.getElementById('viewOrderItemsModal').classList.remove('active');
+        }
+
+        // ==================== ASSIGN DELIVERY BOY ====================
+        function assignDeliveryBoyToOrder(orderId) {
+            const input = document.getElementById('boyInp_' + orderId);
+            const phone = (input ? input.value : '').trim();
+            if (!/^\d{10}$/.test(phone)) {
+                alert("Kripya Delivery Boy ka sahi 10-digit mobile number dalein!");
+                return;
+            }
+            db.collection("orders").doc(orderId).update({
+                assignedBoyPhone: phone,
+                status: "Assigned",
+                assignedByShop: activeMerchant.shopName,
+                assignedAt: new Date().toISOString()
+            }).then(() => {
+                alert("✅ Delivery Boy (" + phone + ") ko order assign ho gaya!");
+            }).catch(err => alert("Assign Error: " + err.message));
+        }
+
+        // ==================== CANCEL ORDER ====================
+        function cancelMerchantOrder(orderId) {
+            const reason = prompt("Order cancel karne ka karan likhein (e.g. Item out of stock / Shop closed):", "Item unavailable");
+            if (reason === null) return;
+
+            db.collection("orders").doc(orderId).update({
+                status: "Cancelled",
+                cancelReason: reason.trim() || "Cancelled by Merchant",
+                cancelledBy: activeMerchant.shopName,
+                closedAt: new Date().toISOString()
+            }).then(() => {
+                alert("❌ Order cancel kar diya gaya hai.");
+            }).catch(err => alert("Cancel Error: " + err.message));
+        }
+
         function updateOrderStatus(orderId, newStatus) {
             const payload = { status: newStatus };
-            if (newStatus === 'Delivered') payload.deliveredAt = new Date().toISOString();
+            if (newStatus === 'Delivered') {
+                payload.deliveredAt = new Date().toISOString();
+                payload.closedAt = new Date().toISOString();
+            }
             db.collection("orders").doc(orderId).update(payload)
                 .then(() => alert("✅ Order status updated: " + newStatus))
                 .catch(err => alert("Error: " + err.message));
+        }
+
+        // ==================== THERMAL BILL PRINT (WITHOUT OTP) ====================
+        function printMerchantBill(orderId) {
+            const order = visibleOrdersCache[orderId];
+            if (!order) return alert("Order data nahi mila!");
+
+            const billBox = document.getElementById('merchantPrintableBill');
+            billBox.style.display = 'block';
+
+            const itemsHtml = order.filteredItems.map(i => {
+                const variant = i.size || i.variant ? ` (${i.size || i.variant})` : '';
+                return `
+                    <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:3px;">
+                        <span>${i.name}${variant} x${i.qty || 1}</span>
+                        <span>₹${Number(i.price) * Number(i.qty || 1)}</span>
+                    </div>
+                `;
+            }).join('');
+
+            const deliveryCharge = Number(order.deliveryCharge || 0);
+            const subtotal = order.subtotal !== undefined ? order.subtotal : (Number(order.totalAmount) - deliveryCharge);
+            const gstLine = activeMerchant.gstin ? `<p style="margin:2px 0 0; font-size:10px;">GSTIN: ${activeMerchant.gstin}</p>` : '';
+
+            billBox.innerHTML = `
+                <div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">
+                    <h3 style="margin:0; font-size:15px;">${activeMerchant.shopName.toUpperCase()}</h3>
+                    <p style="margin:0; font-size:10px;">Powered by KSINDO</p>
+                    ${gstLine}
+                    <p style="margin:2px 0 0; font-size:10px;">${order.orderDateFormatted || new Date().toLocaleString('en-IN')}</p>
+                </div>
+                <div style="font-size:11px; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">
+                    <strong>Order:</strong> #${order.id.slice(-6).toUpperCase()}<br>
+                    <strong>Customer:</strong> ${order.customerName}<br>
+                    <strong>Phone:</strong> ${order.customerPhone}<br>
+                    <strong>Address:</strong> ${order.customerAddress} (PIN: ${order.customerPincode})
+                    ${order.assignedBoyPhone ? `<br><strong>Delivery Boy:</strong> ${order.assignedBoyPhone}` : ''}
+                </div>
+                <div style="border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">
+                    <div style="font-weight:bold; font-size:11px; margin-bottom:3px;">ITEMS:</div>
+                    ${itemsHtml}
+                </div>
+                <div style="font-size:11px; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">
+                    <div style="display:flex; justify-content:space-between;"><span>Subtotal:</span><span>₹${subtotal}</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span>Delivery Fee:</span><span>${deliveryCharge > 0 ? '₹' + deliveryCharge : 'FREE'}</span></div>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:13px; margin-bottom:6px;">
+                    <span>TOTAL PAYABLE:</span>
+                    <span>₹${order.totalAmount}</span>
+                </div>
+                <div style="text-align:center; font-size:10px; border-top:1px dashed #000; padding-top:5px;">
+                    Payment Mode: ${order.paymentMethod || 'COD'}<br>
+                    Thank you for ordering with KSINDO!
+                </div>
+            `;
+
+            window.print();
+            billBox.style.display = 'none';
+
+            if ((order.status || '').toLowerCase() === 'placed') {
+                db.collection("orders").doc(orderId).update({
+                    status: "Confirmed",
+                    billPrintedAt: new Date().toISOString()
+                }).catch(() => {});
+            }
         }
 
         // ==================== ADMIN-STYLE PRODUCT UPLOAD, VARIANTS & STOCK ====================
