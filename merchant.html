@@ -8,14 +8,16 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="KSINDO Merchant">
-    <link rel="manifest" id="dynamicMerchantManifest" href="manifest.json">
+    <!-- Separate Manifest so both Customer & Merchant Apps install independently -->
+    <link rel="manifest" href="merchant-manifest.json">
     <link rel="apple-touch-icon" href="https://poddar977.github.io/jaynagarbazar/logo.png">
     <title>KSINDO Merchant & Store Partner App</title>
 
-    <!-- Firebase Compat SDKs + External Config File -->
+    <!-- Firebase Compat SDKs + Messaging + External Config File -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
     <script src="firebase-config.js"></script>
 
     <style>
@@ -104,7 +106,7 @@
             margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; font-size:12px; gap:10px; flex-wrap:wrap;
         }
 
-        /* DASHBOARD TABS (5 TABS FOR FULL CONTROL) */
+        /* DASHBOARD TABS */
         .dash-nav {
             display:grid; grid-template-columns:repeat(5, 1fr); gap:6px; margin-bottom:16px;
         }
@@ -394,8 +396,8 @@
         </div>
 
         <div class="alert-bar">
-            <span>🔔 Lock-Screen & Sound Order Alert Active</span>
-            <button class="btn-sm" style="background:#ea580c;" onclick="requestSystemNotificationPermission()">Enable Lock Screen Alert</button>
+            <span id="lockPushStatusText">🔔 Lock-Screen & Background Order Alert</span>
+            <button class="btn-sm" style="background:#ea580c;" onclick="registerMerchantLockScreenPush(true)">Enable Lock-Screen Push</button>
         </div>
 
         <div class="dash-nav">
@@ -406,14 +408,14 @@
             <button class="dash-tab-btn" id="navMyProds" onclick="switchDashTab('myProds')">🏪 Catalog & Stock</button>
         </div>
 
-        <!-- TAB 1: LIVE ACTIVE ORDERS ONLY (AUTO-REMOVED WHEN DELIVERED OR CANCELLED) -->
+        <!-- TAB 1: LIVE ACTIVE ORDERS ONLY -->
         <div id="sectionOrders">
             <div id="merchantOrdersList">
                 <p style="text-align:center; padding:30px; color:#64748b;">Live orders load ho rahe hain...</p>
             </div>
         </div>
 
-        <!-- TAB 2: ORDER HISTORY (DELIVERED & CANCELLED + SEARCH BY ORDER ID) -->
+        <!-- TAB 2: ORDER HISTORY -->
         <div id="sectionHistory" style="display:none;">
             <div class="filter-bar-card">
                 <div class="f-field" style="flex:2;">
@@ -432,9 +434,8 @@
             <div id="merchantHistoryList"></div>
         </div>
 
-        <!-- TAB 3: LIVE & CUSTOMIZED COLLECTION REPORT (CASH + UPI + CSV DOWNLOAD) -->
+        <!-- TAB 3: COLLECTION REPORT (CASH + UPI + CSV) -->
         <div id="sectionCollection" style="display:none;">
-            <!-- Live Cash & UPI Summary Cards -->
             <div class="report-stats-grid">
                 <div class="rep-stat-card" style="border-left:4px solid #16a34a;">
                     <small>Total Net Collection (Delivered)</small>
@@ -454,7 +455,6 @@
                 </div>
             </div>
 
-            <!-- Customize Date & Payment Filter + Statement Download -->
             <div class="filter-bar-card">
                 <div class="f-field">
                     <label>From Date</label>
@@ -478,7 +478,6 @@
                 </div>
             </div>
 
-            <!-- Collection Ledger Table -->
             <div class="ledger-table-wrap">
                 <table class="ledger-table">
                     <thead>
@@ -547,7 +546,6 @@
                         </div>
                     </div>
 
-                    <!-- MULTI-SELECT CATEGORIES -->
                     <div class="form-group">
                         <label>Categories (Multi-Select Supported) <span class="req">*</span></label>
                         <div class="cat-checkbox-group">
@@ -563,7 +561,6 @@
 
                     <div class="preview-grid" id="photoPreviewContainer"></div>
 
-                    <!-- SIZE / WEIGHT VARIANTS WITH AUTO DISCOUNT % -->
                     <div class="variant-box">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                             <div>
@@ -634,31 +631,12 @@
     <div class="pwa-download-banner" id="pwaBottomBanner">
         <div>
             <strong>📲 KSINDO Merchant App</strong>
-            <div style="font-size:10px; color:#cbd5e1;">Phone me app install karein fast order alert ke liye</div>
+            <div style="font-size:10px; color:#cbd5e1;">Alag app install karein (Customer app ke saath chalega)</div>
         </div>
         <button class="btn-sm" style="background:#ea580c;" onclick="installMerchantPWA()">Install App</button>
     </div>
 
     <script>
-        // ==================== DYNAMIC PWA MANIFEST FOR STANDALONE APP INSTALL ====================
-        (function setupMerchantManifest() {
-            const manifestObj = {
-                name: "KSINDO Merchant & Store App",
-                short_name: "KSINDO Partner",
-                start_url: window.location.href,
-                display: "standalone",
-                background_color: "#ffffff",
-                theme_color: "#ea580c",
-                icons: [
-                    { src: "https://poddar977.github.io/jaynagarbazar/logo.png", sizes: "192x192", type: "image/png" },
-                    { src: "https://poddar977.github.io/jaynagarbazar/logo.png", sizes: "512x512", type: "image/png" }
-                ]
-            };
-            const blob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
-            const manifestLink = document.getElementById('dynamicMerchantManifest');
-            if (manifestLink) manifestLink.href = URL.createObjectURL(blob);
-        })();
-
         // Initialize Firebase using external firebase-config.js
         if (!window.KSINDO_FIREBASE_CONFIG) {
             alert("Error: firebase-config.js load nahi hui!");
@@ -684,19 +662,29 @@
         let filteredCollectionOrders = [];
         let base64PhotosArray = [];
         let deferredPrompt = null;
+        let merchantSwRegistration = null;
 
-        // ==================== PWA SERVICE WORKER & INSTALL ====================
+        // ==================== DEDICATED SERVICE WORKER & STANDALONE PWA INSTALL ====================
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(() => {});
+            navigator.serviceWorker.register('merchant-sw.js')
+                .then(reg => {
+                    merchantSwRegistration = reg;
+                })
+                .catch(err => console.log("Merchant SW error:", err));
         }
+
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
+            document.getElementById('installPwaBtn').style.display = 'inline-block';
         });
+
         window.addEventListener('appinstalled', () => {
             const banner = document.getElementById('pwaBottomBanner');
             if (banner) banner.style.display = 'none';
+            alert("✅ KSINDO Merchant App phone me install ho gaya hai!");
         });
+
         if (window.matchMedia('(display-mode: standalone)').matches) {
             const banner = document.getElementById('pwaBottomBanner');
             if (banner) banner.style.display = 'none';
@@ -709,63 +697,98 @@
             } else {
                 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
                 if (isIOS) {
-                    alert("📲 iPhone me App install karne ke liye:\n1. Niche 'Share' icon (⬆️) par tap karein.\n2. 'Add to Home Screen' par click karein.");
+                    alert("📲 iPhone me KSINDO Merchant App install karne ke liye:\n1. Niche 'Share' icon (⬆️) par tap karein.\n2. 'Add to Home Screen' par click karein.");
                 } else {
-                    alert("📲 Phone me App install karne ke liye:\n1. Browser ke upar right side 3-dots (⋮) par click karein.\n2. 'Install App' ya 'Add to Home Screen' par tap karein.");
+                    alert("📲 Phone me KSINDO Merchant App install karne ke liye:\n1. Browser ke upar right side 3-dots (⋮) par click karein.\n2. 'Install App' ya 'Add to Home Screen' par tap karein.\n(Note: Agar purana shortcut hai to pehle use remove karke page refresh karein.)");
                 }
             }
         }
 
-        // ==================== LOCK-SCREEN & SOUND NOTIFICATION ENGINE ====================
-        function requestSystemNotificationPermission() {
-            if (!("Notification" in window)) {
-                alert("Is browser me system notification supported nahi hai.");
-                return;
-            }
-            Notification.requestPermission().then(perm => {
-                if (perm === "granted") {
-                    testOrderAlertSound();
-                    alert("✅ Lock-Screen aur Sound Notification Enable ho gaya!");
-                } else {
-                    alert("Please browser settings se Notification permission Allow karein.");
+        // ==================== LOCK-SCREEN & BACKGROUND FCM PUSH + SOUND ====================
+        async function registerMerchantLockScreenPush(showManualAlert = false) {
+            try {
+                if (!("Notification" in window)) {
+                    if (showManualAlert) alert("Is browser me system notification supported nahi hai.");
+                    return;
                 }
-            });
+
+                const perm = await Notification.requestPermission();
+                if (perm !== "granted") {
+                    if (showManualAlert) alert("Please browser settings se Notification permission Allow karein.");
+                    return;
+                }
+
+                const reg = merchantSwRegistration || await navigator.serviceWorker.register('merchant-sw.js');
+                document.getElementById('lockPushStatusText').innerText = "🔔 Lock-Screen & Background Push: ACTIVE";
+
+                // Foreground FCM listener
+                if (firebase.messaging && firebase.messaging.isSupported()) {
+                    const messaging = firebase.messaging();
+                    messaging.onMessage((payload) => {
+                        const title = (payload.notification && payload.notification.title) || "🛎️ Naya Order Aaya Hai!";
+                        const body = (payload.notification && payload.notification.body) || "Order details check karein.";
+                        triggerLockScreenNotification(title, body);
+                    });
+
+                    // Register FCM Token for Lock-Screen / Closed-App Push
+                    // Firebase Console > Cloud Messaging > Web Push Certificates se apni VAPID Key yahan dalein
+                    const vapidKey = "YOUR_FIREBASE_WEB_PUSH_VAPID_KEY";
+                    if (vapidKey && vapidKey !== "YOUR_FIREBASE_WEB_PUSH_VAPID_KEY") {
+                        const fcmToken = await messaging.getToken({
+                            vapidKey: vapidKey,
+                            serviceWorkerRegistration: reg
+                        });
+                        if (fcmToken && activeMerchant && activeMerchant.id) {
+                            await db.collection("shops").doc(activeMerchant.id).update({
+                                merchantFcmToken: fcmToken,
+                                pushUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        }
+                    }
+                }
+
+                if (showManualAlert) {
+                    testOrderAlertSound();
+                    alert("✅ Lock-Screen aur Sound Alert Enable ho gaya!\n\nTip: Phone ki Settings > Apps > KSINDO Merchant > Battery me 'Unrestricted' chunein taaki phone lock hone par bhi alert turant baje.");
+                }
+            } catch (err) {
+                if (showManualAlert) testOrderAlertSound();
+            }
         }
 
         function playAlertTone() {
             try {
                 const AudioCtx = window.AudioContext || window.webkitAudioContext;
                 const ctx = new AudioCtx();
-                const notes = [880, 1100, 880, 1320];
+                const notes = [880, 1100, 880, 1320, 1100, 1320];
                 notes.forEach((freq, idx) => {
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.18);
-                    gain.gain.setValueAtTime(0.35, ctx.currentTime + idx * 0.18);
-                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (idx + 1) * 0.18);
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.16);
+                    gain.gain.setValueAtTime(0.4, ctx.currentTime + idx * 0.16);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (idx + 1) * 0.16);
                     osc.connect(gain);
                     gain.connect(ctx.destination);
-                    osc.start(ctx.currentTime + idx * 0.18);
-                    osc.stop(ctx.currentTime + (idx + 1) * 0.18);
+                    osc.start(ctx.currentTime + idx * 0.16);
+                    osc.stop(ctx.currentTime + (idx + 1) * 0.16);
                 });
-                if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 500]);
+                if (navigator.vibrate) navigator.vibrate([400, 150, 400, 150, 600]);
             } catch (e) {}
         }
 
         function triggerLockScreenNotification(title, bodyText) {
             playAlertTone();
             if ("Notification" in window && Notification.permission === "granted") {
-                if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-                    navigator.serviceWorker.ready.then(reg => {
-                        reg.showNotification(title, {
-                            body: bodyText,
-                            icon: 'https://poddar977.github.io/jaynagarbazar/logo.png',
-                            badge: 'https://poddar977.github.io/jaynagarbazar/logo.png',
-                            vibrate: [300, 150, 300],
-                            requireInteraction: true,
-                            tag: 'ksindo-merchant-order'
-                        });
+                if (merchantSwRegistration) {
+                    merchantSwRegistration.showNotification(title, {
+                        body: bodyText,
+                        icon: 'https://poddar977.github.io/jaynagarbazar/logo.png',
+                        badge: 'https://poddar977.github.io/jaynagarbazar/logo.png',
+                        vibrate: [500, 200, 500, 200, 800],
+                        requireInteraction: true,
+                        renotify: true,
+                        tag: 'ksindo-merchant-urgent-order'
                     });
                 } else {
                     new Notification(title, {
@@ -778,7 +801,7 @@
 
         function testOrderAlertSound() {
             triggerLockScreenNotification(
-                "🔔 KSINDO Test Order Alert",
+                "🔔 KSINDO Urgent Order Alert",
                 "Naya order aane par aapke phone ke lock screen par aisa alert aur sound bajega!"
             );
         }
@@ -1079,9 +1102,7 @@
                 addVariantRow();
             }
 
-            if ("Notification" in window && Notification.permission === "default") {
-                Notification.requestPermission();
-            }
+            registerMerchantLockScreenPush(false);
 
             db.collection("portal_users").where("role", "==", "delivery").onSnapshot(snap => {
                 deliveryBoysList = [];
@@ -1174,7 +1195,6 @@
                             allShopOrdersCache[o.id] = matchedOrder;
                             const st = (matchedOrder.status || 'Placed').toLowerCase();
 
-                            // Delivered ya Cancelled hone par Live Orders se auto-remove hokar History me save hoga
                             if (st === 'delivered' || st === 'cancelled') {
                                 historyOrdersArray.push(matchedOrder);
                             } else {
@@ -1208,7 +1228,7 @@
             knownOrderIds.add(orderId);
         }
 
-        // ==================== RENDER LIVE ORDERS (ACTIVE ONLY, NO OTP) ====================
+        // ==================== RENDER LIVE ORDERS (NO OTP) ====================
         function renderLiveOrders(orders) {
             const container = document.getElementById('merchantOrdersList');
 
@@ -1342,7 +1362,7 @@
             }).join('');
         }
 
-        // ==================== LIVE & CUSTOMIZED COLLECTION REPORT (CASH + UPI + CSV) ====================
+        // ==================== COLLECTION REPORT (CASH + UPI + CSV) ====================
         function getOrderDateObject(o) {
             if (o.orderDate && typeof o.orderDate.toDate === 'function') return o.orderDate.toDate();
             if (o.deliveredAt) return new Date(o.deliveredAt);
@@ -1366,7 +1386,6 @@
             const fromDate = fromVal ? new Date(fromVal + 'T00:00:00') : null;
             const toDate = toVal ? new Date(toVal + 'T23:59:59') : null;
 
-            // Only Delivered orders count toward actual collection
             const deliveredOrders = historyOrdersArray.filter(o => (o.status || '').toLowerCase() === 'delivered');
 
             let totalNet = 0;
@@ -1516,7 +1535,7 @@
             document.getElementById('viewOrderItemsModal').classList.remove('active');
         }
 
-        // ==================== ASSIGN DELIVERY BOY ====================
+        // ==================== ASSIGN DELIVERY BOY & STATUS ACTIONS ====================
         function assignDeliveryBoyToOrder(orderId) {
             const input = document.getElementById('boyInp_' + orderId);
             const phone = (input ? input.value : '').trim();
@@ -1534,7 +1553,6 @@
             }).catch(err => alert("Assign Error: " + err.message));
         }
 
-        // ==================== CANCEL ORDER (MOVES AUTO TO HISTORY) ====================
         function cancelMerchantOrder(orderId) {
             const reason = prompt("Order cancel karne ka karan likhein (e.g. Item out of stock / Shop closed):", "Item unavailable");
             if (reason === null) return;
@@ -1549,7 +1567,6 @@
             }).catch(err => alert("Cancel Error: " + err.message));
         }
 
-        // ==================== UPDATE STATUS (DELIVERED MOVES AUTO TO HISTORY & COLLECTION) ====================
         function updateOrderStatus(orderId, newStatus) {
             const payload = { status: newStatus };
             if (newStatus === 'Delivered') {
