@@ -707,16 +707,7 @@
             <!-- MODULE 10: MASTER SETTINGS -->
             <section id="tab-settings" class="tab-section">
                 <div class="card">
-                    <h2>⚙️ 10. Master Settings & System Maintenance Mode</h2>
-                    <div class="form-grid" style="margin-bottom:15px;">
-                        <div>
-                            <label style="font-size:12px; font-weight:bold; color:#cbd5e1; display:block; margin-bottom:5px;">Maintenance Mode (Emergency Close):</label>
-                            <select id="settingMaintenanceSelect" onchange="handleMaintenanceChange(this.value)">
-                                <option value="open">🟢 Live Store Open (Accepting Orders)</option>
-                                <option value="closed">🔴 Emergency Closed / Maintenance Mode</option>
-                            </select>
-                        </div>
-                        <!-- DYNAMIC PARENT-CHILD CATEGORIZATION SYSTEM -->
+                                 <!-- DYNAMIC PARENT-CHILD CATEGORIZATION SYSTEM -->
 <div class="card" style="border: 1.5px solid #38bdf8; margin-top: 18px;">
     <h2>🗂️ Dynamic Parent-Child Categorization System</h2>
     <p style="font-size:12px; color:#94a3b8; margin-bottom:15px;">
@@ -765,6 +756,15 @@
         </tbody>
     </table>
 </div>
+                    <h2>⚙️ 10. Master Settings & System Maintenance Mode</h2>
+                    <div class="form-grid" style="margin-bottom:15px;">
+                        <div>
+                            <label style="font-size:12px; font-weight:bold; color:#cbd5e1; display:block; margin-bottom:5px;">Maintenance Mode (Emergency Close):</label>
+                            <select id="settingMaintenanceSelect" onchange="handleMaintenanceChange(this.value)">
+                                <option value="open">🟢 Live Store Open (Accepting Orders)</option>
+                                <option value="closed">🔴 Emergency Closed / Maintenance Mode</option>
+                            </select>
+                        </div>
                         <div>
                             <label style="font-size:12px; font-weight:bold; color:#cbd5e1; display:block; margin-bottom:5px;">Customer Helpline Number:</label>
                             <input type="text" id="settingHelplineInput" value="8252731656, 06246451082">
