@@ -2484,36 +2484,6 @@ footer,.ksindo-footer-inner{max-width:100%}
 </nav>
     <script src="ksindo-app-shell.js"></script>
     <script>
-(function() {
-    // 16 नवंबर 2026, सुबह 10:00:00 AM (IST) का टारगेट समय
-    const launchTime = new Date("2026-11-16T10:00:00+05:30").getTime();
-    const overlay = document.getElementById("appLaunchOverlay");
-
-    function updateLaunchTimer() {
-        const now = new Date().getTime();
-        const distance = launchTime - now;
-
-        // जैसे ही 10:00 AM बजेंगे, ओवरले अपने आप हट जाएगा और ऐप खुल जाएगा
-        if (distance <= 0) {
-            if (overlay) overlay.style.display = "none";
-            clearInterval(timerInterval);
-            return;
-        }
-
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-        document.getElementById("cd-days").innerText = String(days).padStart(2, '0');
-        document.getElementById("cd-hours").innerText = String(hours).padStart(2, '0');
-        document.getElementById("cd-mins").innerText = String(minutes).padStart(2, '0');
-        document.getElementById("cd-secs").innerText = String(seconds).padStart(2, '0');
-    }
-
-    updateLaunchTimer();
-    const timerInterval = setInterval(updateLaunchTimer, 1000);
-})();
         db.collection("categories").onSnapshot(snap => {
     const allCats = [];
     snap.forEach(d => allCats.push({ id: d.id, ...d.data() }));
