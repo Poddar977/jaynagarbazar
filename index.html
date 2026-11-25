@@ -4,6 +4,7 @@
     <!-- PWA Settings -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ksindo">
@@ -372,22 +373,6 @@
             flex-shrink: 0;
         }
 
-        .btn-delete-order {
-            background: #fee2e2;
-            color: #ef4444;
-            border: 1px solid #fecaca;
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.15s;
-        }
-        .btn-delete-order:hover { background: #fecaca; color: #b91c1c; }
-
         .terms-row {
             display: flex;
             align-items: flex-start;
@@ -532,8 +517,6 @@ header{background:#fff!important;color:#20252b!important;box-shadow:0 2px 12px r
 .icon-title{font-size:11px!important;font-weight:600!important}
 .ks-app-hero{margin:0;background:linear-gradient(112deg,#ffd34d 0%,#ffad16 54%,#f28a08 100%);min-height:174px;padding:24px 22px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;color:#5a3300}
 .ks-hero-copy{max-width:65%;position:relative;z-index:1}.ks-hero-copy span{font-size:10px;font-weight:900;letter-spacing:1.5px}.ks-hero-copy h1{font-size:clamp(24px,5vw,38px);line-height:1.08;margin:9px 0;font-weight:950}.ks-hero-copy p{font-size:12px;max-width:270px;font-weight:600}.ks-hero-art{font-size:clamp(42px,9vw,76px);filter:drop-shadow(0 5px 5px #9b5b2440)}
-.ks-quick-categories{display:flex;gap:10px;overflow-x:auto;padding:15px 14px 17px;background:#fff;scrollbar-width:none}.ks-quick-categories::-webkit-scrollbar{display:none}.ks-quick-categories a{flex:0 0 118px;min-height:118px;border:1.5px solid #dcecf2;border-radius:17px;background:linear-gradient(145deg,#fff,#f4fbfd);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;text-decoration:none;color:#26343c;box-shadow:0 3px 9px #0d52610b}.ks-quick-categories a span{font-size:35px}.ks-quick-categories a b{font-size:12px;line-height:1.25}
-.ks-promo-ribbon{margin:0 15px 18px;padding:13px 15px;border-radius:14px;background:linear-gradient(100deg,#e8f6fb,#f4fbfd);display:flex;align-items:center;gap:12px;color:#087eae}.ks-promo-ribbon>span:first-child{font-size:24px}.ks-promo-ribbon div{display:flex;flex-direction:column;gap:3px;flex:1}.ks-promo-ribbon strong{font-size:14px}.ks-promo-ribbon small{font-size:11px;color:#52636c}.ks-promo-arrow{font-size:26px}
 .container{max-width:1240px!important;padding:12px 15px 35px!important}
 #sectionGeneralStore>div:first-child{margin:8px 0 14px!important}#marketViewTitle{color:#111!important;font-size:20px!important;font-weight:850!important}
 .product-size-tools button{border-color:#dce5e9!important;color:#52616a!important;background:#fff!important}
@@ -557,7 +540,6 @@ footer,.ksindo-footer-inner{max-width:100%}
  .mode-switcher-container{padding:8px 10px!important}.mode-btn{font-size:11px!important;padding:9px 8px!important}
  .clean-icon-bar{gap:22px!important;padding:12px 14px!important}
  .ks-app-hero{min-height:155px;padding:20px 17px}.ks-hero-copy{max-width:72%}.ks-hero-art{font-size:44px}
- .ks-quick-categories a{flex-basis:104px;min-height:112px}
  .container{padding:8px 12px 25px!important}
  .product-grid,#generalProductGrid,#generalProductGrid.cards-small,#generalProductGrid.cards-large{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important}
  .product-card{padding:6px!important;border-radius:12px!important}
@@ -568,10 +550,9 @@ footer,.ksindo-footer-inner{max-width:100%}
  .ks-app-bottom-nav a{color:#5c6870;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:650;min-width:56px}
  .ks-app-bottom-nav a span{font-size:20px;line-height:1.1}.ks-app-bottom-nav a.active{color:var(--ks-blue)}
 }
-@media(min-width:701px){.ks-app-hero,.ks-quick-categories,.ks-promo-ribbon{max-width:1240px;margin-left:auto;margin-right:auto}}
+@media(min-width:701px){.ks-app-hero{max-width:1240px;margin-left:auto;margin-right:auto}}
 </style>
 
-    <link rel="stylesheet" href="ksindo-marketplace.css">
     <script src="firebase-config.js"></script>
 </head>
     
@@ -579,7 +560,7 @@ footer,.ksindo-footer-inner{max-width:100%}
     <header>
         <div class="logo" onclick="window.location.reload()">ksindo</div>
         <div class="search-container">
-            <input type="text" id="search-input" placeholder="Search vegetables, sarees, pooja, food (हिंदी में भी)..." oninput="window.handleSearchDebounced()" onkeyup="if(event.key==='Enter')window.handleSearch()">
+            <input type="text" id="search-input" placeholder="Search vegetables, sarees, pooja, food (e.g. aalo, potato, sari)..." oninput="window.handleSearchDebounced()" onkeyup="if(event.key==='Enter')window.handleSearch()">
             <button class="search-btn-round" onclick="window.handleSearch()">🔍</button>
         </div>
         <div class="nav-actions">
@@ -595,19 +576,14 @@ footer,.ksindo-footer-inner{max-width:100%}
                 </div>
                 
                 <ul class="user-menu-list">
-                    <!-- Guest Users Section -->
                     <li id="menuItemLogin" onclick="window.openAuthModal('login')" style="color:#16a34a; font-weight:bold;">📱 Login with Phone & OTP</li>
                     <li id="menuItemRegister" onclick="window.openAuthModal('signup')">📝 Register Account (OTP)</li>
 
-                    <!-- Logged-in Users Section -->
                     <li id="menuItemTrack" onclick="window.openOrdersTab('current')" style="display:none;">🚚 Track Current Orders</li>
                     <li id="menuItemDelivered" onclick="window.openOrdersTab('history')" style="display:none;">📜 Order History (Delivered & Cancelled)</li>
                     <li id="menuItemProfile" onclick="window.openProfileModal()" style="display:none;">✏️ Update Profile</li>
 
-                    <!-- Grievance Link in Menu -->
                     <li onclick="window.location.href='grievance.html'" style="color:#4f46e5; font-weight:bold;">💬 24x7 Customer Grievance / Help</li>
-
-                    <!-- Seller & Info -->
                     <li onclick="window.open('seller-center.html', '_blank')" style="color:#ea580c; font-weight:bold;">🏪 Become a Seller / Partner</li>
                     <li onclick="window.location.href='about.html'">ℹ️ About ksindo</li>
                     
@@ -642,12 +618,12 @@ footer,.ksindo-footer-inner{max-width:100%}
     </div>
 
     <!-- Mode Switcher -->
-    <div class="mode-switcher-container">
+    <div class="mode-switcher-container" id="modeSwitcherSection">
         <button class="mode-btn active" id="btnModeGeneral">🛍️ All Products Market</button>
         <a href="fastfood.html" class="mode-btn food-mode">🍔 Fast Food & Restaurants</a>
     </div>
 
-    <!-- Category Icon Strip -->
+    <!-- Category Icon Strip (Dynamic Admin Categories auto-append here) -->
     <div class="clean-icon-bar" id="categoryIconStrip">
         <div class="icon-item active" onclick="window.filterCategory('all', this)"><div class="icon-symbol">🛍️</div><span class="icon-title">For You</span></div>
         <div class="icon-item" onclick="window.filterCategory('fashion', this)"><div class="icon-symbol">👕</div><span class="icon-title">Fashion</span></div>
@@ -663,20 +639,11 @@ footer,.ksindo-footer-inner{max-width:100%}
         <div class="icon-item" onclick="window.filterCategory('electronics', this)"><div class="icon-symbol">💻</div><span class="icon-title">Electronics</span></div>
     </div>
 
-
-    <!-- KSINDO App-style home experience -->
-    <section class="ks-app-hero" aria-label="KSINDO shopping highlights">
+    <!-- Hero Banner (Hidden automatically when user searches) -->
+    <section class="ks-app-hero" id="ksHeroBanner" aria-label="KSINDO shopping highlights">
       <div class="ks-hero-copy"><span>EVERYTHING. ONE PLACE.</span><h1>Celebrate Every Moment</h1><p>Daily needs, fresh food & local favourites at your doorstep</p></div>
-      <div class="ks-hero-art" aria-hidden="true">🛍️　🥭　🪔</div>
+      <div class="ks-hero-art" aria-hidden="true">🛍️ 🥭 🪔</div>
     </section>
-    <section class="ks-quick-categories" aria-label="Shop by collection">
-      <a href="seasonable.html"><span>🪔</span><b>Festival<br>Special</b></a>
-      <a href="fresh.html"><span>🍎</span><b>Fruits &<br>Vegetables</b></a>
-      <a href="fastfood.html"><span>🍕</span><b>Food &<br>Restaurants</b></a>
-      <a href="#generalProductGrid"><span>🛒</span><b>Daily<br>Essentials</b></a>
-      <a href="seller-center.html"><span>🏪</span><b>Become a<br>Seller</b></a>
-    </section>
-    <div class="ks-promo-ribbon"><span>✨</span><div><strong>Shop local with KSINDO</strong><small>Discover products and restaurants around you</small></div><span class="ks-promo-arrow">›</span></div>
 
     <!-- Fashion Sub-Categories Strip -->
     <div class="sub-cat-bar" id="fashionSubCatBar">
@@ -890,7 +857,7 @@ footer,.ksindo-footer-inner{max-width:100%}
     <!-- Mobile Bottom Navigation Bar -->
     <nav class="ksindo-mobile-nav" aria-label="Quick navigation">
         <a href="index.html" style="color:#16a34a;"><span>🏠</span>Home</a>
-        <a href="fresh.html"><span>🥦</span>24x7 Fresh</a>
+        <a href="fresh.html"><span>🥬</span>24x7 Fresh</a>
         <a href="fastfood.html"><span>🍔</span>Food</a>
         <a href="javascript:void(0)" onclick="window.toggleCart()"><span>🛒</span>Cart</a>
         <a href="javascript:void(0)" onclick="window.handleUserIconClick()"><span>👤</span>Account</a>
@@ -1037,7 +1004,7 @@ footer,.ksindo-footer-inner{max-width:100%}
     })();
     </script>
 
-    <!-- CORE ENGINE WITH RECAPTCHA SAFE RESET & AUTO-LOAD ON SCROLL -->
+    <!-- CORE ENGINE WITH SMART PHONETIC SEARCH, DYNAMIC CATEGORIES & SEARCH-MODE UI -->
     <script>
         var firebaseConfig = window.KSINDO_FIREBASE_CONFIG;
         if (!firebase.apps.length) {
@@ -1060,15 +1027,48 @@ footer,.ksindo-footer-inner{max-width:100%}
         var activeCategory = 'all';
         var activeSubCategory = 'all';
 
-        // Auto-Load Balance Tracker
         var visibleProductCount = 10;
         var currentRenderedList = [];
         var isAutoLoading = false;
 
-        var availableCoupons = {
-           
-        };
+        var availableCoupons = {};
         var appliedCoupon = null;
+
+        // ==================== DYNAMIC PARENT-CHILD CATEGORIES SYNC (LIVE) ====================
+        (function syncAdminDynamicCategories() {
+            db.collection("categories").onSnapshot(function(snap) {
+                var allCats = [];
+                snap.forEach(function(d) {
+                    allCats.push({ id: d.id, ...d.data() });
+                });
+
+                var parentCats = allCats.filter(function(c) { return !c.parentId && c.isActive !== false; });
+                var strip = document.getElementById('categoryIconStrip');
+                if (!strip) return;
+
+                // Purani dynamic categories hatayein agar admin ne delete ki ho
+                strip.querySelectorAll('.dynamic-admin-cat').forEach(function(el) {
+                    var slug = el.getAttribute('data-slug');
+                    if (!parentCats.some(function(p) { return p.slug === slug; })) {
+                        el.remove();
+                    }
+                });
+
+                // Nayi Admin categories add karein
+                parentCats.forEach(function(cat) {
+                    if (!strip.querySelector('[data-slug="' + cat.slug + '"]')) {
+                        var item = document.createElement('div');
+                        item.className = 'icon-item dynamic-admin-cat';
+                        item.setAttribute('data-slug', cat.slug);
+                        item.innerHTML = '<div class="icon-symbol">' + (cat.icon || '📦') + '</div><span class="icon-title">' + cat.name + '</span>';
+                        item.onclick = function() {
+                            window.filterCategory(cat.slug, item);
+                        };
+                        strip.appendChild(item);
+                    }
+                });
+            });
+        })();
 
         // AI / ML 3-Clicks Tracking & Preference
         function trackCategoryInterestAI(category) {
@@ -1431,7 +1431,6 @@ footer,.ksindo-footer-inner{max-width:100%}
             }
 
             saveStoredCart(cart);
-            // Keep the cart drawer closed; customer can open it from the cart icon.
             document.getElementById('cart-modal').classList.remove('open');
             window.showCartAddedToast('कार्ट में जोड़ दिया गया · देखने के लिए 🛒 Cart दबाएँ');
         };
@@ -1446,64 +1445,199 @@ footer,.ksindo-footer-inner{max-width:100%}
             window.openCheckoutModal();
         };
 
-        // Fuzzy Search
-        var HINDI_SYNONYM_DICT = {
-            'आलू': ['aloo', 'potato', 'aalu', 'alu', 'allu'],
-            'टमाटर': ['tamatar', 'tomato', 'tamator', 'tamatr'],
-            'प्याज': ['pyaj', 'onion', 'pyaaj', 'kanda', 'pyaz'],
-            'कांदा': ['pyaj', 'onion', 'kanda'],
-            'लहसुन': ['lahsun', 'garlic', 'lehsun'],
-            'अदरक': ['adrak', 'ginger'],
-            'मिर्च': ['mirchi', 'chilli', 'chili', 'mirch'],
-            'धनिया': ['dhaniya', 'coriander'],
-            'सेब': ['apple', 'seb', 'saeb'],
-            'केला': ['banana', 'kela', 'kelaa'],
-            'दूध': ['milk', 'doodh', 'dudh'],
-            'दही': ['curd', 'dahi'],
-            'पनीर': ['paneer', 'cheese', 'panir'],
-            'साड़ी': ['saree', 'sari', 'shari', 'saari'],
-            'कुर्ती': ['kurti', 'kurta', 'kurtiya'],
-            'सूट': ['suit', 'salwar'],
-            'चुनरी': ['chunri', 'chunari', 'chunar', 'mata', 'pooja', 'shringar'],
-            'श्रृंगार': ['shringar', 'beauty', 'makeup', 'cosmetics'],
-            'पूजा': ['pooja', 'puja', 'hawan', 'agarbatti', 'dhoop']
-        };
+        // ==================== SMART FUZZY, PHONETIC & HINGLISH SEARCH ENGINE ====================
+        // Synonyms: User "aalo", "allu", "patato" likhe to "potato" / "आलू" wale products show honge
+        var SMART_SYNONYM_GROUPS = [
+            ['आलू', 'aloo', 'aalo', 'aalu', 'alu', 'allu', 'potato', 'patato', 'poteto', 'potatos', 'potatoes'],
+            ['टमाटर', 'tamatar', 'tamator', 'tamatr', 'tomato', 'tamato', 'tometo', 'tomatoes'],
+            ['प्याज', 'pyaj', 'pyaz', 'pyaaj', 'piyaj', 'kanda', 'onion', 'onions', 'onian'],
+            ['लहसुन', 'lahsun', 'lehsun', 'lahsoon', 'garlic', 'garlik'],
+            ['अदरक', 'adrak', 'adrakh', 'ginger', 'jinjar'],
+            ['मिर्च', 'mirchi', 'mirch', 'chilli', 'chili', 'chilly'],
+            ['धनिया', 'dhaniya', 'dhania', 'coriander', 'coriandar'],
+            ['गोभी', 'gobhi', 'gobi', 'cauliflower', 'cabbage', 'pattagobhi', 'phoolgobhi'],
+            ['भिंडी', 'bhindi', 'bhendi', 'ladyfinger', 'okra'],
+            ['बैंगन', 'baingan', 'baigan', 'brinjal', 'eggplant'],
+            ['सेब', 'seb', 'saeb', 'apple', 'aple', 'appel'],
+            ['केला', 'kela', 'kelaa', 'banana', 'bananas', 'bnana'],
+            ['आम', 'aam', 'mango', 'mangoes', 'mengo'],
+            ['अंगूर', 'angoor', 'angur', 'grapes', 'grape'],
+            ['संतरा', 'santra', 'orange', 'orenge'],
+            ['दूध', 'doodh', 'dudh', 'milk', 'mylk'],
+            ['दही', 'dahi', 'curd', 'yogurt'],
+            ['पनीर', 'paneer', 'panir', 'cheese', 'chees'],
+            ['अंडा', 'anda', 'ande', 'egg', 'eggs', 'eg'],
+            ['चावल', 'chawal', 'chaval', 'rice', 'raice'],
+            ['आटा', 'aata', 'ata', 'atta', 'flour', 'chakki'],
+            ['तेल', 'tel', 'oil', 'mustard', 'sarson', 'refined'],
+            ['चीनी', 'chini', 'cheeni', 'shakkar', 'sugar', 'suger'],
+            ['नमक', 'namak', 'salt'],
+            ['दाल', 'daal', 'dal', 'lentil', 'pulse', 'arhar', 'toor', 'moong', 'masoor'],
+            ['मसाला', 'masala', 'masale', 'spice', 'spices', 'haldi', 'turmeric', 'jeera', 'cumin'],
+            ['चाय', 'chai', 'chay', 'tea', 'patti'],
+            ['बिस्किट', 'biscuit', 'biskut', 'biscuits', 'cookie', 'cookies'],
+            ['साबुन', 'sabun', 'soap', 'sope'],
+            ['शैम्पू', 'shampoo', 'sampoo', 'shampu'],
+            ['साड़ी', 'saree', 'sari', 'shari', 'saari', 'sarees'],
+            ['कुर्ती', 'kurti', 'kurta', 'kurtiya', 'kurtis'],
+            ['सूट', 'suit', 'salwar', 'kameez', 'dress'],
+            ['चुनरी', 'chunri', 'chunari', 'chunar', 'mata', 'pooja', 'shringar'],
+            ['श्रृंगार', 'shringar', 'singar', 'beauty', 'makeup', 'cosmetics', 'lipstick', 'kajal'],
+            ['पूजा', 'pooja', 'puja', 'hawan', 'agarbatti', 'dhoop', 'kapoor'],
+            ['मोबाइल', 'mobile', 'mobail', 'phone', 'fone', 'smartphone', 'charger', 'earphone', 'headphone'],
+            ['जूता', 'juta', 'joota', 'shoes', 'shoe', 'chappal', 'sandal', 'slipper'],
+            ['कपड़ा', 'kapda', 'kapde', 'clothes', 'shirt', 'tshirt', 'pant', 'jeans']
+        ];
 
-        function normalizeSearchText(txt) {
-            if(!txt) return '';
-            return txt.toLowerCase().replace(/([a-z]) +/g, '$1').replace(/[^a-z0-9ऀ-ॿ\s]/gi, ' ').trim();
+        // Phonetic Normalizer (e.g. "patato" -> "ptt", "potato" -> "ptt", "aalo" -> "al", "aloo" -> "al")
+        function phoneticKey(word) {
+            if (!word) return '';
+            var w = word.toLowerCase().trim()
+                .replace(/ph/g, 'f')
+                .replace(/kh/g, 'k')
+                .replace(/gh/g, 'g')
+                .replace(/bh/g, 'b')
+                .replace(/th/g, 't')
+                .replace(/dh/g, 'd')
+                .replace(/sh/g, 's')
+                .replace(/ch/g, 'c')
+                .replace(/ee/g, 'i')
+                .replace(/oo/g, 'u')
+                .replace(/aa/g, 'a')
+                .replace(/v/g, 'w')
+                .replace(/z/g, 'j')
+                .replace(/q/g, 'k')
+                .replace(/c(?=[eiy])/g, 's')
+                .replace(/c/g, 'k');
+            // Collapse repeated consecutive letters (e.g. "allu" -> "alu")
+            w = w.replace(/(.)\1+/g, '$1');
+            // Strip vowels after the first letter to match consonant skeletons ("patato" & "potato" -> "ptt")
+            if (w.length > 2) {
+                w = w[0] + w.slice(1).replace(/[aeiou]/g, '');
+            }
+            return w;
+        }
+
+        // Levenshtein Edit Distance for spelling mistakes (e.g. "biskut" vs "biscuit")
+        function editDistance(a, b) {
+            if (!a || !b) return 99;
+            if (Math.abs(a.length - b.length) > 3) return 99;
+            var matrix = [];
+            for (var i = 0; i <= b.length; i++) matrix[i] = [i];
+            for (var j = 0; j <= a.length; j++) matrix[0][j] = j;
+            for (var i = 1; i <= b.length; i++) {
+                for (var j = 1; j <= a.length; j++) {
+                    if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                        matrix[i][j] = matrix[i - 1][j - 1];
+                    } else {
+                        matrix[i][j] = Math.min(
+                            matrix[i - 1][j - 1] + 1,
+                            matrix[i][j - 1] + 1,
+                            matrix[i - 1][j] + 1
+                        );
+                    }
+                }
+            }
+            return matrix[b.length][a.length];
+        }
+
+        // Expand user query token with all matching Hinglish/English synonyms
+        function expandTokenSynonyms(token) {
+            var expanded = new Set([token]);
+            var tokPhon = phoneticKey(token);
+
+            for (var g = 0; g < SMART_SYNONYM_GROUPS.length; g++) {
+                var group = SMART_SYNONYM_GROUPS[g];
+                var groupMatched = false;
+
+                for (var k = 0; k < group.length; k++) {
+                    var candidate = group[k];
+                    if (candidate === token || candidate.includes(token) || token.includes(candidate)) {
+                        groupMatched = true;
+                        break;
+                    }
+                    if (token.length >= 3 && candidate.length >= 3) {
+                        if (phoneticKey(candidate) === tokPhon || editDistance(token, candidate) <= 1) {
+                            groupMatched = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (groupMatched) {
+                    group.forEach(function(item) { expanded.add(item); });
+                }
+            }
+            return Array.from(expanded);
         }
 
         function isFuzzyTokenMatch(queryToken, targetText) {
             if (!queryToken || !targetText) return false;
             var tLow = targetText.toLowerCase();
-            if (tLow.includes(queryToken)) return true;
-            var qNorm = normalizeSearchText(queryToken);
-            var tNorm = normalizeSearchText(targetText);
-            if (tNorm.includes(qNorm)) return true;
-            for (var hindiWord in HINDI_SYNONYM_DICT) {
-                if (queryToken.includes(hindiWord)) {
-                    var synList = HINDI_SYNONYM_DICT[hindiWord];
-                    for (var s = 0; s < synList.length; s++) {
-                        if (tLow.includes(synList[s])) return true;
+            var targetWords = tLow.split(/[^a-z0-9ऀ-ॿ]+/).filter(Boolean);
+            var candidateTokens = expandTokenSynonyms(queryToken);
+
+            for (var c = 0; c < candidateTokens.length; c++) {
+                var cand = candidateTokens[c];
+                // 1. Direct substring match
+                if (tLow.includes(cand)) return true;
+
+                // 2. Phonetic & Spelling tolerance match against individual product words
+                if (cand.length >= 3) {
+                    var candPhon = phoneticKey(cand);
+                    var maxDist = cand.length >= 6 ? 2 : 1;
+
+                    for (var w = 0; w < targetWords.length; w++) {
+                        var tw = targetWords[w];
+                        if (tw.length < 3) continue;
+                        if (phoneticKey(tw) === candPhon) return true;
+                        if (editDistance(cand, tw) <= maxDist) return true;
                     }
                 }
             }
             return false;
         }
 
+        // Toggle Hero Banner / Ads visibility during Search (Image 2 hidden when searching)
+        function toggleSearchModeUI(isSearching) {
+            var heroBanner = document.getElementById('ksHeroBanner');
+            var iconStrip = document.getElementById('categoryIconStrip');
+            var adsSlot = document.getElementById('adsSlot');
+            var aiBanner = document.getElementById('aiSmartBanner');
+            var titleEl = document.getElementById('marketViewTitle');
+
+            if (isSearching) {
+                if (heroBanner) heroBanner.style.display = 'none';
+                if (iconStrip) iconStrip.style.display = 'none';
+                if (adsSlot) adsSlot.style.display = 'none';
+                if (aiBanner) aiBanner.style.display = 'none';
+                if (titleEl) titleEl.innerText = '🔍 Search Results';
+            } else {
+                if (heroBanner) heroBanner.style.display = '';
+                if (iconStrip) iconStrip.style.display = '';
+                if (adsSlot && document.getElementById('multiAdsTrack')?.innerHTML.trim()) {
+                    adsSlot.style.display = 'block';
+                }
+                if (titleEl) titleEl.innerText = 'Featured Products';
+            }
+        }
+
         var searchDebounceTimer = null;
         window.handleSearchDebounced = function() {
             clearTimeout(searchDebounceTimer);
-            searchDebounceTimer = setTimeout(window.handleSearch, 150);
+            searchDebounceTimer = setTimeout(window.handleSearch, 120);
         };
 
         window.handleSearch = function() {
             var rawQuery = (document.getElementById('search-input').value || '').trim();
             if (!rawQuery) {
+                toggleSearchModeUI(false);
                 renderFilteredProducts();
                 return;
             }
+
+            // Hide Hero Banner & Category Icons so ONLY searched products appear
+            toggleSearchModeUI(true);
 
             var tokens = rawQuery.toLowerCase().split(/\s+/).filter(Boolean);
             var list = allProducts.filter(function(p){
@@ -1514,7 +1648,7 @@ footer,.ksindo-footer-inner{max-width:100%}
             });
 
             list = list.filter(isProductAvailableForPincode);
-            visibleProductCount = 10;
+            visibleProductCount = 20;
             renderProductGridFromList(list);
         };
 
@@ -1637,7 +1771,6 @@ footer,.ksindo-footer-inner{max-width:100%}
                 '</div>';
             }
 
-            // AUTO-LOAD STATUS INDICATOR (Jab aur products bache hon)
             if (visibleProductCount < list.length) {
                 html += '<div id="autoLoadSentinel" class="auto-loader-status">' +
                     '<div class="auto-loader-spinner"></div>' +
@@ -1649,7 +1782,6 @@ footer,.ksindo-footer-inner{max-width:100%}
             initImageLazyLoading();
         }
 
-        // AUTO-LOAD INFINITE SCROLL LISTENER (Mobile & Desktop)
         window.addEventListener('scroll', function() {
             if ((window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 350)) {
                 if (!isAutoLoading && currentRenderedList && visibleProductCount < currentRenderedList.length) {
@@ -1673,7 +1805,7 @@ footer,.ksindo-footer-inner{max-width:100%}
             if (el) el.classList.add('active');
             activeCategory = cat;
             activeSubCategory = 'all';
-            visibleProductCount = 10; // Reset back to first 10 on filter change
+            visibleProductCount = 10;
 
             trackCategoryInterestAI(cat);
 
@@ -1888,7 +2020,7 @@ footer,.ksindo-footer-inner{max-width:100%}
         });
 
         // ==========================================
-        // DYNAMIC RECAPTCHA & OTP VERIFICATION FIX
+        // DYNAMIC RECAPTCHA & OTP VERIFICATION
         // ==========================================
         var confirmationResult = null;
         var pendingRegistrationData = null;
@@ -2098,7 +2230,6 @@ footer,.ksindo-footer-inner{max-width:100%}
                 return;
             }
 
-            // Fresh Dynamic reCAPTCHA
             initRecaptcha();
 
             var fullPhoneNumber = "+91" + phone;
@@ -2397,7 +2528,12 @@ footer,.ksindo-footer-inner{max-width:100%}
                 localStorage.setItem('cached_products', JSON.stringify(leanPayload));
             } catch(e) {}
 
-            renderFilteredProducts();
+            var activeSearch = (document.getElementById('search-input')?.value || '').trim();
+            if (activeSearch) {
+                window.handleSearch();
+            } else {
+                renderFilteredProducts();
+            }
             updateCartUI();
         }
 
@@ -2431,7 +2567,8 @@ footer,.ksindo-footer-inner{max-width:100%}
                 }
             });
             track.innerHTML = html;
-            if(slot) slot.style.display = html.trim() ? 'block' : 'none';
+            var isSearching = (document.getElementById('search-input')?.value || '').trim().length > 0;
+            if(slot) slot.style.display = (!isSearching && html.trim()) ? 'block' : 'none';
         });
 
         window.addEventListener('DOMContentLoaded', function() {
@@ -2444,35 +2581,11 @@ footer,.ksindo-footer-inner{max-width:100%}
     </script>
 
 <nav class="ks-app-bottom-nav" aria-label="App navigation">
- <a class="active" href="index (1).html"><span>⌂</span>Home</a>
+ <a class="active" href="index.html"><span>⌂</span>Home</a>
  <a href="fresh.html"><span>🥬</span>Fresh</a>
  <a href="fastfood.html"><span>🍔</span>Food</a>
  <a href="javascript:void(0)" onclick="window.toggleCart()"><span>🛒</span>Cart</a>
  <a href="javascript:void(0)" onclick="window.handleUserIconClick()"><span>👤</span>Account</a>
 </nav>
-    <script src="ksindo-app-shell.js"></script>
-    <script>
-        db.collection("categories").onSnapshot(snap => {
-    const allCats = [];
-    snap.forEach(d => allCats.push({ id: d.id, ...d.data() }));
-    const parentCats = allCats.filter(c => !c.parentId && c.isActive !== false);
-    const subCats = allCats.filter(c => c.parentId && c.isActive !== false);
-
-    // फ्रंट-एंड कैटेगरी टैब्स (जैसे .cat-tabs) में डायनेमिक कैटेगरी रेंडर करें
-    const navBar = document.querySelector('.cat-tabs');
-    if (navBar && parentCats.length > 0) {
-        parentCats.forEach(cat => {
-            if (!navBar.querySelector(`[data-slug="${cat.slug}"]`)) {
-                const link = document.createElement('a');
-                link.className = 'cat-tab';
-                link.setAttribute('data-slug', cat.slug);
-                link.href = `product.html?cat=${encodeURIComponent(cat.slug)}`;
-                link.innerHTML = `<span>${cat.icon || '📦'}</span>${cat.name}`;
-                navBar.appendChild(link);
-            }
-        });
-    }
-});
-</script>
 </body>
 </html>
