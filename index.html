@@ -2514,6 +2514,27 @@ footer,.ksindo-footer-inner{max-width:100%}
     updateLaunchTimer();
     const timerInterval = setInterval(updateLaunchTimer, 1000);
 })();
+        db.collection("categories").onSnapshot(snap => {
+    const allCats = [];
+    snap.forEach(d => allCats.push({ id: d.id, ...d.data() }));
+    const parentCats = allCats.filter(c => !c.parentId && c.isActive !== false);
+    const subCats = allCats.filter(c => c.parentId && c.isActive !== false);
+
+    // फ्रंट-एंड कैटेगरी टैब्स (जैसे .cat-tabs) में डायनेमिक कैटेगरी रेंडर करें
+    const navBar = document.querySelector('.cat-tabs');
+    if (navBar && parentCats.length > 0) {
+        parentCats.forEach(cat => {
+            if (!navBar.querySelector(`[data-slug="${cat.slug}"]`)) {
+                const link = document.createElement('a');
+                link.className = 'cat-tab';
+                link.setAttribute('data-slug', cat.slug);
+                link.href = `product.html?cat=${encodeURIComponent(cat.slug)}`;
+                link.innerHTML = `<span>${cat.icon || '📦'}</span>${cat.name}`;
+                navBar.appendChild(link);
+            }
+        });
+    }
+});
 </script>
 </body>
 </html>
