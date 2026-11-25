@@ -80,40 +80,29 @@
             font-weight: bold; 
         }
 
-        .detail-container { 
-            max-width: 1100px; 
-            margin: 25px auto; 
-            background: #fffdf0; 
-            border-radius: 16px; 
-            padding: 25px; 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 30px; 
-            border: 2px solid #facc15; 
-            box-shadow: 0 6px 18px rgba(202, 138, 4, 0.1); 
-        }
-        @media (max-width: 768px) { .detail-container { grid-template-columns: 1fr; } }
-
-        .gallery-box { text-align: center; }
-        .main-img { 
-            width: 100%; 
-            max-height: 380px; 
-            object-fit: contain; 
-            border-radius: 12px; 
-            border: 2px solid #fef08a; 
-            background: #ffffff;
-        }
-        .thumb-strip { display: flex; gap: 8px; justify-content: center; margin-top: 12px; overflow-x: auto; }
-        .thumb-strip img { 
-            width: 52px; 
-            height: 52px; 
-            object-fit: cover; 
-            border-radius: 8px; 
-            border: 2px solid #fde047; 
-            cursor: pointer; 
-            background: #ffffff;
-        }
-        .thumb-strip img.active { border-color: #16a34a; box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.3); }
+        .detail-container { max-width:1180px; margin:16px auto; background:#fff; border-radius:14px; padding:22px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:28px; border:1px solid #e5e7eb; box-shadow:0 3px 16px rgba(0,0,0,.06); }
+        @media (max-width:768px) { .detail-container { grid-template-columns:1fr; margin:0 auto 14px; padding:0 0 18px; border:0; border-radius:0; gap:16px; } }
+        .gallery-box { text-align:center; min-width:0; position:relative; }
+        .main-image-stage { position:relative; width:100%; background:#f1f2f4; border-radius:10px; overflow:hidden; touch-action:pan-y; }
+        .main-img { width:100%; height: min(68vw,500px); min-height:280px; max-height:500px; object-fit:contain; display:block; background:#f1f2f4; user-select:none; -webkit-user-drag:none; }
+        @media(max-width:768px){ .main-img{height: min(100vw,520px); min-height:300px; max-height:520px;} }
+        .gallery-arrow { position:absolute; top:50%; transform:translateY(-50%); width:38px; height:48px; border:0; border-radius:8px; background:rgba(255,255,255,.88); color:#222; font-size:24px; box-shadow:0 1px 6px #0002; cursor:pointer; }
+        .gallery-arrow.prev{left:8px}.gallery-arrow.next{right:8px}
+        .gallery-dots{display:flex;justify-content:center;gap:10px;padding:12px 0 4px}
+        .gallery-dot{width:9px;height:9px;border:0;border-radius:50%;background:#d1d5db;padding:0;cursor:pointer}
+        .gallery-dot.active{background:#2563eb;transform:scale(1.25)}
+        .thumb-strip { display:flex; gap:8px; justify-content:flex-start; margin-top:8px; padding:4px 2px 8px; overflow-x:auto; overscroll-behavior-x:contain; scroll-behavior:smooth; -webkit-overflow-scrolling:touch; }
+        .thumb-strip img { flex:0 0 58px; width:58px; height:58px; object-fit:contain; border-radius:7px; border:1px solid #d1d5db; cursor:pointer; background:#fff; padding:2px; }
+        .thumb-strip img.active { border:2px solid #2563eb; }
+        .description-card{margin-top:16px;padding:15px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;color:#374151}
+        .description-title{font-size:18px;font-weight:800;color:#222;margin-bottom:10px}
+        .description-content{font-size:14px;line-height:1.75;overflow-wrap:anywhere}
+        .description-content p{margin:0 0 9px}.description-content ul{padding-left:20px;margin:5px 0 10px}.description-content li{margin:3px 0}.description-content h3,.description-content h4{margin:12px 0 5px;color:#222}
+        .description-content.collapsed{max-height:150px;overflow:hidden;position:relative}
+        .description-content.collapsed:after{content:'';position:absolute;bottom:0;left:0;right:0;height:42px;background:linear-gradient(transparent,#fff)}
+        .description-toggle{border:0;background:none;color:#1769e0;font-weight:800;padding:8px 0;cursor:pointer;font-size:14px}
+        .mobile-buybar{display:none}
+        @media(max-width:768px){body{padding-bottom:86px}.mobile-buybar{display:flex;position:fixed;z-index:150;left:0;right:0;bottom:0;background:#fff;padding:9px 12px calc(9px + env(safe-area-inset-bottom));gap:10px;box-shadow:0 -2px 12px #0002}.mobile-buybar button{height:52px;border-radius:10px;font-size:16px;font-weight:800;flex:1;border:1px solid #d1d5db}.mobile-buybar .mobile-cart{background:#fff;color:#222}.mobile-buybar .mobile-buy{background:#ffdf00;color:#222;border-color:#ffdf00}}
 
         .product-meta h1 { font-size: 22px; color: #166534; margin-bottom: 8px; line-height: 1.35; font-weight: 800; }
         .price-row { margin: 12px 0; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
@@ -215,7 +204,7 @@
 <body>
 
     <header>
-        <button class="back-btn" onclick="window.location.href='index.html'">← Back</button>
+        <button class="back-btn" onclick="goBackOneStep()">← Back</button>
         <div class="logo-text" onclick="window.location.href='index.html'">ksindo</div>
         <div class="nav-actions">
             <button class="nav-round-btn" onclick="openOrdersTab('current')" title="Live Orders">🚚</button>
@@ -227,15 +216,14 @@
         <p style="text-align:center; grid-column:1/-1; padding:30px; font-weight:bold; color:#166534;">Product details load ho rahe hain...</p>
     </div>
 
-    <div class="section-block" id="productReviewsBlock" style="max-width:1100px;margin:0 auto 24px;background:white;border:1px solid #e2e8f0;border-radius:16px;padding:20px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h2 style="font-size:18px">⭐ Customer Reviews & Feedback</h2><button id="productReviewsToggle" type="button" style="background:#15803d;color:white;border:0;border-radius:22px;padding:9px 16px;font-weight:800;cursor:pointer" onclick="toggleProductReviews()">Show Reviews</button></div>
-        <div id="productReviewsContent" style="display:none;margin-top:14px"><div id="productReviewList">Reviews load hone ke liye Show Reviews dabayein.</div>
-        <form id="productReviewForm" style="display:grid;gap:9px;max-width:600px;margin-top:16px"><strong>Apna review dein</strong><select id="reviewRating" required style="padding:10px;border:1px solid #cbd5e1;border-radius:8px"><option value="">Rating choose karein</option><option value="5">★★★★★ Excellent</option><option value="4">★★★★☆ Good</option><option value="3">★★★☆☆ Average</option><option value="2">★★☆☆☆ Poor</option><option value="1">★☆☆☆☆ Bad</option></select><input id="reviewName" placeholder="Your name (optional)" style="padding:10px;border:1px solid #cbd5e1;border-radius:8px"><textarea id="reviewText" rows="3" placeholder="Product ke baare mein feedback likhein" required style="padding:10px;border:1px solid #cbd5e1;border-radius:8px"></textarea><button type="submit" style="background:#15803d;color:white;border:0;border-radius:8px;padding:11px;font-weight:800">Submit Review</button></form></div>
+    <div class="mobile-buybar" aria-label="Product purchase actions">
+        <button class="mobile-cart" onclick="addToCartVariant()">Add to Cart</button>
+        <button class="mobile-buy" onclick="buyDirectVariant()">Buy Now</button>
     </div>
 
     <div class="section-block">
         <div class="section-header">
-            <span>🤖 AI & ML Recommended Similar Products</span>
+            <span>Similar Products</span>
             <small style="font-size:11px; background:#dcfce7; color:#15803d; padding:3px 8px; border-radius:10px; font-weight:bold;">Smart Match Score</small>
         </div>
         <div class="rec-grid" id="recommendationsGrid"></div>
@@ -273,7 +261,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -298,25 +286,6 @@
         let currentUser = null;
         let currentUserProfile = JSON.parse(localStorage.getItem('user_profile')) || null;
 
-        // ==========================================
-        // AI/ML USER AFFINITY ENGINE
-        // ==========================================
-        const UserAffinityEngine = {
-            recordSignal: (category, weight) => {
-                if (!category || category.toLowerCase() === 'food') return;
-                const catKey = category.toLowerCase().trim();
-                try {
-                    const profile = JSON.parse(localStorage.getItem('ksindo_user_dna') || '{}');
-                    if (!profile[catKey]) {
-                        profile[catKey] = { score: 0, lastActive: Date.now() };
-                    }
-                    profile[catKey].score += weight;
-                    profile[catKey].lastActive = Date.now();
-                    localStorage.setItem('ksindo_user_dna', JSON.stringify(profile));
-                } catch(e) {}
-            }
-        };
-
         updateCartUI();
 
         onAuthStateChanged(auth, (user) => {
@@ -327,7 +296,6 @@
             const localHit = cachedProducts.find(p => p.id === productId);
             if (localHit) {
                 renderProductUI(localHit);
-                runMLRecommendation(localHit);
                 trackAndRenderRecentlyViewed(localHit);
             }
         }
@@ -337,76 +305,9 @@
                 if (snap.exists()) {
                     const fresh = { id: snap.id, ...snap.data() };
                     renderProductUI(fresh);
-                    runMLRecommendation(fresh);
                     trackAndRenderRecentlyViewed(fresh);
                 }
             }).catch(() => {});
-        }
-
-        function runMLRecommendation(target) {
-            if (!cachedProducts || cachedProducts.length <= 1) {
-                document.getElementById('recommendationsGrid').innerHTML = '<p style="color:#64748b; font-size:13px; grid-column:1/-1;">Not enough catalog data for ML models.</p>';
-                return;
-            }
-
-            function tokenize(str) {
-                return (str || '').toLowerCase()
-                    .replace(/[^a-z0-9 ]/g, ' ')
-                    .split(/\s+/)
-                    .filter(w => w.length > 2);
-            }
-
-            const targetTokens = new Set(tokenize(target.name + " " + (target.description || '')));
-            const targetCat = (target.category || '').toLowerCase();
-            const targetSubCat = (target.subCategory || '').toLowerCase();
-            const targetPrice = Number(target.price) || 1;
-
-            const scoredProducts = cachedProducts
-                .filter(p => p.id !== target.id)
-                .map(p => {
-                    let score = 0;
-                    const pCat = (p.category || '').toLowerCase();
-                    if (pCat === targetCat) score += 40;
-                    else if (p.categories && Array.isArray(p.categories) && p.categories.includes(targetCat)) score += 30;
-
-                    const pSubCat = (p.subCategory || '').toLowerCase();
-                    if (targetSubCat && pSubCat && pSubCat === targetSubCat) score += 35;
-
-                    const pTokens = tokenize(p.name + " " + (p.description || ''));
-                    let tokenOverlap = 0;
-                    pTokens.forEach(t => { if (targetTokens.has(t)) tokenOverlap++; });
-                    const jaccard = tokenOverlap / Math.max(1, (targetTokens.size + pTokens.length - tokenOverlap));
-                    score += (jaccard * 15);
-
-                    const pPrice = Number(p.price) || 1;
-                    const priceDiffRatio = Math.abs(targetPrice - pPrice) / Math.max(targetPrice, pPrice);
-                    score += Math.max(0, (1 - priceDiffRatio) * 10);
-
-                    return { product: p, score: score };
-                });
-
-            scoredProducts.sort((a, b) => b.score - a.score);
-            const topMatches = scoredProducts.slice(0, 4).map(item => item.product);
-
-            const grid = document.getElementById('recommendationsGrid');
-            if (topMatches.length === 0) {
-                grid.innerHTML = '<p style="color:#64748b; font-size:13px; grid-column:1/-1;">No similar products matched.</p>';
-                return;
-            }
-
-            grid.innerHTML = topMatches.map(p => {
-                const img = (p.images && p.images.length > 0) ? p.images[0] : (p.imageUrl || 'https://via.placeholder.com/150');
-                const discBadge = p.discount ? `<span style="background:#bbf7d0; color:#15803d; font-size:10px; font-weight:bold; padding:1px 5px; border-radius:4px; margin-left:4px;">${p.discount}</span>` : '';
-                return `
-                    <div class="rec-card" onclick="window.location.href='product.html?id=${p.id}'">
-                        <img src="${img}" loading="lazy" alt="${p.name}">
-                        <div style="font-size:13px; font-weight:bold; height:36px; overflow:hidden; color:#166534; line-height:1.3;">${p.name}</div>
-                        <div style="font-weight:900; margin-top:6px; color:#15803d; display:flex; align-items:center; justify-content:center;">
-                            ₹${p.price} ${discBadge}
-                        </div>
-                    </div>
-                `;
-            }).join('');
         }
 
         function trackAndRenderRecentlyViewed(current) {
@@ -452,10 +353,28 @@
             document.getElementById('recentBlock').style.display = 'none';
         };
 
+        let galleryImages = [];
+        let galleryIndex = 0;
+        let descriptionExpanded = false;
+        function escapeHtml(value) { return String(value ?? '').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c])); }
+        function formatProductDescription(value) {
+            const raw = String(value || '').trim();
+            if (!raw) return '<p>इस product की description अभी उपलब्ध नहीं है।</p>';
+            // Admin-entered plain text is formatted into paragraphs, headings and bullet lists.
+            return raw.split(/\r?\n/).map(line => line.trim()).filter(Boolean).map(line => {
+                if (/^(#{1,4})\s+/.test(line)) return `<h3>${escapeHtml(line.replace(/^#{1,4}\s+/,''))}</h3>`;
+                if (/^(•|\*|-)\s+/.test(line)) return `<p style="padding-left:12px">• ${escapeHtml(line.replace(/^(•|\*|-)\s+/,''))}</p>`;
+                if (/^[A-Zअ-ह0-9][^:]{1,50}:$/.test(line)) return `<h4>${escapeHtml(line)}</h4>`;
+                return `<p>${escapeHtml(line)}</p>`;
+            }).join('');
+        }
         function renderProductUI(product) {
             loadedProduct = product;
-            const imgList = (product.images && product.images.length > 0) ? product.images : [product.imageUrl || 'https://via.placeholder.com/300'];
-            let thumbsHtml = imgList.map((img, i) => `<img src="${img}" class="${i===0?'active':''}" onclick="setMainImage('${img}', this)">`).join('');
+            galleryImages = (product.images && product.images.length > 0) ? product.images.filter(Boolean) : [product.imageUrl || 'https://via.placeholder.com/300'];
+            galleryIndex = 0;
+            descriptionExpanded = false;
+            let thumbsHtml = galleryImages.map((img, i) => `<img src="${escapeHtml(img)}" alt="${escapeHtml(product.name || 'Product')} image ${i+1}" class="${i===0?'active':''}" data-gallery-index="${i}" onclick="setMainImageIndex(${i})" loading="lazy">`).join('');
+            let dotsHtml = galleryImages.map((img,i)=>`<button class="gallery-dot ${i===0?'active':''}" aria-label="Image ${i+1}" onclick="setMainImageIndex(${i})"></button>`).join('');
 
             let variantsMarkup = '';
             if (product.sizes && product.sizes.length > 0) {
@@ -487,8 +406,12 @@
 
             document.getElementById('detailContainer').innerHTML = `
                 <div class="gallery-box">
-                    <img id="mainProductImg" src="${imgList[0]}" class="main-img">
-                    <div class="thumb-strip">${thumbsHtml}</div>
+                    <div class="main-image-stage" id="mainImageStage">
+                        <img id="mainProductImg" src="${escapeHtml(galleryImages[0])}" class="main-img" alt="${escapeHtml(product.name || 'Product image')}" draggable="false">
+                        ${galleryImages.length > 1 ? '<button class="gallery-arrow prev" onclick="changeGalleryImage(-1)" aria-label="Previous image">‹</button><button class="gallery-arrow next" onclick="changeGalleryImage(1)" aria-label="Next image">›</button>' : ''}
+                    </div>
+                    <div class="gallery-dots" id="galleryDots">${dotsHtml}</div>
+                    <div class="thumb-strip" id="galleryThumbs">${thumbsHtml}</div>
                 </div>
                 <div class="product-meta">
                     <span style="font-size:12px; background:#fef9c3; color:#854d0e; padding:3px 10px; border-radius:12px; font-weight:800; border:1px solid #fde047; text-transform:uppercase;">${product.category || 'General'}</span>
@@ -499,49 +422,62 @@
                         <span id="displayDiscountTag" class="discount-badge" style="${disc ? '' : 'display:none;'}">${disc}</span>
                     </div>
                     ${variantsMarkup}
-                    <p style="font-size:14px; line-height:1.6; color:#475569; margin-top:12px;">${product.description || ''}</p>
+                    <div class="description-card">
+                        <div class="description-title">Product Description</div>
+                        <div id="productDescriptionContent" class="description-content collapsed">${formatProductDescription(product.description)}</div>
+                        <button id="descriptionToggle" class="description-toggle" onclick="toggleProductDescription()">More ↓</button>
+                    </div>
+                    <div id="detailStockStatus" style="margin-top:12px;font-weight:800;color:${(product.inStock === false || product.stockStatus === 'out' || Number(product.stock) === 0) ? '#dc2626' : '#15803d'}">${(product.inStock === false || product.stockStatus === 'out' || Number(product.stock) === 0) ? 'OUT OF STOCK — Ordering unavailable' : 'In Stock'}</div>
                     <div class="btn-group">
-                        <button id="addCartBtn" class="add-btn" onclick="addToCartVariant()">🛒 Add to Cart</button>
-                        <button class="buy-btn" onclick="buyDirectVariant()">⚡ Buy Now</button>
+                        <button id="addCartBtn" class="add-btn" ${(product.inStock === false || product.stockStatus === 'out' || Number(product.stock) === 0) ? 'disabled' : ''} onclick="addToCartVariant()">🛒 Add to Cart</button>
+                        <button id="buyDirectBtn" class="buy-btn" ${(product.inStock === false || product.stockStatus === 'out' || Number(product.stock) === 0) ? 'disabled' : ''} onclick="buyDirectVariant()">⚡ Buy Now</button>
                     </div>
                 </div>
             `;
-
-            // AI View Signal (+1)
-            if (product && product.category) {
-                UserAffinityEngine.recordSignal(product.category, 1);
-            }
-            // 10-Second Reading Signal (+2)
-            setTimeout(() => {
-                if (loadedProduct && loadedProduct.category) {
-                    UserAffinityEngine.recordSignal(loadedProduct.category, 2);
-                }
-            }, 10000);
         }
 
-        let productReviewsLoaded = false;
-        window.toggleProductReviews = function() {
-            const panel=document.getElementById('productReviewsContent'); const open=panel.style.display!=='block'; panel.style.display=open?'block':'none'; document.getElementById('productReviewsToggle').textContent=open?'Hide Reviews':'Show Reviews';
-            if(open && loadedProduct && !productReviewsLoaded) loadProductReviews();
+        window.setMainImageIndex = (index) => {
+            if (!galleryImages.length) return;
+            galleryIndex = (index + galleryImages.length) % galleryImages.length;
+            const main = document.getElementById('mainProductImg');
+            if (!main) return;
+            main.src = galleryImages[galleryIndex];
+            document.querySelectorAll('.thumb-strip img').forEach((el,i)=>el.classList.toggle('active',i===galleryIndex));
+            document.querySelectorAll('.gallery-dot').forEach((el,i)=>el.classList.toggle('active',i===galleryIndex));
+            const activeThumb = document.querySelectorAll('.thumb-strip img')[galleryIndex];
+            activeThumb?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
         };
-        async function loadProductReviews() {
-            const list=document.getElementById('productReviewList'); if(!loadedProduct || !list)return;
-            try { const q=query(collection(db,'productReviews'),where('productId','==',productId)); onSnapshot(q,(snap)=>{ if(snap.empty){list.innerHTML='<p style="color:#64748b;padding:10px 0">Abhi koi review nahi hai. Aap pehla review dein.</p>';return;} let total=0; const rows=[]; snap.forEach(d=>{const r=d.data();total+=Number(r.rating||0);rows.push('<div style="padding:12px 0;border-bottom:1px solid #e2e8f0"><b>'+escapeReviewText(r.reviewer||'Customer')+'</b> · ⭐ '+Number(r.rating||0)+'/5<p style="margin-top:5px;color:#475569">'+escapeReviewText(r.reviewText||'')+'</p></div>')});list.innerHTML='<b>⭐ '+(total/rows.length).toFixed(1)+' / 5 · '+rows.length+' reviews</b>'+rows.join(''); }); productReviewsLoaded=true; }
-            catch(err){list.textContent='Reviews load nahi ho paaye. Firebase rules check karein.';}
-        }
-        function escapeReviewText(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-        document.getElementById('productReviewForm').addEventListener('submit',async(e)=>{e.preventDefault();if(!loadedProduct)return;try{await addDoc(collection(db,'productReviews'),{productId:productId,productName:loadedProduct.name||'',rating:Number(document.getElementById('reviewRating').value),reviewer:document.getElementById('reviewName').value.trim()||'Customer',reviewText:document.getElementById('reviewText').value.trim(),createdAt:serverTimestamp()});e.target.reset();alert('Thanks! Review submit ho gaya.');}catch(err){alert('Review save nahi hua: '+err.message);}});
+        window.changeGalleryImage = (delta) => setMainImageIndex(galleryIndex + delta);
+        window.toggleProductDescription = () => {
+            descriptionExpanded = !descriptionExpanded;
+            const content = document.getElementById('productDescriptionContent');
+            const btn = document.getElementById('descriptionToggle');
+            content?.classList.toggle('collapsed', !descriptionExpanded);
+            if (btn) btn.textContent = descriptionExpanded ? 'Less ↑' : 'More ↓';
+        };
+        // Touch swipe on the main image; vertical page scrolling remains natural.
+        let galleryTouchStartX = 0, galleryTouchStartY = 0;
+        document.addEventListener('touchstart', e => {
+            if (!e.target.closest('#mainImageStage')) return;
+            galleryTouchStartX = e.touches[0].clientX; galleryTouchStartY = e.touches[0].clientY;
+        }, {passive:true});
+        document.addEventListener('touchend', e => {
+            if (!e.target.closest('#mainImageStage')) return;
+            const dx = e.changedTouches[0].clientX - galleryTouchStartX;
+            const dy = e.changedTouches[0].clientY - galleryTouchStartY;
+            if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.25) changeGalleryImage(dx < 0 ? 1 : -1);
+        }, {passive:true});
 
-        window.setMainImage = (src, el) => {
-            document.getElementById('mainProductImg').src = src;
-            document.querySelectorAll('.thumb-strip img').forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
+        window.goBackOneStep = () => {
+            // Return to the previous in-app page when available; direct product links fall back to catalog.
+            try {
+                const ref = document.referrer ? new URL(document.referrer) : null;
+                if (ref && ref.origin === window.location.origin && window.history.length > 1) window.history.back();
+                else window.location.href = 'index.html';
+            } catch (_) { window.location.href = 'index.html'; }
         };
 
         window.onSelectVariant = (size, price, origPrice, el) => {
-            if (loadedProduct && loadedProduct.category) {
-                UserAffinityEngine.recordSignal(loadedProduct.category, 2);
-            }
 
             document.querySelectorAll('.size-pill').forEach(p => p.classList.remove('active'));
             el.classList.add('active');
@@ -570,10 +506,7 @@
         };
 
         window.addToCartVariant = () => {
-            if (loadedProduct && loadedProduct.category) {
-                UserAffinityEngine.recordSignal(loadedProduct.category, 4);
-            }
-
+            if(!loadedProduct || loadedProduct.inStock === false || loadedProduct.stockStatus === 'out' || Number(loadedProduct.stock) === 0){alert('यह product Out of Stock है।');return;}
             const variantTitle = (selectedVariant && selectedVariant.size) ? `${loadedProduct.name} (${selectedVariant.size})` : loadedProduct.name;
             const finalPrice = selectedVariant ? selectedVariant.price : loadedProduct.price;
 
@@ -586,10 +519,7 @@
         };
 
         window.buyDirectVariant = () => {
-            if (loadedProduct && loadedProduct.category) {
-                UserAffinityEngine.recordSignal(loadedProduct.category, 4);
-            }
-
+            if(!loadedProduct || loadedProduct.inStock === false || loadedProduct.stockStatus === 'out' || Number(loadedProduct.stock) === 0){alert('यह product Out of Stock है।');return;}
             const variantTitle = (selectedVariant && selectedVariant.size) ? `${loadedProduct.name} (${selectedVariant.size})` : loadedProduct.name;
             const finalPrice = selectedVariant ? selectedVariant.price : loadedProduct.price;
             localStorage.setItem('store_cart', JSON.stringify([{ ...loadedProduct, name: variantTitle, price: finalPrice, selectedSize: selectedVariant?.size || '', qty: 1 }]));
