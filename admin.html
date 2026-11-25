@@ -716,6 +716,55 @@
                                 <option value="closed">🔴 Emergency Closed / Maintenance Mode</option>
                             </select>
                         </div>
+                        <!-- DYNAMIC PARENT-CHILD CATEGORIZATION SYSTEM -->
+<div class="card" style="border: 1.5px solid #38bdf8; margin-top: 18px;">
+    <h2>🗂️ Dynamic Parent-Child Categorization System</h2>
+    <p style="font-size:12px; color:#94a3b8; margin-bottom:15px;">
+        Yahan se nayi <b>Parent Category</b> aur unke andar <b>Child Sub-Categories</b> banayein ya delete karein. Yeh turant Product Form aur Customer Front-End par live ho jayengi.
+    </p>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px; margin-bottom:20px;">
+        <!-- Form 1: Add Parent Category -->
+        <form id="addParentCatForm" style="background:#0f172a; padding:15px; border-radius:10px; border:1px solid #334155;">
+            <h3 style="font-size:13px; color:#22c55e; margin-bottom:10px;">+ 1. Add Main (Parent) Category</h3>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <input type="text" id="newParentCatName" placeholder="Category Name (e.g. Electronics, Kirana)" required>
+                <input type="text" id="newParentCatIcon" placeholder="Emoji Icon (e.g. 📱, 🛒, 🍔)" value="📦" maxlength="4">
+                <input type="text" id="newParentCatSlug" placeholder="Slug / Key (auto-generate if blank)" style="text-transform:lowercase;">
+                <button type="submit" class="btn-primary" style="background:#16a34a;">Create Parent Category</button>
+            </div>
+        </form>
+
+        <!-- Form 2: Add Child Sub-Category -->
+        <form id="addChildSubCatForm" style="background:#0f172a; padding:15px; border-radius:10px; border:1px solid #334155;">
+            <h3 style="font-size:13px; color:#38bdf8; margin-bottom:10px;">+ 2. Add Sub-Category (Child)</h3>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <select id="parentCatSelectForChild" required style="font-weight:bold; color:#38bdf8;">
+                    <option value="">-- Select Parent Category --</option>
+                </select>
+                <input type="text" id="newChildSubCatName" placeholder="Sub-Category Name (e.g. Mobile Chargers)" required>
+                <input type="text" id="newChildSubCatSlug" placeholder="Sub-Category Key (auto if blank)" style="text-transform:lowercase;">
+                <button type="submit" class="btn-primary" style="background:#0284c7;">Add Child Sub-Category</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Live Parent-Child Hierarchy Tree Table -->
+    <h3 style="font-size:13px; color:#fbbf24; margin-bottom:10px;">Live Category Hierarchy (Parent → Child Tree)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Icon & Parent Category</th>
+                <th>Database Key (Slug)</th>
+                <th>Child Sub-Categories</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="dynamicCategoriesTableBody">
+            <tr><td colspan="4" style="text-align:center; color:#94a3b8;">Loading categories...</td></tr>
+        </tbody>
+    </table>
+</div>
                         <div>
                             <label style="font-size:12px; font-weight:bold; color:#cbd5e1; display:block; margin-bottom:5px;">Customer Helpline Number:</label>
                             <input type="text" id="settingHelplineInput" value="8252731656, 06246451082">
@@ -2012,6 +2061,180 @@
                 alert("Offer save error: " + err.message);
             }
         });
+        // ==================== DYNAMIC PARENT-CHILD CATEGORIZATION SYSTEM ====================
+let dynamicCategoriesCache = [];
+
+function toCleanSlug(text) {
+    return String(text || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+// 1. Create Parent Category (parentId: null)
+document.getElementById('addParentCatForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('newParentCatName').value.trim();
+    const icon = document.getElementById('newParentCatIcon').value.trim() || '📦';
+    const rawSlug = document.getElementById('newParentCatSlug').value.trim();
+    const slug = toCleanSlug(rawSlug || name);
+
+    if (!name || !slug) return alert("Valid Category Name dalein!");
+
+    const exists = dynamicCategoriesCache.some(c => !c.parentId && c.slug === slug);
+    if (exists) return alert("Yeh Parent Category pehle se maujood hai!");
+
+    try {
+        await addDoc(collection(db, "categories"), {
+            name: name,
+            slug: slug,
+            icon: icon,
+            parentId: null, // Root / Parent Category
+            isActive: true,
+            createdAt: serverTimestamp()
+        });
+        document.getElementById('addParentCatForm').reset();
+        alert(`✅ Parent Category "${name}" add ho gayi!`);
+    } catch (err) {
+        alert("Error adding category: " + err.message);
+    }
+});
+
+// 2. Create Child Sub-Category (linked via parentId)
+document.getElementById('addChildSubCatForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const parentId = document.getElementById('parentCatSelectForChild').value;
+    const name = document.getElementById('newChildSubCatName').value.trim();
+    const rawSlug = document.getElementById('newChildSubCatSlug').value.trim();
+    const slug = toCleanSlug(rawSlug || name);
+
+    if (!parentId) return alert("Pehle Parent Category select karein!");
+    if (!name || !slug) return alert("Sub-Category ka naam dalein!");
+
+    try {
+        await addDoc(collection(db, "categories"), {
+            name: name,
+            slug: slug,
+            parentId: parentId, // Parent-Child Foreign Key Link
+            isActive: true,
+            createdAt: serverTimestamp()
+        });
+        document.getElementById('addChildSubCatForm').reset();
+        alert(`✅ Sub-Category "${name}" add ho gayi!`);
+    } catch (err) {
+        alert("Error adding sub-category: " + err.message);
+    }
+});
+
+// 3. Realtime Listener -> Updates Settings Table, Product Form & Front-End Sync
+onSnapshot(collection(db, "categories"), (snapshot) => {
+    dynamicCategoriesCache = [];
+    snapshot.forEach(docSnap => {
+        dynamicCategoriesCache.push({ id: docSnap.id, ...docSnap.data() });
+    });
+
+    const parents = dynamicCategoriesCache.filter(c => !c.parentId);
+    const children = dynamicCategoriesCache.filter(c => Boolean(c.parentId));
+
+    // A. Update Parent Dropdown in Settings Form
+    const parentSelect = document.getElementById('parentCatSelectForChild');
+    if (parentSelect) {
+        parentSelect.innerHTML = '<option value="">-- Select Parent Category --</option>' +
+            parents.map(p => `<option value="${p.id}">${p.icon || '📦'} ${p.name}</option>`).join('');
+    }
+
+    // B. Render Hierarchy Tree Table in Settings
+    const tbody = document.getElementById('dynamicCategoriesTableBody');
+    if (tbody) {
+        if (parents.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#94a3b8;">Abhi koi dynamic category nahi bani hai. Upar se nayi category banayein.</td></tr>';
+        } else {
+            tbody.innerHTML = parents.map(p => {
+                const myChildren = children.filter(ch => ch.parentId === p.id);
+                const childBadgesHtml = myChildren.length > 0
+                    ? myChildren.map(ch => `
+                        <span style="display:inline-flex; align-items:center; gap:5px; background:#0f172a; border:1px solid #38bdf850; color:#38bdf8; padding:3px 8px; border-radius:12px; font-size:11px; margin:2px;">
+                            ${ch.name}
+                            <button type="button" onclick="deleteDynamicCategory('${ch.id}', false)" style="background:none; border:none; color:#ef4444; font-weight:bold; cursor:pointer; font-size:12px;" title="Remove Sub-Category">&times;</button>
+                        </span>
+                    `).join('')
+                    : '<small style="color:#64748b;">No sub-categories</small>';
+
+                return `
+                    <tr>
+                        <td><strong style="font-size:13px;">${p.icon || '📦'} ${p.name}</strong></td>
+                        <td><code style="color:#22c55e;">${p.slug}</code></td>
+                        <td>${childBadgesHtml}</td>
+                        <td>
+                            <button type="button" class="btn-danger" onclick="deleteDynamicCategory('${p.id}', true)">Delete Parent</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+    }
+
+    // C. Auto-Sync Dynamic Categories into Admin "Add Product" Form
+    syncDynamicCategoriesToProductForm(parents, children);
+});
+
+// 4. Delete Category (Cascade deletes child sub-categories if parent is deleted)
+window.deleteDynamicCategory = async (catId, isParent) => {
+    const msg = isParent
+        ? "Kya aap is Parent Category aur iski sabhi Child Sub-Categories ko delete karna chahte hain?"
+        : "Kya aap is Sub-Category ko delete karna chahte hain?";
+    if (!confirm(msg)) return;
+
+    try {
+        if (isParent) {
+            const childDocs = dynamicCategoriesCache.filter(c => c.parentId === catId);
+            for (const ch of childDocs) {
+                await deleteDoc(doc(db, "categories", ch.id));
+            }
+        }
+        await deleteDoc(doc(db, "categories", catId));
+    } catch (err) {
+        alert("Delete Error: " + err.message);
+    }
+};
+
+// 5. Sync with Admin Product Add/Edit Checkboxes & Sub-Category Dropdown
+function syncDynamicCategoriesToProductForm(parents, children) {
+    const catGroup = document.querySelector('#tab-products .cat-checkbox-group');
+    const subSelect = document.getElementById('prodSubCategory');
+    const filterSelect = document.getElementById('catalogCatFilter');
+
+    if (catGroup && parents.length > 0) {
+        parents.forEach(p => {
+            if (!catGroup.querySelector(`input[value="${p.slug}"]`)) {
+                const lbl = document.createElement('label');
+                lbl.innerHTML = `<input type="checkbox" name="productCats" value="${p.slug}"> ${p.icon || '📦'} ${p.name}`;
+                catGroup.appendChild(lbl);
+            }
+        });
+    }
+
+    if (subSelect && children.length > 0) {
+        children.forEach(ch => {
+            const parentObj = parents.find(p => p.id === ch.parentId);
+            const valKey = ch.name.toLowerCase();
+            if (!subSelect.querySelector(`option[value="${valKey}"]`)) {
+                const opt = document.createElement('option');
+                opt.value = valKey;
+                opt.textContent = `${parentObj ? parentObj.name : 'Dynamic'}: ${ch.name}`;
+                subSelect.appendChild(opt);
+            }
+        });
+    }
+
+    if (filterSelect && parents.length > 0) {
+        parents.forEach(p => {
+            if (!filterSelect.querySelector(`option[value="${p.slug}"]`)) {
+                const opt = document.createElement('option');
+                opt.value = p.slug;
+                opt.textContent = p.name;
+                filterSelect.appendChild(opt);
+            }
+        });
+    }
+}
     </script>
 </body>
 </html>
