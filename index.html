@@ -665,20 +665,9 @@ footer,.ksindo-footer-inner{max-width:100%}
     <div class="ads-scroll-section" id="adsSlot" style="display:none;">
         <div class="ads-scroll-track" id="multiAdsTrack"></div>
     </div>
-
-    <div class="container">
-        <!-- AI/ML Smart Interest Banner -->
-        <div class="ai-rec-banner" id="aiSmartBanner">
-            <span>✨ AI Feed:</span> <span id="aiSmartBannerText">Personalized recommendation for you</span>
-        </div>
-
         <section id="sectionGeneralStore">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
               <h2 style="font-size:18px;color:#15803d;font-weight:800;margin:0;" id="marketViewTitle">Featured Products</h2>
-              <div class="product-size-tools" aria-label="Product card size">
-                  <button type="button" onclick="window.setProductCardSize('small')">A− Small</button>
-                  <button type="button" onclick="window.setProductCardSize('large')">A+ Large</button>
-              </div>
             </div>
             <!-- Initial Product Grid -->
             <div class="product-grid" id="generalProductGrid"></div>
@@ -1015,8 +1004,6 @@ footer,.ksindo-footer-inner{max-width:100%}
             db.enablePersistence({ synchronizeTabs: true }).catch(function(){});
         } catch(e){}
         var auth = firebase.auth();
-        var deliveryBoyWhatsAppNumber = "919771556448";
-
         var currentUserProfile = JSON.parse(localStorage.getItem('ksindo_user_profile')) || null;
 
         var allProducts = [];
