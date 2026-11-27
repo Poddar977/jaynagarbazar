@@ -2,270 +2,181 @@
 <html lang="hi">
 <head>
     <!-- PWA Settings -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#4b0020">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ksindo">
-    <link rel="apple-touch-icon" href="https://poddar977.github.io/jaynagarbazar/logo.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ksindo">
+<link rel="apple-touch-icon" href="https://poddar977.github.io/jaynagarbazar/logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ksindo Fast Food & Kitchens</title>
-
-    <!-- Stable Firebase Compat SDKs + External Config File -->
+    <!-- Stable Firebase Compat SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="firebase-config.js"></script>
 
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color:transparent; }
-        body { background:#f8fafc; color:#171717; padding-bottom:82px; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color:transparent; }
+        body { background-color:#fff7ed; color:#1e293b; padding-bottom:60px; }
 
-        /* HEADER */
-        header {
-            background:#4b0020; color:#fff; padding:11px 4%; position:sticky; top:0; z-index:1000;
-            box-shadow:0 2px 12px rgba(36, 0, 18, 0.25); display:flex; align-items:center;
-            justify-content:space-between; gap:10px; flex-wrap:wrap;
+        header { 
+            background-color:#ea580c; color:white; padding:12px 5%; 
+            display:flex; align-items:center; justify-content:space-between; 
+            position:sticky; top:0; z-index:1000; box-shadow:0 2px 10px rgba(234, 88, 12, 0.3); 
         }
-        .header-left { display:flex; align-items:center; gap:10px; min-width:0; }
-        .back-btn {
-            background:rgba(255,255,255,0.16); color:#fff; border:1px solid rgba(255,255,255,0.3);
-            padding:6px 12px; border-radius:20px; font-weight:800; cursor:pointer; font-size:12px; text-decoration:none;
+        .header-left { display:flex; align-items:center; gap:12px; }
+        .back-btn { 
+            background:white; color:#ea580c; border:none; padding:7px 14px; 
+            border-radius:20px; font-weight:800; cursor:pointer; font-size:12px; text-decoration:none;
         }
-        .logo-text { font-size:20px; font-weight:900; letter-spacing:0.3px; cursor:pointer; white-space:nowrap; }
-
+        .logo-text { font-size:22px; font-weight:900; letter-spacing:1px; cursor:pointer; }
+        
         .location-pill {
-            background:rgba(255,255,255,0.16); border:1px solid rgba(255,255,255,0.3);
-            padding:6px 13px; border-radius:20px; font-size:12px; font-weight:700;
+            background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4);
+            padding:6px 14px; border-radius:20px; font-size:12px; font-weight:700;
             display:flex; align-items:center; gap:6px; cursor:pointer;
         }
 
-        .nav-actions { display:flex; gap:8px; align-items:center; }
-        .user-status-chip {
-            background:rgba(255,255,255,0.16); border:1px solid rgba(255,255,255,0.35);
-            color:#fff; padding:6px 12px; border-radius:20px; font-size:11px; font-weight:800;
-            cursor:pointer; text-decoration:none; white-space:nowrap;
-        }
-        .nav-round-btn {
-            background:#fff; color:#4b0020; border:none; width:36px; height:36px;
-            border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;
+        .nav-actions { display:flex; gap:10px; align-items:center; }
+        .nav-round-btn { 
+            background-color:#fff; color:#ea580c; border:none; width:38px; height:38px; 
+            border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; 
             font-size:16px; position:relative; font-weight:bold;
         }
-        .cart-badge {
-            background:#ea580c; color:white; padding:2px 6px; border-radius:12px;
-            font-size:11px; position:absolute; top:-4px; right:-4px; font-weight:bold;
+        .cart-badge { 
+            background-color:#0f172a; color:white; padding:2px 6px; border-radius:12px; 
+            font-size:11px; position:absolute; top:-4px; right:-4px; font-weight:bold; 
         }
 
         /* LOCATION GATEWAY BLOCKER */
         #locationGatewayModal {
             position:fixed; inset:0; background:rgba(15, 23, 42, 0.85); backdrop-filter:blur(5px);
-            z-index:99999; display:none; align-items:center; justify-content:center; padding:20px;
+            z-index:99999; display:flex; align-items:center; justify-content:center; padding:20px;
         }
         .gateway-card {
             background:white; border-radius:20px; padding:30px 25px; width:100%; max-width:420px;
-            text-align:center; box-shadow:0 20px 40px rgba(0,0,0,0.3);
+            text-align:center; box-shadow:0 20px 40px rgba(0,0,0,0.3); border:2px solid #fed7aa;
         }
         .gateway-icon { font-size:48px; margin-bottom:12px; display:inline-block; }
-        .gateway-card h2 { font-size:20px; color:#4b0020; margin-bottom:8px; font-weight:800; }
+        .gateway-card h2 { font-size:20px; color:#c2410c; margin-bottom:8px; font-weight:800; }
         .gateway-card p { font-size:13px; color:#64748b; margin-bottom:20px; line-height:1.5; }
+        
         .btn-gps {
-            width:100%; background:#4b0020; color:white; border:none; padding:13px;
+            width:100%; background:#ea580c; color:white; border:none; padding:13px;
             border-radius:12px; font-size:14px; font-weight:bold; cursor:pointer; margin-bottom:14px;
             display:flex; align-items:center; justify-content:center; gap:8px;
         }
         .divider { display:flex; align-items:center; color:#94a3b8; font-size:12px; margin:14px 0; }
         .divider::before, .divider::after { content:''; flex:1; height:1px; background:#e2e8f0; }
         .divider span { padding:0 10px; }
+
         .pincode-input-box { display:flex; gap:8px; }
         .pincode-input-box input {
             flex:1; padding:12px; border:2px solid #cbd5e1; border-radius:10px;
             font-size:14px; font-weight:bold; text-align:center; outline:none;
         }
-        .pincode-input-box input:focus { border-color:#4b0020; }
+        .pincode-input-box input:focus { border-color:#ea580c; }
         .pincode-input-box button {
             background:#0f172a; color:white; border:none; padding:0 20px;
             border-radius:10px; font-weight:bold; cursor:pointer;
         }
 
-        /* RESPONSIVE CONTAINER: MOBILE VS DESKTOP */
-        .container { max-width:1240px; margin:0 auto; padding:12px 14px; }
-
-        /* STICKY SMART SEARCH BAR */
-        .ff-search-wrap {
-            position:sticky; top:60px; z-index:900; background:#f8fafc; padding:8px 0;
-        }
-        .ff-search {
-            display:flex; align-items:center; gap:10px; background:#fff;
-            border:1.5px solid #e2e8f0; border-radius:14px; padding:11px 14px;
-            box-shadow:0 4px 12px rgba(15, 23, 42, 0.06);
-        }
-        .ff-search:focus-within { border-color:#4b0020; }
-        .ff-search input { border:0; outline:0; flex:1; min-width:0; font-size:14px; color:#0f172a; }
-        .ff-clear-search {
-            display:none; background:#e2e8f0; color:#334155; border:none; width:22px; height:22px;
-            border-radius:50%; font-size:12px; font-weight:bold; cursor:pointer;
-        }
-
-        /* PROMO & CUISINE STRIPS */
-        .ff-promo {
-            margin:10px 0 14px; background:linear-gradient(110deg,#79002f,#35001e); color:#fff;
-            border-radius:16px; padding:16px 18px; min-height:110px; display:flex;
-            align-items:center; justify-content:space-between; overflow:hidden;
-        }
-        .ff-promo strong { font-size:24px; color:#ffdf24; line-height:1.1; }
-        .ff-promo small { display:block; font-size:12px; margin-top:5px; opacity:0.9; }
-        .ff-promo .emoji { font-size:44px; }
-
-        .ff-section { margin:14px 0 18px; }
-        .ff-section-head { display:flex; align-items:center; justify-content:space-between; margin:0 2px 10px; }
-        .ff-section-head strong { font-size:17px; color:#0f172a; }
-
-        .ff-cuisine-row { display:flex; gap:12px; overflow-x:auto; padding:4px 2px 10px; scrollbar-width:none; }
-        .ff-cuisine-row::-webkit-scrollbar { display:none; }
-        .ff-cuisine {
-            flex:0 0 72px; text-align:center; font-size:11.5px; font-weight:700;
-            color:#334155; cursor:pointer; transition:0.15s;
-        }
-        .ff-cuisine:hover { transform:translateY(-2px); color:#4b0020; }
-        .ff-cuisine i {
-            display:flex; width:60px; height:60px; margin:0 auto 6px; border-radius:50%;
-            align-items:center; justify-content:center; background:#fff0e4; font-style:normal;
-            font-size:28px; box-shadow:0 2px 8px rgba(0,0,0,0.08); border:1.5px solid #fed7aa;
-        }
-
-        .page-title {
-            color:#0f172a; font-size:17px; font-weight:800; margin:16px 2px 12px;
-            display:flex; justify-content:space-between; align-items:center;
-        }
-
-        /* RESTAURANT GRID: MOBILE (1 COL) VS DESKTOP (3 COLS) */
-        .restaurant-grid { display:grid; grid-template-columns:1fr; gap:16px; }
-        @media(min-width:650px) {
-            .restaurant-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); gap:18px; }
-        }
-        @media(min-width:980px) {
-            .restaurant-grid { grid-template-columns:repeat(3, minmax(0, 1fr)); gap:20px; }
-        }
-
+        .container { max-width:1150px; margin:20px auto; padding:0 15px; }
+        .page-title { font-size:18px; font-weight:800; color:#c2410c; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; }
+        
+        .restaurant-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:18px; }
         .restaurant-card {
-            background:#fff; border-radius:16px; box-shadow:0 3px 12px rgba(15, 23, 42, 0.07);
-            overflow:hidden; cursor:pointer; transition:transform 0.2s, box-shadow 0.2s;
-            border:1px solid #e2e8f0; position:relative;
+            background:white; border-radius:16px; overflow:hidden; border:1.5px solid #fed7aa;
+            cursor:pointer; transition:0.2s; box-shadow:0 4px 12px rgba(234, 88, 12, 0.06);
         }
-        .restaurant-card:hover { transform:translateY(-3px); box-shadow:0 10px 24px rgba(15, 23, 42, 0.12); }
-        .restaurant-img-wrap { width:100%; aspect-ratio:16/9; background:#f1f5f9; overflow:hidden; }
-        .restaurant-img { width:100%; height:100%; object-fit:cover; display:block; }
-        .restaurant-info { padding:12px 14px; }
+        .restaurant-card:hover { transform:translateY(-4px); box-shadow:0 8px 20px rgba(234, 88, 12, 0.15); }
+        .restaurant-img { width:100%; height:140px; object-fit:cover; background:#fed7aa; }
+        .restaurant-info { padding:14px; }
         .restaurant-title { font-size:16px; font-weight:800; color:#0f172a; margin-bottom:4px; }
-        .restaurant-sub { font-size:12px; color:#64748b; margin-bottom:8px; line-height:1.4; }
-        .restaurant-badge { background:#fff1e8; color:#e65300; padding:3px 9px; border-radius:6px; font-size:11px; font-weight:700; }
+        .restaurant-sub { font-size:12px; color:#64748b; margin-bottom:8px; }
+        .restaurant-badge { background:#ffedd5; color:#ea580c; font-size:11px; font-weight:bold; padding:3px 8px; border-radius:6px; }
 
-        /* DISH GRID: MOBILE (2 COLS) VS DESKTOP (4 COLS) + AUTO-FIT IMAGE */
-        .product-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; }
-        @media(min-width:650px) {
-            .product-grid { grid-template-columns:repeat(3, minmax(0, 1fr)); gap:16px; }
+        .product-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:16px; }
+        @media(max-width:600px){ .product-grid { grid-template-columns:repeat(auto-fill, minmax(145px, 1fr)); gap:10px; } }
+        
+        .dish-card { 
+            background:white; border:1.5px solid #fed7aa; border-radius:14px; padding:12px; 
+            display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 4px 10px rgba(234, 88, 12, 0.05);
         }
-        @media(min-width:980px) {
-            .product-grid { grid-template-columns:repeat(4, minmax(0, 1fr)); gap:18px; }
-        }
+        .dish-card img { width:100%; height:130px; object-fit:contain; border-radius:8px; margin-bottom:8px; background:#fffaf0; }
+        .dish-title { font-size:13px; font-weight:700; color:#0f172a; height:34px; overflow:hidden; line-height:1.3; }
+        .dish-price { font-size:16px; font-weight:900; color:#ea580c; margin:6px 0; }
+        
+        .card-actions { display:flex; gap:6px; margin-top:8px; }
+        .btn-dish-add { background:#ea580c; color:white; border:none; padding:8px; border-radius:8px; font-weight:bold; font-size:11px; flex:1; cursor:pointer; }
+        .btn-dish-order { background:#16a34a; color:white; border:none; padding:8px; border-radius:8px; font-weight:bold; font-size:11px; flex:1; cursor:pointer; }
 
-        .dish-card {
-            background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:10px;
-            display:flex; flex-direction:column; justify-content:space-between;
-            box-shadow:0 2px 8px rgba(0,0,0,0.05); transition:0.2s; min-width:0;
-        }
-        .dish-card:hover { border-color:#fdba74; box-shadow:0 6px 16px rgba(234, 88, 12, 0.1); }
-        .dish-card.highlighted-dish {
-            border:2px solid #ea580c; background:#fff7ed; box-shadow:0 6px 18px rgba(234, 88, 12, 0.18);
-        }
-
-        /* AUTO-FIT IMAGE CONTAINER (NO CROPPING OR STRETCHING ON ANY SCREEN) */
-        .dish-img-box {
-            width:100%; aspect-ratio:4/3; background:#fffaf0; border-radius:10px;
-            overflow:hidden; display:flex; align-items:center; justify-content:center;
-            margin-bottom:8px; border:1px solid #f1f5f9; padding:4px;
-        }
-        .dish-img-box img {
-            width:100%; height:100%; object-fit:contain; display:block;
-        }
-
-        .dish-shop-tag {
-            display:inline-block; background:#fef3c7; color:#92400e; font-size:10px;
-            font-weight:800; padding:2px 7px; border-radius:6px; margin-bottom:4px;
-            white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
-        }
-        .dish-title {
-            font-size:13px; font-weight:700; color:#0f172a; line-height:1.3;
-            display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
-        }
-        .dish-price { font-size:15px; font-weight:900; color:#0f172a; margin:6px 0; }
-
-        .card-actions { display:flex; gap:6px; margin-top:6px; }
-        .btn-dish-add {
-            background:#fff; color:#07884c; border:1.5px solid #07884c; padding:8px 6px;
-            border-radius:9px; font-weight:800; font-size:11px; flex:1; cursor:pointer;
-        }
-        .btn-dish-order {
-            background:#07884c; color:white; border:none; padding:8px 6px;
-            border-radius:9px; font-weight:800; font-size:11px; flex:1; cursor:pointer;
-        }
-        .btn-visit-shop {
-            width:100%; background:#4b0020; color:white; border:none; padding:8px;
-            border-radius:9px; font-weight:800; font-size:11px; cursor:pointer; margin-top:6px;
-        }
-
-        /* CART & CHECKOUT MODALS */
-        .cart-modal {
-            position:fixed; top:0; right:-100%; width:100%; max-width:380px; height:100%;
-            background:white; box-shadow:-5px 0 20px rgba(0,0,0,0.3);
-            transition:right 0.3s ease; z-index:99999; display:flex; flex-direction:column;
+        .cart-modal { 
+            position:fixed; top:0; right:-100%; width:100%; max-width:380px; height:100%; 
+            background:white; box-shadow:-5px 0 20px rgba(0,0,0,0.3); 
+            transition:right 0.3s ease; z-index:99999; display:flex; flex-direction:column; 
         }
         .cart-modal.open { right:0 !important; }
-        .cart-header { background:#4b0020; color:white; padding:15px; display:flex; justify-content:space-between; align-items:center; }
+        .cart-header { background:#ea580c; color:white; padding:15px; display:flex; justify-content:space-between; align-items:center; }
         .cart-items { flex:1; overflow-y:auto; padding:15px; }
         .cart-item { display:flex; gap:10px; align-items:center; border-bottom:1px solid #eee; padding:10px 0; }
-        .cart-item img { width:48px; height:48px; object-fit:contain; border-radius:8px; background:#fffaf0; border:1px solid #eee; }
+        .cart-item img { width:45px; height:45px; object-fit:cover; border-radius:8px; }
         .qty-controls { display:inline-flex; align-items:center; border:1px solid #fed7aa; border-radius:20px; background:#fff7ed; overflow:hidden; margin-top:4px; }
         .qty-btn { background:#ffedd5; border:none; width:26px; height:26px; cursor:pointer; font-weight:bold; color:#ea580c; }
         .qty-val { min-width:24px; text-align:center; font-size:12px; font-weight:bold; }
         .cart-footer { padding:15px; border-top:1px solid #eee; background:#fffaf0; }
-        .btn-order-confirm { background:#07884c; color:white; border:none; font-weight:bold; cursor:pointer; width:100%; padding:13px; border-radius:25px; font-size:14px; }
+        .btn-order-confirm { background:#ea580c; color:white; border:none; font-weight:bold; cursor:pointer; width:100%; padding:13px; border-radius:25px; font-size:14px; }
 
         .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:100000; padding:15px; }
         .modal-overlay.active { display:flex; }
-        .modal-box { background:white; padding:25px; border-radius:18px; width:100%; max-width:480px; max-height:90vh; overflow-y:auto; position:relative; }
+        .modal-box { background:white; padding:25px; border-radius:18px; width:100%; max-width:500px; max-height:90vh; overflow-y:auto; position:relative; }
         .close-btn { position:absolute; right:15px; top:15px; cursor:pointer; font-size:22px; font-weight:bold; width:30px; height:30px; border-radius:50%; background:#f1f2f6; display:flex; align-items:center; justify-content:center; border:none; }
         .form-row { margin-bottom:12px; }
         .form-row label { display:block; font-size:12px; font-weight:bold; margin-bottom:4px; color:#475569; }
         .form-row input { width:100%; padding:10px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:13px; outline:none; }
 
-        /* LOGIN GATE BLOCKER */
-        .ff-login-gate {
-            position:fixed; inset:0; z-index:100001; background:rgba(15, 23, 42, 0.9); backdrop-filter:blur(6px);
-            display:none; align-items:center; justify-content:center; padding:22px; text-align:center;
-        }
-        .ff-login-card {
-            max-width:380px; width:100%; border-radius:22px; padding:28px 22px;
-            box-shadow:0 12px 35px rgba(0,0,0,0.35); background:#fff;
-        }
-        .ff-login-card .lock { font-size:46px; }
-        .ff-login-card h2 { font-size:21px; color:#4b0020; margin:12px 0 8px; font-weight:900; }
-        .ff-login-card p { font-size:13px; color:#64748b; line-height:1.5; margin-bottom:18px; }
-        .ff-login-card a {
-            display:block; background:#4b0020; color:#fff; text-decoration:none;
-            padding:13px; border-radius:12px; font-weight:800; font-size:14px;
-        }
-        .ff-login-card button {
-            margin-top:12px; background:transparent; border:0; color:#64748b;
-            padding:8px; font-weight:700; cursor:pointer;
-        }
+        /* KSINDO marketplace-style restaurant discovery UI */
+        body{background:#fff;color:#171717;padding-bottom:78px;font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+        header{background:#4b0020;color:#fff;padding:10px 12px;position:sticky;top:0;z-index:1000;box-shadow:0 2px 10px #24001235;gap:8px;flex-wrap:wrap}
+        .header-left{gap:8px;min-width:0}.back-btn{background:transparent;color:#fff;padding:4px 6px;border-radius:8px;font-size:12px}.logo-text{font-size:18px;letter-spacing:.2px;white-space:nowrap}
+        .location-pill{order:3;width:100%;justify-content:flex-start;border:0;background:#ffffff18;padding:3px 6px;font-size:11px}
+        .nav-round-btn{width:34px;height:34px;color:#4b0020}
+        .container{max-width:760px;margin:0 auto;padding:0 10px}
+        .page-title{color:#222;font-size:15px;margin:16px 2px 10px}
+        #restaurantListView{padding-bottom:15px}
+        .ff-search{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:11px 13px;margin:10px 0;box-shadow:0 2px 8px #00000008}
+        .ff-search input{border:0;outline:0;flex:1;min-width:0;font-size:13px}
+        .ff-tabs{display:flex;gap:18px;overflow:auto;white-space:nowrap;padding:9px 3px;color:#555;font-size:11px;border-bottom:1px solid #eee;scrollbar-width:none}
+        .ff-tabs span{flex:none}.ff-promo{margin:12px 0;background:linear-gradient(110deg,#79002f,#35001e);color:#fff;border-radius:16px;padding:15px 13px;min-height:104px;display:flex;align-items:center;justify-content:space-between;overflow:hidden}
+        .ff-promo strong{font-size:25px;color:#ffdf24;line-height:1.05}.ff-promo small{display:block;font-size:11px;margin-top:5px}.ff-promo .emoji{font-size:42px}
+        .ff-deal-strip{display:flex;gap:9px;overflow:auto;margin:10px 0 14px;scrollbar-width:none}.ff-deal{min-width:95px;flex:1;border-radius:12px;background:#d41488;color:#fff;text-align:center;padding:10px 5px;font-size:11px;font-weight:800}.ff-deal b{display:block;font-size:17px;color:#ffe34d;margin-top:5px}
+        .ff-section{margin:14px 0 18px}.ff-section-head{display:flex;align-items:center;justify-content:space-between;margin:0 2px 10px}.ff-section-head strong{font-size:17px}.ff-section-head small{color:#0784bd;font-weight:700}
+        .ff-cuisine-row{display:flex;gap:12px;overflow:auto;padding:4px 2px 10px;scrollbar-width:none}.ff-cuisine{flex:0 0 67px;text-align:center;font-size:11px;color:#333}.ff-cuisine i{display:flex;width:58px;height:58px;margin:0 auto 5px;border-radius:50%;align-items:center;justify-content:center;background:#fff0e4;font-style:normal;font-size:29px;box-shadow:0 2px 7px #00000010}
+        .ff-filter-row{display:flex;gap:7px;overflow:auto;padding:3px 1px 10px;scrollbar-width:none}.ff-filter{flex:none;border:1px solid #ddd;background:#fff;border-radius:8px;padding:7px 10px;font-size:11px;color:#333}
+        .restaurant-grid{display:grid;grid-template-columns:1fr;gap:14px}
+        .restaurant-card{border:0;border-radius:14px;box-shadow:0 2px 6px #0002;overflow:hidden;background:#fff;transition:none}
+        .restaurant-card:hover{transform:none;box-shadow:0 2px 6px #0002}
+        .restaurant-img{height:190px;display:block;object-fit:cover;background:#eee}
+        .restaurant-info{padding:10px 11px 12px}.restaurant-title{font-size:15px;margin-bottom:4px;color:#171717}.restaurant-sub{font-size:11px;margin-bottom:7px;line-height:1.45}
+        .restaurant-badge{background:#fff1e8;color:#e65300;border-radius:5px;font-size:10px}
+        .ff-rating{color:#07884c;font-size:11px;font-weight:700}.ff-offer-tag{position:absolute;left:8px;bottom:8px;background:#111b;color:white;padding:4px 7px;border-radius:5px;font-size:10px}
+        .restaurant-card{position:relative}.restaurant-card .restaurant-img{height:190px}
+        .product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+        .dish-card{padding:8px;border:1px solid #eee;border-radius:12px;box-shadow:0 2px 6px #0000000d;min-width:0}
+        .dish-card img{height:125px;object-fit:cover;background:#f7f7f7}.dish-title{height:auto;min-height:32px;font-size:12px}.dish-price{font-size:15px;color:#171717}
+        .btn-dish-add{background:#fff;color:#07884c;border:1px solid #07884c}.btn-dish-order{background:#07884c}
+        .cart-header{background:#4b0020}.btn-order-confirm{background:#07884c}
+        .gateway-card{border:0;border-radius:20px}.gateway-card h2{color:#4b0020}.btn-gps{background:#4b0020}
+        .ff-login-gate{position:fixed;inset:0;z-index:100001;background:#fff;display:none;align-items:center;justify-content:center;padding:22px;text-align:center}
+        .ff-login-card{max-width:360px;width:100%;border-radius:22px;padding:28px 22px;box-shadow:0 8px 35px #0002;background:#fff}
+        .ff-login-card .lock{font-size:46px}.ff-login-card h2{font-size:21px;color:#4b0020;margin:12px 0 8px}.ff-login-card p{font-size:13px;color:#666;line-height:1.5;margin-bottom:18px}
+        .ff-login-card a{display:block;background:#4b0020;color:#fff;text-decoration:none;padding:13px;border-radius:12px;font-weight:800}
+        .ff-login-card button{margin-top:12px;background:transparent;border:0;color:#555;padding:8px;font-weight:700}
+        .ff-bottom-search{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:900;background:#222;color:#fff;border:0;border-radius:22px;padding:9px 17px;font-size:12px;box-shadow:0 3px 10px #0003}
+        @media(min-width:650px){.restaurant-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.restaurant-img{height:170px}.ff-promo{min-height:125px}.container{padding:0 18px}}
 
-        @media(max-width:649px) {
-            .location-pill { order:3; width:100%; justify-content:flex-start; padding:4px 8px; font-size:11px; }
-            .ff-search-wrap { top:86px; }
-        }
     </style>
 </head>
 <body>
@@ -283,7 +194,6 @@
         </div>
 
         <div class="nav-actions">
-            <a href="index.html" class="user-status-chip" id="headerAccountChip">👤 Login</a>
             <button class="nav-round-btn" onclick="toggleCart(true)">
                 🛒 <span class="cart-badge" id="cart-count">0</span>
             </button>
@@ -313,65 +223,26 @@
     <!-- MAIN RESTAURANT CONTAINER -->
     <div class="container" id="foodMainContent" style="display:none;">
         <div id="restaurantListView">
-            <!-- SMART SEARCH BAR (SEARCHES BOTH DISHES LIKE "MOMOS" AND RESTAURANTS) -->
-            <div class="ff-search-wrap">
-                <div class="ff-search">
-                    <span>🔍</span>
-                    <input id="foodSearchInput" type="search" placeholder="Search dishes (e.g. Momos, Burger, Biryani) or Restaurants..." oninput="handleSmartFoodSearch()">
-                    <button class="ff-clear-search" id="clearFoodSearchBtn" onclick="clearFoodSearch()">✕</button>
-                </div>
-            </div>
-
-            <!-- CROSS-RESTAURANT DISH SEARCH RESULTS (SHOWN WHEN USER SEARCHES E.G. "MOMOS") -->
-            <div id="dishSearchResultsSection" style="display:none; margin-bottom:22px;">
-                <div class="page-title">
-                    <span id="dishSearchHeading">🍽️ Matching Dishes Across Restaurants</span>
-                    <small id="dishMatchCountBadge" style="background:#ffedd5; color:#c2410c; padding:3px 10px; border-radius:10px; font-size:11px; font-weight:800;">0 Dishes</small>
-                </div>
-                <div class="product-grid" id="searchedDishesGrid"></div>
-            </div>
-
-            <!-- PROMO & CUISINE DISCOVERY (AUTO-HIDDEN DURING SEARCH) -->
-            <div id="foodDiscoveryBanners">
-                <div class="ff-promo">
-                    <div>
-                        <strong>FLAVOURFEST</strong>
-                        <small>ORDER NOW · Hot & fresh meals from local kitchens</small>
-                    </div>
-                    <div class="emoji">🥟🍔🍕</div>
-                </div>
-
-                <div class="ff-section">
-                    <div class="ff-section-head"><strong>What's on your mind? (Tap to Search)</strong></div>
-                    <div class="ff-cuisine-row">
-                        <div class="ff-cuisine" onclick="quickSearchDish('Momos')"><i>🥟</i>Momos</div>
-                        <div class="ff-cuisine" onclick="quickSearchDish('Burger')"><i>🍔</i>Burgers</div>
-                        <div class="ff-cuisine" onclick="quickSearchDish('Pizza')"><i>🍕</i>Pizza</div>
-                        <div class="ff-cuisine" onclick="quickSearchDish('Biryani')"><i>🍛</i>Biryani</div>
-                        <div class="ff-cuisine" onclick="quickSearchDish('Paneer')"><i>🥘</i>Paneer</div>
-                        <div class="ff-cuisine" onclick="quickSearchDish('Roll')"><i>🌯</i>Veg Roll</div>
-                        <div class="ff-cuisine" onclick="quickSearchDish('Noodles')"><i>🍜</i>Noodles</div>
-                        <div class="ff-cuisine" onclick="quickSearchDish('Cake')"><i>🍰</i>Cakes</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="page-title">
-                <span id="restaurantListHeading">Restaurants to explore</span>
-                <small id="filteredCountBadge" style="background:#e2e8f0; color:#334155; padding:3px 10px; border-radius:10px; font-size:11px; font-weight:800;"></small>
-            </div>
+            <div class="ff-search"><span>⌕</span><input id="foodSearchInput" type="search" placeholder="Try ‘Burger in 20 minutes’" oninput="filterFoodRestaurants()"><span>🎙️</span></div>
+            <div class="ff-tabs"><span>✦ ALL</span><span>▣ STORE</span><span>♢ OFFERS</span><span>▣ FOOD ON TRAIN</span><span>☷ MORE</span></div>
+            <div class="ff-promo"><div><strong>FLAVOURFEST</strong><small>ORDER NOW · Delicious food near you</small></div><div class="emoji">🍟🍕</div></div>
+            <div class="ff-deal-strip"><div class="ff-deal">Dishes From ₹39<b>⚡ RUSH</b></div><div class="ff-deal">Get 70% OFF<b>％</b></div><div class="ff-deal">Binge-Worthy Offers<b>₹150</b></div><div class="ff-deal">More Deals<b>🎁</b></div></div>
+            <div class="ff-section"><div class="ff-section-head"><strong>🍲 Store <small style="font-size:11px;color:#666;font-weight:500">Meals at ₹99 + Free Delivery</small></strong><small>View All ›</small></div><div class="ff-cuisine-row"><div class="ff-cuisine"><i>🥘</i>Paneer</div><div class="ff-cuisine"><i>🍛</i>Paratha</div><div class="ff-cuisine"><i>🌯</i>Veg Roll</div><div class="ff-cuisine"><i>🍔</i>Burger</div><div class="ff-cuisine"><i>🍕</i>Pizza</div></div></div>
+            <div class="ff-promo" style="background:linear-gradient(100deg,#09275b,#173c82);min-height:65px;padding:10px 14px"><div><b style="font-size:16px;color:white">Use your Freecash : ₹40</b><small>Auto-applied on orders above ₹99</small></div><div class="emoji">🪙</div></div>
+            <div class="ff-section"><div class="ff-section-head"><strong>What's on your mind?</strong></div><div class="ff-cuisine-row"><div class="ff-cuisine"><i>🍔</i>Burgers</div><div class="ff-cuisine"><i>🥞</i>Dosa</div><div class="ff-cuisine"><i>🍰</i>Cakes</div><div class="ff-cuisine"><i>🍜</i>Noodles</div><div class="ff-cuisine"><i>🥪</i>Sandwich</div><div class="ff-cuisine"><i>🍕</i>Pizza</div></div></div>
+            <div class="ff-filter-row"><button class="ff-filter">Filter ☷</button><button class="ff-filter">Sort by⌄</button><button class="ff-filter">🍲 99 Store</button><button class="ff-filter">Offers</button><button class="ff-filter">Ratings</button></div>
+            <div class="page-title"><span>Restaurants to explore</span><small id="filteredCountBadge" style="background:#f3f4f6;color:#555;padding:3px 8px;border-radius:10px;font-size:11px"></small></div>
             <div class="restaurant-grid" id="restaurantsContainer"></div>
         </div>
 
-        <!-- SELECTED RESTAURANT MENU VIEW -->
         <div id="restaurantMenuView" style="display:none;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:15px; background:white; padding:15px 18px; border-radius:14px; border:1.5px solid #fed7aa; box-shadow:0 2px 10px rgba(0,0,0,0.04);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:white; padding:15px 20px; border-radius:12px; border:1px solid #fed7aa;">
                 <div>
-                    <button onclick="backToShopsList()" style="background:#4b0020; color:white; border:none; padding:6px 13px; border-radius:20px; font-weight:bold; cursor:pointer; font-size:12px; margin-bottom:6px;">← Back to All Restaurants</button>
-                    <h2 id="activeShopName" style="color:#0f172a; font-size:19px; font-weight:900;">Restaurant Menu</h2>
+                    <button onclick="backToShopsList()" style="background:#ea580c; color:white; border:none; padding:5px 12px; border-radius:15px; font-weight:bold; cursor:pointer; font-size:12px; margin-bottom:4px;">← Change Restaurant</button>
+                    <h2 id="activeShopName" style="color:#0f172a; font-size:18px;">Restaurant Menu</h2>
                     <small id="activeShopAddress" style="color:#64748b; font-size:12px;"></small>
                 </div>
-                <span id="activeShopPincode" style="background:#ffedd5; color:#ea580c; font-weight:800; padding:5px 12px; border-radius:12px; font-size:12px;"></span>
+                <span id="activeShopPincode" style="background:#ffedd5; color:#ea580c; font-weight:bold; padding:4px 10px; border-radius:10px; font-size:12px;"></span>
             </div>
             <div class="product-grid" id="dishesGrid"></div>
         </div>
@@ -385,9 +256,9 @@
         </div>
         <div class="cart-items" id="cart-items"></div>
         <div class="cart-footer">
-            <div style="font-size:13px; margin-bottom:4px; display:flex; justify-content:space-between;"><span>Food Subtotal:</span> <span>₹<span id="cart-subtotal">0</span></span></div>
-            <div style="font-size:13px; margin-bottom:4px; color:#c2410c; font-weight:bold; display:flex; justify-content:space-between;"><span>Delivery Fee:</span> <span>₹<span id="delivery-charge">0</span></span></div>
-            <h4 style="margin:8px 0; color:#4b0020; display:flex; justify-content:space-between; border-top:1px solid #fed7aa; padding-top:6px;"><span>Total Payable:</span> <span>₹<span id="cart-total">0</span></span></h4>
+            <div style="font-size:13px; margin-bottom:4px;">Food Subtotal: ₹<span id="cart-subtotal">0</span></div>
+            <div style="font-size:13px; margin-bottom:4px; color:#c2410c; font-weight:bold;">Delivery Fee: ₹<span id="delivery-charge">0</span></div>
+            <h4 style="margin:6px 0; color:#ea580c;">Total Payable: ₹<span id="cart-total">0</span></h4>
             <button class="btn-order-confirm" onclick="openCheckoutModal()">PROCEED TO CHECKOUT</button>
         </div>
     </div>
@@ -396,15 +267,15 @@
     <div class="modal-overlay" id="checkout-modal-overlay">
         <div class="modal-box">
             <button class="close-btn" onclick="closeCheckoutModal()">&times;</button>
-            <h2 style="font-size:18px; color:#4b0020; margin-bottom:14px;">🛵 Confirm Kitchen Order</h2>
+            <h2 style="font-size:18px; color:#ea580c; margin-bottom:14px;">🛵 Confirm Kitchen Order</h2>
             <form id="foodCheckoutForm">
                 <div class="form-row">
                     <label>Customer Name</label>
                     <input type="text" id="custName" placeholder="Full Name" required>
                 </div>
                 <div class="form-row">
-                    <label>Registered Phone Number</label>
-                    <input type="tel" id="custPhone" placeholder="10-digit Phone" maxlength="10" readonly style="background:#f1f5f9; font-weight:bold;" required>
+                    <label>Phone Number</label>
+                    <input type="tel" id="custPhone" placeholder="10-digit Phone" maxlength="10" required>
                 </div>
                 <div class="form-row">
                     <label>Delivery Address</label>
@@ -426,111 +297,60 @@
         </div>
     </div>
 
-    <!-- MANDATORY LOGIN GATE (CHECKS index.html LOGIN SESSION) -->
-    <div class="ff-login-gate" id="foodLoginGate">
-        <div class="ff-login-card">
-            <div class="lock">🔐</div>
-            <h2>Login Required to Order</h2>
-            <p>Aap abhi logged in nahi hain. Fast Food aur Restaurants se order karne ke liye pehle <b>index.html</b> se apne Mobile Number & OTP se login karein.</p>
-            <a id="foodLoginLink" href="index.html?openLogin=1&returnTo=fastfood.html">Login / Register on Home</a>
-            <button onclick="window.location.href='index.html'">← Back to Market Home</button>
-        </div>
-    </div>
+    <div class="ff-login-gate" id="foodLoginGate"><div class="ff-login-card"><div class="lock">🔐</div><h2>Login to order on KSINDO</h2><p>Restaurant aur Fast Food se order karne ke liye pehle KSINDO account mein login karein. Login ke baad isi page par wapas aa jayenge.</p><a id="foodLoginLink" href="index.html?openLogin=1&returnTo=fastfood.html">Login / Create Account</a><button onclick="window.location.href='index.html'">Back to Home</button></div></div>
+    <button class="ff-bottom-search" onclick="document.getElementById('foodSearchInput').focus()">⌕ Search</button>
 
     <script>
-        // Initialize Firebase using external firebase-config.js
-        if (!window.KSINDO_FIREBASE_CONFIG) {
-            alert("Error: firebase-config.js load nahi hui!");
-        } else if (!firebase.apps.length) {
-            firebase.initializeApp(window.KSINDO_FIREBASE_CONFIG);
+        var firebaseConfig = {
+            apiKey: "AIzaSyA7f9PWSyws4XkzKq077sNdlF0J33DSVSo",
+            authDomain: "jaynagar-srote.firebaseapp.com",
+            projectId: "jaynagar-srote",
+            storageBucket: "jaynagar-srote.firebasestorage.app",
+            messagingSenderId: "820632565818",
+            appId: "1:820632565818:web:0b2f4676cecd799a801d03"
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-
         var db = firebase.firestore();
         var auth = firebase.auth();
 
         var currentUser = null;
-        // Sync with index.html login session (ksindo_user_profile)
-        var currentUserProfile = JSON.parse(localStorage.getItem('ksindo_user_profile') || localStorage.getItem('user_profile') || 'null');
-        var savedLocObj = JSON.parse(localStorage.getItem('ksindo_delivery_location') || 'null');
-        var userLocationPin = localStorage.getItem('ksindo_user_pin') || (savedLocObj && savedLocObj.pincode) || (currentUserProfile && currentUserProfile.pincode) || '';
+        var currentUserProfile = JSON.parse(localStorage.getItem('user_profile') || '{}');
+        var userLocationPin = localStorage.getItem('ksindo_user_pin') || '';
 
         var allShops = [];
         var allFoodDishes = [];
         var activeShopId = null;
-        var highlightedDishId = null;
+
         var foodAuthReady = false;
-
-        // ==================== STRICT LOGIN CHECK (SYNCED WITH index.html) ====================
-        function isFoodUserLoggedIn() {
-            var storedProfile = JSON.parse(localStorage.getItem('ksindo_user_profile') || localStorage.getItem('user_profile') || 'null');
-            if (storedProfile && storedProfile.phone) {
-                currentUserProfile = storedProfile;
-                return true;
-            }
-            if (currentUser && (currentUser.uid || currentUser.phoneNumber)) {
-                return true;
-            }
-            return false;
+        var foodLoginRequired = false;
+        function isFoodUserLoggedIn(){
+            var stored = JSON.parse(localStorage.getItem('ksindo_user_profile') || localStorage.getItem('user_profile') || 'null');
+            if (stored && stored.phone) { currentUserProfile = stored; return true; }
+            return !!(currentUser && (currentUser.uid || currentUser.phoneNumber)) || !!(currentUserProfile && (currentUserProfile.phone || currentUserProfile.userEmail || currentUserProfile.email));
         }
-
-        function updateHeaderAccountChip() {
-            var chip = document.getElementById('headerAccountChip');
-            if (!chip) return;
-            if (isFoodUserLoggedIn()) {
-                var name = (currentUserProfile && currentUserProfile.fullName) ? currentUserProfile.fullName.split(' ')[0] : 'Account';
-                chip.innerText = "👤 " + name;
-            } else {
-                chip.innerText = "🔐 Login";
-            }
+        function refreshFoodLoginGate(){
+            var gate=document.getElementById('foodLoginGate');
+            foodLoginRequired=foodAuthReady && !isFoodUserLoggedIn();
+            gate.style.display=foodLoginRequired?'flex':'none';
+            document.getElementById('foodMainContent').style.display=foodLoginRequired?'none':(userLocationPin && userLocationPin.length===6?'block':'none');
         }
-
-        function refreshFoodLoginGate() {
-            var gate = document.getElementById('foodLoginGate');
-            var loggedIn = isFoodUserLoggedIn();
-            updateHeaderAccountChip();
-
-            if (!loggedIn && foodAuthReady) {
-                gate.style.display = 'flex';
-                document.getElementById('foodMainContent').style.display = 'none';
-                document.getElementById('locationGatewayModal').style.display = 'none';
-                return false;
-            } else if (loggedIn) {
-                gate.style.display = 'none';
-                return true;
-            }
-            return false;
-        }
-
         auth.onAuthStateChanged(function(user) {
             currentUser = user;
-            if (user && user.phoneNumber) {
-                var cleanPhone = user.phoneNumber.replace('+91', '').trim();
-                db.collection("users").doc(cleanPhone).get().then(function(doc) {
-                    if (doc.exists) {
-                        currentUserProfile = doc.data();
-                        localStorage.setItem('ksindo_user_profile', JSON.stringify(currentUserProfile));
-                    }
-                }).finally(function() {
-                    foodAuthReady = true;
-                    if (refreshFoodLoginGate()) checkLocationStatus();
-                });
+            if (user) {
+                db.collection("users").doc(user.uid).get().then(function(doc) {
+                    if (doc.exists) { currentUserProfile = doc.data(); localStorage.setItem('user_profile', JSON.stringify(currentUserProfile)); }
+                }).finally(function(){ foodAuthReady=true; refreshFoodLoginGate(); checkLocationStatus(); });
             } else {
-                foodAuthReady = true;
-                if (refreshFoodLoginGate()) checkLocationStatus();
-            }
-        });
-
-        // Listen for login changes in another tab (index.html)
-        window.addEventListener('storage', function(e) {
-            if (e.key === 'ksindo_user_profile' || e.key === 'user_profile') {
-                currentUserProfile = JSON.parse(e.newValue || 'null');
+                currentUserProfile = JSON.parse(localStorage.getItem('ksindo_user_profile') || localStorage.getItem('user_profile') || 'null');
+                foodAuthReady=true;
                 if (refreshFoodLoginGate()) checkLocationStatus();
             }
         });
 
         function checkLocationStatus() {
-            if (!refreshFoodLoginGate()) return;
-
+            if (!foodAuthReady || !isFoodUserLoggedIn()) { refreshFoodLoginGate(); return; }
             if (userLocationPin && userLocationPin.length === 6) {
                 document.getElementById('locationGatewayModal').style.display = 'none';
                 document.getElementById('foodMainContent').style.display = 'block';
@@ -560,13 +380,13 @@
             }
             var btn = document.querySelector('.btn-gps');
             btn.innerText = "Locating...";
-            navigator.geolocation.getCurrentPosition(function() {
-                var detectedPin = (currentUserProfile && currentUserProfile.pincode) || "847226";
+            navigator.geolocation.getCurrentPosition(function(pos) {
+                var detectedPin = currentUserProfile.pincode || "847226";
                 userLocationPin = detectedPin;
                 localStorage.setItem('ksindo_user_pin', detectedPin);
                 alert("Location detect ho gayi! (PIN: " + detectedPin + ")");
                 checkLocationStatus();
-            }, function() {
+            }, function(err) {
                 alert("GPS permission deny ho gaya. Kripya neeche apna 6-digit Pincode dalein.");
                 btn.innerHTML = '<span>🎯</span> Use Current GPS Location';
             });
@@ -576,204 +396,62 @@
             document.getElementById('locationGatewayModal').style.display = 'flex';
         };
 
-        // ==================== LOAD RESTAURANTS & ALL DISHES ====================
         function loadFoodData() {
             db.collection("shops").onSnapshot(function(snap) {
                 allShops = [];
                 snap.forEach(function(d) {
                     var s = { id: d.id, ...d.data() };
-                    var isRestaurant = !s.shopType || s.shopType === 'restaurant' || (s.shopCategory || '').toLowerCase().includes('restaurant');
-                    if (isRestaurant && (s.pincode === userLocationPin || !s.pincode || (s.address || '').includes(userLocationPin))) {
+                    if (s.pincode === userLocationPin || !s.pincode || (s.address || '').includes(userLocationPin)) {
                         allShops.push(s);
                     }
                 });
-                handleSmartFoodSearch();
+                renderShopsList();
             });
 
             db.collection("products").onSnapshot(function(snap) {
                 allFoodDishes = [];
                 snap.forEach(function(d) {
                     var p = { id: d.id, ...d.data() };
-                    var isFood = (p.category || '').toLowerCase() === 'food' || (Array.isArray(p.categories) && p.categories.includes('food'));
-                    var pinOk = !Array.isArray(p.availablePincodes) || p.availablePincodes.length === 0 || p.availablePincodes.map(String).includes(String(userLocationPin));
-                    if (isFood && pinOk && p.inStock !== false) {
-                        allFoodDishes.push(p);
-                    }
+                    var isFood = (p.category || '').toLowerCase() === 'food' || (p.categories && p.categories.includes('food'));
+                    if (isFood) allFoodDishes.push(p);
                 });
-                handleSmartFoodSearch();
                 if (activeShopId) renderActiveMenu();
             });
         }
 
-        // ==================== SMART DISH + RESTAURANT SEARCH ENGINE ====================
-        var FOOD_SYNONYMS = [
-            ['momo', 'momos', 'dumpling', 'dimsum', 'kurkure momo', 'fried momo', 'steam momo'],
-            ['burger', 'burgers', 'aaloo tikki', 'aloo tikki', 'zinger'],
-            ['pizza', 'pizzas', 'margherita', 'paneer pizza', 'cheese burst'],
-            ['biryani', 'biriyani', 'pulao', 'veg biryani', 'chicken biryani'],
-            ['chowmein', 'noodles', 'hakka noodles', 'chowmin', 'chomin'],
-            ['roll', 'rolls', 'kathi roll', 'egg roll', 'paneer roll', 'veg roll'],
-            ['paneer', 'chilli paneer', 'kadhai paneer', 'shahi paneer', 'matar paneer'],
-            ['samosa', 'kachori', 'chaat', 'tikki', 'golgappa', 'panipuri'],
-            ['cake', 'pastry', 'brownie', 'dessert', 'sweet', 'mithai']
-        ];
-
-        function isSmartFoodMatch(query, targetText) {
-            if (!query || !targetText) return false;
-            var q = query.toLowerCase().trim();
-            var t = targetText.toLowerCase();
-            if (t.includes(q)) return true;
-
-            // Check singular/plural & food synonyms (e.g. "momos" <-> "momo")
-            var tokens = q.split(/\s+/).filter(Boolean);
-            return tokens.every(function(tok) {
-                if (t.includes(tok)) return true;
-                var singular = tok.endsWith('s') && tok.length > 3 ? tok.slice(0, -1) : tok;
-                if (t.includes(singular)) return true;
-
-                for (var g = 0; g < FOOD_SYNONYMS.length; g++) {
-                    var grp = FOOD_SYNONYMS[g];
-                    if (grp.some(function(w) { return w.includes(tok) || tok.includes(w); })) {
-                        if (grp.some(function(w) { return t.includes(w); })) return true;
-                    }
-                }
-                return false;
-            });
-        }
-
-        window.quickSearchDish = function(term) {
-            var inp = document.getElementById('foodSearchInput');
-            if (inp) {
-                inp.value = term;
-                handleSmartFoodSearch();
-            }
-        };
-
-        window.clearFoodSearch = function() {
-            var inp = document.getElementById('foodSearchInput');
-            if (inp) inp.value = '';
-            handleSmartFoodSearch();
-        };
-
-        window.handleSmartFoodSearch = function() {
-            var searchTerm = (document.getElementById('foodSearchInput')?.value || '').trim();
-            var clearBtn = document.getElementById('clearFoodSearchBtn');
-            var dishSection = document.getElementById('dishSearchResultsSection');
-            var banners = document.getElementById('foodDiscoveryBanners');
-            var restHeading = document.getElementById('restaurantListHeading');
-
-            if (clearBtn) clearBtn.style.display = searchTerm ? 'inline-block' : 'none';
-
-            if (!searchTerm) {
-                // Default Discovery View
-                if (dishSection) dishSection.style.display = 'none';
-                if (banners) banners.style.display = 'block';
-                if (restHeading) restHeading.innerText = 'Restaurants to explore';
-                renderShopsList(allShops);
-                return;
-            }
-
-            // Active Search View: Hide promo banners & show matching dishes across ALL restaurants first
-            if (banners) banners.style.display = 'none';
-            if (dishSection) dishSection.style.display = 'block';
-            if (restHeading) restHeading.innerText = 'Matching Restaurants';
-
-            // 1. Find all matching dishes across all local restaurants
-            var matchingDishes = allFoodDishes.filter(function(d) {
-                var hay = (d.name || '') + ' ' + (d.subCategory || '') + ' ' + (d.description || '') + ' ' + (d.assignedShopName || d.shopName || '');
-                return isSmartFoodMatch(searchTerm, hay);
-            });
-
-            renderSearchedDishes(matchingDishes, searchTerm);
-
-            // 2. Find restaurants whose name/address matches OR that serve the searched dish (e.g. Momos)
-            var shopIdsServingDish = new Set(matchingDishes.map(function(d) { return d.assignedShopId; }).filter(Boolean));
-            var shopNamesServingDish = new Set(matchingDishes.map(function(d) { return (d.assignedShopName || d.shopName || '').toLowerCase(); }).filter(Boolean));
-
-            var matchingShops = allShops.filter(function(shop) {
-                var directShopMatch = isSmartFoodMatch(searchTerm, (shop.shopName || '') + ' ' + (shop.address || ''));
-                var servesSearchedDish = shopIdsServingDish.has(shop.id) || shopNamesServingDish.has((shop.shopName || '').toLowerCase());
-                return directShopMatch || servesSearchedDish;
-            });
-
-            renderShopsList(matchingShops);
-        };
-
-        // Render Cross-Restaurant Dishes (Clicking a dish opens that Restaurant's Menu & highlights the dish!)
-        function renderSearchedDishes(dishes, searchTerm) {
-            var grid = document.getElementById('searchedDishesGrid');
-            var badge = document.getElementById('dishMatchCountBadge');
-            var heading = document.getElementById('dishSearchHeading');
-
-            heading.innerText = '🍽️ "' + searchTerm + '" across Restaurants';
-            badge.innerText = dishes.length + (dishes.length === 1 ? ' Dish' : ' Dishes');
-
-            if (dishes.length === 0) {
-                grid.innerHTML = '<div style="grid-column:1/-1; background:white; padding:20px; border-radius:14px; text-align:center; color:#64748b; font-size:13px;">"' + searchTerm + '" ke liye koi dish nahi mili. Neeche restaurants check karein.</div>';
-                return;
-            }
-
-            grid.innerHTML = dishes.map(function(d) {
-                var img = (d.images && d.images.length > 0) ? d.images[0] : (d.imageUrl || 'https://via.placeholder.com/200');
-                var shopObj = allShops.find(function(s) {
-                    return s.id === d.assignedShopId || (s.shopName && s.shopName.toLowerCase() === (d.assignedShopName || d.shopName || '').toLowerCase());
-                });
-                var targetShopId = shopObj ? shopObj.id : (d.assignedShopId || '');
-                var shopTitle = shopObj ? shopObj.shopName : (d.assignedShopName || d.shopName || 'Local Kitchen');
-
-                return '<div class="dish-card" style="cursor:pointer;" onclick="jumpToRestaurantFromDish(\'' + targetShopId + '\', \'' + d.id + '\')">' +
-                    '<div class="dish-img-box"><img src="' + img + '" loading="lazy" alt="' + d.name + '"></div>' +
-                    '<div>' +
-                        '<div class="dish-shop-tag">🏪 ' + shopTitle + '</div>' +
-                        '<div class="dish-title">' + d.name + '</div>' +
-                        '<div class="dish-price">₹' + d.price + '</div>' +
-                    '</div>' +
-                    '<button type="button" class="btn-visit-shop">Open Restaurant & Order →</button>' +
-                '</div>';
-            }).join('');
-        }
-
-        // Jump straight to the clicked dish's Restaurant Menu so user can order from there
-        window.jumpToRestaurantFromDish = function(shopId, dishId) {
-            if (!shopId) {
-                alert("Is dish ka restaurant profile abhi available nahi hai.");
-                return;
-            }
-            highlightedDishId = dishId;
-            openShopMenu(shopId);
-        };
-
-        function renderShopsList(shopsList) {
+        window.filterFoodRestaurants = function(){ renderShopsList(); };
+        function renderShopsList() {
             var container = document.getElementById('restaurantsContainer');
             var badge = document.getElementById('filteredCountBadge');
-            var listToRender = shopsList || allShops;
-            badge.innerText = listToRender.length + " Restaurants";
+            var searchTerm=(document.getElementById('foodSearchInput')?.value || '').trim().toLowerCase();
+            var visibleShops=allShops.filter(function(x){return !searchTerm || ((x.shopName||'')+' '+(x.address||'')).toLowerCase().includes(searchTerm);});
+            badge.innerText = visibleShops.length + " Restaurants";
 
-            if (listToRender.length === 0) {
-                container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:35px; background:white; border-radius:16px; border:1px solid #e2e8f0;">' +
-                    '<h3 style="color:#4b0020;">Is Location / Search Par Koi Restaurant Nahi Mila</h3>' +
-                    '<p style="color:#64748b; font-size:13px; margin-top:6px;">Pincode ' + userLocationPin + ' par active kitchens check karein ya search clear karein.</p>' +
-                    '<button onclick="reopenLocationGateway()" style="margin-top:14px; background:#4b0020; color:white; border:none; padding:9px 18px; border-radius:20px; font-weight:bold; cursor:pointer;">Change Pincode</button>' +
+            if (visibleShops.length === 0) {
+                container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; background:white; border-radius:16px;">' +
+                    '<h3 style="color:#c2410c;">Is Location Par Abhi Restaurants Live Nahi Hain</h3>' +
+                    '<p style="color:#64748b; font-size:13px; margin-top:6px;">Pincode ' + userLocationPin + ' par deliver karne wale restaurants jald shamil honge.</p>' +
+                    '<button onclick="reopenLocationGateway()" style="margin-top:14px; background:#ea580c; color:white; border:none; padding:8px 16px; border-radius:20px; font-weight:bold; cursor:pointer;">Change Pincode</button>' +
                 '</div>';
                 return;
             }
 
             var html = '';
-            listToRender.forEach(function(shop) {
+            visibleShops.forEach(function(shop) {
                 var dishCount = allFoodDishes.filter(function(d) {
-                    return (d.assignedShopId === shop.id || (d.shopName && d.shopName.toLowerCase() === (shop.shopName || '').toLowerCase()));
+                    return (d.assignedShopId === shop.id || d.shopName === shop.shopName);
                 }).length;
 
-                var banner = shop.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600';
+                var banner = shop.imageUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500';
 
-                html += '<div class="restaurant-card" onclick="highlightedDishId=null; openShopMenu(\'' + shop.id + '\')">' +
-                    '<div class="restaurant-img-wrap"><img src="' + banner + '" class="restaurant-img" loading="lazy" alt="' + shop.shopName + '"></div>' +
+                html += '<div class="restaurant-card" onclick="openShopMenu(\'' + shop.id + '\')">' +
+                    '<img src="' + banner + '" class="restaurant-img">' +
                     '<div class="restaurant-info">' +
                         '<div class="restaurant-title">' + shop.shopName + '</div>' +
                         '<div class="restaurant-sub">📍 ' + (shop.address || 'Local Market') + ' (PIN: ' + (shop.pincode || userLocationPin) + ')</div>' +
                         '<div style="display:flex; justify-content:space-between; align-items:center;">' +
                             '<span class="restaurant-badge">' + dishCount + ' Dishes Available</span>' +
-                            '<strong style="color:#07884c; font-size:12px;">View Menu →</strong>' +
+                            '<strong style="color:#ea580c; font-size:12px;">Order Now →</strong>' +
                         '</div>' +
                     '</div>' +
                 '</div>';
@@ -782,16 +460,13 @@
         }
 
         window.openShopMenu = function(shopId, fromHistory) {
-            if (!fromHistory) {
-                history.pushState({ foodView: 'menu', shopId: shopId }, '', '#restaurant-' + encodeURIComponent(shopId));
-            }
+            if (!fromHistory) { history.pushState({foodView:'menu',shopId:shopId}, '', '#restaurant-'+encodeURIComponent(shopId)); }
             activeShopId = shopId;
-            var shop = allShops.find(function(s) { return s.id === shopId; });
+            var shop = allShops.find(function(s){ return s.id === shopId; });
             if (!shop) return;
 
             document.getElementById('restaurantListView').style.display = 'none';
             document.getElementById('restaurantMenuView').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
 
             document.getElementById('activeShopName').innerText = shop.shopName;
             document.getElementById('activeShopAddress').innerText = "📍 " + (shop.address || '');
@@ -802,31 +477,23 @@
 
         window.backToShopsList = function(fromPop) {
             activeShopId = null;
-            highlightedDishId = null;
             document.getElementById('restaurantListView').style.display = 'block';
             document.getElementById('restaurantMenuView').style.display = 'none';
-            if (!fromPop && history.state && history.state.foodView === 'menu') history.back();
+            if (!fromPop && history.state && history.state.foodView==='menu') history.back();
         };
-
-        window.addEventListener('popstate', function() {
-            if (activeShopId) { backToShopsList(true); }
+        window.addEventListener('popstate',function(e){
+            if (activeShopId) { backToShopsList(true); return; }
+            if (location.hash.indexOf('#restaurant-')===0) { history.replaceState({foodView:'list'},'',location.pathname+location.search); }
         });
 
         function renderActiveMenu() {
             var grid = document.getElementById('dishesGrid');
-            var shop = allShops.find(function(s) { return s.id === activeShopId; });
+            var shop = allShops.find(function(s){ return s.id === activeShopId; });
             if (!shop) return;
 
             var dishes = allFoodDishes.filter(function(d) {
-                return (d.assignedShopId === shop.id || (d.shopName && d.shopName.toLowerCase() === (shop.shopName || '').toLowerCase()));
+                return (d.assignedShopId === shop.id || d.shopName === shop.shopName);
             });
-
-            // Put the clicked searched dish (e.g. Momos) first so user sees it immediately
-            if (highlightedDishId) {
-                dishes.sort(function(a, b) {
-                    return (b.id === highlightedDishId ? 1 : 0) - (a.id === highlightedDishId ? 1 : 0);
-                });
-            }
 
             if (dishes.length === 0) {
                 grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:30px; background:white; border-radius:12px;">Is restaurant ke dishes jald live honge.</p>';
@@ -835,15 +502,11 @@
 
             var html = '';
             dishes.forEach(function(d) {
-                var img = (d.images && d.images.length > 0) ? d.images[0] : (d.imageUrl || 'https://via.placeholder.com/200');
-                var isHighlighted = (d.id === highlightedDishId);
-                html += '<div class="dish-card ' + (isHighlighted ? 'highlighted-dish' : '') + '">' +
-                    '<div>' +
-                        '<div class="dish-img-box"><img src="' + img + '" loading="lazy" alt="' + d.name + '"></div>' +
-                        (isHighlighted ? '<div class="dish-shop-tag" style="background:#ea580c; color:white;">⭐ Selected Item</div>' : '') +
-                        '<div class="dish-title">' + d.name + '</div>' +
-                        '<div class="dish-price">₹' + d.price + '</div>' +
-                    '</div>' +
+                var img = (d.images && d.images.length > 0) ? d.images[0] : (d.imageUrl || 'https://via.placeholder.com/150');
+                html += '<div class="dish-card">' +
+                    '<img src="' + img + '">' +
+                    '<div class="dish-title">' + d.name + '</div>' +
+                    '<div class="dish-price">₹' + d.price + '</div>' +
                     '<div class="card-actions">' +
                         '<button class="btn-dish-add" onclick="addDishToCart(\'' + d.id + '\')">🛒 Add</button>' +
                         '<button class="btn-dish-order" onclick="directOrderDish(\'' + d.id + '\')">⚡ Order</button>' +
@@ -853,7 +516,7 @@
             grid.innerHTML = html;
         }
 
-        // ==================== ISOLATED FOOD CART ====================
+        // ISOLATED FOOD CART (STORED IN food_cart TO PREVENT INDEX CART CONFLICT)
         function getFoodCart() {
             try {
                 var c = JSON.parse(localStorage.getItem('food_cart')) || [];
@@ -874,24 +537,24 @@
             updateCartUI();
         };
 
+        // CONDITION: ONLY ONE RESTAURANT ALLOWED AT A TIME
         window.addDishToCart = function(dishId) {
-            if (!isFoodUserLoggedIn()) {
-                refreshFoodLoginGate();
-                return;
-            }
-            var dish = allFoodDishes.find(function(x) { return x.id === dishId; });
-            var shop = allShops.find(function(s) { return s.id === activeShopId; });
+            if (!isFoodUserLoggedIn()) { document.getElementById('foodLoginGate').style.display='flex'; return alert('Order karne se pehle login karein.'); }
+            var dish = allFoodDishes.find(function(x){ return x.id === dishId; });
+            var shop = allShops.find(function(s){ return s.id === activeShopId; });
             if (!dish || !shop) return;
 
             var cart = getFoodCart();
-            var existingOtherShop = cart.find(function(i) { return i.assignedShopId && i.assignedShopId !== shop.id; });
+            
+            // Check if cart already has items from another restaurant
+            var existingOtherShop = cart.find(function(i){ return i.assignedShopId && i.assignedShopId !== shop.id; });
             if (existingOtherShop) {
                 var change = confirm('Aapke cart me pehle se "' + existingOtherShop.assignedShopName + '" ka khana add hai.\n\nNaye restaurant (' + shop.shopName + ') se order karne par purana cart replace ho jayega. Continue karein?');
                 if (!change) return;
-                cart = [];
+                cart = []; // Clear previous restaurant
             }
 
-            var item = cart.find(function(i) { return i.id === dishId; });
+            var item = cart.find(function(i){ return i.id === dishId; });
             if (item) {
                 item.qty = (Number(item.qty) || 1) + 1;
             } else {
@@ -912,10 +575,7 @@
         };
 
         window.directOrderDish = function(dishId) {
-            if (!isFoodUserLoggedIn()) {
-                refreshFoodLoginGate();
-                return;
-            }
+            if (!isFoodUserLoggedIn()) { document.getElementById('foodLoginGate').style.display='flex'; return; }
             addDishToCart(dishId);
             openCheckoutModal();
         };
@@ -923,7 +583,7 @@
         function updateCartUI() {
             var cart = getFoodCart();
             var totalQty = 0, subtotal = 0;
-            cart.forEach(function(i) {
+            cart.forEach(function(i){
                 totalQty += (Number(i.qty) || 1);
                 subtotal += (Number(i.price) * (Number(i.qty) || 1));
             });
@@ -952,7 +612,7 @@
                             '<button class="qty-btn" onclick="modifyQty(' + idx + ', 1)">+</button>' +
                         '</div>' +
                     '</div>' +
-                    '<button onclick="removeFoodItem(' + idx + ')" style="background:none; border:none; color:red; cursor:pointer; font-weight:bold;">✕</button>' +
+                    '<button onclick="removeFoodItem(' + idx + ')" style="background:none; border:none; color:red; cursor:pointer;">✕</button>' +
                 '</div>';
             });
             container.innerHTML = html;
@@ -978,16 +638,13 @@
         };
 
         window.openCheckoutModal = function() {
-            if (!isFoodUserLoggedIn()) {
-                refreshFoodLoginGate();
-                return;
-            }
+            if (!isFoodUserLoggedIn()) { document.getElementById('foodLoginGate').style.display='flex'; return; }
             var cart = getFoodCart();
             if (cart.length === 0) return alert("Cart khali hai!");
 
-            document.getElementById('custName').value = (currentUserProfile && currentUserProfile.fullName) || '';
-            document.getElementById('custPhone').value = (currentUserProfile && currentUserProfile.phone) || '';
-            document.getElementById('custAddress').value = (currentUserProfile && currentUserProfile.address) || '';
+            document.getElementById('custName').value = currentUserProfile.fullName || '';
+            document.getElementById('custPhone').value = currentUserProfile.phone || '';
+            document.getElementById('custAddress').value = currentUserProfile.address || '';
             document.getElementById('custPincode').value = userLocationPin;
 
             toggleCart(false);
@@ -1000,17 +657,14 @@
 
         document.getElementById('foodCheckoutForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            if (!isFoodUserLoggedIn()) {
-                refreshFoodLoginGate();
-                return;
-            }
+            if (!isFoodUserLoggedIn()) { document.getElementById('foodLoginGate').style.display='flex'; return; }
             var cart = getFoodCart();
             var btn = document.getElementById('btnPlaceFoodOrder');
             btn.innerText = "Sending Order...";
             btn.disabled = true;
 
             var name = document.getElementById('custName').value.trim();
-            var phone = (currentUserProfile && currentUserProfile.phone) || document.getElementById('custPhone').value.trim();
+            var phone = document.getElementById('custPhone').value.trim();
             var address = document.getElementById('custAddress').value.trim();
             var subtotal = Number(document.getElementById('cart-subtotal').innerText);
             var deliveryCharge = Number(document.getElementById('delivery-charge').innerText);
@@ -1035,7 +689,7 @@
                 deliveryOtp: deliveryOtp,
                 assignedShopId: shopId,
                 assignedShopName: shopName,
-                userEmail: (currentUser && currentUser.email) || (currentUserProfile && currentUserProfile.userEmail) || (phone + "@ksindo.com"),
+                userEmail: currentUser ? currentUser.email : (currentUserProfile.userEmail || "guest@ksindo.com"),
                 orderDateFormatted: new Date().toLocaleString('en-IN'),
                 orderDate: firebase.firestore.FieldValue.serverTimestamp()
             }).then(function() {
@@ -1051,14 +705,8 @@
             });
         });
 
-        // Initial check on page load
-        window.addEventListener('DOMContentLoaded', function() {
-            foodAuthReady = true;
-            if (refreshFoodLoginGate()) {
-                checkLocationStatus();
-            }
-            updateCartUI();
-        });
+        // Auth state listener calls checkLocationStatus once Firebase session is restored.
+        if (auth.currentUser) { currentUser=auth.currentUser; foodAuthReady=true; refreshFoodLoginGate(); checkLocationStatus(); }
     </script>
 </body>
 </html>
