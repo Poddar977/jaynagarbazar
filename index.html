@@ -1253,6 +1253,23 @@ footer,.ksindo-footer-inner{max-width:100%}
                 }
 
                 var c = q.docs[0].data();
+                var curPin = String(getCustomerPincode() || '').trim();
+                if (Array.isArray(c.targetPincodes) && c.targetPincodes.length > 0 && curPin && !c.targetPincodes.includes(curPin)) {
+                    msg.innerText = "⚠️ Yeh coupon sirf pincode " + c.targetPincodes.join(', ') + " par valid hai!";
+                    msg.style.color = "#dc2626";
+                    return;
+                }
+                if (c.targetShopId && c.targetShopId !== 'ALL') {
+                    var matchesTargetShop = cart.some(function(item) {
+                        var p = allProducts.find(function(x){ return x.id === item.id; }) || item;
+                        return p.assignedShopId === c.targetShopId || p.shopId === c.targetShopId;
+                    });
+                    if (!matchesTargetShop) {
+                        msg.innerText = "⚠️ Yeh coupon sirf '" + (c.targetShopName || 'Selected Store') + "' ke products par valid hai!";
+                        msg.style.color = "#dc2626";
+                        return;
+                    }
+                }
                 if (subtotal < Number(c.minOrder || 0)) {
                     msg.innerText = "⚠️ Minimum cart amount ₹" + c.minOrder + " hona chahiye!";
                     msg.style.color = "#dc2626";
@@ -1920,10 +1937,25 @@ footer,.ksindo-footer-inner{max-width:100%}
             var panel = document.getElementById('checkoutOfferPanel'); 
             if(!panel) return;
             try {
-                var snap = await db.collection('checkoutOffers').where('active','==',true).limit(1).get(); 
+                var snap = await db.collection('checkoutOffers').where('active','==',true).get(); 
                 if(snap.empty){ panel.style.display='none'; activeCheckoutOffer=null; return; }
                 
-                var d = snap.docs[0];
+                var curPin = String(getCustomerPincode() || '').trim();
+                var cart = getStoredCart();
+                var matchingDoc = null;
+                snap.forEach(function(docSnap) {
+                    if (matchingDoc) return;
+                    var oData = docSnap.data();
+                    var pinMatch = !Array.isArray(oData.targetPincodes) || oData.targetPincodes.length === 0 || !curPin || oData.targetPincodes.includes(curPin);
+                    var shopMatch = !oData.targetShopId || oData.targetShopId === 'ALL' || cart.some(function(item) {
+                        var p = allProducts.find(function(x){ return x.id === item.id; }) || item;
+                        return p.assignedShopId === oData.targetShopId || p.shopId === oData.targetShopId;
+                    });
+                    if (pinMatch && shopMatch) matchingDoc = docSnap;
+                });
+
+                if (!matchingDoc) { panel.style.display='none'; activeCheckoutOffer=null; return; }
+                var d = matchingDoc;
                 activeCheckoutOffer = { id: d.id, ...d.data() };
                 var cart = getStoredCart();
                 var subtotal = cart.reduce((a,i)=>a+(Number(i.price)||0)*(Number(i.qty)||1),0);
@@ -2616,6 +2648,8 @@ footer,.ksindo-footer-inner{max-width:100%}
                     stock: data.stock,
                     availablePincodes: data.availablePincodes || data.pincodes || [],
                     buyLimit: data.buyLimit || null,
+                    assignedShopId: data.assignedShopId || data.shopId || '',
+                    assignedShopName: data.assignedShopName || data.shopName || '',
                     sizes: data.sizes || []
                 });
             });
