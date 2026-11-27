@@ -1372,6 +1372,15 @@ footer,.ksindo-footer-inner{max-width:100%}
         window.changeCartQty = function(index, delta) {
             var cart = getStoredCart();
             if (!cart[index]) return;
+            if (delta > 0) {
+                var pObj = allProducts.find(function(x){ return x.id === cart[index].id; }) || cart[index];
+                var totalSame = cart.filter(function(i){ return i.id === cart[index].id; }).reduce(function(s, i){ return s + (Number(i.qty) || 1); }, 0);
+                var limitCheck = canAddMoreOfProduct(pObj, totalSame);
+                if (!limitCheck.allowed) {
+                    alert(limitCheck.reason);
+                    return;
+                }
+            }
             cart[index].qty = (Number(cart[index].qty) || 1) + delta;
             if (cart[index].qty <= 0) cart.splice(index, 1);
             saveStoredCart(cart);
@@ -1392,6 +1401,82 @@ footer,.ksindo-footer-inner{max-width:100%}
             window.__ksCartToastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2100);
         };
 
+
+        // ==================== PRODUCT BUY USER LIMIT CHECKER ====================
+        function isWithinBuyTimeWindow(startStr, endStr) {
+            if (!startStr || !endStr) return true;
+            var now = new Date();
+            var curMins = now.getHours() * 60 + now.getMinutes();
+            var s = startStr.split(':').map(Number);
+            var e = endStr.split(':').map(Number);
+            return curMins >= (s[0] * 60 + s[1]) && curMins <= (e[0] * 60 + e[1]);
+        }
+
+        function canAddMoreOfProduct(productObj, currentQtyInCart) {
+            var lim = productObj && productObj.buyLimit;
+            if (!lim || !lim.enabled) return { allowed: true };
+            if (lim.startTime && lim.endTime && !isWithinBuyTimeWindow(lim.startTime, lim.endTime)) {
+                return { allowed: false, reason: '⏰ "' + productObj.name + '" sirf ' + lim.startTime + ' se ' + lim.endTime + ' ke beech hi buy kiya ja sakta hai!' };
+            }
+            if (lim.maxQtyPerUser && (currentQtyInCart + 1) > Number(lim.maxQtyPerUser)) {
+                return { allowed: false, reason: '🚫 Limit Alert: Ek user "' + productObj.name + '" ki maximum ' + lim.maxQtyPerUser + ' quantity hi buy kar sakta hai!' };
+            }
+            return { allowed: true };
+        }
+
+        async function verifyUserCooldownLimits(cartItems, userPhone) {
+            var limitedItems = cartItems.filter(function(item) {
+                var p = allProducts.find(function(x) { return x.id === item.id; }) || item;
+                return p.buyLimit && p.buyLimit.enabled;
+            });
+            if (limitedItems.length === 0) return { ok: true };
+
+            for (var i = 0; i < limitedItems.length; i++) {
+                var p = allProducts.find(function(x) { return x.id === limitedItems[i].id; }) || limitedItems[i];
+                var lim = p.buyLimit;
+                if (lim.startTime && lim.endTime && !isWithinBuyTimeWindow(lim.startTime, lim.endTime)) {
+                    return { ok: false, message: '⏰ "' + p.name + '" abhi buy time (' + lim.startTime + ' - ' + lim.endTime + ') ke bahar hai.' };
+                }
+                if (lim.maxQtyPerUser && Number(limitedItems[i].qty) > Number(lim.maxQtyPerUser)) {
+                    return { ok: false, message: '🚫 "' + p.name + '" ki maximum limit ' + lim.maxQtyPerUser + ' qty hai. Cart me quantity kam karein.' };
+                }
+            }
+
+            var cooldownItems = limitedItems.filter(function(item) {
+                var p = allProducts.find(function(x) { return x.id === item.id; }) || item;
+                return Number(p.buyLimit.nextBuyDays || 0) > 0;
+            });
+            if (cooldownItems.length > 0 && userPhone) {
+                var pastSnap = await db.collection("orders").where("customerPhone", "==", String(userPhone)).get();
+                var nowMs = Date.now();
+                for (var j = 0; j < cooldownItems.length; j++) {
+                    var prod = allProducts.find(function(x) { return x.id === cooldownItems[j].id; }) || cooldownItems[j];
+                    var days = Number(prod.buyLimit.nextBuyDays);
+                    var cooldownMs = days * 24 * 60 * 60 * 1000;
+                    var blockedUntil = null;
+                    pastSnap.forEach(function(doc) {
+                        var ord = doc.data();
+                        if ((ord.status || '').toLowerCase() === 'cancelled') return;
+                        if ((ord.items || []).some(function(oi) { return oi.id === prod.id; })) {
+                            var ordTime = ord.orderDate && typeof ord.orderDate.toDate === 'function'
+                                ? ord.orderDate.toDate().getTime()
+                                : new Date(ord.orderDateFormatted || 0).getTime();
+                            if (ordTime && (nowMs - ordTime) < cooldownMs) {
+                                blockedUntil = new Date(ordTime + cooldownMs);
+                            }
+                        }
+                    });
+                    if (blockedUntil) {
+                        return {
+                            ok: false,
+                            message: '⏳ "' + prod.name + '" par ' + days + ' din ki buy limit lagi hai.\nAap ise ' + blockedUntil.toLocaleDateString('en-IN') + ' ke baad dubara buy kar payenge!'
+                        };
+                    }
+                }
+            }
+            return { ok: true };
+        }
+
         window.addToCart = function(prodId) {
             var p = allProducts.find(function(x){ return x.id === prodId; });
             if (!p) return;
@@ -1403,6 +1488,13 @@ footer,.ksindo-footer-inner{max-width:100%}
             trackCategoryInterestAI(p.category || (p.categories && p.categories[0]));
 
             var cart = getStoredCart();
+            var totalSame = cart.filter(function(i){ return i.id === prodId; }).reduce(function(s, i){ return s + (Number(i.qty) || 1); }, 0);
+            var limitCheck = canAddMoreOfProduct(p, totalSame);
+            if (!limitCheck.allowed) {
+                alert(limitCheck.reason);
+                return;
+            }
+
             var existing = cart.find(function(i){ return i.id === prodId && !i.selectedSize; });
             if (existing) {
                 existing.qty = (Number(existing.qty) || 1) + 1;
@@ -1413,6 +1505,7 @@ footer,.ksindo-footer-inner{max-width:100%}
                     price: Number(p.price) || 0,
                     imageUrl: p.imageUrl || (p.images ? p.images[0] : ''),
                     category: p.category || 'General',
+                    buyLimit: p.buyLimit || null,
                     qty: 1
                 });
             }
@@ -1923,7 +2016,7 @@ footer,.ksindo-footer-inner{max-width:100%}
         };
 
         // Confirm Order (COD / UPI)
-        document.getElementById('orderForm').addEventListener('submit', function(e) {
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             if (!currentUserProfile || !currentUserProfile.phone) {
@@ -1970,6 +2063,12 @@ footer,.ksindo-footer-inner{max-width:100%}
                 totalAmount = String((Number(totalAmount) || 0) + (Number(unlockedOffer.price) || 0));
             }
 
+            var cooldownCheck = await verifyUserCooldownLimits(cart, phone);
+            if (!cooldownCheck.ok) {
+                alert(cooldownCheck.message);
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = "Confirm Order"; }
+                return;
+            }
             var deliveryOtp = Math.floor(1000 + Math.random() * 9000).toString();
 
             db.collection("orders").add({
@@ -2290,7 +2389,15 @@ footer,.ksindo-footer-inner{max-width:100%}
         function setCustomerSession(userData) {
             currentUserProfile = userData;
             localStorage.setItem('ksindo_user_profile', JSON.stringify(userData));
+            localStorage.setItem('user_profile', JSON.stringify(userData));
+            if (userData && userData.pincode) {
+                localStorage.setItem('ksindo_user_pin', userData.pincode);
+            }
             updateUserUIHeader();
+            var retUrl = new URLSearchParams(window.location.search).get('returnTo');
+            if (retUrl) {
+                window.location.href = retUrl;
+            }
         }
 
         function updateUserUIHeader() {
@@ -2507,7 +2614,9 @@ footer,.ksindo-footer-inner{max-width:100%}
                     inStock: data.inStock,
                     stockStatus: data.stockStatus,
                     stock: data.stock,
-                    availablePincodes: data.availablePincodes || data.pincodes || []
+                    availablePincodes: data.availablePincodes || data.pincodes || [],
+                    buyLimit: data.buyLimit || null,
+                    sizes: data.sizes || []
                 });
             });
 
@@ -2563,6 +2672,13 @@ footer,.ksindo-footer-inner{max-width:100%}
             updateCartUI();
             if (typeof renderFilteredProducts === 'function') {
                 renderFilteredProducts();
+            }
+            if (new URLSearchParams(window.location.search).get('openLogin') === '1' && !currentUserProfile) {
+                window.openAuthModal('login');
+            }
+            if (localStorage.getItem('open_checkout_direct') === 'true') {
+                localStorage.removeItem('open_checkout_direct');
+                window.openCheckoutModal();
             }
         });
     </script>
