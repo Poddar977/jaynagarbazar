@@ -2565,6 +2565,12 @@ footer,.ksindo-footer-inner{max-width:100%}
                 renderFilteredProducts();
             }
         });
+        const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('openLogin') === '1' && !currentUserProfile) {
+    window.openAuthModal('login');
+}
+        const ret = new URLSearchParams(window.location.search).get('returnTo');
+if (ret) window.location.href = ret;
     </script>
 
 <nav class="ks-app-bottom-nav" aria-label="App navigation">
