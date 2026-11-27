@@ -6,17 +6,61 @@
     <title>ksindo - Admin Master Control & Multi-Vendor Hub</title>
     <link rel="preconnect" href="https://firestore.googleapis.com">
     <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
+    <!-- External Firebase Config File (No API Key hardcoded in HTML) -->
     <script src="firebase-config.js"></script>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Roboto, sans-serif; }
         body { background:#0f172a; color:#f8fafc; display:flex; height:100vh; overflow:hidden; }
-        #adminLoginScreen { position: fixed; inset: 0; background: linear-gradient(135deg, #090d16, #0f172a); display: flex; align-items: center; justify-content: center; z-index: 99999; padding: 20px; }
-        .login-card { background: #1e293b; border: 1.5px solid #334155; border-radius: 16px; padding: 35px 30px; width: 100%; max-width: 420px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); text-align: center; }
+
+        #adminLoginScreen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #090d16, #0f172a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            padding: 20px;
+        }
+        .login-card {
+            background: #1e293b;
+            border: 1.5px solid #334155;
+            border-radius: 16px;
+            padding: 35px 30px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            text-align: center;
+        }
         .login-card h2 { font-size: 24px; font-weight: 900; color: #f8fafc; margin-bottom: 6px; }
         .login-card p { font-size: 13px; color: #94a3b8; margin-bottom: 22px; }
-        .login-card input { width: 100%; padding: 13px 15px; border: 1.5px solid #334155; background: #0f172a; color: white; border-radius: 10px; font-size: 14px; margin-bottom: 15px; outline: none; transition: 0.2s; }
+        .login-card input {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1.5px solid #334155;
+            background: #0f172a;
+            color: white;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            outline: none;
+            transition: 0.2s;
+        }
         .login-card input:focus { border-color: #22c55e; }
-        .btn-admin-login { width: 100%; background: linear-gradient(135deg, #22c55e, #15803d); color: white; border: none; padding: 13px; border-radius: 10px; font-size: 15px; font-weight: 800; cursor: pointer; transition: 0.15s; }
+        .btn-admin-login {
+            width: 100%;
+            background: linear-gradient(135deg, #22c55e, #15803d);
+            color: white;
+            border: none;
+            padding: 13px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .btn-admin-login:hover { opacity: 0.95; }
+        
         aside { width:270px; background:#1e293b; color:white; display:flex; flex-direction:column; flex-shrink:0; border-right:1px solid #334155; }
         aside .logo { padding:18px 20px; font-size:17px; font-weight:bold; background:#0f172a; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; }
         aside .logo span { color:#38bdf8; font-weight:900; }
@@ -26,23 +70,29 @@
         aside nav a.active { background:#16a34a; color:white; border-left-color:#38bdf8; }
         .nav-count { background:#ef4444; color:white; padding:2px 7px; border-radius:12px; font-size:10px; font-weight:bold; }
         .nav-section-title { font-size:10px; text-transform:uppercase; color:#64748b; font-weight:800; padding:10px 18px 4px; letter-spacing:0.5px; }
+
         main { flex:1; display:flex; flex-direction:column; overflow-y:auto; background:#0f172a; }
         header { background:#1e293b; padding:12px 25px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; position:sticky; top:0; z-index:50; }
+        
         .content-body { padding:22px 25px; flex:1; }
         .stats-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:14px; margin-bottom:20px; }
         .stat-card { background:#1e293b; padding:16px 18px; border-radius:12px; border:1px solid #334155; }
         .stat-card h3 { font-size:11px; color:#94a3b8; margin-bottom:4px; text-transform:uppercase; font-weight:700; }
         .stat-card .val { font-size:20px; font-weight:900; color:#f8fafc; }
+
         .tab-section { display:none; }
         .tab-section.active { display:block; }
+        
         .card { background:#1e293b; border-radius:12px; padding:20px; border:1px solid #334155; margin-bottom:18px; box-shadow:0 4px 15px rgba(0,0,0,0.2); }
         .card h2 { font-size:15px; margin-bottom:12px; color:#38bdf8; display:flex; justify-content:space-between; align-items:center; font-weight:800; }
         table { width:100%; border-collapse:collapse; font-size:12.5px; text-align:left; color:#f1f5f9; }
         table th { background:#0f172a; padding:10px 12px; border-bottom:1px solid #334155; color:#94a3b8; font-weight:700; }
         table td { padding:10px 12px; border-bottom:1px solid #334155; vertical-align:middle; }
         table tr:hover { background:#1e293b80; }
+        
         .clickable-customer-row { cursor:pointer; transition:background-color 0.2s; }
         .clickable-customer-row:hover { background-color:#334155 !important; }
+
         .form-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; }
         input, select, textarea { width:100%; padding:9px 12px; border:1px solid #334155; border-radius:8px; font-size:12.5px; outline:none; background:#0f172a; color:#f8fafc; transition:0.2s; }
         input:focus, select:focus, textarea:focus { border-color:#22c55e; }
@@ -51,25 +101,34 @@
         .btn-edit { background:#0284c7; color:white; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:11px; margin-right:4px; }
         .btn-danger { background:#ef4444; color:white; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:11px; }
         .btn-print { background:#0284c7; color:white; border:none; padding:5px 9px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:11px; }
+        .btn-print:hover { background:#0369a1; }
         .btn-secondary { background:#475569; color:white; border:none; padding:7px 12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:12px; }
+
         .status-pill { padding:3px 8px; border-radius:12px; font-size:10px; font-weight:bold; text-transform:uppercase; background:#334155; color:#f8fafc; }
+
         .cat-checkbox-group { display:flex; gap:12px; flex-wrap:wrap; background:#0f172a; padding:10px 12px; border-radius:8px; border:1px solid #334155; }
         .cat-checkbox-group label { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; cursor:pointer; color:#cbd5e1; }
         .cat-checkbox-group input { width:auto; }
+
         .preview-grid { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
         .preview-box { width:55px; height:55px; border-radius:6px; border:1px solid #334155; object-fit:cover; }
+        
         .variant-row { display:grid; grid-template-columns:1fr 1.5fr 0.9fr 0.9fr 0.8fr auto; gap:8px; align-items:center; margin-bottom:8px; background:#0f172a; padding:8px; border-radius:8px; border:1px solid #334155; }
+
         .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; justify-content:center; align-items:center; z-index:500; }
         .modal-overlay.active { display:flex; }
         .modal-box { background:#1e293b; color:#f8fafc; padding:25px; border-radius:14px; width:92%; max-width:750px; box-shadow:0 6px 30px rgba(0,0,0,0.6); position:relative; max-height:85vh; overflow-y:auto; border:1px solid #334155; }
         .close-modal-btn { position:absolute; right:18px; top:18px; cursor:pointer; font-size:20px; font-weight:bold; width:30px; height:30px; border-radius:50%; background:#334155; color:white; display:flex; align-items:center; justify-content:center; border:none; }
+
         .filter-search-bar { display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; align-items:center; }
         .filter-search-bar input { max-width:240px; padding:7px 12px; }
         .filter-search-bar select { max-width:180px; padding:7px 12px; }
+
         .badge-role { padding:3px 7px; border-radius:6px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; }
         .role-vendor { background:#0284c720; color:#38bdf8; border:1px solid #0284c750; }
         .role-delivery { background:#ea580c20; color:#fb923c; border:1px solid #ea580c50; }
         .role-admin { background:#16a34a20; color:#4ade80; border:1px solid #16a34a50; }
+
         @media print {
             body * { visibility:hidden; }
             #adminPrintableBill, #adminPrintableBill * { visibility:visible; }
@@ -91,6 +150,7 @@
         </div>
     </div>
 
+    <!-- SITEMAP V1.0 STRUCTURED SIDEBAR -->
     <aside>
         <div class="logo">
             <span>⚡ ksindo Master</span>
@@ -98,20 +158,48 @@
         </div>
         <nav>
             <div class="nav-section-title">Core Operations</div>
-            <a onclick="showTab('tab-overview', this)" class="active"><span>📊 Dashboard Overview</span></a>
-            <a onclick="showTab('tab-merchant-approvals', this)"><span>✅ Merchant Approvals</span><span class="nav-count" id="badgePendingMerchants" style="background:#ef4444; display:none;">0</span></a>
-            <a onclick="showTab('tab-shops', this)"><span>🏪 1. Create Shop</span></a>
-            <a onclick="showTab('tab-users', this)"><span>👥 2. User & Portal Logins</span><span class="nav-count" id="badgePortalCount" style="background:#0284c7;">0</span></a>
-            <a onclick="showTab('tab-orders', this)"><span>📦 3. Order Management</span><span class="nav-count" id="badgeGeneralOrders" style="display:none;">0</span></a>
-            <a onclick="showTab('tab-payment', this)"><span>💳 4. Payment & Commission</span></a>
-            <a onclick="showTab('tab-logistics', this)"><span>🚚 5. Delivery & Logistics</span></a>
+            <a onclick="showTab('tab-overview', this)" class="active">
+                <span>📊 Dashboard Overview</span>
+            </a>
+            <a onclick="showTab('tab-merchant-approvals', this)">
+                <span>✅ Merchant Approvals</span>
+                <span class="nav-count" id="badgePendingMerchants" style="background:#ef4444; display:none;">0</span>
+            </a>
+            <a onclick="showTab('tab-shops', this)">
+                <span>🏪 1. Create Shop</span>
+            </a>
+            <a onclick="showTab('tab-users', this)">
+                <span>👥 2. User & Portal Logins</span>
+                <span class="nav-count" id="badgePortalCount" style="background:#0284c7;">0</span>
+            </a>
+            <a onclick="showTab('tab-orders', this)">
+                <span>📦 3. Order Management</span>
+                <span class="nav-count" id="badgeGeneralOrders" style="display:none;">0</span>
+            </a>
+            <a onclick="showTab('tab-payment', this)">
+                <span>💳 4. Payment & Commission</span>
+            </a>
+            <a onclick="showTab('tab-logistics', this)">
+                <span>🚚 5. Delivery & Logistics</span>
+            </a>
 
             <div class="nav-section-title">Catalog & Business</div>
-            <a onclick="showTab('tab-products', this)"><span>🏷️ 6. Product & Category</span></a>
-            <a onclick="showTab('tab-reports', this)"><span>📈 7. Reports & Analytics</span></a>
-            <a onclick="showTab('tab-grievances', this)"><span>💬 8. Customer Complaint</span><span class="nav-count" id="badgeGrievanceCount" style="background:#ea580c; display:none;">0</span></a>
-            <a onclick="showTab('tab-ads', this)"><span>📢 9. Marketing & Content</span></a>
-            <a onclick="showTab('tab-settings', this)"><span>⚙️ 10. Settings & Categories</span></a>
+            <a onclick="showTab('tab-products', this)">
+                <span>🏷️ 6. Product & Category</span>
+            </a>
+            <a onclick="showTab('tab-reports', this)">
+                <span>📈 7. Reports & Analytics</span>
+            </a>
+            <a onclick="showTab('tab-grievances', this)">
+                <span>💬 8. Customer Complaint</span>
+                <span class="nav-count" id="badgeGrievanceCount" style="background:#ea580c; display:none;">0</span>
+            </a>
+            <a onclick="showTab('tab-ads', this)">
+                <span>📢 9. Marketing & Content</span>
+            </a>
+            <a onclick="showTab('tab-settings', this)">
+                <span>⚙️ 10. Settings & Mode</span>
+            </a>
         </nav>
     </aside>
 
@@ -131,6 +219,7 @@
         </header>
 
         <div class="content-body">
+            <!-- Central Metrics Strip -->
             <div class="stats-grid">
                 <div class="stat-card"><h3>Total Revenue</h3><div class="val" id="statRevenue" style="color:#22c55e;">₹0</div></div>
                 <div class="stat-card"><h3>Cash (COD)</h3><div class="val" id="statTotalCash" style="color:#fbbf24;">₹0</div></div>
@@ -143,6 +232,7 @@
             <section id="tab-overview" class="tab-section active">
                 <div class="card">
                     <h2>📊 Dashboard Overview — Central Operations & Live Activity</h2>
+                    <p style="font-size:12.5px; color:#94a3b8; margin-bottom:15px;">Hyperlocal multi-vendor e-commerce, restaurant food orders aur delivery boy fleet ka central control status.</p>
                     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
                         <div style="background:#0f172a; padding:15px; border-radius:10px; border:1px solid #334155;">
                             <strong style="color:#38bdf8; font-size:13px; display:block; margin-bottom:5px;">⚡ Quick Actions:</strong>
@@ -159,7 +249,7 @@
                             <p style="font-size:12px; color:#cbd5e1; line-height:1.6;">
                                 • Firebase Realtime DB: <b>Connected (jaynagar-srote)</b><br>
                                 • Config Source: <b>External firebase-config.js</b><br>
-                                • Dynamic Categories & Buy Limits: <b>Active</b><br>
+                                • Order Verification: <b>4-digit OTP Mandatory</b><br>
                                 • Emergency Status: <b id="overviewStatusText" style="color:#22c55e;">ONLINE (Active)</b><br>
                                 • Portal Roles Active: <b id="overviewPortalCount">0 Logins Issued</b>
                             </p>
@@ -168,13 +258,26 @@
                 </div>
             </section>
 
-            <!-- MERCHANT SIGNUP APPROVALS -->
+            <!-- NEW MODULE: MERCHANT SIGNUP APPROVALS (FROM merchant.html) -->
             <section id="tab-merchant-approvals" class="tab-section">
                 <div class="card" style="border:1.5px solid #f59e0b;">
                     <h2>✅ Pending Merchant & Store Applications (OTP Verified)</h2>
+                    <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">
+                        Merchant portal (`merchant.html`) se OTP verify karke aaye hue naye registration requests. Approve karte hi inki shop aur User ID live ho jayegi.
+                    </p>
                     <table>
                         <thead>
-                            <tr><th>Owner & Email</th><th>Vendor / Shop Name</th><th>Category</th><th>GSTIN</th><th>Address & PIN</th><th>User ID & Pass</th><th>Verified Phone</th><th>Status</th><th>Admin Action</th></tr>
+                            <tr>
+                                <th>Owner & Email</th>
+                                <th>Vendor / Shop Name</th>
+                                <th>Category</th>
+                                <th>GSTIN</th>
+                                <th>Address & PIN</th>
+                                <th>User ID & Pass</th>
+                                <th>Verified Phone</th>
+                                <th>Status</th>
+                                <th>Admin Action</th>
+                            </tr>
                         </thead>
                         <tbody id="merchantRequestsTableBody">
                             <tr><td colspan="9" style="text-align:center; color:#94a3b8;">Loading merchant requests...</td></tr>
@@ -189,7 +292,7 @@
                     <h2>🏪 1. Create Shop & MultiVendor Management</h2>
                     <form id="addShopForm">
                         <div class="form-grid">
-                            <input type="text" id="shopNameInput" placeholder="Shop Name" required>
+                            <input type="text" id="shopNameInput" placeholder="Shop Name (e.g. Aman Saree Center / Food Hub)" required>
                             <select id="shopTypeInput" required style="font-weight:bold;">
                                 <option value="restaurant">🍔 Fast Food & Restaurant</option>
                                 <option value="fresh">🥦 24x7 Fresh (Vegetables, Fruits, Dairy)</option>
@@ -199,10 +302,10 @@
                             </select>
                             <input type="text" id="shopOwnerInput" placeholder="Owner Name" required>
                             <input type="tel" id="shopPhoneInput" placeholder="Mobile Number (10 Digit)" maxlength="10" required>
-                            <input type="text" id="shopGstinInput" placeholder="GSTIN / FSSAI (Optional)">
+                            <input type="text" id="shopGstinInput" placeholder="GSTIN / FSSAI License Number (Optional)">
                             <input type="text" id="shopPincodeInput" placeholder="Pincode (6-digit)" maxlength="6" required>
-                            <input type="text" id="shopAddressInput" placeholder="Shop Address" required>
-                            <input type="text" id="shopUserInput" placeholder="Shop Portal Login ID" required>
+                            <input type="text" id="shopAddressInput" placeholder="Shop Address (Ward, Area, Jainagar)" required>
+                            <input type="text" id="shopUserInput" placeholder="Shop Portal Login ID / Username" required>
                             <input type="text" id="shopPassInput" placeholder="Shop Portal Password" required>
                         </div>
                         <button type="submit" class="btn-primary" style="margin-top:12px;">+ Onboard & Register Shop</button>
@@ -217,10 +320,13 @@
                 </div>
             </section>
 
-            <!-- MODULE 2: USER MANAGEMENT & PORTAL CREDENTIALS -->
+            <!-- MODULE 2: USER MANAGEMENT & PORTAL CREDENTIALS GENERATOR -->
             <section id="tab-users" class="tab-section">
                 <div class="card" style="border:1.5px solid #0284c7;">
-                    <h2>🔑 Portal Login Credentials Generator</h2>
+                    <h2>🔑 Portal Login Credentials Generator (Admin Dwara ID & Password)</h2>
+                    <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">
+                        Kisi bhi dukandaar (Merchant), Delivery Boy ya Staff ke login ke liye yahan se ID aur Password generate karein. User isi ID se apne app/portal me login karega.
+                    </p>
                     <form id="portalCredentialsForm">
                         <div class="form-grid">
                             <select id="portalRoleSelect" required style="font-weight:bold; color:#38bdf8;">
@@ -228,11 +334,11 @@
                                 <option value="delivery">🚴 Delivery Boy Portal (deliveryboy.html)</option>
                                 <option value="subadmin">🛡️ Staff / Sub-Admin Operator</option>
                             </select>
-                            <input type="text" id="portalFullName" placeholder="Full Name" required>
+                            <input type="text" id="portalFullName" placeholder="Full Name (e.g. Rahul Kumar)" required>
                             <input type="tel" id="portalPhone" placeholder="10-digit Phone Number" maxlength="10" required>
-                            <input type="text" id="portalLoginId" placeholder="Login ID / Username" required style="text-transform:lowercase;">
+                            <input type="text" id="portalLoginId" placeholder="Login ID / Username (e.g. KS-VEN-01)" required style="text-transform:lowercase;">
                             <input type="text" id="portalPassword" placeholder="Set Secure Password" required>
-                            <input type="text" id="portalAssignedArea" placeholder="Assigned Shop / Zone">
+                            <input type="text" id="portalAssignedArea" placeholder="Assigned Shop / Zone (e.g. Ward 4 / Station Road)">
                         </div>
                         <button type="submit" class="btn-primary" style="margin-top:12px; background:#0284c7;">+ Generate & Issue Portal Login</button>
                     </form>
@@ -241,13 +347,18 @@
                 <div class="card">
                     <h2>Authorized Portal Logins Directory</h2>
                     <table>
-                        <thead><tr><th>Name</th><th>Role</th><th>Portal ID</th><th>Password</th><th>Phone</th><th>Zone / Shop</th><th>Status</th><th>Action</th></tr></thead>
+                        <thead>
+                            <tr><th>Name</th><th>Role</th><th>Portal ID / Username</th><th>Password</th><th>Phone</th><th>Zone / Shop</th><th>Status</th><th>Action</th></tr>
+                        </thead>
                         <tbody id="portalLoginsTableBody"></tbody>
                     </table>
                 </div>
 
                 <div class="card">
-                    <h2>👥 Registered Customer Accounts</h2>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <h2>👥 Registered Customer Accounts</h2>
+                        <small style="color:#22c55e; font-weight:700;">👉 Click row to view complete order history</small>
+                    </div>
                     <table>
                         <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Address</th><th>Orders</th><th>Action</th></tr></thead>
                         <tbody id="usersTableBody"></tbody>
@@ -266,7 +377,9 @@
                         </div>
                     </div>
                     <table>
-                        <thead><tr><th>Time</th><th>Customer</th><th>Address</th><th>Items</th><th>Total</th><th>OTP</th><th>Status</th><th>Receipt</th><th>Assign Boy</th><th>Action</th></tr></thead>
+                        <thead>
+                            <tr><th>Time</th><th>Customer</th><th>Address</th><th>Items</th><th>Total</th><th>OTP</th><th>Status</th><th>Receipt</th><th>Assign Boy</th><th>Action</th></tr>
+                        </thead>
                         <tbody id="generalOrdersTableBody"></tbody>
                     </table>
                 </div>
@@ -274,13 +387,15 @@
                 <div class="card" style="border-left:5px solid #ea580c;">
                     <h2>🍕 Live Restaurant & Food Orders (Kitchen Queue)</h2>
                     <table>
-                        <thead><tr><th>Time</th><th>Food Items</th><th>Customer</th><th>Total</th><th>OTP</th><th>Status</th><th>Kitchen Shop</th><th>Receipt</th><th>Assign Boy</th><th>Action</th></tr></thead>
+                        <thead>
+                            <tr><th>Time</th><th>Food Items</th><th>Customer</th><th>Total</th><th>OTP</th><th>Status</th><th>Kitchen Shop</th><th>Receipt</th><th>Assign Boy</th><th>Action</th></tr>
+                        </thead>
                         <tbody id="foodOrdersTableBody"></tbody>
                     </table>
                 </div>
 
                 <div class="card">
-                    <h2>📜 Order Delivered History & Cancellation Audit</h2>
+                    <h2>📜 Order Delivered History & Refund / Cancellation Audit</h2>
                     <table>
                         <thead><tr><th>Time</th><th>Customer</th><th>Mode</th><th>Amount</th><th>Boy</th><th>Status</th></tr></thead>
                         <tbody id="deliveredTableBody"></tbody>
@@ -292,50 +407,89 @@
             <section id="tab-payment" class="tab-section">
                 <div class="card">
                     <h2>💳 4. Payment, Commission & Vendor Settlements</h2>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+                        <p style="font-size:12px; color:#94a3b8;">Har dukandar ka gross sale, 5% admin commission, aur net payout calculation:</p>
+                        <button onclick="downloadMonthlyStatement()" class="btn-primary" style="font-size:11px;">📊 Download Full Payout Statement CSV</button>
+                    </div>
                     <table>
-                        <thead><tr><th>Merchant / Vendor</th><th>Shop Type</th><th>Phone</th><th>Delivered Orders</th><th>Gross Sales</th><th>Admin Commission (5%)</th><th>Net Vendor Payout</th><th>Settlement</th></tr></thead>
+                        <thead>
+                            <tr><th>Merchant / Vendor</th><th>Shop Type</th><th>Phone</th><th>Delivered Orders</th><th>Gross Sales</th><th>Admin Commission (5%)</th><th>Net Vendor Payout</th><th>Settlement</th></tr>
+                        </thead>
                         <tbody id="vendorSettlementsTableBody"></tbody>
                     </table>
                 </div>
 
+                <!-- CARD 1: DYNAMIC DISCOUNT COUPONS -->
                 <div class="card" style="border: 1.5px solid #16a34a; margin-top: 20px;">
-                    <h2>🎟️ 1. Discount Coupon Code Manager</h2>
+                    <h2>🎟️ 1. Discount Coupon Code Manager (Cart Discount)</h2>
+                    <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">
+                        Yahan create kiye gaye coupons customer ke cart drawer me turant apply honge.
+                    </p>
                     <form id="createCouponForm">
                         <div class="form-grid">
-                            <input type="text" id="couponCodeInput" placeholder="Coupon Code (e.g. KSINDO50)" required style="text-transform:uppercase; font-weight:bold;">
+                            <input type="text" id="couponCodeInput" placeholder="Coupon Code (e.g. KSINDO50, FLAT10)" required style="text-transform:uppercase; font-weight:bold;">
                             <select id="couponTypeSelect" required style="font-weight:bold;">
                                 <option value="flat">Flat Cash Discount (₹ OFF)</option>
                                 <option value="percent">Percentage Discount (% OFF)</option>
                             </select>
                             <input type="number" id="couponDiscountVal" placeholder="Discount Amount (₹ ya %)" min="1" required>
                             <input type="number" id="couponMinOrder" placeholder="Minimum Cart Total (₹)" min="0" value="149" required>
-                            <input type="number" id="couponMaxDiscount" placeholder="Max Cap (For % only)">
+                            <input type="number" id="couponMaxDiscount" placeholder="Max Cap (For % only, e.g. 150)">
                         </div>
                         <button type="submit" class="btn-primary" style="margin-top:12px; background:#16a34a;">+ Publish Coupon Code</button>
                     </form>
-                    <table style="margin-top:15px;">
-                        <thead><tr><th>Coupon</th><th>Type</th><th>Discount</th><th>Min Order</th><th>Status</th><th>Action</th></tr></thead>
-                        <tbody id="couponsTableBody"></tbody>
-                    </table>
+
+                    <div style="margin-top:20px;">
+                        <h3 style="font-size:13px; color:#38bdf8; margin-bottom:10px;">Active Live Coupons</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Coupon</th>
+                                    <th>Type</th>
+                                    <th>Discount</th>
+                                    <th>Min Order</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="couponsTableBody">
+                                <tr><td colspan="6" style="text-align:center; color:#94a3b8;">Loading coupons...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
+                <!-- CARD 2: CHECKOUT SPECIAL OFFERS -->
                 <div class="card" style="border: 1.5px solid #ea580c; margin-top: 20px;">
                     <h2>🎁 2. Checkout Discount Offers & Special Freebies</h2>
+                    <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">
+                        Yeh item checkout screen par customer ko target cart value par unlock hoga. File upload ya Image URL dono supported hain.
+                    </p>
                     <form id="checkoutOfferForm">
                         <div class="form-grid">
-                            <input id="offerName" placeholder="Offer Product Name" required>
-                            <input id="offerPrice" type="number" min="0" step="0.01" placeholder="Offer Item Price (₹)" value="0" required>
+                            <input id="offerName" placeholder="Offer Product Name (e.g. Free Pooja Samagri Kit)" required>
+                            <input id="offerPrice" type="number" min="0" step="0.01" placeholder="Offer Item Price (₹, 0 for free)" value="0" required>
                             <input id="offerMinAmount" type="number" min="1" placeholder="Min Cart Amount to Unlock (₹)" required>
-                            <input id="offerTargetUrl" placeholder="Product Link">
-                            <input type="file" id="offerFileInput" accept="image/*" onchange="previewOfferUpload(this)">
-                            <input id="offerImage" type="url" placeholder="Direct Image URL">
+                            <input id="offerTargetUrl" placeholder="Product Link (e.g. product.html?id=... ya fresh.html)">
+                            
+                            <div>
+                                <label style="font-size:11px; font-weight:bold; color:#cbd5e1;">Option 1: Upload Offer Photo:</label>
+                                <input type="file" id="offerFileInput" accept="image/*" onchange="previewOfferUpload(this)">
+                            </div>
+                            <div>
+                                <label style="font-size:11px; font-weight:bold; color:#cbd5e1;">Option 2: Direct Image URL:</label>
+                                <input id="offerImage" type="url" placeholder="https://...">
+                            </div>
+
                             <select id="offerMaxPerCustomer">
                                 <option value="1">Limit: 1 time per user</option>
                                 <option value="2">Limit: 2 times per user</option>
                                 <option value="3" selected>Limit: 3 times (Standard)</option>
                             </select>
                         </div>
+
                         <div id="offerPhotoPreview" style="margin-top:10px;"></div>
+
                         <button class="btn-primary" type="submit" style="margin-top:12px; background:#ea580c;">+ Save / Publish Checkout Offer</button>
                     </form>
                     <div id="offerAdminStatus" style="margin-top:10px; font-size:12px; color:#22c55e; font-weight:bold;"></div>
@@ -347,14 +501,18 @@
                 <div class="card">
                     <h2>🚚 5. Delivery Boy Fleet & Cash Collection Audit</h2>
                     <table>
-                        <thead><tr><th>Delivery Boy Phone</th><th>Delivered Orders</th><th>COD Cash Collected</th><th>Online Paid</th><th>Total Handled</th><th>Status</th></tr></thead>
+                        <thead>
+                            <tr><th>Delivery Boy Phone</th><th>Delivered Orders</th><th>COD Cash Collected</th><th>Online Paid</th><th>Total Handled</th><th>Status</th></tr>
+                        </thead>
                         <tbody id="deliveryBoyAuditBody"></tbody>
                     </table>
                 </div>
+
                 <div class="card">
                     <h2>📍 Pincode & Service Zone Logistics</h2>
+                    <p style="font-size:12px; color:#94a3b8; margin-bottom:10px;">Jainagar aur surrounding delivery zones ka status:</p>
                     <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
-                        <input id="pinCatalogSearch" placeholder="Search 6-digit Pincode" style="max-width:240px;">
+                        <input id="pinCatalogSearch" placeholder="Search 6-digit Pincode (e.g. 847226)" style="max-width:240px;">
                         <button class="btn-secondary" onclick="renderPincodeCatalog()">Verify Coverage</button>
                     </div>
                     <div id="pincodeCatalogResults" style="font-size:12px;"></div>
@@ -368,7 +526,7 @@
                     <form id="addProductForm">
                         <input type="hidden" id="editProductId" value="">
                         <div class="form-grid">
-                            <input type="text" id="prodName" placeholder="Default Product Title / Name" required>
+                            <input type="text" id="prodName" placeholder="Product Title / Name" required>
                             
                             <div>
                                 <select id="prodSubCategory" onchange="checkSeasonalInput(this.value)">
@@ -380,7 +538,7 @@
                                     <option value="dryfruits">24x7 Fresh: Dry Fruits (काजू, बादाम)</option>
                                     <option value="shringar">Seasonal: Chunri & Shringar (चुनरी, श्रृंगार)</option>
                                     <option value="pooja">Seasonal: Pooja & Hawan Samagri</option>
-                                    <option value="seasonal special">Seasonal: Festival Special</option> 
+                                    <option value="seasonal special">Seasonal: Festival Special (Durga Puja, Diwali, Chhath, Eid)</option> 
                                     <option value="lingerie">Fashion: Lingerie / Innerwear</option>
                                     <option value="women">Fashion: Women Dresses</option>
                                     <option value="men">Fashion: Men Wear</option>
@@ -392,7 +550,7 @@
                             </div>
 
                             <div id="festivalTagContainer" style="display:none;">
-                                <input type="text" id="prodFestivalTag" placeholder="Festival Tag">
+                                <input type="text" id="prodFestivalTag" placeholder="Festival Tag (e.g. durga-puja, diwali, chhath, eid)">
                             </div>
 
                             <input type="url" id="prodImageLink" placeholder="Option 1: Image URL Link">
@@ -416,18 +574,18 @@
 
                         <div class="preview-grid" id="photoPreviewContainer"></div>
 
-                        <!-- VARIANT WITH SEPARATE PRODUCT TITLE -->
                         <div style="margin-top:16px; padding:15px; background:#0f172a; border:1px dashed #16a34a; border-radius:8px;">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                                 <div>
-                                    <strong style="font-size:13px; color:#f8fafc;">📏 Size / Weight Variants (Alag Size = Alag Product Name):</strong>
-                                    <p style="font-size:11px; color:#94a3b8; margin-top:2px;">Har variant/size ke liye alag Product Title, Selling Price aur MRP set kar sakte hain.</p>
+                                    <strong style="font-size:13px; color:#f8fafc;">📏 Size / Weight Variants:</strong>
+                                    <p style="font-size:11px; color:#94a3b8; margin-top:2px;">Size, Selling Price aur MRP dalne par discount automatic calculate hoga.</p>
                                 </div>
                                 <button type="button" onclick="addVariantRow()" style="background:#16a34a; color:white; border:none; padding:7px 14px; border-radius:6px; font-weight:bold; font-size:12px; cursor:pointer;">+ Add Size Variant</button>
                             </div>
                             <div id="variantsContainer"></div>
                         </div>
 
+                        
                         <!-- PRODUCT BUY USER LIMIT SETTINGS -->
                         <div style="margin-top:14px; padding:14px; background:#0f172a; border:1px dashed #38bdf8; border-radius:8px;">
                             <strong style="font-size:13px; color:#38bdf8; display:block; margin-bottom:4px;">🛡️ Product Buy User Limit (Optional — Khali chhodne par unlimited buy)</strong>
@@ -489,16 +647,16 @@
                         </div>
                     </div>
                     <table>
-                        <thead><tr><th>Image</th><th>Name</th><th>Categories</th><th>Price</th><th>Buy Limit</th><th>Stock</th><th>Variants</th><th>Action</th></tr></thead>
+                        <thead><tr><th>Image</th><th>Name</th><th>Categories</th><th>Price</th><th>Stock Status</th><th>Variants</th><th>Action</th></tr></thead>
                         <tbody id="productsTableBody"></tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- MODULE 7: REPORTS -->
+            <!-- MODULE 7: REPORTS & ANALYTICS -->
             <section id="tab-reports" class="tab-section">
                 <div class="card">
-                    <h2>📈 7. Reports & Analytics</h2>
+                    <h2>📈 7. Reports & Analytics — Daily & Monthly Business</h2>
                     <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
                         <button onclick="downloadMonthlyStatement()" class="btn-primary">📥 Export Complete Monthly Sales Report (CSV)</button>
                         <button onclick="exportOrdersToCSV()" class="btn-secondary">📥 Export Live Ledger CSV</button>
@@ -520,21 +678,24 @@
                 </div>
             </section>
 
-            <!-- MODULE 8: GRIEVANCES -->
+            <!-- MODULE 8: CUSTOMER COMPLAINT & GRIEVANCE -->
             <section id="tab-grievances" class="tab-section">
                 <div class="card">
-                    <h2>💬 8. Customer Complaints & Grievance Tickets</h2>
+                    <h2>💬 8. Customer Complaints & Grievance Tickets (24x7 Helpdesk)</h2>
+                    <p style="font-size:12px; color:#94a3b8; margin-bottom:12px;">Customer app (`grievance.html`) dwara aayi hui shikayatein:</p>
                     <table>
-                        <thead><tr><th>Ticket ID</th><th>Customer</th><th>Phone</th><th>Category</th><th>Description</th><th>Status</th><th>Action</th></tr></thead>
+                        <thead>
+                            <tr><th>Ticket ID</th><th>Customer</th><th>Phone</th><th>Category</th><th>Description</th><th>Status</th><th>Resolution Action</th></tr>
+                        </thead>
                         <tbody id="grievanceTicketsTableBody"></tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- MODULE 9: MARKETING -->
+            <!-- MODULE 9: MARKETING & CONTENT -->
             <section id="tab-ads" class="tab-section">
                 <div class="card">
-                    <h2>📢 9. Marketing & Content — Ads</h2>
+                    <h2>📢 9. Marketing & Content — 5-Second Video / Banner Ads</h2>
                     <form id="createAdForm">
                         <div class="form-grid">
                             <input type="text" id="adTitle" placeholder="Ad Offer Title" required>
@@ -542,12 +703,21 @@
                                 <option value="image">🖼️ Photo / Image Banner</option>
                                 <option value="video">🎥 5-Second Video (MP4)</option>
                             </select>
-                            <input type="file" id="adDirectFile" accept="image/*,video/mp4" onchange="previewAdDirectFile(this)">
-                            <input type="url" id="adMediaUrl" placeholder="Online Media URL">
-                            <input type="text" id="adTargetUrl" placeholder="Target Link">
+                            <div>
+                                <label style="font-size:11px; font-weight:bold;">Option 1: Direct File Upload:</label>
+                                <input type="file" id="adDirectFile" accept="image/*,video/mp4" onchange="previewAdDirectFile(this)">
+                            </div>
+                            <div>
+                                <label style="font-size:11px; font-weight:bold;">Option 2: Online Media URL:</label>
+                                <input type="url" id="adMediaUrl" placeholder="https://...">
+                            </div>
+                            <div>
+                                <label style="font-size:11px; font-weight:bold;">Target Link (product.html?id=... / fresh.html / seasonable.html):</label>
+                                <input type="text" id="adTargetUrl" placeholder="e.g. fresh.html ya seasonable.html?fest=durga-puja">
+                            </div>
                         </div>
                         <div id="adFilePreviewContainer" style="margin-top:10px;"></div>
-                        <button type="submit" class="btn-primary" style="margin-top:12px; background:#e11d48;">+ Publish Ad Banner</button>
+                        <button type="submit" class="btn-primary" style="margin-top:12px; background:#e11d48;">+ Publish 5s Ad Banner</button>
                     </form>
                 </div>
                 <div class="card">
@@ -559,52 +729,62 @@
                 </div>
             </section>
 
-            <!-- MODULE 10: MASTER SETTINGS & DYNAMIC CATEGORIES -->
+            <!-- MODULE 10: MASTER SETTINGS -->
             <section id="tab-settings" class="tab-section">
-                <div class="card" style="border: 1.5px solid #38bdf8;">
-                    <h2>🗂️ Dynamic Parent-Child Categorization System</h2>
-                    <p style="font-size:12px; color:#94a3b8; margin-bottom:15px;">
-                        Yahan se nayi <b>Parent Category</b> aur unke andar <b>Child Sub-Categories</b> banayein ya delete karein. Yeh turant Admin, Merchant Portal aur Customer Front-End par live ho jayengi.
-                    </p>
-
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px; margin-bottom:20px;">
-                        <form id="addParentCatForm" style="background:#0f172a; padding:15px; border-radius:10px; border:1px solid #334155;">
-                            <h3 style="font-size:13px; color:#22c55e; margin-bottom:10px;">+ 1. Add Main (Parent) Category</h3>
-                            <div style="display:flex; flex-direction:column; gap:8px;">
-                                <input type="text" id="newParentCatName" placeholder="Category Name (e.g. Electronics, Kirana)" required>
-                                <input type="text" id="newParentCatIcon" placeholder="Emoji Icon (e.g. 📱, 🛒, 🍔)" value="📦" maxlength="4">
-                                <input type="text" id="newParentCatSlug" placeholder="Slug / Key (auto-generate if blank)" style="text-transform:lowercase;">
-                                <button type="submit" class="btn-primary" style="background:#16a34a;">Create Parent Category</button>
-                            </div>
-                        </form>
-
-                        <form id="addChildSubCatForm" style="background:#0f172a; padding:15px; border-radius:10px; border:1px solid #334155;">
-                            <h3 style="font-size:13px; color:#38bdf8; margin-bottom:10px;">+ 2. Add Sub-Category (Child)</h3>
-                            <div style="display:flex; flex-direction:column; gap:8px;">
-                                <select id="parentCatSelectForChild" required style="font-weight:bold; color:#38bdf8;">
-                                    <option value="">-- Select Parent Category --</option>
-                                </select>
-                                <input type="text" id="newChildSubCatName" placeholder="Sub-Category Name (e.g. Mobile Chargers)" required>
-                                <input type="text" id="newChildSubCatSlug" placeholder="Sub-Category Key (auto if blank)" style="text-transform:lowercase;">
-                                <button type="submit" class="btn-primary" style="background:#0284c7;">Add Child Sub-Category</button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <h3 style="font-size:13px; color:#fbbf24; margin-bottom:10px;">Live Category Hierarchy (Parent → Child Tree)</h3>
-                    <table>
-                        <thead><tr><th>Icon & Parent Category</th><th>Database Key (Slug)</th><th>Child Sub-Categories</th><th>Action</th></tr></thead>
-                        <tbody id="dynamicCategoriesTableBody">
-                            <tr><td colspan="4" style="text-align:center; color:#94a3b8;">Loading categories...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
                 <div class="card">
+                                 <!-- DYNAMIC PARENT-CHILD CATEGORIZATION SYSTEM -->
+<div class="card" style="border: 1.5px solid #38bdf8; margin-top: 18px;">
+    <h2>🗂️ Dynamic Parent-Child Categorization System</h2>
+    <p style="font-size:12px; color:#94a3b8; margin-bottom:15px;">
+        Yahan se nayi <b>Parent Category</b> aur unke andar <b>Child Sub-Categories</b> banayein ya delete karein. Yeh turant Product Form aur Customer Front-End par live ho jayengi.
+    </p>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px; margin-bottom:20px;">
+        <!-- Form 1: Add Parent Category -->
+        <form id="addParentCatForm" style="background:#0f172a; padding:15px; border-radius:10px; border:1px solid #334155;">
+            <h3 style="font-size:13px; color:#22c55e; margin-bottom:10px;">+ 1. Add Main (Parent) Category</h3>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <input type="text" id="newParentCatName" placeholder="Category Name (e.g. Electronics, Kirana)" required>
+                <input type="text" id="newParentCatIcon" placeholder="Emoji Icon (e.g. 📱, 🛒, 🍔)" value="📦" maxlength="4">
+                <input type="text" id="newParentCatSlug" placeholder="Slug / Key (auto-generate if blank)" style="text-transform:lowercase;">
+                <button type="submit" class="btn-primary" style="background:#16a34a;">Create Parent Category</button>
+            </div>
+        </form>
+
+        <!-- Form 2: Add Child Sub-Category -->
+        <form id="addChildSubCatForm" style="background:#0f172a; padding:15px; border-radius:10px; border:1px solid #334155;">
+            <h3 style="font-size:13px; color:#38bdf8; margin-bottom:10px;">+ 2. Add Sub-Category (Child)</h3>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <select id="parentCatSelectForChild" required style="font-weight:bold; color:#38bdf8;">
+                    <option value="">-- Select Parent Category --</option>
+                </select>
+                <input type="text" id="newChildSubCatName" placeholder="Sub-Category Name (e.g. Mobile Chargers)" required>
+                <input type="text" id="newChildSubCatSlug" placeholder="Sub-Category Key (auto if blank)" style="text-transform:lowercase;">
+                <button type="submit" class="btn-primary" style="background:#0284c7;">Add Child Sub-Category</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Live Parent-Child Hierarchy Tree Table -->
+    <h3 style="font-size:13px; color:#fbbf24; margin-bottom:10px;">Live Category Hierarchy (Parent → Child Tree)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Icon & Parent Category</th>
+                <th>Database Key (Slug)</th>
+                <th>Child Sub-Categories</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="dynamicCategoriesTableBody">
+            <tr><td colspan="4" style="text-align:center; color:#94a3b8;">Loading categories...</td></tr>
+        </tbody>
+    </table>
+</div>
                     <h2>⚙️ 10. Master Settings & System Maintenance Mode</h2>
                     <div class="form-grid" style="margin-bottom:15px;">
                         <div>
-                            <label style="font-size:12px; font-weight:bold; color:#cbd5e1; display:block; margin-bottom:5px;">Maintenance Mode:</label>
+                            <label style="font-size:12px; font-weight:bold; color:#cbd5e1; display:block; margin-bottom:5px;">Maintenance Mode (Emergency Close):</label>
                             <select id="settingMaintenanceSelect" onchange="handleMaintenanceChange(this.value)">
                                 <option value="open">🟢 Live Store Open (Accepting Orders)</option>
                                 <option value="closed">🔴 Emergency Closed / Maintenance Mode</option>
@@ -636,6 +816,7 @@
         </div>
     </div>
 
+    <!-- UTILITY JAVASCRIPT LOGIC -->
     <script>
         let isAudioAlarmMuted = false;
         function toggleAudioAlarm() {
@@ -663,62 +844,94 @@
             toggleStoreStatus();
         };
 
-        window.saveMasterSettings = function() { alert("✅ Settings saved successfully!"); };
+        window.saveMasterSettings = function() {
+            alert("✅ Settings saved successfully!");
+        };
 
         function checkSeasonalInput(val) {
             const container = document.getElementById('festivalTagContainer');
-            container.style.display = (val === 'seasonal special' || val === 'shringar' || val === 'pooja') ? 'block' : 'none';
+            if (val === 'seasonal special' || val === 'shringar' || val === 'pooja') {
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
         }
 
         function calculateRowDiscount(row) {
-            const price = parseFloat(row.querySelector('.v-price').value);
-            const orig = parseFloat(row.querySelector('.v-orig-price').value);
+            const priceInput = row.querySelector('.v-price');
+            const origPriceInput = row.querySelector('.v-orig-price');
             const discountPill = row.querySelector('.v-discount-pill');
+
+            const price = parseFloat(priceInput.value);
+            const orig = parseFloat(origPriceInput.value);
+
             if (!isNaN(price) && !isNaN(orig) && orig > price && price > 0) {
-                discountPill.value = Math.round(((orig - price) / orig) * 100) + "% OFF";
+                const perc = Math.round(((orig - price) / orig) * 100);
+                discountPill.value = perc + "% OFF";
                 discountPill.style.color = "#22c55e";
             } else {
                 discountPill.value = '';
             }
         }
 
-        window.addVariantRow = function(valName = '', valCustomTitle = '', valPrice = '', valOrigPrice = '', valDisc = '') {
+        window.addVariantRow = function(valName, valPrice, valOrigPrice, valDisc, valCustomTitle) {
+            valName = valName || '';
+            valPrice = valPrice || '';
+            valOrigPrice = valOrigPrice || '';
+            valDisc = valDisc || '';
+            valCustomTitle = valCustomTitle || '';
             const container = document.getElementById('variantsContainer');
             const row = document.createElement('div');
             row.className = 'variant-row';
             row.innerHTML = 
                 '<input type="text" placeholder="Size (e.g. 1L, 5L)" value="' + valName + '" class="v-name" style="padding:7px 10px; font-size:12px;" required>' +
                 '<input type="text" placeholder="Alag Product Title (Optional)" value="' + valCustomTitle + '" class="v-title" style="padding:7px 10px; font-size:12px;">' +
-                '<input type="number" placeholder="Price (₹)" value="' + valPrice + '" class="v-price" style="padding:7px 10px; font-size:12px;" required>' +
-                '<input type="number" placeholder="MRP (₹)" value="' + valOrigPrice + '" class="v-orig-price" style="padding:7px 10px; font-size:12px;">' +
+                '<input type="number" placeholder="Selling Price (₹)" value="' + valPrice + '" class="v-price" style="padding:7px 10px; font-size:12px;" required>' +
+                '<input type="number" placeholder="Original MRP (₹)" value="' + valOrigPrice + '" class="v-orig-price" style="padding:7px 10px; font-size:12px;">' +
                 '<input type="text" placeholder="Discount" value="' + valDisc + '" class="v-discount-pill" readonly style="padding:7px 10px; border:1px solid #16a34a50; background:#16a34a10; font-size:12px; font-weight:bold; color:#22c55e;">' +
                 '<button type="button" onclick="this.parentElement.remove()" style="background:#ef4444; color:white; border:none; padding:7px 12px; border-radius:6px; cursor:pointer; font-weight:bold;">✕</button>';
 
-            row.querySelector('.v-price').addEventListener('input', () => calculateRowDiscount(row));
-            row.querySelector('.v-orig-price').addEventListener('input', () => calculateRowDiscount(row));
+            const priceInp = row.querySelector('.v-price');
+            const origInp = row.querySelector('.v-orig-price');
+
+            priceInp.addEventListener('input', function() { calculateRowDiscount(row); });
+            origInp.addEventListener('input', function() { calculateRowDiscount(row); });
+
             container.appendChild(row);
             if (valPrice && valOrigPrice) calculateRowDiscount(row);
         };
 
         window.addEventListener('DOMContentLoaded', () => {
-            if (document.getElementById('variantsContainer').children.length === 0) addVariantRow();
+            if (document.getElementById('variantsContainer').children.length === 0) {
+                addVariantRow();
+            }
         });
 
         let base64PhotosArray = [];
         function compressImageFile(file, maxWidth, quality) {
-            return new Promise(resolve => {
+            return new Promise(function(resolve) {
                 var reader = new FileReader();
                 reader.readAsDataURL(file);
-                reader.onload = event => {
+                reader.onload = function(event) {
                     var img = new Image();
                     img.src = event.target.result;
-                    img.onload = () => {
+                    img.onload = function() {
                         var canvas = document.createElement('canvas');
-                        var width = img.width, height = img.height;
-                        if (width > maxWidth) { height = Math.round((height * maxWidth) / width); width = maxWidth; }
-                        canvas.width = width; canvas.height = height;
-                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', quality));
+                        var width = img.width;
+                        var height = img.height;
+
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        var ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        var compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                        resolve(compressedBase64);
                     };
                 };
             });
@@ -728,50 +941,84 @@
             const container = document.getElementById('photoPreviewContainer');
             container.innerHTML = '<span style="font-size:12px; color:#38bdf8; font-weight:bold;">⚡ Compressing images...</span>';
             base64PhotosArray = [];
-            if (input.files.length > 6) { alert("Maximum 6 photos allowed hain!"); input.value = ''; container.innerHTML = ''; return; }
-            for (let f of Array.from(input.files)) base64PhotosArray.push(await compressImageFile(f, 800, 0.7));
+
+            if (input.files.length > 6) {
+                alert("Maximum 6 photos allowed hain!");
+                input.value = '';
+                container.innerHTML = '';
+                return;
+            }
+
+            const files = Array.from(input.files);
+            for (let f of files) {
+                const compressedData = await compressImageFile(f, 800, 0.7);
+                base64PhotosArray.push(compressedData);
+            }
+
             container.innerHTML = '';
             base64PhotosArray.forEach(src => {
                 const img = document.createElement('img');
-                img.src = src; img.className = 'preview-box';
+                img.src = src;
+                img.className = 'preview-box';
+                img.style.cssText = "width:60px; height:60px; object-fit:cover; border-radius:6px; border:2px solid #22c55e;";
                 container.appendChild(img);
             });
         }
 
         let base64OfferPhoto = '';
         window.previewOfferUpload = async function(input) {
-            const file = input.files[0]; if (!file) return;
+            const file = input.files[0];
+            if (!file) return;
+            const container = document.getElementById('offerPhotoPreview');
+            container.innerHTML = '<span style="font-size:11px; color:#38bdf8;">Compressing...</span>';
             base64OfferPhoto = await compressImageFile(file, 600, 0.7);
-            document.getElementById('offerPhotoPreview').innerHTML = '<img src="' + base64OfferPhoto + '" style="width:70px; height:70px; object-fit:cover; border-radius:8px; border:2px solid #ea580c;">';
+            container.innerHTML = '<img src="' + base64OfferPhoto + '" style="width:70px; height:70px; object-fit:cover; border-radius:8px; border:2px solid #ea580c;">';
         };
 
         let base64AdMedia = '';
         window.previewAdDirectFile = function(input) {
             const container = document.getElementById('adFilePreviewContainer');
-            container.innerHTML = ''; base64AdMedia = '';
-            const file = input.files[0]; if (!file) return;
+            container.innerHTML = '';
+            base64AdMedia = '';
+            const file = input.files[0];
+            if (!file) return;
+
             const reader = new FileReader();
-            reader.onload = e => {
+            reader.onload = function(e) {
                 base64AdMedia = e.target.result;
-                container.innerHTML = file.type.startsWith('video/')
-                    ? '<video src="' + e.target.result + '" style="width:160px; height:80px; object-fit:cover; border-radius:8px;" controls muted></video>'
-                    : '<img src="' + e.target.result + '" style="width:160px; height:80px; object-fit:cover; border-radius:8px;">';
+                if (file.type.startsWith('video/')) {
+                    container.innerHTML = '<video src="' + e.target.result + '" style="width:160px; height:80px; object-fit:cover; border-radius:8px; border:2px solid #e11d48;" controls muted></video>';
+                    document.getElementById('adType').value = 'video';
+                } else {
+                    container.innerHTML = '<img src="' + e.target.result + '" style="width:160px; height:80px; object-fit:cover; border-radius:8px; border:2px solid #e11d48;">';
+                    document.getElementById('adType').value = 'image';
+                }
             };
             reader.readAsDataURL(file);
         };
-        window.handleAdTypeChange = type => { document.getElementById('adDirectFile').accept = type === 'video' ? 'video/mp4' : 'image/*'; };
+
+        window.handleAdTypeChange = function(type) {
+            const fileInput = document.getElementById('adDirectFile');
+            if (type === 'video') fileInput.accept = 'video/mp4';
+            else fileInput.accept = 'image/*';
+        };
     </script>
 
+    <!-- FIREBASE MODULE & REALTIME LISTENERS (USING EXTERNAL firebase-config.js) -->
     <script type="module">
         import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, doc, getDocs, onSnapshot, updateDoc, deleteDoc, serverTimestamp, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = window.KSINDO_FIREBASE_CONFIG;
+        if (!firebaseConfig) {
+            alert("Critical Error: firebase-config.js file load nahi hui! Kripya check karein ki firebase-config.js same folder me maujood hai.");
+            throw new Error("Missing window.KSINDO_FIREBASE_CONFIG");
+        }
+
         const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        setPersistence(auth, browserLocalPersistence).catch(() => {});
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -784,17 +1031,57 @@
 
         document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const email = document.getElementById('adminEmail').value.trim();
+            const pass = document.getElementById('adminPassword').value;
             const btn = document.getElementById('loginBtn');
-            btn.innerText = "Authorizing..."; btn.disabled = true;
+
+            btn.innerText = "Authorizing...";
+            btn.disabled = true;
+
             try {
-                await signInWithEmailAndPassword(auth, document.getElementById('adminEmail').value.trim(), document.getElementById('adminPassword').value);
-            } catch (err) { alert("Login Error: " + err.message); }
-            finally { btn.innerText = "Authorize & Enter"; btn.disabled = false; }
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (err) {
+                alert("Login Error: " + err.message);
+            } finally {
+                btn.innerText = "Authorize & Enter";
+                btn.disabled = false;
+            }
         });
 
-        window.logoutAdminMaster = () => { if (confirm("Logout?")) signOut(auth).then(() => location.reload()); };
+        window.logoutAdminMaster = () => {
+            if (confirm("Logout from Master Admin Panel?")) {
+                signOut(auth).then(() => location.reload());
+            }
+        };
 
-        let isFirstLoad = true, knownOrders = new Set(), ordersDataCache = {}, productsDataCache = {}, shopsDataCache = {}, merchantRequestsCache = {}, dynamicCategoriesCache = [];
+        const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+        let isFirstLoad = true;
+        let knownOrders = new Set();
+        let ordersDataCache = {};
+        let productsDataCache = {};
+        let shopsDataCache = {};
+        let portalUsersCache = {};
+        let merchantRequestsCache = {};
+
+        function playBellAlarm() {
+            if (isAudioAlarmMuted) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = ctx.currentTime;
+                [0, 0.25, 0.5, 0.75].forEach((delay, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = "sine";
+                    osc.frequency.setValueAtTime(idx % 2 === 0 ? 880 : 1046.5, now + delay);
+                    gain.gain.setValueAtTime(0.5, now + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.22);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + delay);
+                    osc.stop(now + delay + 0.22);
+                });
+            } catch(e) {}
+        }
 
         window.showTab = function(tabId, el) {
             document.querySelectorAll('.tab-section').forEach(t => t.classList.remove('active'));
@@ -802,42 +1089,155 @@
             const target = document.getElementById(tabId);
             if (target) target.classList.add('active');
             if (el) el.classList.add('active');
-        };
-        setInterval(() => { document.getElementById('liveClock').innerText = new Date().toLocaleString('en-IN'); }, 1000);
 
-        // Merchant Approvals
+            const sectionTitles = {
+                'tab-overview': 'Dashboard Overview',
+                'tab-merchant-approvals': 'Merchant Signup Approvals',
+                'tab-shops': '1. Create Shop & MultiVendor',
+                'tab-users': '2. User Management & Portal Logins',
+                'tab-orders': '3. Order Management Queue',
+                'tab-payment': '4. Payment & Commission Settlements',
+                'tab-logistics': '5. Delivery & Logistics Fleet',
+                'tab-products': '6. Product & Category Management',
+                'tab-reports': '7. Reports & Analytics',
+                'tab-grievances': '8. Customer Complaint / Tickets',
+                'tab-ads': '9. Marketing & Content (5s Ads)',
+                'tab-settings': '10. Settings & Mode'
+            };
+            if (sectionTitles[tabId]) {
+                document.getElementById('currentSectionTitle').innerText = sectionTitles[tabId];
+            }
+        };
+
+        setInterval(() => {
+            document.getElementById('liveClock').innerText = new Date().toLocaleString('en-IN');
+        }, 1000);
+
+        // ==================== 0. MERCHANT APPROVAL QUEUE (merchant_requests) ====================
         onSnapshot(collection(db, "merchant_requests"), (snapshot) => {
             const tbody = document.getElementById('merchantRequestsTableBody');
             if (!tbody) return;
-            tbody.innerHTML = ''; merchantRequestsCache = {}; let pendingCount = 0;
+            tbody.innerHTML = '';
+            merchantRequestsCache = {};
+            let pendingCount = 0;
+
+            if (snapshot.empty) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:#94a3b8;">Abhi koi merchant application nahi aaya hai.</td></tr>';
+            }
+
             snapshot.forEach(docSnap => {
                 const req = { id: docSnap.id, ...docSnap.data() };
                 merchantRequestsCache[req.id] = req;
                 const status = (req.approvalStatus || 'pending').toLowerCase();
                 if (status === 'pending') pendingCount++;
-                const actionBtns = status === 'pending'
-                    ? `<button class="btn-primary" style="padding:5px 9px; font-size:11px;" onclick="approveMerchantRequest('${req.id}')">✅ Approve</button> <button class="btn-danger" style="padding:5px 9px; font-size:11px;" onclick="rejectMerchantRequest('${req.id}')">❌ Reject</button>`
-                    : `<button class="btn-danger" style="padding:4px 8px; font-size:10px;" onclick="deleteMerchantRequest('${req.id}')">Delete</button>`;
-                tbody.innerHTML += `<tr><td><strong>${req.ownerName || ''}</strong><br><small>${req.email || ''}</small></td><td><strong style="color:#38bdf8;">${req.shopName || ''}</strong></td><td>${req.shopCategory || '-'}</td><td>${req.gstin || 'N/A'}</td><td>${req.address || ''}<br><b>PIN: ${req.pincode || ''}</b></td><td><code>${req.userId}</code> / ${req.password}</td><td>${req.phone}</td><td>${status.toUpperCase()}</td><td>${actionBtns}</td></tr>`;
+
+                let statusBadge = '<span style="background:#f59e0b20; color:#fbbf24; border:1px solid #f59e0b50; padding:3px 8px; border-radius:8px; font-size:10px; font-weight:bold;">PENDING</span>';
+                if (status === 'approved') statusBadge = '<span style="background:#16a34a20; color:#4ade80; border:1px solid #16a34a50; padding:3px 8px; border-radius:8px; font-size:10px; font-weight:bold;">APPROVED</span>';
+                if (status === 'rejected') statusBadge = '<span style="background:#ef444420; color:#f87171; border:1px solid #ef444450; padding:3px 8px; border-radius:8px; font-size:10px; font-weight:bold;">REJECTED</span>';
+
+                let actionBtns = '';
+                if (status === 'pending') {
+                    actionBtns = `
+                        <button class="btn-primary" style="padding:5px 9px; font-size:11px; margin-bottom:4px;" onclick="approveMerchantRequest('${req.id}')">✅ Approve</button>
+                        <button class="btn-danger" style="padding:5px 9px; font-size:11px;" onclick="rejectMerchantRequest('${req.id}')">❌ Reject</button>
+                    `;
+                } else {
+                    actionBtns = `<button class="btn-danger" style="padding:4px 8px; font-size:10px;" onclick="deleteMerchantRequest('${req.id}')">Delete Record</button>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${req.ownerName || ''}</strong><br><small style="color:#94a3b8;">${req.email || ''}</small></td>
+                        <td><strong style="color:#38bdf8;">${req.shopName || ''}</strong><br><small>${req.vendorType || ''}</small></td>
+                        <td><span class="status-pill">${req.shopCategory || '-'}</span></td>
+                        <td><small>${req.gstin || 'N/A'}</small></td>
+                        <td><small>${req.address || ''}</small><br><b>PIN: ${req.pincode || ''}</b></td>
+                        <td><code style="color:#22c55e;">${req.userId}</code><br><small style="color:#94a3b8;">Pass: ${req.password}</small></td>
+                        <td>📞 ${req.phone} ${req.phoneVerified ? '✅' : ''}</td>
+                        <td>${statusBadge}</td>
+                        <td>${actionBtns}</td>
+                    </tr>
+                `;
             });
+
             const badge = document.getElementById('badgePendingMerchants');
-            badge.style.display = pendingCount > 0 ? 'inline-block' : 'none';
-            badge.innerText = pendingCount;
+            if (badge) {
+                if (pendingCount > 0) {
+                    badge.innerText = pendingCount;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
         });
 
         window.approveMerchantRequest = async (reqId) => {
-            const req = merchantRequestsCache[reqId]; if (!req) return;
-            const catLower = (req.shopCategory || '').toLowerCase();
-            const mappedShopType = catLower.includes('restaurant') ? 'restaurant' : ((catLower.includes('kapada') || catLower.includes('shoes')) ? 'fashion' : 'mart');
-            await addDoc(collection(db, "shops"), { ...req, shopType: mappedShopType, username: req.userId, isOpen: true, approvedAt: serverTimestamp(), createdAt: serverTimestamp() });
-            await addDoc(collection(db, "portal_users"), { fullName: req.shopName, role: 'vendor', phone: req.phone, loginId: req.userId, password: req.password, area: `${req.address} (PIN: ${req.pincode})`, isActive: true, createdAt: serverTimestamp() });
-            await updateDoc(doc(db, "merchant_requests", reqId), { approvalStatus: "approved", approvedAt: serverTimestamp() });
-            alert(`🎉 "${req.shopName}" approve ho gaya hai!`);
-        };
-        window.rejectMerchantRequest = async (reqId) => { await updateDoc(doc(db, "merchant_requests", reqId), { approvalStatus: "rejected" }); };
-        window.deleteMerchantRequest = async (reqId) => { await deleteDoc(doc(db, "merchant_requests", reqId)); };
+            const req = merchantRequestsCache[reqId];
+            if (!req) return;
+            if (!confirm(`Kya aap "${req.shopName}" (${req.ownerName}) ko approve karke live karna chahte hain?`)) return;
 
-        // Portal Users
+            try {
+                const catLower = (req.shopCategory || '').toLowerCase();
+                let mappedShopType = 'mart';
+                if (catLower.includes('restaurant')) mappedShopType = 'restaurant';
+                else if (catLower.includes('kapada') || catLower.includes('shoes')) mappedShopType = 'fashion';
+
+                await addDoc(collection(db, "shops"), {
+                    ownerName: req.ownerName,
+                    email: req.email,
+                    vendorType: req.vendorType,
+                    shopCategory: req.shopCategory,
+                    shopType: mappedShopType,
+                    shopName: req.shopName,
+                    gstin: req.gstin || "",
+                    address: req.address,
+                    pincode: req.pincode,
+                    userId: req.userId,
+                    username: req.userId,
+                    password: req.password,
+                    phone: req.phone,
+                    isOpen: true,
+                    approvedAt: serverTimestamp(),
+                    createdAt: serverTimestamp()
+                });
+
+                await addDoc(collection(db, "portal_users"), {
+                    fullName: req.shopName,
+                    role: 'vendor',
+                    phone: req.phone,
+                    loginId: req.userId,
+                    password: req.password,
+                    area: `${req.address} (PIN: ${req.pincode})`,
+                    isActive: true,
+                    createdAt: serverTimestamp()
+                });
+
+                await updateDoc(doc(db, "merchant_requests", reqId), {
+                    approvalStatus: "approved",
+                    approvedAt: serverTimestamp()
+                });
+
+                alert(`🎉 "${req.shopName}" approve ho gaya hai! Ab merchant apne User ID (${req.userId}) se login kar sakta hai.`);
+            } catch (err) {
+                alert("Approval Error: " + err.message);
+            }
+        };
+
+        window.rejectMerchantRequest = async (reqId) => {
+            if (!confirm("Is merchant request ko reject karein?")) return;
+            await updateDoc(doc(db, "merchant_requests", reqId), {
+                approvalStatus: "rejected",
+                rejectedAt: serverTimestamp()
+            });
+            alert("Merchant request rejected.");
+        };
+
+        window.deleteMerchantRequest = async (reqId) => {
+            if (!confirm("Is request record ko delete karein?")) return;
+            await deleteDoc(doc(db, "merchant_requests", reqId));
+        };
+
+        // 1. Portal Generator
         document.getElementById('portalCredentialsForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const role = document.getElementById('portalRoleSelect').value;
@@ -846,59 +1246,390 @@
             const loginId = document.getElementById('portalLoginId').value.trim().toLowerCase();
             const password = document.getElementById('portalPassword').value.trim();
             const area = document.getElementById('portalAssignedArea').value.trim();
-            await addDoc(collection(db, "portal_users"), { fullName, role, phone, loginId, password, area, isActive: true, createdAt: serverTimestamp() });
-            alert("Portal login created!"); document.getElementById('portalCredentialsForm').reset();
+
+            if (phone.length !== 10) return alert("10-digit mobile number dalein!");
+
+            try {
+                await addDoc(collection(db, "portal_users"), {
+                    fullName, role, phone, loginId, password, area,
+                    isActive: true,
+                    createdAt: serverTimestamp()
+                });
+
+                if (role === 'vendor') {
+                    await addDoc(collection(db, "shops"), {
+                        shopName: fullName,
+                        shopType: 'mart',
+                        ownerName: fullName,
+                        phone: phone,
+                        userId: loginId,
+                        username: loginId,
+                        email: loginId,
+                        password: password,
+                        address: area || 'Jainagar',
+                        isOpen: true,
+                        createdAt: serverTimestamp()
+                    });
+                }
+
+                alert(`🎉 Portal Login successfully created!\n\nRole: ${role.toUpperCase()}\nLogin ID: ${loginId}\nPassword: ${password}\n\nAb dukandar ya rider is credentials se login kar sakta hai.`);
+                document.getElementById('portalCredentialsForm').reset();
+            } catch(err) {
+                alert("Error creating login: " + err.message);
+            }
         });
 
         onSnapshot(collection(db, "portal_users"), (snapshot) => {
-            const tbody = document.getElementById('portalLoginsTableBody'); tbody.innerHTML = '';
-            document.getElementById('badgePortalCount').innerText = snapshot.size;
+            const tbody = document.getElementById('portalLoginsTableBody');
+            tbody.innerHTML = '';
+            portalUsersCache = {};
+            const count = snapshot.size;
+            document.getElementById('badgePortalCount').innerText = count;
+            const ov = document.getElementById('overviewPortalCount');
+            if (ov) ov.innerText = count + ' Logins Issued';
+
             snapshot.forEach(docSnap => {
                 const u = { id: docSnap.id, ...docSnap.data() };
-                tbody.innerHTML += `<tr><td><strong>${u.fullName}</strong></td><td>${u.role}</td><td><code>${u.loginId}</code></td><td>${u.password}</td><td>${u.phone}</td><td>${u.area || '-'}</td><td>Active</td><td><button class="btn-danger" onclick="deletePortalLogin('${u.id}')">Revoke</button></td></tr>`;
+                portalUsersCache[u.id] = u;
+
+                let roleBadge = '<span class="badge-role role-vendor">Vendor Portal</span>';
+                if (u.role === 'delivery') roleBadge = '<span class="badge-role role-delivery">Delivery Boy</span>';
+                else if (u.role === 'subadmin') roleBadge = '<span class="badge-role role-admin">Sub-Admin</span>';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${u.fullName || 'User'}</strong></td>
+                        <td>${roleBadge}</td>
+                        <td><code style="background:#0f172a; padding:3px 7px; border-radius:4px; color:#38bdf8; font-weight:bold;">${u.loginId}</code></td>
+                        <td><span style="font-family:monospace; background:#0f172a; padding:3px 7px; border-radius:4px;">${u.password}</span></td>
+                        <td>${u.phone}</td>
+                        <td><small>${u.area || '-'}</small></td>
+                        <td><b style="color:#22c55e;">Active</b></td>
+                        <td><button class="btn-danger" onclick="deletePortalLogin('${u.id}')">Revoke</button></td>
+                    </tr>
+                `;
             });
         });
-        window.deletePortalLogin = async (id) => { await deleteDoc(doc(db, "portal_users", id)); };
 
-        // Orders
-        onSnapshot(collection(db, "orders"), (snapshot) => {
-            let totalRevenue = 0, foodCount = 0, generalCount = 0;
+        window.deletePortalLogin = async (id) => {
+            if (confirm("Is portal login credentials ko delete / revoke karein?")) {
+                await deleteDoc(doc(db, "portal_users", id));
+            }
+        };
+
+        // 2. Realtime Orders Queue
+        onSnapshot(collection(db, "orders"), async (snapshot) => {
+            let totalRevenue = 0, totalCash = 0;
+            let foodCount = 0, generalCount = 0;
+            let boyStats = {};
+            const now = Date.now();
+
             const generalTable = document.getElementById('generalOrdersTableBody');
             const foodTable = document.getElementById('foodOrdersTableBody');
             const historyTable = document.getElementById('deliveredTableBody');
-            generalTable.innerHTML = ''; foodTable.innerHTML = ''; historyTable.innerHTML = '';
+            const auditTable = document.getElementById('deliveryBoyAuditBody');
 
-            snapshot.forEach(docSnap => {
+            generalTable.innerHTML = '';
+            foodTable.innerHTML = '';
+            historyTable.innerHTML = '';
+            auditTable.innerHTML = '';
+
+            for (const docSnap of snapshot.docs) {
                 const order = { id: docSnap.id, ...docSnap.data() };
                 ordersDataCache[order.id] = order;
+
+                if (!isFirstLoad && !knownOrders.has(docSnap.id)) {
+                    playBellAlarm();
+                }
+                knownOrders.add(docSnap.id);
+
                 const st = (order.status || 'Placed').toLowerCase();
                 const amt = Number(order.totalAmount || 0);
+
                 if (st === 'delivered' || st === 'cancelled') {
-                    if (st === 'delivered') totalRevenue += amt;
-                    historyTable.innerHTML += `<tr><td>${order.orderDateFormatted || ''}</td><td>${order.customerName}</td><td>${order.paymentMethod || 'COD'}</td><td>₹${amt}</td><td>${order.assignedBoyPhone || '-'}</td><td>${order.status}</td></tr>`;
+                    let closedTime = order.closedAt ? new Date(order.closedAt).getTime() : (order.deliveredAt ? new Date(order.deliveredAt).getTime() : now);
+                    if (now - closedTime >= TWENTY_FOUR_HOURS_MS) {
+                        try { await deleteDoc(doc(db, "orders", order.id)); } catch (err) {}
+                        continue;
+                    }
+                    if (st === 'delivered') {
+                        totalRevenue += amt;
+                        totalCash += amt;
+                        if (order.assignedBoyPhone) {
+                            const b = order.assignedBoyPhone;
+                            if (!boyStats[b]) boyStats[b] = { count: 0, cash: 0 };
+                            boyStats[b].count++;
+                            boyStats[b].cash += amt;
+                        }
+                    }
+
+                    historyTable.innerHTML += 
+                        '<tr>' +
+                            '<td><small>' + (order.orderDateFormatted || 'Done') + '</small></td>' +
+                            '<td>' + (order.customerName || '') + '</td>' +
+                            '<td>' + (order.paymentMethod || 'COD') + '</td>' +
+                            '<td>₹' + order.totalAmount + '</td>' +
+                            '<td>' + (order.assignedBoyPhone || '-') + '</td>' +
+                            '<td><span class="status-pill">' + order.status + '</span></td>' +
+                        '</tr>';
                 } else {
                     const hasFood = (order.items || []).some(i => (i.category || '').toLowerCase() === 'food');
-                    const itemsText = (order.items || []).map(i => `${i.name} (x${i.qty || 1})`).join(', ');
-                    const rowHtml = `<tr><td><small>${order.orderDateFormatted || ''}</small></td><td><strong>${order.customerName}</strong><br><small>${order.customerPhone}</small></td><td>${order.customerAddress || ''}</td><td>${itemsText}</td><td>₹${amt}</td><td><b>${order.deliveryOtp || 'N/A'}</b></td><td>${order.status}</td><td><button class="btn-print" onclick="printAdminBill('${order.id}')">🖨️</button></td><td><input type="tel" id="boy_${order.id}" value="${order.assignedBoyPhone || ''}" style="width:95px;"><button onclick="assignBoy('${order.id}')" class="btn-primary">Set</button></td><td><button onclick="cancelOrder('${order.id}')" class="btn-danger">Cancel</button></td></tr>`;
-                    if (hasFood) { foodCount++; foodTable.innerHTML += rowHtml; }
-                    else { generalCount++; generalTable.innerHTML += rowHtml; }
+                    const itemsText = (order.items || []).map(i => i.name + ' (x' + (i.qty || 1) + ')').join(', ');
+                    const statusColor = (st === 'confirmed') ? '#1e3a8a' : '#7c2d12';
+                    const textColor = (st === 'confirmed') ? '#93c5fd' : '#fdba74';
+
+                    if (hasFood) {
+                        foodCount++;
+                        foodTable.innerHTML += 
+                            '<tr>' +
+                                '<td><small>' + (order.orderDateFormatted || 'Just now') + '</small></td>' +
+                                '<td>' + itemsText + '</td>' +
+                                '<td><strong>' + (order.customerName || '') + '</strong><br><small>📞 ' + (order.customerPhone || '') + '</small></td>' +
+                                '<td>₹' + order.totalAmount + '</td>' +
+                                '<td><strong>' + (order.deliveryOtp || 'N/A') + '</strong></td>' +
+                                '<td><span style="background:' + statusColor + '; color:' + textColor + '; padding:3px 6px; border-radius:10px; font-weight:bold; font-size:11px;">' + order.status + '</span></td>' +
+                                '<td><strong style="color:#ea580c;">' + (order.assignedShopName || 'Kitchen') + '</strong></td>' +
+                                '<td><button class="btn-print" onclick="printAdminBill(\'' + order.id + '\')">🖨️ Bill</button></td>' +
+                                '<td>' +
+                                    '<input type="tel" id="boy_' + order.id + '" placeholder="Boy Phone" value="' + (order.assignedBoyPhone || '') + '" style="width:100px; font-size:11px; padding:3px;"> ' +
+                                    '<button onclick="assignBoy(\'' + order.id + '\')" class="btn-primary" style="padding:3px 6px;">Assign</button>' +
+                                '</td>' +
+                                '<td><button onclick="cancelOrder(\'' + order.id + '\')" class="btn-danger">Cancel</button></td>' +
+                            '</tr>';
+                    } else {
+                        generalCount++;
+                        generalTable.innerHTML += 
+                            '<tr>' +
+                                '<td><small>' + (order.orderDateFormatted || 'Just now') + '</small></td>' +
+                                '<td><strong>' + (order.customerName || '') + '</strong><br><small>📞 ' + (order.customerPhone || '') + '</small></td>' +
+                                '<td>' + (order.customerAddress || '') + '</td>' +
+                                '<td>' + itemsText + '</td>' +
+                                '<td>₹' + order.totalAmount + '</td>' +
+                                '<td><strong>' + (order.deliveryOtp || 'N/A') + '</strong></td>' +
+                                '<td><span style="background:' + statusColor + '; color:' + textColor + '; padding:3px 6px; border-radius:10px; font-weight:bold; font-size:11px;">' + order.status + '</span></td>' +
+                                '<td><button class="btn-print" onclick="printAdminBill(\'' + order.id + '\')">🖨️ Bill</button></td>' +
+                                '<td>' +
+                                    '<input type="tel" id="boy_' + order.id + '" placeholder="Boy Phone" value="' + (order.assignedBoyPhone || '') + '" style="width:100px; font-size:11px; padding:3px;"> ' +
+                                    '<button onclick="assignBoy(\'' + order.id + '\')" class="btn-primary" style="padding:3px 6px;">Assign</button>' +
+                                '</td>' +
+                                '<td><button onclick="cancelOrder(\'' + order.id + '\')" class="btn-danger">Cancel</button></td>' +
+                            '</tr>';
+                    }
                 }
+            }
+
+            isFirstLoad = false;
+
+            const bGen = document.getElementById('badgeGeneralOrders');
+            if (generalCount > 0) { bGen.innerText = generalCount; bGen.style.display = 'inline-block'; } else { bGen.style.display = 'none'; }
+
+            Object.keys(boyStats).forEach(phone => {
+                const b = boyStats[phone];
+                auditTable.innerHTML += 
+                    '<tr>' +
+                        '<td><strong>📞 ' + phone + '</strong></td>' +
+                        '<td>' + b.count + ' Orders</td>' +
+                        '<td><strong style="color:#fbbf24;">₹' + b.cash + ' (Cash)</strong></td>' +
+                        '<td>₹0</td>' +
+                        '<td>₹' + b.cash + '</td>' +
+                        '<td><span style="color:#22c55e; font-weight:bold;">Active Fleet</span></td>' +
+                    '</tr>';
             });
+
             document.getElementById('statRevenue').innerText = '₹' + totalRevenue;
-            document.getElementById('statTotalCash').innerText = '₹' + totalRevenue;
+            document.getElementById('statTotalCash').innerText = '₹' + totalCash;
             document.getElementById('statFood').innerText = foodCount;
             document.getElementById('statGeneral').innerText = generalCount;
+            document.getElementById('reportDeliveredGross').innerText = '₹' + totalRevenue;
+            document.getElementById('reportAdminCommission').innerText = '₹' + Math.round(totalRevenue * 0.05);
+
+            renderVendorSettlements();
         });
+
+        function renderVendorSettlements() {
+            const tbody = document.getElementById('vendorSettlementsTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            Object.values(shopsDataCache).forEach(s => {
+                const myOrders = Object.values(ordersDataCache).filter(o => 
+                    (o.assignedShopId === s.id || (o.items && o.items.some(i => i.shopId === s.id))) && 
+                    (o.status || '').toLowerCase() === 'delivered'
+                );
+
+                const gross = myOrders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
+                const comm = Math.round(gross * 0.05);
+                const net = gross - comm;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${s.shopName}</strong></td>
+                        <td><span style="text-transform:uppercase; font-size:10px; font-weight:bold;">${s.shopType || 'Mart'}</span></td>
+                        <td>${s.phone || '-'}</td>
+                        <td>${myOrders.length} Delivered</td>
+                        <td style="color:#38bdf8; font-weight:bold;">₹${gross}</td>
+                        <td style="color:#ef4444; font-weight:bold;">₹${comm}</td>
+                        <td style="color:#22c55e; font-weight:900;">₹${net}</td>
+                        <td><button class="btn-primary" style="padding:4px 8px; font-size:10px;" onclick="alert('Settlement mark ho gaya!')">Mark Paid</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        window.filterOrdersTableLive = function() {
+            const query = (document.getElementById('orderSearchInput').value || '').toLowerCase();
+            const rows = document.querySelectorAll('#generalOrdersTableBody tr');
+            rows.forEach(r => {
+                const text = r.innerText.toLowerCase();
+                r.style.display = text.includes(query) ? '' : 'none';
+            });
+        };
+
+        window.exportOrdersToCSV = function() {
+            let csv = "Order ID,Date,Customer,Phone,Amount,Status,OTP,Boy Phone\n";
+            Object.values(ordersDataCache).forEach(o => {
+                csv += `"${o.id}","${o.orderDateFormatted || ''}","${o.customerName || ''}","${o.customerPhone || ''}","${o.totalAmount || 0}","${o.status || ''}","${o.deliveryOtp || ''}","${o.assignedBoyPhone || ''}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `ksindo_orders_${Date.now()}.csv`);
+            a.click();
+        };
+
+        window.printAdminBill = async function(orderId) {
+            const order = ordersDataCache[orderId];
+            if (!order) return alert("Order data nahi mila!");
+
+            const invoiceArea = document.getElementById('adminPrintableBill');
+            invoiceArea.style.display = 'block';
+
+            let itemsRow = (order.items || []).map(i => 
+                '<div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px;">' +
+                    '<span>' + i.name + ' (x' + (i.qty || 1) + ')</span>' +
+                    '<span>₹' + ((i.price) * (i.qty || 1)) + '</span>' +
+                '</div>'
+            ).join('');
+
+            const deliveryCharge = Number(order.deliveryCharge !== undefined ? order.deliveryCharge : (Number(order.totalAmount) < 100 ? 20 : 0));
+            const subtotal = order.subtotal !== undefined ? order.subtotal : (Number(order.totalAmount) - deliveryCharge);
+
+            let shopGstinLine = '';
+            if (order.assignedShopId && shopsDataCache[order.assignedShopId]?.gstin) {
+                shopGstinLine = '<p style="margin:2px 0 0; font-size:10px;"><strong>GSTIN/FSSAI:</strong> ' + shopsDataCache[order.assignedShopId].gstin + '</p>';
+            }
+
+            invoiceArea.innerHTML = 
+                '<div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">' +
+                    '<h3 style="margin:0; font-size:16px;">KSINDO</h3>' +
+                    '<p style="margin:0; font-size:10px;">Official Invoice Receipt</p>' +
+                    shopGstinLine +
+                    '<p style="margin:0; font-size:10px;">' + (order.orderDateFormatted || new Date().toLocaleString()) + '</p>' +
+                '</div>' +
+                '<div style="font-size:11px; margin-bottom:5px; border-bottom:1px dashed #000; padding-bottom:5px;">' +
+                    '<strong>Customer:</strong> ' + (order.customerName || '') + '<br>' +
+                    '<strong>Phone:</strong> ' + (order.customerPhone || '') + '<br>' +
+                    '<strong>Address:</strong> ' + (order.customerAddress || '') + ' (PIN: ' + (order.customerPincode || '') + ')' +
+                '</div>' +
+                '<div style="margin-bottom:5px; border-bottom:1px dashed #000; padding-bottom:5px;">' +
+                    '<div style="font-weight:bold; font-size:11px; margin-bottom:3px;">ITEMS:</div>' +
+                    itemsRow +
+                '</div>' +
+                '<div style="font-size:12px; border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px;">' +
+                    '<div style="display:flex; justify-content:space-between; margin-bottom:2px;">' +
+                        '<span>Item Subtotal:</span>' +
+                        '<span>₹' + subtotal + '</span>' +
+                    '</div>' +
+                    '<div style="display:flex; justify-content:space-between; font-weight:bold;">' +
+                        '<span>Delivery Charge:</span>' +
+                        '<span>' + (deliveryCharge > 0 ? ('+ ₹' + deliveryCharge) : 'FREE (₹0)') + '</span>' +
+                    '</div>' +
+                '</div>' +
+                '<div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px; margin-bottom:5px;">' +
+                    '<span>FINAL PAYABLE:</span>' +
+                    '<span>₹' + order.totalAmount + '</span>' +
+                '</div>' +
+                '<div style="text-align:center; font-size:10px; border-top:1px dashed #000; padding-top:5px; margin-top:5px;">' +
+                    'Payment: ' + (order.paymentMethod || 'COD') + '<br>' +
+                    'Helpline: 8252731656 , 06246451082<br>' +
+                    '<em>Doorstep OTP verification compulsory</em>' +
+                '</div>';
+
+            window.print();
+            invoiceArea.style.display = 'none';
+
+            try {
+                if ((order.status || '').toLowerCase() === 'placed') {
+                    await updateDoc(doc(db, "orders", orderId), {
+                        status: "Confirmed",
+                        billPrintedAt: new Date().toISOString()
+                    });
+                }
+            } catch(e) {}
+        };
 
         window.assignBoy = async (id) => {
             const phone = document.getElementById('boy_' + id).value.trim();
+            if (phone.length !== 10) return alert("10-digit phone number dalein!");
             await updateDoc(doc(db, "orders", id), { assignedBoyPhone: phone, status: "Assigned" });
-            alert("Assigned!");
+            alert("Delivery boy assigned!");
         };
-        window.cancelOrder = async (id) => { await updateDoc(doc(db, "orders", id), { status: "Cancelled", closedAt: new Date().toISOString() }); };
-        window.printAdminBill = (id) => { window.print(); };
 
-        // Shops
+        window.cancelOrder = async (id) => {
+            if (confirm("Cancel order?")) {
+                await updateDoc(doc(db, "orders", id), { status: "Cancelled", closedAt: new Date().toISOString() });
+            }
+        };
+
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const u = docSnap.data();
+                const tr = document.createElement('tr');
+                tr.className = 'clickable-customer-row';
+                tr.innerHTML = 
+                    '<td><strong>' + (u.fullName || 'User') + '</strong></td>' +
+                    '<td>' + (u.userEmail || u.email || '') + '</td>' +
+                    '<td>' + (u.phone || '-') + '</td>' +
+                    '<td>' + (u.address || '-') + '</td>' +
+                    '<td>' + (u.totalOrdersCount || 0) + '</td>' +
+                    '<td><button class="btn-primary" style="padding:3px 8px; font-size:11px;">View</button></td>';
+                tr.addEventListener('click', () => viewCustomerAudit(u.userEmail || u.email, u.fullName));
+                tbody.appendChild(tr);
+            });
+        });
+
+        window.viewCustomerAudit = async function(email, name) {
+            const modal = document.getElementById('customerAuditModal');
+            document.getElementById('modalCustName').innerText = 'History: ' + (name || 'Customer');
+            document.getElementById('modalCustEmail').innerText = 'Email: ' + (email || '');
+            const container = document.getElementById('modalOrdersContainer');
+            container.innerHTML = 'Searching orders...';
+            modal.classList.add('active');
+
+            try {
+                const q = query(collection(db, "orders"), where("userEmail", "==", email));
+                const snap = await getDocs(q);
+                if (snap.empty) { container.innerHTML = 'Koi order record nahi mila.'; return; }
+                container.innerHTML = '';
+                snap.forEach(d => {
+                    const o = d.data();
+                    const itemNames = (o.items || []).map(i => i.name + ' (x' + (i.qty || 1) + ')').join(', ');
+                    container.innerHTML += 
+                        '<div style="background:#0f172a; border:1px solid #334155; padding:10px; border-radius:8px; margin-bottom:8px;">' +
+                            '<strong>Date:</strong> ' + (o.orderDateFormatted || 'N/A') + ' | <strong>Status:</strong> ' + o.status + '<br>' +
+                            '<strong>Amount:</strong> ₹' + o.totalAmount + ' | <strong>OTP:</strong> ' + (o.deliveryOtp || 'N/A') + '<br>' +
+                            '<strong>Items:</strong> ' + itemNames +
+                        '</div>';
+                });
+            } catch(e) { container.innerHTML = 'Error: ' + e.message; }
+        };
+
+        window.closeCustomerAudit = () => document.getElementById('customerAuditModal').classList.remove('active');
+
+        // Manage Shops
         document.getElementById('addShopForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const shopName = document.getElementById('shopNameInput').value.trim();
@@ -910,63 +1641,165 @@
             const address = document.getElementById('shopAddressInput').value.trim();
             const username = document.getElementById('shopUserInput').value.trim().toLowerCase();
             const password = document.getElementById('shopPassInput').value.trim();
-            await addDoc(collection(db, "shops"), { shopName, shopType, ownerName, phone, gstin, pincode, address, userId: username, username, password, isOpen: true, createdAt: serverTimestamp() });
-            alert("Shop added!"); document.getElementById('addShopForm').reset();
+
+            try {
+                await addDoc(collection(db, "shops"), {
+                    shopName, shopType, ownerName, phone, gstin, pincode, address, 
+                    userId: username, username, email: username, password,
+                    isOpen: true,
+                    createdAt: serverTimestamp()
+                });
+
+                await addDoc(collection(db, "portal_users"), {
+                    fullName: shopName,
+                    role: 'vendor',
+                    phone: phone,
+                    loginId: username,
+                    password: password,
+                    area: address,
+                    isActive: true,
+                    createdAt: serverTimestamp()
+                });
+
+                alert('✅ Shop / Merchant Registered! Login ID: ' + username);
+                document.getElementById('addShopForm').reset();
+            } catch(err) { alert("Error: " + err.message); }
         });
 
         onSnapshot(collection(db, "shops"), (snapshot) => {
-            const tbody = document.getElementById('shopsTableBody'); tbody.innerHTML = '';
+            const tbody = document.getElementById('shopsTableBody');
+            tbody.innerHTML = '';
+            shopsDataCache = {};
             document.getElementById('statShopsCount').innerText = snapshot.size;
+
             snapshot.forEach(docSnap => {
                 const s = { id: docSnap.id, ...docSnap.data() };
                 shopsDataCache[s.id] = s;
-                tbody.innerHTML += `<tr><td><strong>${s.shopName}</strong></td><td>${s.shopType}</td><td>${s.gstin || 'None'}</td><td>${s.ownerName}</td><td>${s.phone}</td><td>${s.pincode || '-'}</td><td><code>${s.userId || s.username}</code></td><td><button class="btn-danger" onclick="deleteShop('${s.id}')">Delete</button></td></tr>`;
+
+                let typeBadge = '<span style="background:#ea580c20; color:#fb923c; border:1px solid #ea580c40; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">🍔 Restaurant</span>';
+                if (s.shopType === 'fresh') typeBadge = '<span style="background:#16a34a20; color:#4ade80; border:1px solid #16a34a40; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">🥦 24x7 Fresh</span>';
+                else if (s.shopType === 'seasonal') typeBadge = '<span style="background:#eab30820; color:#facc15; border:1px solid #eab30840; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">🪔 Seasonal</span>';
+                else if (s.shopType === 'mart') typeBadge = '<span style="background:#0284c720; color:#38bdf8; border:1px solid #0284c740; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">⚡ Quick Mart</span>';
+                else if (s.shopType === 'fashion') typeBadge = '<span style="background:#a855f720; color:#c084fc; border:1px solid #a855f740; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:11px;">👗 Fashion / Retail</span>';
+
+                tbody.innerHTML += 
+                    '<tr>' +
+                        '<td><strong>' + s.shopName + '</strong></td>' +
+                        '<td>' + typeBadge + '</td>' +
+                        '<td><small><strong>' + (s.gstin || 'None') + '</strong></small></td>' +
+                        '<td>' + s.ownerName + '</td>' +
+                        '<td>' + s.phone + '</td>' +
+                        '<td>' + (s.pincode || '-') + '</td>' +
+                        '<td><code>' + (s.userId || s.username || s.email) + '</code></td>' +
+                        '<td><button class="btn-danger" onclick="deleteShop(\'' + docSnap.id + '\')">Delete</button></td>' +
+                    '</tr>';
+            });
+            renderVendorSettlements();
+        });
+        window.deleteShop = async (id) => { if (confirm("Delete shop?")) await deleteDoc(doc(db, "shops", id)); };
+
+        // 3. Marketing Ads
+        onSnapshot(collection(db, "ads"), (snap) => {
+            const tbody = document.getElementById('adsTableBody');
+            tbody.innerHTML = '';
+
+            snap.forEach(d => {
+                const ad = { id: d.id, ...d.data() };
+                const mediaMarkup = (ad.type === 'video')
+                    ? '<video src="' + ad.mediaUrl + '" style="width:60px; height:35px; object-fit:cover; border-radius:4px;" muted></video>'
+                    : '<img src="' + ad.mediaUrl + '" style="width:60px; height:35px; object-fit:cover; border-radius:4px;">';
+
+                tbody.innerHTML += 
+                    '<tr>' +
+                        '<td>' + mediaMarkup + '</td>' +
+                        '<td><strong>' + (ad.title || 'Special Deal') + '</strong></td>' +
+                        '<td>' + ad.type.toUpperCase() + '</td>' +
+                        '<td><small>' + (ad.targetUrl || 'None') + '</small></td>' +
+                        '<td><button onclick="delAd(\'' + ad.id + '\')" class="btn-danger">Delete</button></td>' +
+                    '</tr>';
             });
         });
-        window.deleteShop = async (id) => { await deleteDoc(doc(db, "shops", id)); };
 
-        // Products with Buy Limits & Variant-Specific Titles
+        document.getElementById('createAdForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('adTitle').value.trim();
+            const type = document.getElementById('adType').value;
+            const linkUrl = document.getElementById('adMediaUrl').value.trim();
+            const targetUrl = document.getElementById('adTargetUrl').value.trim();
+
+            let finalMedia = base64AdMedia || linkUrl;
+            if (!finalMedia) return alert("Photo/Video direct upload karein ya URL link dalein!");
+
+            try {
+                await addDoc(collection(db, "ads"), {
+                    title, type, mediaUrl: finalMedia, targetUrl, createdAt: serverTimestamp()
+                });
+                alert("🎉 Ad successfully publish ho gaya! Index me live scroll hoga.");
+                document.getElementById('createAdForm').reset();
+                document.getElementById('adFilePreviewContainer').innerHTML = '';
+                base64AdMedia = '';
+            } catch(err) { alert("Error: " + err.message); }
+        });
+        window.delAd = async (id) => { if(confirm("Ad delete karein?")) await deleteDoc(doc(db, "ads", id)); };
+
+        // 4. Products Management
         window.editProduct = function(productId) {
-            const p = productsDataCache[productId]; if (!p) return;
+            const p = productsDataCache[productId];
+            if (!p) return alert("Product data load nahi ho paya!");
+
             document.getElementById('editProductId').value = productId;
             document.getElementById('prodName').value = p.name || '';
             document.getElementById('prodSubCategory').value = p.subCategory || 'none';
             document.getElementById('prodImageLink').value = p.imageUrl || '';
             document.getElementById('prodDesc').value = p.description || '';
             document.getElementById('prodStockStatus').value = (p.inStock === false || p.stockStatus === 'out') ? 'out' : 'in';
-            document.getElementById('prodPincodes').value = (p.availablePincodes || []).join(', ');
-
-            const lim = p.buyLimit || {};
-            document.getElementById('prodBuyMaxQty').value = lim.maxQtyPerUser || '';
-            document.getElementById('prodNextBuyDays').value = lim.nextBuyDays || '';
-            document.getElementById('prodBuyStartTime').value = lim.startTime || '';
-            document.getElementById('prodBuyEndTime').value = lim.endTime || '';
+            document.getElementById('prodPincodes').value = (p.availablePincodes || p.pincodes || []).join(', ');
+            
+            if (p.festivalTag) {
+                document.getElementById('festivalTagContainer').style.display = 'block';
+                document.getElementById('prodFestivalTag').value = p.festivalTag;
+            } else {
+                document.getElementById('festivalTagContainer').style.display = 'none';
+            }
 
             const selectedCats = p.categories || [p.category];
-            document.querySelectorAll('input[name="productCats"]').forEach(cb => { cb.checked = selectedCats.includes(cb.value); });
+            document.querySelectorAll('input[name="productCats"]').forEach(cb => {
+                cb.checked = selectedCats.includes(cb.value);
+            });
 
             const container = document.getElementById('variantsContainer');
             container.innerHTML = '';
+            const lim = p.buyLimit || {};
+            if (document.getElementById('prodBuyMaxQty')) document.getElementById('prodBuyMaxQty').value = lim.maxQtyPerUser || '';
+            if (document.getElementById('prodNextBuyDays')) document.getElementById('prodNextBuyDays').value = lim.nextBuyDays || '';
+            if (document.getElementById('prodBuyStartTime')) document.getElementById('prodBuyStartTime').value = lim.startTime || '';
+            if (document.getElementById('prodBuyEndTime')) document.getElementById('prodBuyEndTime').value = lim.endTime || '';
+
             if (p.sizes && p.sizes.length > 0) {
-                p.sizes.forEach(v => addVariantRow(v.size, v.title || v.productName || '', v.price, v.originalPrice, v.discount || ''));
+                p.sizes.forEach(v => {
+                    addVariantRow(v.size, v.price, v.originalPrice, v.discount || '', v.title || v.productName || '');
+                });
             } else {
-                addVariantRow('Default', p.name, p.price, p.originalPrice, p.discount || '');
+                addVariantRow('Default', p.price, p.originalPrice, p.discount || '', p.name || '');
             }
 
             document.getElementById('productFormHeader').innerText = '✏️ Edit Product: ' + p.name;
             document.getElementById('productSubmitBtn').innerText = 'Update Product';
             document.getElementById('cancelEditBtn').style.display = 'inline-block';
+
             showTab('tab-products');
+            window.scrollTo({ top: document.getElementById('tab-products').offsetTop, behavior: 'smooth' });
         };
 
         window.resetProductForm = function() {
             document.getElementById('addProductForm').reset();
             document.getElementById('editProductId').value = '';
-            document.getElementById('productFormHeader').innerText = '🏷️ 6. Product & Category Management — Add / Edit';
+            document.getElementById('productFormHeader').innerText = '+ Naya Product Add Karein';
             document.getElementById('productSubmitBtn').innerText = 'Publish Product';
             document.getElementById('cancelEditBtn').style.display = 'none';
             document.getElementById('photoPreviewContainer').innerHTML = '';
             document.getElementById('variantsContainer').innerHTML = '';
+            document.getElementById('festivalTagContainer').style.display = 'none';
             base64PhotosArray = [];
             addVariantRow();
         };
@@ -994,169 +1827,461 @@
                 const vTitle = (vTitles[idx]?.value || '').trim() || (name + (vName && vName !== 'Default' ? ' - ' + vName : ''));
                 const vPrice = Number(vPrices[idx].value);
                 const vOrig = Number(vOrigPrices[idx].value) || '';
+                
                 if (vName && !isNaN(vPrice) && vPrice > 0) {
-                    let vDisc = (vOrig && vOrig > vPrice) ? Math.round(((vOrig - vPrice) / vOrig) * 100) + '% OFF' : '';
-                    variantsList.push({ size: vName, title: vTitle, productName: vTitle, price: vPrice, originalPrice: vOrig, discount: vDisc });
+                    let vDisc = '';
+                    if (vOrig && vOrig > vPrice) {
+                        vDisc = Math.round(((vOrig - vPrice) / vOrig) * 100) + '% OFF';
+                    }
+                    variantsList.push({ 
+                        size: vName, 
+                        title: vTitle,
+                        productName: vTitle,
+                        price: vPrice, 
+                        originalPrice: vOrig, 
+                        discount: vDisc
+                    });
                 }
             });
-            if (variantsList.length === 0) return alert("Kam se kam 1 Size/Variant add karein!");
 
-            const maxBuyQty = Number(document.getElementById('prodBuyMaxQty').value || 0);
-            const nextBuyDays = Number(document.getElementById('prodNextBuyDays').value || 0);
-            const buyStartTime = document.getElementById('prodBuyStartTime').value.trim();
-            const buyEndTime = document.getElementById('prodBuyEndTime').value.trim();
-            const buyLimit = (maxBuyQty > 0 || nextBuyDays > 0 || (buyStartTime && buyEndTime))
+            const maxBuyQty = Number(document.getElementById('prodBuyMaxQty')?.value || 0);
+            const nextBuyDays = Number(document.getElementById('prodNextBuyDays')?.value || 0);
+            const buyStartTime = (document.getElementById('prodBuyStartTime')?.value || '').trim();
+            const buyEndTime = (document.getElementById('prodBuyEndTime')?.value || '').trim();
+            const buyLimitConfig = (maxBuyQty > 0 || nextBuyDays > 0 || (buyStartTime && buyEndTime))
                 ? { enabled: true, maxQtyPerUser: maxBuyQty > 0 ? maxBuyQty : null, nextBuyDays: nextBuyDays > 0 ? nextBuyDays : 0, startTime: buyStartTime, endTime: buyEndTime }
                 : { enabled: false };
 
-            let photos = base64PhotosArray.length > 0 ? base64PhotosArray : (imgLink ? [imgLink] : (editId && productsDataCache[editId] ? (productsDataCache[editId].images || [productsDataCache[editId].imageUrl]) : []));
-            if (photos.length === 0) return alert("Photo link dalein ya photos upload karein!");
-
-            const productData = {
-                name: variantsList[0].title || name,
-                baseName: name,
-                price: variantsList[0].price,
-                originalPrice: variantsList[0].originalPrice || '',
-                discount: variantsList[0].discount || '',
-                categories: selectedCats,
-                category: selectedCats[0],
-                subCategory,
-                festivalTag: festivalTag || '',
-                description: desc,
-                buyLimit: buyLimit,
-                inStock: document.getElementById('prodStockStatus').value !== 'out',
-                stockStatus: document.getElementById('prodStockStatus').value,
-                availablePincodes: document.getElementById('prodPincodes').value.split(',').map(x=>x.trim()).filter(x=>/^\d{6}$/.test(x)),
-                imageUrl: photos[0],
-                images: photos,
-                hasVariants: true,
-                sizes: variantsList
-            };
-
-            if (editId) {
-                await updateDoc(doc(db, "products", editId), { ...productData, updatedAt: serverTimestamp() });
-                alert("✅ Product update ho gaya!");
-            } else {
-                await addDoc(collection(db, "products"), { ...productData, createdAt: serverTimestamp() });
-                alert("✅ Product publish ho gaya!");
+            if (variantsList.length === 0) {
+                return alert("Kam se kam 1 Size/Variant add karein!");
             }
-            resetProductForm();
+
+            const defaultBasePrice = variantsList[0].price;
+            const defaultOriginalPrice = variantsList[0].originalPrice || '';
+            const defaultDiscount = variantsList[0].discount || '';
+
+            let photos = [];
+            if (base64PhotosArray.length > 0) {
+                photos = base64PhotosArray;
+            } else if (imgLink) {
+                photos = [imgLink];
+            } else if (editId && productsDataCache[editId]) {
+                photos = productsDataCache[editId].images || [productsDataCache[editId].imageUrl];
+            } else {
+                return alert("Photo link dalein ya 1-6 photos upload karein!");
+            }
+
+            try {
+                const productData = {
+                    name: variantsList[0].title || name,
+                    baseName: name,
+                    buyLimit: buyLimitConfig,
+                    price: defaultBasePrice,
+                    originalPrice: defaultOriginalPrice,
+                    discount: defaultDiscount,
+                    categories: selectedCats,
+                    category: selectedCats[0],
+                    subCategory,
+                    festivalTag: festivalTag || '',
+                    description: desc,
+                    inStock: document.getElementById('prodStockStatus').value !== 'out',
+                    stockStatus: document.getElementById('prodStockStatus').value,
+                    availablePincodes: document.getElementById('prodPincodes').value.split(',').map(x=>x.trim()).filter(x=>/^\d{6}$/.test(x)),
+                    imageUrl: photos[0],
+                    images: photos,
+                    hasVariants: true,
+                    sizes: variantsList
+                };
+
+                if (editId) {
+                    await updateDoc(doc(db, "products", editId), {
+                        ...productData,
+                        updatedAt: serverTimestamp()
+                    });
+                    alert("✅ Product update ho gaya!");
+                } else {
+                    await addDoc(collection(db, "products"), {
+                        ...productData,
+                        createdAt: serverTimestamp()
+                    });
+                    alert("✅ Product publish ho gaya!");
+                }
+
+                resetProductForm();
+            } catch(err) { alert("Error: " + err.message); }
         });
 
         onSnapshot(collection(db, "products"), (snapshot) => {
             productsDataCache = {};
-            snapshot.forEach(docSnap => { productsDataCache[docSnap.id] = { id: docSnap.id, ...docSnap.data() }; });
+            snapshot.forEach(docSnap => {
+                productsDataCache[docSnap.id] = { id: docSnap.id, ...docSnap.data() };
+            });
             renderCatalogRows();
-            document.getElementById('reportProductsTotal').innerText = snapshot.size;
+            const repP = document.getElementById('reportProductsTotal');
+            if (repP) repP.innerText = snapshot.size;
         });
 
         function renderCatalogRows(filteredList = null) {
-            const tbody = document.getElementById('productsTableBody'); tbody.innerHTML = '';
+            const tbody = document.getElementById('productsTableBody');
+            tbody.innerHTML = '';
             const list = filteredList || Object.values(productsDataCache);
+
             list.forEach(p => {
                 const cats = p.categories ? p.categories.join(', ') : p.category;
-                const lim = p.buyLimit;
-                const limText = (lim && lim.enabled) ? `Max ${lim.maxQtyPerUser || '∞'} / ${lim.nextBuyDays || 0}d` : 'Unlimited';
-                tbody.innerHTML += `<tr><td><img src="${p.imageUrl || ''}" style="width:35px; height:35px; border-radius:4px; object-fit:cover;"></td><td><strong>${p.name}</strong></td><td>${cats}</td><td>₹${p.price}</td><td><small style="color:#38bdf8;">${limText}</small></td><td>${p.inStock === false ? 'Out' : 'In Stock'}</td><td>${(p.sizes || []).length} Sizes</td><td><button onclick="editProduct('${p.id}')" class="btn-edit">✏️</button><button onclick="delProd('${p.id}')" class="btn-danger">🗑️</button></td></tr>`;
+                const vCount = (p.sizes && p.sizes.length > 0) ? (p.sizes.length + ' Sizes') : 'Single';
+                const origMarkup = p.originalPrice ? ('<span style="text-decoration:line-through; color:#64748b; font-size:11px;">(₹' + p.originalPrice + ')</span>') : '';
+                const imgUrl = p.imageUrl || (p.images ? p.images[0] : '');
+
+                tbody.innerHTML += 
+                    '<tr>' +
+                        '<td><img src="' + imgUrl + '" style="width:35px; height:35px; border-radius:4px; object-fit:cover; background:#0f172a;"></td>' +
+                        '<td><strong>' + p.name + '</strong></td>' +
+                        '<td><span style="background:#0284c720; color:#38bdf8; padding:2px 6px; border-radius:6px; font-weight:bold; font-size:11px;">' + cats + '</span></td>' +
+                        '<td>₹' + p.price + ' ' + origMarkup + '</td>' +
+                        '<td>' + ((p.inStock === false || p.stockStatus === 'out') ? '<b style="color:#ef4444">Out of stock</b>' : '<b style="color:#22c55e">In stock</b>') + '</td>' +
+                        '<td><span style="background:#fef3c720; color:#facc15; padding:2px 6px; border-radius:10px; font-weight:bold; font-size:11px;">' + vCount + '</span></td>' +
+                        '<td>' +
+                            '<button onclick="editProduct(\'' + p.id + '\')" class="btn-edit">✏️ Edit</button>' +
+                            '<button onclick="delProd(\'' + p.id + '\')" class="btn-danger">Delete</button>' +
+                        '</td>' +
+                    '</tr>';
             });
         }
-        window.filterCatalogLive = () => {
-            const q = (document.getElementById('catalogSearchInput').value || '').toLowerCase();
+
+        window.filterCatalogLive = function() {
+            const query = (document.getElementById('catalogSearchInput').value || '').toLowerCase();
             const cat = document.getElementById('catalogCatFilter').value;
-            renderCatalogRows(Object.values(productsDataCache).filter(p => (p.name || '').toLowerCase().includes(q) && (cat === 'all' || (p.categories || [p.category]).includes(cat))));
+
+            const filtered = Object.values(productsDataCache).filter(p => {
+                const matchesName = (p.name || '').toLowerCase().includes(query);
+                const cats = p.categories || [p.category || ''];
+                const matchesCat = (cat === 'all') || cats.includes(cat);
+                return matchesName && matchesCat;
+            });
+
+            renderCatalogRows(filtered);
         };
-        window.delProd = async (id) => { if (confirm("Delete product?")) await deleteDoc(doc(db, "products", id)); };
 
-        // Dynamic Parent-Child Categorization System
-        function toCleanSlug(text) { return String(text || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+        window.delProd = async (id) => { 
+            if (confirm("Delete product?")) await deleteDoc(doc(db, "products", id)); 
+        };
 
-        document.getElementById('addParentCatForm').addEventListener('submit', async (e) => {
+        // 5. Customer Complaints
+        onSnapshot(collection(db, "grievances"), (snapshot) => {
+            const tbody = document.getElementById('grievanceTicketsTableBody');
+            tbody.innerHTML = '';
+            let openTickets = 0;
+
+            snapshot.forEach(docSnap => {
+                const g = { id: docSnap.id, ...docSnap.data() };
+                if (g.status !== 'Resolved') openTickets++;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><code style="color:#38bdf8; font-weight:bold;">#${g.ticketId || g.id.slice(0,6)}</code></td>
+                        <td><strong>${g.name || 'Customer'}</strong></td>
+                        <td>${g.phone || '-'}</td>
+                        <td><span style="background:#334155; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;">${(g.category || 'general').toUpperCase()}</span></td>
+                        <td><small>${g.description || '-'}</small></td>
+                        <td><span style="color:${g.status === 'Resolved' ? '#22c55e' : '#f59e0b'}; font-weight:bold;">${g.status || 'Open'}</span></td>
+                        <td>
+                            ${g.status !== 'Resolved' ? `<button onclick="resolveGrievanceTicket('${g.id}')" class="btn-primary" style="padding:4px 8px; font-size:11px;">Mark Resolved</button>` : '<span style="color:#22c55e;">Done</span>'}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            const badgeG = document.getElementById('badgeGrievanceCount');
+            if (openTickets > 0) {
+                badgeG.innerText = openTickets;
+                badgeG.style.display = 'inline-block';
+            } else {
+                badgeG.style.display = 'none';
+            }
+        });
+
+        window.resolveGrievanceTicket = async (id) => {
+            await updateDoc(doc(db, "grievances", id), {
+                status: 'Resolved',
+                resolvedAt: serverTimestamp()
+            });
+            alert("✅ Complaint ticket resolved!");
+        };
+
+        // Monthly statement CSV
+        window.downloadMonthlyStatement = function(){
+          const now=new Date();const month=now.getMonth(),year=now.getFullYear();
+          const rows=[['Order ID','Date','Customer','Phone','Pincode','Status','Subtotal','Delivery','Total','Items']];
+          Object.values(ordersDataCache).forEach(o=>{const raw=o.orderDate?.toDate?o.orderDate.toDate():new Date(o.orderDateFormatted||o.createdAt||0);if(raw.getMonth()!==month||raw.getFullYear()!==year)return;rows.push([o.id,raw.toLocaleString('en-IN'),o.customerName||'',o.customerPhone||'',o.customerPincode||'',o.status||'',o.subtotal||'',o.deliveryCharge||'',o.totalAmount||'',(o.items||[]).map(i=>(i.name||'')+' x'+(i.qty||1)).join('; ')]);});
+          const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='KSINDO_Monthly_Statement_'+year+'-'+String(month+1).padStart(2,'0')+'.csv';link.click();URL.revokeObjectURL(url);
+        };
+
+        window.renderPincodeCatalog=function(){const pin=(document.getElementById('pinCatalogSearch').value||'').trim();const out=document.getElementById('pincodeCatalogResults');const items=Object.values(productsDataCache).filter(p=>{const pins=p.availablePincodes||p.pincodes||[];return !pin||pins.length===0||pins.map(String).includes(String(pin));});out.innerHTML='<p><b>'+items.length+'</b> products available'+(pin?' for pincode '+pin:'')+'</p>'+items.map(p=>'<div style="padding:8px;border-bottom:1px solid #334155">'+p.name+' — '+((p.inStock===false||p.stockStatus==='out')?'Out of stock':'In stock')+' — '+((p.availablePincodes||p.pincodes||[]).join(', ')||'All pincodes')+'</div>').join('');};
+
+        // Realtime Coupon Manager Logic
+        document.getElementById('createCouponForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const name = document.getElementById('newParentCatName').value.trim();
-            const icon = document.getElementById('newParentCatIcon').value.trim() || '📦';
-            const slug = toCleanSlug(document.getElementById('newParentCatSlug').value.trim() || name);
-            if (!name || !slug) return;
-            await addDoc(collection(db, "categories"), { name, slug, icon, parentId: null, isActive: true, createdAt: serverTimestamp() });
-            document.getElementById('addParentCatForm').reset();
-            alert(`✅ Parent Category "${name}" add ho gayi!`);
+            const code = document.getElementById('couponCodeInput').value.trim().toUpperCase();
+            const type = document.getElementById('couponTypeSelect').value;
+            const discount = Number(document.getElementById('couponDiscountVal').value);
+            const minOrder = Number(document.getElementById('couponMinOrder').value);
+            const maxDiscount = Number(document.getElementById('couponMaxDiscount').value) || 0;
+
+            try {
+                await addDoc(collection(db, "coupons"), {
+                    code, type, discount, minOrder, maxDiscount,
+                    isActive: true,
+                    createdAt: serverTimestamp()
+                });
+                alert("🎉 Coupon '" + code + "' live activate ho gaya!");
+                document.getElementById('createCouponForm').reset();
+            } catch(err) {
+                alert("Coupon error: " + err.message);
+            }
         });
 
-        document.getElementById('addChildSubCatForm').addEventListener('submit', async (e) => {
+        onSnapshot(collection(db, "coupons"), (snapshot) => {
+            const tbody = document.getElementById('couponsTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            if (snapshot.empty) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#94a3b8;">Koi coupon active nahi hai.</td></tr>';
+                return;
+            }
+            snapshot.forEach(docSnap => {
+                const c = { id: docSnap.id, ...docSnap.data() };
+                const discText = c.type === 'flat' ? ('₹' + c.discount + ' OFF') : (c.discount + '% OFF');
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong style="color:#22c55e;">${c.code}</strong></td>
+                        <td><span style="text-transform:uppercase; font-size:11px;">${c.type}</span></td>
+                        <td><b style="color:#38bdf8;">${discText}</b></td>
+                        <td>₹${c.minOrder}</td>
+                        <td><span class="status-pill" style="background:#16a34a20; color:#4ade80;">Active</span></td>
+                        <td><button class="btn-danger" onclick="deleteCouponItem('${c.id}')">Delete</button></td>
+                    </tr>
+                `;
+            });
+        });
+
+        window.deleteCouponItem = async (id) => {
+            if (confirm("Coupon delete karein?")) await deleteDoc(doc(db, "coupons", id));
+        };
+
+        // Checkout Offer with Image & Product Link
+        document.getElementById('checkoutOfferForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const parentId = document.getElementById('parentCatSelectForChild').value;
-            const name = document.getElementById('newChildSubCatName').value.trim();
-            const slug = toCleanSlug(document.getElementById('newChildSubCatSlug').value.trim() || name);
-            if (!parentId || !name) return;
-            await addDoc(collection(db, "categories"), { name, slug, parentId, isActive: true, createdAt: serverTimestamp() });
-            document.getElementById('addChildSubCatForm').reset();
-            alert(`✅ Sub-Category "${name}" add ho gayi!`);
-        });
+            const name = document.getElementById('offerName').value.trim();
+            const offerPrice = Number(document.getElementById('offerPrice').value || 0);
+            const minAmount = Number(document.getElementById('offerMinAmount').value);
+            const targetUrl = document.getElementById('offerTargetUrl').value.trim();
+            const directUrl = document.getElementById('offerImage').value.trim();
+            const finalImage = base64OfferPhoto || directUrl || '';
+            const maxPerCustomer = Number(document.getElementById('offerMaxPerCustomer').value || 3);
 
-        onSnapshot(collection(db, "categories"), (snapshot) => {
-            dynamicCategoriesCache = [];
-            snapshot.forEach(docSnap => dynamicCategoriesCache.push({ id: docSnap.id, ...docSnap.data() }));
-            const parents = dynamicCategoriesCache.filter(c => !c.parentId);
-            const children = dynamicCategoriesCache.filter(c => Boolean(c.parentId));
+            try {
+                const payload = {
+                    name,
+                    offerPrice,
+                    minimumAmount: minAmount,
+                    unlockAmount: minAmount,
+                    targetUrl: targetUrl || '',
+                    imageUrl: finalImage,
+                    maxPerCustomer,
+                    active: true,
+                    updatedAt: serverTimestamp()
+                };
 
-            const parentSelect = document.getElementById('parentCatSelectForChild');
-            if (parentSelect) {
-                parentSelect.innerHTML = '<option value="">-- Select Parent Category --</option>' + parents.map(p => `<option value="${p.id}">${p.icon || '📦'} ${p.name}</option>`).join('');
-            }
+                const activeSnap = await getDocs(query(collection(db, 'checkoutOffers'), where('active', '==', true)));
+                if (!activeSnap.empty) {
+                    await updateDoc(doc(db, 'checkoutOffers', activeSnap.docs[0].id), payload);
+                } else {
+                    payload.createdAt = serverTimestamp();
+                    await addDoc(collection(db, 'checkoutOffers'), payload);
+                }
 
-            const tbody = document.getElementById('dynamicCategoriesTableBody');
-            if (tbody) {
-                tbody.innerHTML = parents.length === 0
-                    ? '<tr><td colspan="4" style="text-align:center; color:#94a3b8;">Abhi koi dynamic category nahi bani hai.</td></tr>'
-                    : parents.map(p => {
-                        const myChildren = children.filter(ch => ch.parentId === p.id);
-                        const childHtml = myChildren.map(ch => `<span style="display:inline-flex; align-items:center; gap:5px; background:#0f172a; border:1px solid #38bdf850; color:#38bdf8; padding:3px 8px; border-radius:12px; font-size:11px; margin:2px;">${ch.name} <button type="button" onclick="deleteDynamicCategory('${ch.id}', false)" style="background:none; border:none; color:#ef4444; font-weight:bold; cursor:pointer;">&times;</button></span>`).join('') || '<small style="color:#64748b;">No sub-categories</small>';
-                        return `<tr><td><strong>${p.icon || '📦'} ${p.name}</strong></td><td><code>${p.slug}</code></td><td>${childHtml}</td><td><button type="button" class="btn-danger" onclick="deleteDynamicCategory('${p.id}', true)">Delete Parent</button></td></tr>`;
-                    }).join('');
-            }
-
-            // Sync into Product Form Checkboxes & Dropdowns
-            const catGroup = document.querySelector('#tab-products .cat-checkbox-group');
-            const subSelect = document.getElementById('prodSubCategory');
-            if (catGroup) {
-                parents.forEach(p => {
-                    if (!catGroup.querySelector(`input[value="${p.slug}"]`)) {
-                        const lbl = document.createElement('label');
-                        lbl.innerHTML = `<input type="checkbox" name="productCats" value="${p.slug}"> ${p.icon || '📦'} ${p.name}`;
-                        catGroup.appendChild(lbl);
-                    }
-                });
-            }
-            if (subSelect) {
-                children.forEach(ch => {
-                    const pObj = parents.find(p => p.id === ch.parentId);
-                    const valKey = ch.name.toLowerCase();
-                    if (!subSelect.querySelector(`option[value="${valKey}"]`)) {
-                        const opt = document.createElement('option');
-                        opt.value = valKey;
-                        opt.textContent = `${pObj ? pObj.name : 'Category'}: ${ch.name}`;
-                        subSelect.appendChild(opt);
-                    }
-                });
+                document.getElementById('offerAdminStatus').textContent = '✅ Offer save ho gaya! Image aur Link live ho gaye.';
+                base64OfferPhoto = '';
+                document.getElementById('offerPhotoPreview').innerHTML = '';
+                document.getElementById('checkoutOfferForm').reset();
+            } catch(err) {
+                alert("Offer save error: " + err.message);
             }
         });
+        // ==================== DYNAMIC PARENT-CHILD CATEGORIZATION SYSTEM ====================
+let dynamicCategoriesCache = [];
 
-        window.deleteDynamicCategory = async (catId, isParent) => {
-            if (!confirm("Delete category?")) return;
-            if (isParent) {
-                for (const ch of dynamicCategoriesCache.filter(c => c.parentId === catId)) await deleteDoc(doc(db, "categories", ch.id));
+function toCleanSlug(text) {
+    return String(text || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+// 1. Create Parent Category (parentId: null)
+document.getElementById('addParentCatForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('newParentCatName').value.trim();
+    const icon = document.getElementById('newParentCatIcon').value.trim() || '📦';
+    const rawSlug = document.getElementById('newParentCatSlug').value.trim();
+    const slug = toCleanSlug(rawSlug || name);
+
+    if (!name || !slug) return alert("Valid Category Name dalein!");
+
+    const exists = dynamicCategoriesCache.some(c => !c.parentId && c.slug === slug);
+    if (exists) return alert("Yeh Parent Category pehle se maujood hai!");
+
+    try {
+        await addDoc(collection(db, "categories"), {
+            name: name,
+            slug: slug,
+            icon: icon,
+            parentId: null, // Root / Parent Category
+            isActive: true,
+            createdAt: serverTimestamp()
+        });
+        document.getElementById('addParentCatForm').reset();
+        alert(`✅ Parent Category "${name}" add ho gayi!`);
+    } catch (err) {
+        alert("Error adding category: " + err.message);
+    }
+});
+
+// 2. Create Child Sub-Category (linked via parentId)
+document.getElementById('addChildSubCatForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const parentId = document.getElementById('parentCatSelectForChild').value;
+    const name = document.getElementById('newChildSubCatName').value.trim();
+    const rawSlug = document.getElementById('newChildSubCatSlug').value.trim();
+    const slug = toCleanSlug(rawSlug || name);
+
+    if (!parentId) return alert("Pehle Parent Category select karein!");
+    if (!name || !slug) return alert("Sub-Category ka naam dalein!");
+
+    try {
+        await addDoc(collection(db, "categories"), {
+            name: name,
+            slug: slug,
+            parentId: parentId, // Parent-Child Foreign Key Link
+            isActive: true,
+            createdAt: serverTimestamp()
+        });
+        document.getElementById('addChildSubCatForm').reset();
+        alert(`✅ Sub-Category "${name}" add ho gayi!`);
+    } catch (err) {
+        alert("Error adding sub-category: " + err.message);
+    }
+});
+
+// 3. Realtime Listener -> Updates Settings Table, Product Form & Front-End Sync
+onSnapshot(collection(db, "categories"), (snapshot) => {
+    dynamicCategoriesCache = [];
+    snapshot.forEach(docSnap => {
+        dynamicCategoriesCache.push({ id: docSnap.id, ...docSnap.data() });
+    });
+
+    const parents = dynamicCategoriesCache.filter(c => !c.parentId);
+    const children = dynamicCategoriesCache.filter(c => Boolean(c.parentId));
+
+    // A. Update Parent Dropdown in Settings Form
+    const parentSelect = document.getElementById('parentCatSelectForChild');
+    if (parentSelect) {
+        parentSelect.innerHTML = '<option value="">-- Select Parent Category --</option>' +
+            parents.map(p => `<option value="${p.id}">${p.icon || '📦'} ${p.name}</option>`).join('');
+    }
+
+    // B. Render Hierarchy Tree Table in Settings
+    const tbody = document.getElementById('dynamicCategoriesTableBody');
+    if (tbody) {
+        if (parents.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#94a3b8;">Abhi koi dynamic category nahi bani hai. Upar se nayi category banayein.</td></tr>';
+        } else {
+            tbody.innerHTML = parents.map(p => {
+                const myChildren = children.filter(ch => ch.parentId === p.id);
+                const childBadgesHtml = myChildren.length > 0
+                    ? myChildren.map(ch => `
+                        <span style="display:inline-flex; align-items:center; gap:5px; background:#0f172a; border:1px solid #38bdf850; color:#38bdf8; padding:3px 8px; border-radius:12px; font-size:11px; margin:2px;">
+                            ${ch.name}
+                            <button type="button" onclick="deleteDynamicCategory('${ch.id}', false)" style="background:none; border:none; color:#ef4444; font-weight:bold; cursor:pointer; font-size:12px;" title="Remove Sub-Category">&times;</button>
+                        </span>
+                    `).join('')
+                    : '<small style="color:#64748b;">No sub-categories</small>';
+
+                return `
+                    <tr>
+                        <td><strong style="font-size:13px;">${p.icon || '📦'} ${p.name}</strong></td>
+                        <td><code style="color:#22c55e;">${p.slug}</code></td>
+                        <td>${childBadgesHtml}</td>
+                        <td>
+                            <button type="button" class="btn-danger" onclick="deleteDynamicCategory('${p.id}', true)">Delete Parent</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+    }
+
+    // C. Auto-Sync Dynamic Categories into Admin "Add Product" Form
+    syncDynamicCategoriesToProductForm(parents, children);
+});
+
+// 4. Delete Category (Cascade deletes child sub-categories if parent is deleted)
+window.deleteDynamicCategory = async (catId, isParent) => {
+    const msg = isParent
+        ? "Kya aap is Parent Category aur iski sabhi Child Sub-Categories ko delete karna chahte hain?"
+        : "Kya aap is Sub-Category ko delete karna chahte hain?";
+    if (!confirm(msg)) return;
+
+    try {
+        if (isParent) {
+            const childDocs = dynamicCategoriesCache.filter(c => c.parentId === catId);
+            for (const ch of childDocs) {
+                await deleteDoc(doc(db, "categories", ch.id));
             }
-            await deleteDoc(doc(db, "categories", catId));
-        };
+        }
+        await deleteDoc(doc(db, "categories", catId));
+    } catch (err) {
+        alert("Delete Error: " + err.message);
+    }
+};
 
-        window.downloadMonthlyStatement = () => {
-            const rows = [['Order ID', 'Date', 'Customer', 'Phone', 'Total', 'Status']];
-            Object.values(ordersDataCache).forEach(o => rows.push([o.id, o.orderDateFormatted || '', o.customerName || '', o.customerPhone || '', o.totalAmount || 0, o.status || '']));
-            const csv = rows.map(r => r.join(',')).join('
-');
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' }));
-            a.download = 'KSINDO_Admin_Statement.csv'; a.click();
-        };
+// 5. Sync with Admin Product Add/Edit Checkboxes & Sub-Category Dropdown
+function syncDynamicCategoriesToProductForm(parents, children) {
+    const catGroup = document.querySelector('#tab-products .cat-checkbox-group');
+    const subSelect = document.getElementById('prodSubCategory');
+    const filterSelect = document.getElementById('catalogCatFilter');
+
+    if (catGroup && parents.length > 0) {
+        parents.forEach(p => {
+            if (!catGroup.querySelector(`input[value="${p.slug}"]`)) {
+                const lbl = document.createElement('label');
+                lbl.innerHTML = `<input type="checkbox" name="productCats" value="${p.slug}"> ${p.icon || '📦'} ${p.name}`;
+                catGroup.appendChild(lbl);
+            }
+        });
+    }
+
+    if (subSelect && children.length > 0) {
+        children.forEach(ch => {
+            const parentObj = parents.find(p => p.id === ch.parentId);
+            const valKey = ch.name.toLowerCase();
+            if (!subSelect.querySelector(`option[value="${valKey}"]`)) {
+                const opt = document.createElement('option');
+                opt.value = valKey;
+                opt.textContent = `${parentObj ? parentObj.name : 'Dynamic'}: ${ch.name}`;
+                subSelect.appendChild(opt);
+            }
+        });
+    }
+
+    if (filterSelect && parents.length > 0) {
+        parents.forEach(p => {
+            if (!filterSelect.querySelector(`option[value="${p.slug}"]`)) {
+                const opt = document.createElement('option');
+                opt.value = p.slug;
+                opt.textContent = p.name;
+                filterSelect.appendChild(opt);
+            }
+        });
+    }
+}
     </script>
 </body>
 </html>
